@@ -59,25 +59,26 @@ public class BoardTools{
 			}
 		}
 		for(int i=0;i<Global.getN();i++){
-			if(recursiveCheckP1(new Posn(i,0),flags)){
+			if(recursiveCheckP1(new Posn(i,0),flags,flags)){
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	public static boolean recursiveCheckP1(Posn hex, byte[][] flags){
+	public static boolean recursiveCheckP1(Posn hex, byte[][] flags, byte[][] allFlags){
 		byte[][] checked = new byte[Global.getN()][Global.getN()];
 		for(int i=0;i<Global.getN();i++){
 			checked[i] = flags[i].clone();
 		}
-		if(Global.getGameboard()[hex.getX()][hex.getY()]!=(byte) 1 || checked[hex.getX()][hex.getY()]==1){
+		if(Global.getGameboard()[hex.getX()][hex.getY()]!=(byte) 1 || checked[hex.getX()][hex.getY()]==1 || allFlags[hex.getX()][hex.getY()]==1){
 			//This isn't a valid piece
 			return false;
 		}
 		else if(hex.getY()==Global.getN()-1){
 			//We made it to the other side
 			checked[hex.getX()][hex.getY()]=1;
+			allFlags[hex.getX()][hex.getY()]=1;
 			for(int i=0;i<Global.getN();i++){
 				for(int j=0;j<Global.getN();j++){
 					if(checked[i][j]==1){
@@ -90,29 +91,30 @@ public class BoardTools{
 		else{
 			//Check surrounding pieces
 			checked[hex.getX()][hex.getY()]=1;
+			allFlags[hex.getX()][hex.getY()]=1;
 			boolean rest = false;
 			if(hex.getX()>0){
 				rest = rest || 
-						recursiveCheckP1(new Posn(hex.getX()-1,hex.getY()),checked);
+						recursiveCheckP1(new Posn(hex.getX()-1,hex.getY()),checked,allFlags);
 				if(hex.getY()<Global.getN()-1){
-					recursiveCheckP1(new Posn(hex.getX()-1,hex.getY()+1),checked);
+					recursiveCheckP1(new Posn(hex.getX()-1,hex.getY()+1),checked,allFlags);
 				}
 			}
 			if(hex.getX()<Global.getN()-1){
 				rest = rest || 
-						recursiveCheckP1(new Posn(hex.getX()+1,hex.getY()),checked);
+						recursiveCheckP1(new Posn(hex.getX()+1,hex.getY()),checked,allFlags);
 				if(hex.getY()>0){
 					rest = rest || 
-							recursiveCheckP1(new Posn(hex.getX()+1,hex.getY()-1),checked);
+							recursiveCheckP1(new Posn(hex.getX()+1,hex.getY()-1),checked,allFlags);
 				}
 			}
 			if(hex.getY()>0){
 				rest = rest || 
-						recursiveCheckP1(new Posn(hex.getX(),hex.getY()-1),checked);
+						recursiveCheckP1(new Posn(hex.getX(),hex.getY()-1),checked,allFlags);
 			}
 			if(hex.getY()<Global.getN()-1){
 				rest = rest || 
-						recursiveCheckP1(new Posn(hex.getX(),hex.getY()+1),checked);
+						recursiveCheckP1(new Posn(hex.getX(),hex.getY()+1),checked,allFlags);
 			}
 			return rest;
 		}
@@ -133,25 +135,26 @@ public class BoardTools{
 			}
 		}
 		for(int i=0;i<Global.getN();i++){
-			if(recursiveCheckP2(new Posn(0,i),flags)){
+			if(recursiveCheckP2(new Posn(0,i),flags,flags)){
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	public static boolean recursiveCheckP2(Posn hex, byte[][] flags){
+	public static boolean recursiveCheckP2(Posn hex, byte[][] flags, byte[][] allFlags){
 		byte[][] checked = new byte[Global.getN()][Global.getN()];
 		for(int i=0;i<Global.getN();i++){
 			checked[i] = flags[i].clone();
 		}
-		if(Global.getGameboard()[hex.getX()][hex.getY()]!=(byte) 2 || checked[hex.getX()][hex.getY()]==1){
+		if(Global.getGameboard()[hex.getX()][hex.getY()]!=(byte) 2 || checked[hex.getX()][hex.getY()]==1 || allFlags[hex.getX()][hex.getY()]==1){
 			//This isn't a valid piece
 			return false;
 		}
 		else if(hex.getX()==Global.getN()-1){
 			//We made it to the other side
 			checked[hex.getX()][hex.getY()]=1;
+			allFlags[hex.getX()][hex.getY()]=1;
 			for(int i=0;i<Global.getN();i++){
 				for(int j=0;j<Global.getN();j++){
 					if(checked[i][j]==1){
@@ -164,29 +167,30 @@ public class BoardTools{
 		else{
 			//Check surrounding pieces
 			checked[hex.getX()][hex.getY()]=1;
+			allFlags[hex.getX()][hex.getY()]=1;
 			boolean rest = false;
 			if(hex.getX()>0){
 				rest = rest || 
-						recursiveCheckP2(new Posn(hex.getX()-1,hex.getY()),checked);
+						recursiveCheckP2(new Posn(hex.getX()-1,hex.getY()),checked,allFlags);
 				if(hex.getY()<Global.getN()-1){
-					recursiveCheckP2(new Posn(hex.getX()-1,hex.getY()+1),checked);
+					recursiveCheckP2(new Posn(hex.getX()-1,hex.getY()+1),checked,allFlags);
 				}
 			}
 			if(hex.getX()<Global.getN()-1){
 				rest = rest || 
-						recursiveCheckP2(new Posn(hex.getX()+1,hex.getY()),checked);
+						recursiveCheckP2(new Posn(hex.getX()+1,hex.getY()),checked,allFlags);
 				if(hex.getY()>0){
 					rest = rest || 
-							recursiveCheckP2(new Posn(hex.getX()+1,hex.getY()-1),checked);
+							recursiveCheckP2(new Posn(hex.getX()+1,hex.getY()-1),checked,allFlags);
 				}
 			}
 			if(hex.getY()>0){
 				rest = rest || 
-						recursiveCheckP2(new Posn(hex.getX(),hex.getY()-1),checked);
+						recursiveCheckP2(new Posn(hex.getX(),hex.getY()-1),checked,allFlags);
 			}
 			if(hex.getY()<Global.getN()-1){
 				rest = rest || 
-						recursiveCheckP2(new Posn(hex.getX(),hex.getY()+1),checked);
+						recursiveCheckP2(new Posn(hex.getX(),hex.getY()+1),checked,allFlags);
 			}
 			return rest;
 		}

@@ -10,7 +10,7 @@ public class Global{
 	private static PlayingEntity player1;
 	private static PlayingEntity player2;
 	private static boolean running;
-	private static int n;
+	private static int gridSize;
 	private static Posn[][] polyXY;
 	private static byte currentPlayer = 1;
 	private static View board;
@@ -19,10 +19,16 @@ public class Global{
 	private static Posn pendingMove;
 	private static int hexLength;
 	public static int getN() {
-		return n;
+		return gridSize;
 	}
-	public static void setN(int n) {
-		Global.n = n;
+	public static void setN(int size) {
+		Global.gridSize = size;
+	}
+	public static int getGridSize() {
+		return gridSize;
+	}
+	public static void setGridSize(int size) {
+		Global.gridSize = size;
 	}
 	public static byte[][] getGameboard() {
 		return gameboard;

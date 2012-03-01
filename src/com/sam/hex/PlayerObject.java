@@ -21,15 +21,16 @@ public class PlayerObject implements PlayingEntity {
 		makeMove();
 	}
 	public void makeMove(){
-		while(Global.getPendingMove()==null){
+		while(Global.getPendingMove()==null && Global.getRunning()){
 			try {
 				Thread.sleep(50);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
-		BoardTools.makeMove(Global.getPendingMove().getX(), Global.getPendingMove().getY(), Global.getCurrentPlayer());
-		Global.setPendingMove(null);
+		if(Global.getRunning()){
+			BoardTools.makeMove(Global.getPendingMove().getX(), Global.getPendingMove().getY(), Global.getCurrentPlayer());
+			Global.setPendingMove(null);
+		}
 	}
-
 }

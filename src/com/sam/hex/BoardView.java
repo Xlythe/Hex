@@ -34,7 +34,7 @@ public class BoardView extends View{
 					mDrawable[i][j].getPaint().setColor(0xffffff00);//Yellow
 				}
 				else{
-					mDrawable[i][j].getPaint().setColor(0xff74AC23);
+					mDrawable[i][j].getPaint().setColor(0xff74AC23);//Green
 				}
 				mDrawable[i][j].draw(canvas);
 			}
@@ -46,15 +46,29 @@ public class BoardView extends View{
 		mDrawable = new ShapeDrawable[n][n];
 		
 		DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-		int L=Math.min(metrics.widthPixels/(3*n/2),metrics.heightPixels/(3*n/2))/2;
-		int width = Math.min(metrics.widthPixels/(3*n/2),metrics.heightPixels/(3*n/2));
-		int height = Math.min(metrics.widthPixels/(3*n/2),metrics.heightPixels/(3*n/2));
-		Global.setHexLength(L);
-		//double game_length=L*Math.sqrt(3) * n * (n-1)*L*(Math.sqrt(3)/2);
+		int screenWidth = metrics.widthPixels;
+		int screenHeight = metrics.heightPixels;
+		switch(metrics.densityDpi) {
+			case DisplayMetrics.DENSITY_HIGH:
+				screenHeight -= 48;
+				break;
+			case DisplayMetrics.DENSITY_MEDIUM:
+				screenHeight -= 32;
+				break;
+			case DisplayMetrics.DENSITY_LOW:
+				screenHeight -= 24;
+				break;
+		}
 		
+		int spacing_width = 2;
+		int spacing_height = 2;
+		int L = (int) Math.min(((screenWidth / (n + (n-1)/2)) - spacing_width)/Math.sqrt(3), (screenHeight-(n+1)*spacing_height)/((n+1)+(n+1)/2+1/2));
+		int width = (int) (Math.sqrt(3)*L);
+		int height = (int) (Math.sqrt(3)*L);//2*L;
+		Global.setHexLength(L);
 		
 		int x=width;
-		int y=height;
+		int y=L;
 		int spacing=0;
 		
 		//Shape of a hexagon
@@ -75,12 +89,12 @@ public class BoardView extends View{
 				
 				BoardTools.setPolyXY(i, j, new Posn(x-2*L,y));
 				
-				x+=width;
+				x+=width+spacing_width;
 			}
 			
 			spacing+=width/2;
-			x=width+spacing;
-			y+=height;
+			x=width+spacing+spacing_width/2;
+			y+=L+L/2+spacing_height;
 		}
 	}
 }

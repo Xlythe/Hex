@@ -1,27 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>    
     <string-array name="gameModeArray">
-        <item>PvP</item>
-        <item>PvC</item>
-        <item>CvP</item>
-        <item>CvC</item>
+        <item>Player vs Player</item>
+        <item>Player vs Com</item>
+        <item>Com vs Player</item>
+        <item>Com vs Com</item>
+        <item>Player vs Local Player</item>
+        <!-- <item>Player vs Online Player</item> -->
     </string-array>
     <string-array name="gameModeValues">
         <item>0</item>
         <item>1</item>
         <item>2</item>
         <item>3</item>
+        <item>4</item>
+        <!-- <item>5</item> -->
     </string-array>
     <string-array name="gameSizeArray">
         <item>7x7</item>
         <item>9x9</item>
         <item>11x11</item>
         <item>13x13</item>
+        <item>14x14</item>
     </string-array>
     <string-array name="gameSizeValues">
         <item>7</item>
         <item>9</item>
         <item>11</item>
         <item>13</item>
+        <item>14</item>
+    </string-array>
+    <string-array name="aiLabels">
+        <item>Easy</item>
+        <item>Hard</item>
+    </string-array>
+    <string-array name="aiValues">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+    <string-array name="availablePlayers">
+        <item>Scanning…</item>
     </string-array>
 </resources>

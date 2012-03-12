@@ -13,102 +13,85 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.graphics.Point;
+import java.util.ArrayList;
 
 public class HexGame extends Activity {
+	GameObject game;
+	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        if(BoardTools.teamGrid()==null){
+        if(Global.gamePiece[0][0]==null){
         	initializeNewGame();//Must be set up immediately
         }
         else{
-        	Global.setBoard(new BoardView(this));
         	//Add the touch listener
-    		OnTouchListener touchListener = new OnTouchListener() {
-    			@Override
-    			public boolean onTouch(View v, MotionEvent event) {
-    				//Check if its a human's turn
-    				if(Global.getCurrentPlayer()==1){
-    					if(Global.getGameType()<2) 
-    						makeMove((int)event.getX(), (int)event.getY(), Global.getCurrentPlayer());
-    				}
-    				else{
-    					if((Global.getGameType()+1)%2>0) 
-    						makeMove((int)event.getX(), (int)event.getY(), Global.getCurrentPlayer());
-    				}
-    				
-    				return false;
-    			}
-            };
-            Global.getBoard().setOnTouchListener(touchListener);
-            setContentView(Global.getBoard());
+        	if(game!=null)
+        		game.stop();
+        	BoardTools.clearBoard();
+        	Global.board=new BoardView(this);
+        	game=new GameObject();
+            Global.board.setOnTouchListener(new TouchListener());
+            setContentView(Global.board);
         }
     }
-    
-    public boolean makeMove(int X, int Y, byte team){
-    	for(int i=0;i<Global.getN();i++){
-    		for(int j=0;j<Global.getN();j++){
-    			if(BoardTools.getPolyXY()[i][j].getX()+2*Global.getHexLength()>X && X>BoardTools.getPolyXY()[i][j].getX() && Y>BoardTools.getPolyXY()[i][j].getY() && BoardTools.getPolyXY()[i][j].getY()+2*Global.getHexLength()>Y){
-    				if(BoardTools.teamGrid()[i][j]==0){
-    					Global.setPendingMove(new Posn(i,j));
-    					return true;
-    				}
-    				else{
-    					return false;
-    				}
-    			}
-    		}
+    class TouchListener implements OnTouchListener{
+    	public boolean onTouch(View v, MotionEvent event){
+    		int x = (int)event.getX();
+			int y = (int)event.getY();
+			for (int xc = 0; xc < Global.gamePiece.length; xc++) {
+				for (int yc=0; yc<Global.gamePiece[0].length; yc++)
+					if (Global.gamePiece[xc][yc].contains(x, y)) {
+						if(game!=null)game.setPiece(new Point(xc,yc));
+						//Return false. We got our point. (True is used for gestures)
+						return false;
+					}
+			}
+			//Return false. We got our point. (True is used for gestures)
+			return false;
     	}
-    	return false;
     }
     
     public void initializeNewGame(){
+    	//Stop the old game
+    	if(game!=null)
+    		game.stop();
+    	
     	//Load preferences
     	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    	Global.gamePrefs=prefs;
     	
+    	//Set player names
+    	Global.playerOneName = prefs.getString("player1Name", "Player1");
+    	Global.playerTwoName = prefs.getString("player2Name", "Player2");
+    	
+    	//Set player colors
+    	Global.playerOneColor = prefs.getInt("player1Color", Global.playerOneDefaultColor);
+    	Global.playerTwoColor = prefs.getInt("player2Color", Global.playerTwoDefaultColor);
+
     	//Create our board
-    	BoardTools.setGame(Integer.decode(prefs.getString("gameSizePref", "7")));
-    	BoardTools.clearBoard();
-    	Global.setBoard(new BoardView(this));
+    	Global.gridSize=Integer.decode(prefs.getString("gameSizePref", "7"));
+    	Global.difficulty=Integer.decode(prefs.getString("aiPref", "1"));
+    	Global.gamePiece=new RegularPolygonGameObject[Global.gridSize][Global.gridSize];
+    	BoardTools.clearBoard(); 
+    	Global.board=new BoardView(this);
     	
     	//Make sure the board is empty and defaults are set
-    	BoardTools.clearMoveList();
-    	Global.setCurrentPlayer((byte) 1);
-    	Global.setRunning(true);
-    	Global.setPendingMove(null);
+    	Global.moveList=new ArrayList<Point>();
+    	BoardTools.setBoard();
     	
     	//Set game mode
-    	Global.setGameType(prefs.getString("gameModePref", "0"));
-    	if(Global.getGameType()<2) Global.setPlayer1(new PlayerObject((byte)1));
-		else Global.setPlayer1(new GameAI((byte)1,(byte)1));//Sets Player vs Ai
-		if((Global.getGameType()+1)%2>0) Global.setPlayer2(new PlayerObject((byte)2));
-		else Global.setPlayer2(new GameAI((byte)2,(byte)1));//Sets Player vs Ai
-		
-		//Create the game object
-		@SuppressWarnings("unused")
-		GameObject game = new GameObject();
+    	Global.gameType=(byte)Integer.parseInt(prefs.getString("gameModePref", "0"));
 		
 		//Add the touch listener
-		OnTouchListener touchListener = new OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				//Check if its a human's turn
-				if(Global.getCurrentPlayer()==1){
-					if(Global.getGameType()<2) 
-						makeMove((int)event.getX(), (int)event.getY(), Global.getCurrentPlayer());
-				}
-				else{
-					if((Global.getGameType()+1)%2>0) 
-						makeMove((int)event.getX(), (int)event.getY(), Global.getCurrentPlayer());
-				}
-				
-				return false;
-			}
-        };
-        Global.getBoard().setOnTouchListener(touchListener);
-        setContentView(Global.getBoard());
+        Global.board.setOnTouchListener(new TouchListener());
+        setContentView(Global.board);
+        
+        //Create the game object
+        game = new GameObject();
     }
     
     @Override
@@ -118,9 +101,26 @@ public class HexGame extends Activity {
     	//Load preferences
     	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     	
-    	//Check if settings were changed
-    	if(Integer.decode(prefs.getString("gameSizePref", "7")) != Global.getN() || Integer.decode(prefs.getString("gameModePref", "0")) != (int) Global.getGameType()){
+    	//Check if settings were changed and we need to run a new game
+    	if(Integer.decode(prefs.getString("gameModePref", "0")) != (int) Global.gameType && Integer.decode(prefs.getString("gameModePref", "0")) == 4){
+    		//Go to the local lobby
+    		Global.gameType = 4;
+        	startActivity(new Intent(getBaseContext(),LocalLobbyActivity.class));
+        	finish();
+    	}
+    	else if(Integer.decode(prefs.getString("aiPref", "1")) != Global.difficulty || Integer.decode(prefs.getString("gameSizePref", "7")) != Global.gridSize || Integer.decode(prefs.getString("gameModePref", "0")) != (int) Global.gameType){
+    		//Reset the game
     		initializeNewGame();
+    	}
+    	else
+    	{	
+    		//Apply minor changes without stopping the current game
+    		Global.playerOneColor = prefs.getInt("player1Color", Global.playerOneDefaultColor);
+	    	Global.playerTwoColor = prefs.getInt("player2Color", Global.playerTwoDefaultColor);
+	    	Global.playerOneName = prefs.getString("player1Name", "Player1");
+	    	Global.playerTwoName = prefs.getString("player2Name", "Player2");
+	    	Global.board.onSizeChanged(Global.windowWidth,Global.windowHeight,0,0);
+	    	Global.board.invalidate();
     	}
     }
     
@@ -136,70 +136,29 @@ public class HexGame extends Activity {
         // Handle item selection
         switch (item.getItemId()) {
         case R.id.settings:
-        	Intent settingsActivity = new Intent(getBaseContext(),Preferences.class);
-        	startActivity(settingsActivity);
+        	startActivity(new Intent(getBaseContext(),Preferences.class));
             return true;
         case R.id.undo:
-        	if(!Global.getMoveList().isEmpty()){
-    			Posn lastMove = Global.getMoveList().get(Global.getMoveList().size()-1);
-    			Global.setGameboard(lastMove.getX(), lastMove.getY(), (byte) 0);
-    			Global.removeFromMoveList(lastMove);
-        	}
-        	BoardTools.updateCurrentPlayer();
-    		Global.setRunning(true);
-    		Global.setPendingMove(null);
-    		for(int i=0;i<Global.getN();i++){
-				for(int j=0;j<Global.getN();j++){
-					if(Global.getGameboard()[i][j]==(byte) 3){
-						Global.setGameboard(i, j, (byte) 1);
-					}
-					else if(Global.getGameboard()[i][j]==(byte) 4){
-						Global.setGameboard(i, j, (byte) 2);
-					}
-				}
-			}
-        	//Create our board
-        	Global.setBoard(new BoardView(this));
-    		
-    		//Create the game object
-    		@SuppressWarnings("unused")
-    		GameObject game = new GameObject();
-    		
-    		//Add the touch listener
-    		OnTouchListener touchListener = new OnTouchListener() {
-    			@Override
-    			public boolean onTouch(View v, MotionEvent event) {
-    				//Check if its a human's turn
-    				if(Global.getCurrentPlayer()==1){
-    					if(Global.getGameType()<2) 
-    						makeMove((int)event.getX(), (int)event.getY(), Global.getCurrentPlayer());
-    				}
-    				else{
-    					if((Global.getGameType()+1)%2>0) 
-    						makeMove((int)event.getX(), (int)event.getY(), Global.getCurrentPlayer());
-    				}
-    				
-    				return false;
-    			}
-            };
-            Global.getBoard().setOnTouchListener(touchListener);
-            setContentView(Global.getBoard());
-        	Global.getBoard().invalidate();
+        	if(game!=null)
+        		game.stop();
+        	BoardTools.clearBoard();
+        	BoardTools.undo();
+        	if(Global.gameType!=0)
+        		BoardTools.undo();
+        	game= new GameObject();
             return true;
         case R.id.newgame:
         	initializeNewGame();
-        	Global.getBoard().invalidate();
+        	Global.board.invalidate();
             return true;
         case R.id.quit:
         	DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-        	    @Override
         	    public void onClick(DialogInterface dialog, int which) {
         	        switch (which){
         	        case DialogInterface.BUTTON_POSITIVE:
         	            //Yes button clicked
         	        	android.os.Process.killProcess(android.os.Process.myPid());
         	            break;
-
         	        case DialogInterface.BUTTON_NEGATIVE:
         	            //No button clicked
         	        	//Do nothing

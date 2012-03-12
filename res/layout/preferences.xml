@@ -14,4 +14,35 @@
             android:defaultValue="7"
             android:entries="@array/gameSizeArray"
             android:entryValues="@array/gameSizeValues" />
+        <EditTextPreference
+            android:title="Player1's Name"
+            android:summary="Name: Player1"
+            android:key="player1Name"
+            android:defaultValue="Player1" />
+        <net.margaritov.preference.colorpicker.ColorPickerPreference
+		    android:title="Player1's Color"
+		    android:summary="Pick a color for Player1"
+		    android:key="player1Color"
+		    android:defaultValue="@integer/COLOR_BLUE" />
+        <EditTextPreference
+            android:title="Player2's Name"
+            android:summary="Name: Player2"
+            android:key="player2Name"
+            android:defaultValue="Player2" />
+        <net.margaritov.preference.colorpicker.ColorPickerPreference
+		    android:title="Player2's Color"
+		    android:summary="Pick a color for Player2"
+		    android:key="player2Color"
+		    android:defaultValue="@integer/COLOR_RED" />
+        <ListPreference
+            android:title="Difficulty"
+            android:summary="Set AI intelligence"
+            android:key="aiPref"
+            android:defaultValue="1"
+            android:entries="@array/aiLabels"
+            android:entryValues="@array/aiValues" />
+       <Preference
+            android:title="Reset to Defaults"
+            android:summary="Reset all settings to their defaults"
+            android:key="resetPref"/>
 </PreferenceScreen>

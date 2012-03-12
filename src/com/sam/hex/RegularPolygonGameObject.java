@@ -1,23 +1,37 @@
 package com.sam.hex;
 
-import java.awt.Color;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import android.graphics.Color;
 
 import sl.shapes.RegularPolygon;
 
 
-public class RegularPolygonGameObject implements Shape {
+public class RegularPolygonGameObject {
 
 	RegularPolygon Hex;
-	private byte teamNumber; // 1 is left-right, 2 is top-down
-	private Color objectColor = Color.white;
+	private byte teamNumber=0; // 1 is left-right, 2 is top-down
+	private int objectColor = Color.WHITE;
 	boolean checkedflage = false;
+	double x;
+	double y;
+	double radius;
 
+	
+	public RegularPolygonGameObject() {
+		x=0;
+		y=0;
+		radius=0;
+	}
+	public RegularPolygonGameObject(double x, double y, double r) {
+		this.x=x;
+		this.y=y;
+		radius=r;
+	}
+	public void set(double x, double y, double r){
+		this.x=x;
+		this.y=y;
+		radius=r;
+		update(x,y,r,6, Math.PI / 2);
+	}
 	public RegularPolygonGameObject(double x, double y, double r,
 			int vertexCount) {
 		Hex = new RegularPolygon(x, y, r, vertexCount);
@@ -33,13 +47,14 @@ public class RegularPolygonGameObject implements Shape {
 			double startAngle) {
 		Hex = new RegularPolygon(x, y, r, vertexCount, startAngle);
 	}
-
 	public void setTeam(byte t) {
 		teamNumber = t;
 		if (teamNumber == 1)
-			setColor(Global.playerOne);
+			setColor(Global.playerOneColor);
+		else if(teamNumber==2)
+			setColor(Global.playerTwoColor);
 		else
-			setColor(Global.playerTwo);
+			setColor(Color.WHITE);
 	}
 
 	public byte getTeam() {
@@ -51,7 +66,7 @@ public class RegularPolygonGameObject implements Shape {
 		if (team == teamNumber && !checkedflage) {
 			checkedflage = !checkedflage;
 			if (checkSpot(team, x, y) || checkWinTeam(team, x, y, gamePeace)) {
-				objectColor = Color.green;
+				objectColor = Color.GREEN;
 				return true;
 			}
 		}
@@ -172,7 +187,7 @@ public class RegularPolygonGameObject implements Shape {
 	
 	public static void colorPath(int x,int y, String path){
 		
-		while (path!=null&&!path.isEmpty()){
+		while (path!=null&&path.length()!=0){
 				 
 			Global.gamePiece[x][y].setColor(Color.BLACK);
 				switch (posDir.valueOf(path.substring(0, 2))){
@@ -197,71 +212,19 @@ public class RegularPolygonGameObject implements Shape {
 		return false;
 	}
 
-	public void setColor(Color c) {
+	public void setColor(int c) {
 		objectColor = c;
 	}
 
-	public Color getColor() {
+	public int getColor() {
 		return objectColor;
 	}
 
-	@Override
-	public boolean contains(Point2D p) {
-
-		return Hex.contains(p);
+	public boolean contains(double ex, double why) { //TODO: hit detect MAY be off slightly...
+		
+		
+		//return Math.abs(x-ex)<radius/2 && Math.abs(y-why)<radius/2; //very simplified!
+		return Hex.contains((int)ex,(int)why);
 	}
 
-	@Override
-	public boolean contains(Rectangle2D r) {
-
-		return Hex.contains(r);
-	}
-
-	@Override
-	public boolean contains(double x, double y) {
-
-		return Hex.contains(x, y);
-	}
-
-	@Override
-	public boolean contains(double x, double y, double w, double h) {
-
-		return Hex.contains(x, y, w, h);
-	}
-
-	@Override
-	public Rectangle getBounds() {
-
-		return Hex.getBounds();
-	}
-
-	@Override
-	public Rectangle2D getBounds2D() {
-
-		return Hex.getBounds2D();
-	}
-
-	@Override
-	public PathIterator getPathIterator(AffineTransform at) {
-
-		return Hex.getPathIterator(at);
-	}
-
-	@Override
-	public PathIterator getPathIterator(AffineTransform at, double flatness) {
-
-		return Hex.getPathIterator(at, flatness);
-	}
-
-	@Override
-	public boolean intersects(Rectangle2D r) {
-
-		return Hex.intersects(r);
-	}
-
-	@Override
-	public boolean intersects(double x, double y, double w, double h) {
-
-		return Hex.intersects(x, y, w, h);
-	}
 }

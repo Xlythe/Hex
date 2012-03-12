@@ -1,6 +1,8 @@
 package sl.shapes;
 
-import java.awt.*;
+
+
+import com.sam.android.awt.Polygon;;
 
 public class RegularPolygon extends Polygon {
     public RegularPolygon(double x, double y, double r, int vertexCount) {

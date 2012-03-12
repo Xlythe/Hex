@@ -3,5 +3,45 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.28"
+        android:gravity="center"
+        android:text="@string/frontpage"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="71dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="0.63"
+        android:contentDescription="@string/frontpage"
+        android:src="@drawable/icon" />
+
+    <Button
+        android:id="@+id/startButton"
+        android:layout_width="240dp"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_weight="0.55"
+        android:text="@string/start" />
+    <Button
+        android:id="@+id/instructionsButton"
+        android:layout_width="240dp"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_weight="0.55"
+        android:text="@string/rules" />
+
+    <Button
+        android:id="@+id/optionsButton"
+        android:layout_width="240dp"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_weight="0.55"
+        android:text="@string/options" />
 
 </LinearLayout>

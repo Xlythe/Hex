@@ -11,6 +11,12 @@
         android:layout_gravity="center"
         android:text="@string/local"
         android:textAppearance="?android:attr/textAppearanceLarge" />
+    <Button
+        android:id="@+id/customIP"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/customIP" />
 
     <ListView
         android:id="@+id/players"

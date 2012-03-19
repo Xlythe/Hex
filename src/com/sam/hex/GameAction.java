@@ -89,8 +89,8 @@ public class GameAction {
 			while (hex == null) {
 				try {
 					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
+				} 
+				catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}

@@ -3,13 +3,32 @@
     <!-- Application name -->
     <string name="app_name">Hex</string>
     
-    <!-- Preference title -->
-    <string name="inline_preferences">Settings</string>
+    <!-- Preferences -->
+    <string name="preferences">Settings</string>
+    <string name="gameSizeTitle">Game Size</string>
+    <string name="gameSizeSummary">Pick a size for the gameboard (Current: 7x7)</string>
+    <string name="player1NameTitle">Player1\'s Name</string>
+    <string name="player1NameSummary">Name: Player1</string>
+    <string name="player1TypeTitle">Player1\'s Type</string>
+    <string name="player1TypeSummary">Switch between Player and Computer</string>
+    <string name="player1ColorTitle">Player1\'s Color</string>
+    <string name="player1ColorSummary">Pick a color for Player1</string>
+    <string name="player2NameTitle">Player2\'s Name</string>
+    <string name="player2NameSummary">Name: Player2</string>
+    <string name="player2TypeTitle">Player2\'s Type</string>
+    <string name="player2TypeSummary">Switch between Player and Computer</string>
+    <string name="player2ColorTitle">Player2\'s Color</string>
+    <string name="player2ColorSummary">Pick a color for Player2</string>
+    <string name="aiTitle">Difficulty</string>
+    <string name="aiSummary">Set AI intelligence</string>
+    <string name="resetTitle">Reset to Defaults</string>
+    <string name="resetSummary">Reset all settings to their defaults</string>
     
-    <!-- Local lobby title -->
+    <!-- Local lobby -->
     <string name="local">Local Lobby</string>
+    <string name="customIP">Enter an IP directly</string>
     
-    <!-- Main page title -->
+    <!-- Main page -->
     <string name="frontpage">Welcome to Hex</string>
     
     <!-- Buttons from top to bottom -->
@@ -24,7 +43,8 @@
     <string name="quit">Quit</string>
     
     <!-- Game instructions -->
-    <string name="instructions">Instructions:\n\nPlayer 1, connect left and right!\nPlayer 2, connect top and bottom!</string>
+    <string name="instructions">Hex is played by two players, who take turns placing pieces on the board. The players have different colours, say red and blue. (The players themselves are sometimes referred to as Red and Blue) The four edges of the board are coloured with the same colours, in such a way that parallel edges have the same colour. Red wins if he can build a continuous chain between the two red edges, and blue wins if he can build such a chain between the blue edges.\n\n
+        (Taken from <a href="http://www.hexwiki.org/index.php?title=Rules">hexwiki.org</a>)</string>
     
     <!-- Color Picker -->
     <string name="dialog_color_picker">Color Picker</string>

@@ -9,38 +9,44 @@ package com.sam.hex;
 
 public final class R {
     public static final class array {
-        public static final int aiLabels=0x7f050004;
-        public static final int aiValues=0x7f050005;
-        public static final int availablePlayers=0x7f050006;
-        /**  <item>Player vs Online Player</item> 
+        public static final int aiLabels=0x7f050006;
+        public static final int aiValues=0x7f050007;
+        public static final int availablePlayers=0x7f050008;
+        public static final int gameSizeArray=0x7f050004;
+        public static final int gameSizeValues=0x7f050005;
+        public static final int player1Array=0x7f050000;
+        public static final int player1Values=0x7f050001;
+        /**  <item>Local Network Player</item>
+        <item>Online Player</item> 
          */
-        public static final int gameModeArray=0x7f050000;
-        /**  <item>5</item> 
+        public static final int player2Array=0x7f050002;
+        /**  <item>2</item>
+        <item>3</item> 
          */
-        public static final int gameModeValues=0x7f050001;
-        public static final int gameSizeArray=0x7f050002;
-        public static final int gameSizeValues=0x7f050003;
+        public static final int player2Values=0x7f050003;
     }
     public static final class attr {
     }
     public static final class drawable {
         public static final int icon=0x7f020000;
-        public static final int icon_old=0x7f020001;
+        public static final int icon_large=0x7f020001;
+        public static final int icon_old=0x7f020002;
     }
     public static final class id {
         public static final int color_picker_view=0x7f090000;
-        public static final int imageView1=0x7f090007;
-        public static final int instructionsButton=0x7f090009;
+        public static final int customIP=0x7f090005;
+        public static final int imageView1=0x7f090008;
+        public static final int instructionsButton=0x7f09000a;
         public static final int new_color_panel=0x7f090002;
         public static final int newgame=0x7f09000d;
         public static final int old_color_panel=0x7f090001;
-        public static final int optionsButton=0x7f09000a;
-        public static final int players=0x7f090005;
-        public static final int quit=0x7f09000e;
+        public static final int optionsButton=0x7f09000b;
+        public static final int players=0x7f090006;
+        public static final int quit=0x7f09000f;
         public static final int rules=0x7f090003;
-        public static final int settings=0x7f09000b;
-        public static final int startButton=0x7f090008;
-        public static final int textView1=0x7f090006;
+        public static final int settings=0x7f09000e;
+        public static final int startButton=0x7f090009;
+        public static final int textView1=0x7f090007;
         public static final int title=0x7f090004;
         public static final int undo=0x7f09000c;
     }
@@ -59,49 +65,71 @@ public final class R {
         public static final int preferences=0x7f030005;
     }
     public static final class string {
+        public static final int aiSummary=0x7f070011;
+        public static final int aiTitle=0x7f070010;
         /**  Application name 
          */
         public static final int app_name=0x7f070000;
-        public static final int color1_summary=0x7f070010;
-        public static final int color1_title=0x7f07000f;
-        public static final int color2_summary=0x7f070012;
-        public static final int color2_title=0x7f070011;
-        public static final int color3_summary=0x7f070014;
-        public static final int color3_title=0x7f070013;
-        public static final int color4_summary=0x7f070016;
-        public static final int color4_title=0x7f070015;
+        public static final int color1_summary=0x7f070023;
+        public static final int color1_title=0x7f070022;
+        public static final int color2_summary=0x7f070025;
+        public static final int color2_title=0x7f070024;
+        public static final int color3_summary=0x7f070027;
+        public static final int color3_title=0x7f070026;
+        public static final int color4_summary=0x7f070029;
+        public static final int color4_title=0x7f070028;
+        public static final int customIP=0x7f070015;
         /**  Color Picker 
          */
-        public static final int dialog_color_picker=0x7f07000c;
-        /**  Main page title 
+        public static final int dialog_color_picker=0x7f07001f;
+        /**  Main page 
          */
-        public static final int frontpage=0x7f070003;
-        /**  Preference title 
-         */
-        public static final int inline_preferences=0x7f070001;
+        public static final int frontpage=0x7f070016;
+        public static final int gameSizeSummary=0x7f070003;
+        public static final int gameSizeTitle=0x7f070002;
         /**  Game instructions 
          */
-        public static final int instructions=0x7f07000b;
-        /**  Local lobby title 
+        public static final int instructions=0x7f07001e;
+        /**  Local lobby 
          */
-        public static final int local=0x7f070002;
-        public static final int newgame=0x7f070009;
-        public static final int options=0x7f070006;
+        public static final int local=0x7f070014;
+        public static final int newgame=0x7f07001c;
+        public static final int options=0x7f070019;
+        public static final int player1ColorSummary=0x7f070009;
+        public static final int player1ColorTitle=0x7f070008;
+        public static final int player1NameSummary=0x7f070005;
+        public static final int player1NameTitle=0x7f070004;
+        public static final int player1TypeSummary=0x7f070007;
+        public static final int player1TypeTitle=0x7f070006;
+        public static final int player2ColorSummary=0x7f07000f;
+        public static final int player2ColorTitle=0x7f07000e;
+        public static final int player2NameSummary=0x7f07000b;
+        public static final int player2NameTitle=0x7f07000a;
+        public static final int player2TypeSummary=0x7f07000d;
+        public static final int player2TypeTitle=0x7f07000c;
         /**  Preferences 
          */
-        public static final int pref_category=0x7f07000e;
-        public static final int press_color_to_apply=0x7f07000d;
-        public static final int quit=0x7f07000a;
-        public static final int rules=0x7f070005;
+        public static final int pref_category=0x7f070021;
+        /**  Preferences 
+         */
+        public static final int preferences=0x7f070001;
+        public static final int press_color_to_apply=0x7f070020;
+        public static final int quit=0x7f07001d;
+        public static final int resetSummary=0x7f070013;
+        public static final int resetTitle=0x7f070012;
+        public static final int rules=0x7f070018;
         /**  Menu choices 
          */
-        public static final int settings=0x7f070007;
+        public static final int settings=0x7f07001a;
         /**  Buttons from top to bottom 
          */
-        public static final int start=0x7f070004;
-        public static final int undo=0x7f070008;
+        public static final int start=0x7f070017;
+        public static final int undo=0x7f07001b;
     }
     public static final class style {
+        /**  <item name="android:windowIsFloating">true</item> 
+         */
+        public static final int Theme_QuickLoad=0x7f080001;
         public static final int Theme_Transparent=0x7f080000;
     }
     public static final class xml {

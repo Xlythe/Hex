@@ -1,48 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="preferences">
         <ListPreference
-            android:title="Game Mode"
-            android:summary="Switch between PvP, PvC, CvP, CvC"
-            android:key="gameModePref"
-            android:defaultValue="0"
-            android:entries="@array/gameModeArray"
-            android:entryValues="@array/gameModeValues" />
-        <ListPreference
-            android:title="Game Size"
-            android:summary="Pick a size for the gameboard"
+            android:title="@string/gameSizeTitle"
+            android:summary="@string/gameSizeSummary"
             android:key="gameSizePref"
             android:defaultValue="7"
             android:entries="@array/gameSizeArray"
             android:entryValues="@array/gameSizeValues" />
         <EditTextPreference
-            android:title="Player1's Name"
-            android:summary="Name: Player1"
-            android:key="player1Name"
-            android:defaultValue="Player1" />
-        <net.margaritov.preference.colorpicker.ColorPickerPreference
-		    android:title="Player1's Color"
-		    android:summary="Pick a color for Player1"
-		    android:key="player1Color"
-		    android:defaultValue="@integer/COLOR_BLUE" />
-        <EditTextPreference
-            android:title="Player2's Name"
-            android:summary="Name: Player2"
-            android:key="player2Name"
-            android:defaultValue="Player2" />
-        <net.margaritov.preference.colorpicker.ColorPickerPreference
-		    android:title="Player2's Color"
-		    android:summary="Pick a color for Player2"
-		    android:key="player2Color"
-		    android:defaultValue="@integer/COLOR_RED" />
-        <ListPreference
-            android:title="Difficulty"
-            android:summary="Set AI intelligence"
-            android:key="aiPref"
-            android:defaultValue="1"
-            android:entries="@array/aiLabels"
-            android:entryValues="@array/aiValues" />
-       <Preference
-            android:title="Reset to Defaults"
-            android:summary="Reset all settings to their defaults"
-            android:key="resetPref"/>
+            android:key="customGameSizePref"
+            android:defaultValue="7" />
+        <PreferenceCategory
+                android:title=" ">
+	        <EditTextPreference
+	            android:title="@string/player1NameTitle"
+	            android:summary="@string/player1NameSummary"
+	            android:key="player1Name"
+	            android:defaultValue="Player1" />
+	        <ListPreference
+	            android:title="@string/player1TypeTitle"
+	            android:summary="@string/player1TypeSummary"
+	            android:key="player1Type"
+	            android:defaultValue="0"
+	            android:entries="@array/player1Array"
+	            android:entryValues="@array/player1Values" />
+	        <net.margaritov.preference.colorpicker.ColorPickerPreference
+			    android:title="@string/player1ColorTitle"
+			    android:summary="@string/player1ColorSummary"
+			    android:key="player1Color"
+			    android:defaultValue="@integer/COLOR_BLUE" />
+	    </PreferenceCategory>
+	    <PreferenceCategory
+                android:title=" ">
+	        <EditTextPreference
+	            android:title="@string/player2NameTitle"
+	            android:summary="@string/player2NameSummary"
+	            android:key="player2Name"
+	            android:defaultValue="Player2" />
+	        <ListPreference
+	            android:title="@string/player2TypeTitle"
+	            android:summary="@string/player2TypeSummary"
+	            android:key="player2Type"
+	            android:defaultValue="0"
+	            android:entries="@array/player2Array"
+	            android:entryValues="@array/player2Values" />
+	        <net.margaritov.preference.colorpicker.ColorPickerPreference
+			    android:title="@string/player2ColorTitle"
+			    android:summary="@string/player2ColorSummary"
+			    android:key="player2Color"
+			    android:defaultValue="@integer/COLOR_RED" />
+	    </PreferenceCategory>
+	    <PreferenceCategory
+                android:title=" ">
+	        <ListPreference
+	            android:title="@string/aiTitle"
+	            android:summary="@string/aiSummary"
+	            android:key="aiPref"
+	            android:defaultValue="1"
+	            android:entries="@array/aiLabels"
+	            android:entryValues="@array/aiValues" />
+	       <Preference
+	            android:title="@string/resetTitle"
+	            android:summary="@string/resetSummary"
+	            android:key="resetPref"/>
+	    </PreferenceCategory>
 </PreferenceScreen>

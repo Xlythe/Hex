@@ -1,34 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>    
-    <string-array name="gameModeArray">
-        <item>Player vs Player</item>
-        <item>Player vs Com</item>
-        <item>Com vs Player</item>
-        <item>Com vs Com</item>
-        <item>Player vs Local Player</item>
-        <!-- <item>Player vs Online Player</item> -->
+<resources>
+    <string-array name="player1Array">
+        <item>Human</item>
+        <item>Computer</item>
     </string-array>
-    <string-array name="gameModeValues">
+    <string-array name="player1Values">
         <item>0</item>
         <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <!-- <item>5</item> -->
+    </string-array>
+    <string-array name="player2Array">
+        <item>Human</item>
+        <item>Computer</item>
+        <!-- <item>Local Network Player</item>
+        <item>Online Player</item> -->
+    </string-array>
+    <string-array name="player2Values">
+        <item>0</item>
+        <item>1</item>
+        <!-- <item>2</item>
+        <item>3</item> -->
     </string-array>
     <string-array name="gameSizeArray">
         <item>7x7</item>
         <item>9x9</item>
         <item>11x11</item>
-        <item>13x13</item>
-        <item>14x14</item>
+        <item>Custom</item>
     </string-array>
     <string-array name="gameSizeValues">
         <item>7</item>
         <item>9</item>
         <item>11</item>
-        <item>13</item>
-        <item>14</item>
+        <item>0</item>
     </string-array>
     <string-array name="aiLabels">
         <item>Easy</item>

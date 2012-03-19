@@ -77,13 +77,13 @@ public class BoardView extends View{
 	        
 	        backgroundTopBottom = new ShapeDrawable(new RectShape());
 	        backgroundTopBottom.setBounds(0,0,Global.windowWidth,Global.windowHeight);
-	        backgroundTopBottom.getPaint().setColor(Global.playerTwoColor);
+	        backgroundTopBottom.getPaint().setColor(Global.player2Color);
 	        backgroundLeft = new ShapeDrawable(new PathShape(left, Global.windowWidth, Global.windowHeight));
 	        backgroundLeft.setBounds(0,(int) (yOffset+hrad),Global.windowWidth,Global.windowHeight);
-	        backgroundLeft.getPaint().setColor(Global.playerOneColor);
+	        backgroundLeft.getPaint().setColor(Global.player1Color);
 	        backgroundRight = new ShapeDrawable(new PathShape(right, Global.windowWidth, Global.windowHeight));
 	        backgroundRight.setBounds(0,0,Global.windowWidth,(int) (Global.windowHeight-(yOffset+hrad)));
-	        backgroundRight.getPaint().setColor(Global.playerOneColor);
+	        backgroundRight.getPaint().setColor(Global.player1Color);
         }
         else{
         	Path left = new Path();
@@ -99,13 +99,13 @@ public class BoardView extends View{
 	        
         	backgroundTopBottom = new ShapeDrawable(new RectShape());
 	        backgroundTopBottom.setBounds(0,0,Global.windowWidth,Global.windowHeight);
-	        backgroundTopBottom.getPaint().setColor(Global.playerOneColor);
+	        backgroundTopBottom.getPaint().setColor(Global.player1Color);
 	        backgroundLeft = new ShapeDrawable(new PathShape(left, Global.windowWidth, Global.windowHeight));
 	        backgroundLeft.setBounds(0,0,Global.windowWidth,Global.windowHeight);
-	        backgroundLeft.getPaint().setColor(Global.playerTwoColor);
+	        backgroundLeft.getPaint().setColor(Global.player2Color);
 	        backgroundRight = new ShapeDrawable(new PathShape(right, Global.windowWidth, Global.windowHeight));
 	        backgroundRight.setBounds(0,0,Global.windowWidth,Global.windowHeight);
-	        backgroundRight.getPaint().setColor(Global.playerTwoColor);
+	        backgroundRight.getPaint().setColor(Global.player2Color);
         }
         
               

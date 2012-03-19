@@ -34,7 +34,12 @@ public class PlayerObject implements PlayingEntity {
 		this.gameBoard=BoardTools.teamGrid();
 		makeMove();
 	}
+	
 	public void makeMove(){
 		GameAction.getPlayerTurn(team);//Have the player make a move
+	}
+	
+	public void undo(Point hex){
+		Global.gamePiece[hex.x][hex.y].setTeam((byte)0);
 	}
 }

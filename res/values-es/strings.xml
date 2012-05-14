@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Please note, # represents a variable. For example, # wins will write out Alex wins (or whatever their name is) -->
+    
+    <!-- Application name -->
+    <string name="app_name">Hex</string>
+    
+    <!-- Preferences -->
+    <string name="preferences">Configuración (Local)</string>
+    <string name="preferences_net">Configuración (Línea)</string>
+    <string name="gameLocationTitle">modo de juego</string>
+    <string name="gameLocationSummary">Jugar en el mismo dispositivo, a través de LAN o en Internet</string>
+    <string name="gameSizeTitle">Tamaño del juego</string>
+    <string name="gameSizeSummary">Elija un tamaño para el tablero de juego (actual: 7x7)</string>
+    <string name="gameSizeSummary_onChange">Elija un tamaño para el tablero de juego (actual: #x#)</string>
+    <string name="customGameSizeSummary">Introduzca un tamaño de la cuadrícula (Ex. 9)</string>
+    <string name="swapTitle">Intercambiar</string>
+    <string name="swapSummary">Deje que el segundo jugador que cambia de lugar durante su primer paso</string>
+    <string name="timerTitle">Temporizador</string>
+    <string name="timerSummary">Limite la cantidad de tiempo que un jugador tiene (en minutos)</string>
+    
+    <string name="player1NameTitle">Nombre del Jugador1</string>
+    <string name="player1NameSummary">Nombre: Player1</string>
+    <string name="player1NameSummary_onChange">Nombre: #</string>
+    <string name="player1TypeTitle">Tipo de Jugador1</string>
+    <string name="player1TypeSummary">Cambiar entre el jugador y el ordenador</string>
+    <string name="player1ColorTitle">Color del Jugador1</string>
+    <string name="player1ColorSummary">Elija un color para el Jugador1</string>
+    
+    <string name="player2NameTitle">Nombre del Jugador2</string>
+    <string name="player2NameSummary">Nombre: Player2</string>
+    <string name="player2NameSummary_onChange">Nombre: #</string>
+    <string name="player2TypeTitle">Tipo de Jugador2</string>
+    <string name="player2TypeSummary">Cambiar entre el jugador y el ordenador</string>
+    <string name="player2ColorTitle">Color del Jugador2</string>
+    <string name="player2ColorSummary">Elija un color para el Jugador2</string>
+    
+    <string name="lanPlayerNameTitle">Nombre del Jugador</string>
+    <string name="lanPlayerNameSummary">Nombre: Player</string>
+    <string name="lanPlayerNameSummary_onChange">Nombre: #</string>
+    <string name="lanPlayerTypeTitle">Tipo de Jugador</string>
+    <string name="lanPlayerTypeSummary">Cambiar entre el jugador y el ordenador</string>
+    <string name="lanPlayerColorTitle">Color del Jugador</string>
+    <string name="lanPlayerColorSummary">Elija un color para el Jugador</string>
+    
+    <string name="netUsernameTitle">Nombre de usuario</string>
+    <string name="netUsernameSummary">Nombre de usuario para iniciar sesión en igGC</string>
+    <string name="netPasswordTitle">Contraseña</string>
+    <string name="netPasswordSummary">Contraseña para iniciar sesión en igGC</string>
+    
+    <string name="resetTitle">Restaurar valores predeterminados</string>
+    <string name="resetSummary">Restablecer todas las configuraciones a sus valores predeterminados</string>
+    
+    <!-- Main page -->
+    <string name="frontpage">Bienvenido a Hex</string>
+    
+    <!-- Buttons from top to bottom -->
+    <string name="start">Inicio del juego</string>
+    <string name="resume">Juego de residencia</string>
+    <string name="online">Jugar Online</string>
+    <string name="rules">Cómo jugar</string>
+    <string name="options">Opciones</string>
+    
+    <!-- Menu choices -->
+    <string name="undo">Deshacer</string>
+    <string name="newgame">Nuevo Juego</string>
+    <string name="replay">Repetir</string>
+    <string name="loadReplay">Carga</string>
+    <string name="saveReplay">Guardar</string>
+    <string name="settings">Configuración</string>
+    <string name="quit">Salir</string>
+    
+    <!-- In game notifications -->
+    <string name="winner"># gana!</string>
+    <string name="timer">Tiempo restante: #</string>
+    <string name="saved">¡Salvados!</string>
+    <string name="claimVictory">Reclamar la Victoria</string>
+    
+    <!-- Game instructions -->
+    <string name="instructions">Hex es jugado por dos jugadores, que se turnan para colocar las piezas en el tablero. Los jugadores tienen diferentes colores, digamos rojo y azul. (Los jugadores mismos se denominan a veces como rojo y azul) Los cuatro bordes de la placa son de color con los mismos colores, de tal manera que los bordes paralelos tienen el mismo color. Rojo gana si se puede construir una cadena continua entre los dos bordes rojos, azules y gana si puede construir una cadena entre los bordes azules. \n \n
+        (Tomado de <a href="http://www.hexwiki.org/index.php?title=Rules">hexwiki.org </a>)</string>
+    
+    <!-- Confirmation -->
+    <string name="confirmExit">¿Seguro que desea salir?</string>
+    <string name="confirmNewgame">¿Quieres iniciar un nuevo juego?</string>
+    
+    <!-- Local lobby -->
+    <string name="local">Lobby local</string>
+    <string name="customIP">Introduzca una dirección IP directa</string>
+    
+    <!-- LAN play -->
+    <string name="challenger"># te reta. Aceptar?</string>
+    <string name="sendChallenge">¿Quieres a desafiar #?</string>
+    <string name="challengeSent">Desafío enviado</string>
+    <string name="newLANGame"># quiere jugar un juego nuevo. Aceptar?</string>
+    <string name="LANUndo"># quiere deshacer. Aceptar?</string>
+    <string name="LANplayAgain">El otro jugador accedió a un nuevo juego.</string>
+    <string name="LANdontPlayAgain">El otro jugador negó un nuevo juego.</string>
+    <string name="LANundoAccepted">El otro jugador permitió que un deshacer.</string>
+    <string name="LANundoDenied">El otro jugador negó un deshacer.</string>
+    <string name="playerQuit">El otro jugador a la izquierda del juego.</string>
+    <string name="wifiOff">Wi-Fi está apagado. ¿Activar ahora?</string>
+    <string name="yourIP">Tu dirección IP es: #</string>
+    <string name="yourIPWarning">Esa es su propia IP</string>
+    
+    <!-- Net play -->
+    <string name="cantConnect">No se puede conectar a Internet. ¿Quieres probar Wi-Fi?</string>
+    
+    <string name="net">Lobby neto</string>
+    <string name="createBoard">Crear un juego de mesa</string>
+    <string name="position">Posición</string>
+    <string name="waiting">Espera…</string>
+    <string name="active">Activo</string>
+    
+    <string name="register">Registrar</string>
+    <string name="field_username">Nombre (requerido):</string>
+    <string name="field_password">Contraseña (obligatorio):</string>
+    <string name="field_email">E-mail:</string>
+    <string name="field_birthday">Fecha de nacimiento:</string>
+    <string name="field_about">Acerca de:</string>
+    
+    <string name="login">Iniciar sesión</string>
+    <string name="login_field_username">Nombre de Usuario:</string>
+    <string name="login_field_password">Contraseña:</string>
+    <string name="loginFailed">No hemos podido iniciar sesión en</string>
+    
+    <string name="waitingroom">Sala de espera</string>
+    <string name="sendAMessage">Enviar un mensaje</string>
+    <string name="ready">Listo</string>
+    <string name="unready">Indeciso</string>
+    <string name="optionsChanged">Opciones de cambio</string>
+    <string name="rated">Juego Calificación:</string>
+    
+    <!-- Dialog Options -->
+    <string name="yes">Sí</string>
+    <string name="no">No</string>
+    <string name="enter">Entrar</string>
+    <string name="okay">Bueno</string>
+    <string name="cancel">Cancelar</string>
+    <string name="submit">Presentar</string>
+    <string name="rename">Cambiar el nombre de</string>
+    <string name="delete">Borrar</string>
+    
+    <!-- Color Picker -->
+    <string name="dialog_color_picker">Selector de color</string>
+    <string name="press_color_to_apply">Prensa de Color para aplicar</string>
+    
+    <!-- Preferences -->
+    <string name="pref_category">Categoría</string>
+    <string name="color1_title">color 1</string>
+    <string name="color1_summary">color negro de forma predeterminada, fija tomando como referencia</string>
+    <string name="color2_title">color 2</string>
+    <string name="color2_summary">no el color persistente \ deslizante nalpha añadido a través del código</string>
+    <string name="color3_title">color 3</string>
+    <string name="color3_summary">selector con el deslizador alfa</string>
+    <string name="color4_title">color 4</string>
+    <string name="color4_summary">de color conjunto con código hexadecimal en xml</string>
+</resources>

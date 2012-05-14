@@ -1,50 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Please note, # represents a variable. For example, # wins will write out Alex wins (or whatever their name is) -->
+    
     <!-- Application name -->
     <string name="app_name">Hex</string>
     
     <!-- Preferences -->
-    <string name="preferences">Settings</string>
-    <string name="gameSizeTitle">Game Size</string>
+    <string name="preferences">Settings (Local)</string>
+    <string name="preferences_net">Settings (Online)</string>
+    <string name="gameLocationTitle">Local or Online</string>
+    <string name="gameLocationSummary">Switch between playing on the same device or going online!</string>
+    <string name="gameSizeTitle">Board Size</string>
     <string name="gameSizeSummary">Pick a size for the gameboard (Current: 7x7)</string>
+    <string name="gameSizeSummary_onChange">Pick a size for the gameboard (Current: #x#)</string>
+    <string name="customGameSizeSummary">Enter a grid size (Ex. 9)</string>
+    <string name="swapTitle">Swap</string>
+    <string name="swapSummary">Allow the second player to swap places during their first move</string>
+    <string name="timerTitle">Timer</string>
+    <string name="timerSummary">Limit the amount of time a player has (in minutes)</string>
+    
     <string name="player1NameTitle">Player1\'s Name</string>
     <string name="player1NameSummary">Name: Player1</string>
+    <string name="player1NameSummary_onChange">Name: #</string>
     <string name="player1TypeTitle">Player1\'s Type</string>
     <string name="player1TypeSummary">Switch between Player and Computer</string>
     <string name="player1ColorTitle">Player1\'s Color</string>
     <string name="player1ColorSummary">Pick a color for Player1</string>
+    
     <string name="player2NameTitle">Player2\'s Name</string>
     <string name="player2NameSummary">Name: Player2</string>
+    <string name="player2NameSummary_onChange">Name: #</string>
     <string name="player2TypeTitle">Player2\'s Type</string>
     <string name="player2TypeSummary">Switch between Player and Computer</string>
     <string name="player2ColorTitle">Player2\'s Color</string>
     <string name="player2ColorSummary">Pick a color for Player2</string>
-    <string name="aiTitle">Difficulty</string>
-    <string name="aiSummary">Set AI intelligence</string>
+    
+    <string name="lanPlayerNameTitle">Player\'s Name</string>
+    <string name="lanPlayerNameSummary">Name: Player</string>
+    <string name="lanPlayerNameSummary_onChange">Name: #</string>
+    <string name="lanPlayerTypeTitle">Player\'s Type</string>
+    <string name="lanPlayerTypeSummary">Switch between Player and Computer</string>
+    <string name="lanPlayerColorTitle">Player\'s Color</string>
+    <string name="lanPlayerColorSummary">Pick a color for Player</string>
+    
+    <string name="netUsernameTitle">Username</string>
+    <string name="netUsernameSummary">Username to sign into igGC</string>
+    <string name="netPasswordTitle">Password</string>
+    <string name="netPasswordSummary">Password to sign into igGC</string>
+    
     <string name="resetTitle">Reset to Defaults</string>
     <string name="resetSummary">Reset all settings to their defaults</string>
-    
-    <!-- Local lobby -->
-    <string name="local">Local Lobby</string>
-    <string name="customIP">Enter an IP directly</string>
     
     <!-- Main page -->
     <string name="frontpage">Welcome to Hex</string>
     
     <!-- Buttons from top to bottom -->
     <string name="start">Start Game</string>
-    <string name="rules">Instructions</string>
-    <string name="options">Options</string>
+    <string name="resume">Resume Game</string>
+    <string name="online">Play Online</string>
+    <string name="rules">How to Play</string>
+    <string name="options">Settings</string>
     
     <!-- Menu choices -->
-    <string name="settings">Settings</string>
     <string name="undo">Undo</string>
     <string name="newgame">New Game</string>
+    <string name="replay">Replay</string>
+    <string name="loadReplay">Load</string>
+    <string name="saveReplay">Save</string>
+    <string name="settings">Settings</string>
     <string name="quit">Quit</string>
+    
+    <!-- In game notifications -->
+    <string name="winner"># wins!</string>
+    <string name="timer">Time Left: #</string>
+    <string name="saved">Saved!</string>
+    <string name="claimVictory">Claim Victory</string>
     
     <!-- Game instructions -->
     <string name="instructions">Hex is played by two players, who take turns placing pieces on the board. The players have different colours, say red and blue. (The players themselves are sometimes referred to as Red and Blue) The four edges of the board are coloured with the same colours, in such a way that parallel edges have the same colour. Red wins if he can build a continuous chain between the two red edges, and blue wins if he can build such a chain between the blue edges.\n\n
         (Taken from <a href="http://www.hexwiki.org/index.php?title=Rules">hexwiki.org</a>)</string>
+    
+    <!-- Confirmation -->
+    <string name="confirmExit">Are you sure you want to exit?</string>
+    <string name="confirmNewgame">Do you want to start a new game?</string>
+    
+    <!-- Local lobby -->
+    <string name="local">Local Lobby</string>
+    <string name="customIP">Enter an IP directly</string>
+    
+    <!-- LAN play -->
+    <string name="challenger"># challenges you. Accept?</string>
+    <string name="sendChallenge">Do you want to challenge #?</string>
+    <string name="challengeSent">Challenge sent</string>
+    <string name="newLANGame"># wants to play a new game. Accept?</string>
+    <string name="LANUndo"># wants to undo. Accept?</string>
+    <string name="LANplayAgain">The other player agreed to a new game.</string>
+    <string name="LANdontPlayAgain">The other player denied a new game.</string>
+    <string name="LANundoAccepted">The other player allowed an undo.</string>
+    <string name="LANundoDenied">The other player denied an undo.</string>
+    <string name="playerQuit">The other player left the game.</string>
+    <string name="wifiOff">Wifi is off. Enable?</string>
+    <string name="yourIP">Your ip address is: #</string>
+    <string name="yourIPWarning">That\'s your own ip</string>
+    
+    <!-- Net play -->
+    <string name="cantConnect">Can\'t connect to the internet. Want to try wifi?</string>
+    
+    <string name="net">Net Lobby</string>
+    <string name="createBoard">Create a Game Board</string>
+    <string name="position">Position</string>
+    <string name="waiting">Waiting…</string>
+    <string name="active">Active</string>
+    
+    <string name="register">Register</string>
+    <string name="field_username">Username (required):</string>
+    <string name="field_password">Password (required):</string>
+    <string name="field_email">Email:</string>
+    <string name="field_birthday">Birthday:</string>
+    <string name="field_about">About:</string>
+    
+    <string name="login">Login</string>
+    <string name="login_field_username">Username:</string>
+    <string name="login_field_password">Password:</string>
+    <string name="loginFailed">We couldn\'t log you in</string>
+    
+    <string name="waitingroom">Waiting Room</string>
+    <string name="sendAMessage">Send a message</string>
+    <string name="ready">Ready</string>
+    <string name="unready">Unready</string>
+    <string name="optionsChanged">Options changed</string>
+    <string name="rated">Rated Game:</string>
+    
+    <!-- Dialog Options -->
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="enter">Enter</string>
+    <string name="okay">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="submit">Submit</string>
+    <string name="rename">Rename</string>
+    <string name="delete">Delete</string>
     
     <!-- Color Picker -->
     <string name="dialog_color_picker">Color Picker</string>

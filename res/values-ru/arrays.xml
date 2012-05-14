@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="player1Array">
+        <item>человек</item>
+        <item>компьютер (Will)</item>
+        <item>компьютер (Bee)</item>
+    </string-array>
+    <string-array name="player2Array">
+        <item>человек</item>
+        <item>компьютер (Will)</item>
+        <item>компьютер (Bee)</item>
+    </string-array>
+    <string-array name="gameSizeArray">
+        <item>7x7</item>
+        <item>9x9</item>
+        <item>11x11</item>
+        <item>обычай</item>
+    </string-array>
+    <string-array name="availablePlayers">
+        <item>сканирование…</item>
+    </string-array>
+    <string-array name="gameLocationArray">
+        <item>То же устройство</item>
+        <!-- <item>LAN</item> -->
+        <item>Интернет</item>
+    </string-array>
+    <string-array name="netPositionArray">
+        <item>зритель</item>
+        <item>Первый игрок</item>
+        <item>Второй игрок</item>
+    </string-array>
+    <string-array name="timerTypeArray">
+        <item>Нет таймер</item>
+        <item>На ходу</item>
+        <item>Весь матч</item>
+    </string-array>
+    <string-array name="netTimerArray">
+        <item>без таймера</item>
+        <item>5минут</item>
+        <item>10минут</item>
+        <item>15минут</item>
+        <item>20минут</item>
+        <item>30минут</item>
+        <item>45min</item>
+        <item>1час</item>
+        <item>1час 30минут</item>
+        <item>2часа</item>
+    </string-array>
+    <string-array name="netAdditionalTimeArray">
+        <item>+0секунд/двигаться</item>
+        <item>+10секунд/двигаться</item>
+        <item>+15секунд/двигаться</item>
+        <item>+20секунд/двигаться</item>
+        <item>+30секунд/двигаться</item>
+        <item>+45секунд/двигаться</item>
+        <item>+1минут/двигаться</item>
+    </string-array>
+</resources>

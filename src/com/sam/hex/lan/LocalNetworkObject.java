@@ -4,6 +4,9 @@ import java.net.InetAddress;
 
 import com.sam.hex.Global;
 
+/**
+ * @author Will Harmon
+ **/
 public class LocalNetworkObject{
 	public String playerName;
 	public int playerColor=Global.player2DefaultColor;
@@ -16,13 +19,16 @@ public class LocalNetworkObject{
 		this.ip = ip;
 	}
 	
+	public LocalNetworkObject() {
+	}
+	
 	public String toString(){
 		return playerName;
 	}
 	
 	public boolean equals(Object e){
 		if(e instanceof LocalNetworkObject){
-			return this.playerName.equals(((LocalNetworkObject) e).playerName) && this.ip.equals(((LocalNetworkObject) e).ip);
+			return this.ip.equals(((LocalNetworkObject) e).ip);
 		}
 		else{
 			return false;

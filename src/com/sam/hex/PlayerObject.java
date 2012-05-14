@@ -1,45 +1,129 @@
 package com.sam.hex;
 
+import java.util.LinkedList;
+
+import com.sam.hex.net.MoveListener;
+
 import android.graphics.Point;
 
 public class PlayerObject implements PlayingEntity {
+	private String name;
+	private int color;
+	private long timeLeft;
+	private int team;
+	private LinkedList<Point> hex = new LinkedList<Point>();
+	private GameObject game;
 	
-	byte[][] gameBoard; 
-	byte team;
+	public PlayerObject(int team, GameObject game) {
+		this.team=team;
+		this.game=game;
+	}
 	
-	public PlayerObject(byte i) {
-	this.team=i;//Set the player's team
+	@Override
+	public void getPlayerTurn() {
+		while (true) {
+			while (hex.size()==0) {
+				try {
+					Thread.sleep(80);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			if (hex.get(0).equals(new Point(-1,-1))){
+				hex.remove(0);
+				break;
+			}
+			if (GameAction.makeMove(this, (byte) team, hex.get(0), game)) {
+				hex.remove(0);
+				break;
+			}
+			hex.remove(0);
+		}
+	}
+	
+	@Override
+	public void undoCalled(){
+	}
+	
+	@Override
+	public void newgameCalled() {
+		endMove();
 	}
 
-	
-	public void getPlayerTurn(byte[][] gameBoard) {
-		 this.gameBoard=gameBoard;
-		 makeMove();
+	@Override
+	public boolean supportsUndo() {
+		return true;
 	}
-	
-	public Point getPlayerTurn(Point hex){
-		if (validMove(hex)) {
-			Global.gamePiece[hex.x][hex.y].setTeam(team);
-			Global.moveList.add(hex);
-			return new Point(-1,-1);
+
+	@Override
+	public boolean supportsNewgame() {
+		return true;
+	}
+
+	@Override
+	public void quit() {
+		endMove();
+	}
+
+	@Override
+	public void win() {
+	}
+
+	@Override
+	public void lose() {
+	}
+
+	@Override
+	public boolean supportsSave() {
+		return false;
+	}
+
+	@Override
+	public void endMove() {
+		hex.add(new Point(-1,-1));
+	}
+
+	@Override
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public void setColor(int color) {
+		this.color = color;
+	}
+
+	@Override
+	public int getColor() {
+		return color;
+	}
+
+	@Override
+	public void setTime(long time) {
+		this.timeLeft = time;
+	}
+
+	@Override
+	public long getTime() {
+		return timeLeft;
+	}
+
+	@Override
+	public void setMove(Object o, Point hex) {
+		if(o instanceof GameAction && game.currentPlayer==team){
+			this.hex = new LinkedList<Point>();
+			this.hex.add(hex);
 		}
-		return new Point(-1,-1);
+		else if(o instanceof MoveListener) this.hex.add(hex);
 	}
-	
-	public boolean validMove(Point hex){
-		return hex!=null && Global.gamePiece[hex.x][hex.y].getTeam() == 0;
-	}
-	
-	public void getPlayerTurn() {
-		this.gameBoard=BoardTools.teamGrid();
-		makeMove();
-	}
-	
-	public void makeMove(){
-		GameAction.getPlayerTurn(team);//Have the player make a move
-	}
-	
-	public void undo(Point hex){
-		Global.gamePiece[hex.x][hex.y].setTeam((byte)0);
+
+	@Override
+	public boolean giveUp() {
+		return false;
 	}
 }

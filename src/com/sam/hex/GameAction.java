@@ -1,150 +1,369 @@
 package com.sam.hex;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+import com.sam.hex.lan.LANGlobal;
+import com.sam.hex.lan.LocalPlayerObject;
+import com.sam.hex.net.NetGlobal;
+import com.sam.hex.net.NetPlayerObject;
+
 import android.graphics.Point;
+import android.view.View;
 
 public class GameAction {
-	private static int[][] gameboard;
-	private static int n;
-	private static Point[][] polyXY;
-	private static RegularPolygonGameObject hex;
-
-	public static boolean checkWinPlayer1() {
-		for (int i = 0; i < Global.gridSize; i++) {
-			if (RegularPolygonGameObject.checkWinTeam((byte) 1,
-					Global.gridSize, i, Global.gamePiece)) {
-				System.out.println("Player one wins");
-				String path=RegularPolygonGameObject.findShortestPath((byte) 1,
-						Global.gridSize, i, Global.gamePiece);
-				RegularPolygonGameObject.colorPath(Global.gridSize,i,path);
-				return true;
-			}
-		}
-		return false;
-	}
+	private GameAction(){}
 	
-	public static boolean checkWinPlayer2() {
-		for (int i = 0; i < Global.gridSize; i++) {
-			if (RegularPolygonGameObject.checkWinTeam((byte) 2, i,
-					Global.gridSize, Global.gamePiece)) {
-				System.out.println("Player Two wins");
-				RegularPolygonGameObject.findShortestPath((byte) 2, i,
-				Global.gridSize, Global.gamePiece);
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public static void checkedFlagReset() {
-		for (int x = Global.gridSize - 1; x >= 0; x--) {
-			for (int y = Global.gridSize - 1; y >= 0; y--) {
-				Global.gamePiece[x][y].checkedflage = false;
-			}
-		}
-	}
-/*	public static void updateBoard() { //should be handled in boardview
-		if (HexGameWindow.cPolygons.getWidth() != Global.windowWidth
-				|| HexGameWindow.cPolygons.getHeight() != Global.windowHeight) {
-			fullUpdateBoard();
-		}
-
-		HexGameWindow.cPolygons.revalidate();
-		HexGameWindow.cPolygons.repaint();
-
-	}
-
-	public static void fullUpdateBoard() { //should be handled in boardview
-		Global.windowWidth = HexGameWindow.cPolygons.getWidth();
-		Global.windowHeight = HexGameWindow.cPolygons.getHeight();
-		double radius;
-		RegularPolygonGameObject[][] gamePeace = Global.gamePiece;
-		radius = BoardTools.radiusCalculator(Global.windowWidth,
-				Global.windowHeight, Global.gridSize);
-		// radius = BoardTools.radiusCalculator(400,400, 7);
-		double hrad = radius * Math.sqrt(3) / 2; // Horizontal radius
-		int yOffset = (int) ((HexGameWindow.cPolygons.getHeight() - ((3 * radius / 2)
-				* (gamePeace[0].length - 1) + 2 * radius)) / 2);
-		int xOffset = (int) ((HexGameWindow.cPolygons.getWidth() - (hrad
-				* gamePeace.length * 2 + hrad * (gamePeace[0].length - 1))) / 2);
-
-		for (int xc = 0; xc < Global.gamePiece.length; xc++) {
-			for (int yc = 0; yc < gamePeace[0].length; yc++)
-				gamePeace[xc][yc].update((hrad + yc * hrad + 2 * hrad * xc)
-						+ xOffset, (1.5 * radius * yc + radius) + yOffset,
-						radius, 6, Math.PI / 2);
-		}
-
-		BoardTools.setBackground(Global.windowWidth, Global.windowHeight);
-		HexGameWindow.cPolygons.revalidate();
-		HexGameWindow.cPolygons.repaint();
-
-	}*/
-
-	public static void setPiece(RegularPolygonGameObject h) {
-		hex = h;
-	}
-
-	public static void getPlayerTurn(byte team) {
-		while (true) {
-			while (hex == null) {
-				try {
-					Thread.sleep(100);
-				} 
-				catch (InterruptedException e) {
-					e.printStackTrace();
+	public static synchronized boolean checkWinPlayer(int team, GameObject game) {
+		if(team==1){
+			if(game.timer.type!=0 && game.player2.getTime()<0) return true;
+			if(game.player2.giveUp()) return true;
+			for (int i = 0; i < game.gridSize; i++) {
+				if (RegularPolygonGameObject.checkWinTeam((byte) 1, game.gridSize, i, game.gamePiece)) {
+					System.out.println("Player one wins");
+					checkedFlagReset(game);
+					String path=RegularPolygonGameObject.findShortestPath((byte) 1, game.gridSize, i, game.gamePiece);
+					RegularPolygonGameObject.colorPath(game.gridSize,i,path,game);
+					return true;
 				}
 			}
-			if (hex.getTeam() == 0) {
-				hex.setTeam(team);
-				hex = null;
-				break;
+			return false;
+		}
+		else{
+			if(game.timer.type!=0 && game.player1.getTime()<0) return true;
+			if(game.player1.giveUp()) return true;
+			for (int i = 0; i < game.gridSize; i++) {
+				if (RegularPolygonGameObject.checkWinTeam((byte) 2, i, game.gridSize, game.gamePiece)) {
+					System.out.println("Player two wins");
+					checkedFlagReset(game);
+					String path=RegularPolygonGameObject.findShortestPath((byte) 2, i, game.gridSize, game.gamePiece);
+					RegularPolygonGameObject.colorPath(i,game.gridSize,path,game);
+					return true;
+				}
 			}
-			hex = null;
+			return false;
+		}
+	}
+
+	public static void checkedFlagReset(GameObject game) {
+		for (int x = game.gridSize - 1; x >= 0; x--) {
+			for (int y = game.gridSize - 1; y >= 0; y--) {
+				game.gamePiece[x][y].checkedflage = false;
+			}
 		}
 	}
 	
-	public void setGame(int m){
-		n=m;
-		gameboard = new int[n][n];
-		for(int i=0;i<n;i++){
-			for(int j=0;j<n;j++){
-				gameboard[i][j]=0;
+	public static void setPiece(Point p, GameObject game) {
+		getPlayer(game.currentPlayer, game).setMove(new GameAction(),p);
+	}
+	
+	private static void setTeam(byte t,int x,int y, GameObject game) {
+		game.moveList.makeMove(x, y, t, System.currentTimeMillis()-game.moveStart, game.moveNumber);
+		game.gamePiece[x][y].setTeam(t,game);
+		game.moveNumber++;
+		game.board.postInvalidate();
+	}
+	
+	public static boolean makeMove(PlayingEntity player, byte team, Point hex, GameObject game){
+		if(player!=null && game.gamePiece[hex.x][hex.y].getTeam() == 0){
+			setTeam(team,hex.x,hex.y,game);
+			return true;
+		}
+		else if(player!=null && game.moveNumber==2 && game.gamePiece[hex.x][hex.y].getTeam() == 1){//Swap rule
+	    	if(game.swap){
+				setTeam(team,hex.x,hex.y,game);
+				return true;
+	    	}
+		}
+		return false;
+	}
+	
+	public static void undo(int gameLocation, GameObject game){
+		if(game.moveNumber>1 && game.player1.supportsUndo() && game.player2.supportsUndo()){
+			checkedFlagReset(game);
+			
+			//Remove the piece from the board and the movelist
+			Move lastMove = game.moveList.thisMove;
+			game.gamePiece[lastMove.getX()][lastMove.getY()].setTeam((byte)0,game);
+			game.moveList = game.moveList.nextMove;
+			game.moveList.replay(0,game);
+			game.moveNumber--;
+			
+			if(gameLocation==Global.GAME_LOCATION){
+				//Determine who is a human
+				boolean p1 = game.player1 instanceof PlayerObject;
+				boolean p2 = game.player2 instanceof PlayerObject;
+				if(game.gameOver) game.currentPlayer = (game.currentPlayer%2)+1;
+				
+				if(game.currentPlayer==1 && p1){//It's a human's turn
+					game.player2.undoCalled();//Tell the other player we're going back a turn
+					
+					if(!p2){//If the other person isn't a human, undo again
+						if(game.moveNumber>1){
+							lastMove = game.moveList.thisMove;
+							game.gamePiece[lastMove.getX()][lastMove.getY()].setTeam((byte)0,game);
+							game.moveList = game.moveList.nextMove;
+							game.moveNumber--;
+						}
+						else{
+							getPlayer(game.currentPlayer, game).endMove();
+						}
+					}
+					else{
+						//Otherwise, cede the turn to the other player
+						getPlayer(game.currentPlayer, game).endMove();
+					}
+				}
+				else if(game.currentPlayer==1 && !p1){
+					if(!game.gameOver){
+						game.player1.undoCalled();
+					}
+				}
+				else if(game.currentPlayer==2 && p2){
+					game.player1.undoCalled();
+					
+					//If the other person isn't a (local) human
+					if(!p1){
+						//Undo again
+						if(game.moveNumber>1){
+							lastMove = game.moveList.thisMove;
+							game.gamePiece[lastMove.getX()][lastMove.getY()].setTeam((byte)0,game);
+							game.moveList = game.moveList.nextMove;
+							game.moveNumber--;
+						}
+						else{
+							getPlayer(game.currentPlayer, game).endMove();
+						}
+					}
+					else{
+						//Otherwise, cede the turn to the other player
+						getPlayer(game.currentPlayer, game).endMove();
+					}
+				}
+				else if(game.currentPlayer==2 && !p2){
+					if(!game.gameOver) {
+						game.player2.undoCalled();
+					}
+				}
+				if(game.gameOver && ((game.currentPlayer==2 && p1) || (game.currentPlayer==1 && p2))) game.currentPlayer = (game.currentPlayer%2)+1;
+			}
+			else if(gameLocation==LANGlobal.GAME_LOCATION){//Inside a LAN game
+				if(game.currentPlayer==1){//First player's turn
+					if(game.player1 instanceof LocalPlayerObject){//First player is on the network (not local)
+						if(LANGlobal.undoRequested){//First player requested the undo
+							//undo twice, don't switch players
+							if(game.moveNumber>1){
+								lastMove = game.moveList.thisMove;
+								game.gamePiece[lastMove.getX()][lastMove.getY()].setTeam((byte)0,game);
+								game.moveList = game.moveList.nextMove;
+								game.moveNumber--;
+							}
+							if(game.gameOver) game.currentPlayer = (game.currentPlayer%2)+1;
+						}
+						else{//Second player requested the undo
+							//undo once, switch players
+							GameAction.getPlayer(game.currentPlayer, game).endMove();
+						}
+					}
+					else{//First player is local (not on the network)
+						if(LANGlobal.undoRequested){//Second player requested the undo
+							//undo once, switch players
+							getPlayer(game.currentPlayer, game).endMove();
+						}
+						else{//First player requested the undo
+							//undo twice, don't switch players
+							if(game.moveNumber>1){
+								lastMove = game.moveList.thisMove;
+								game.gamePiece[lastMove.getX()][lastMove.getY()].setTeam((byte)0,game);
+								game.moveList = game.moveList.nextMove;
+								game.moveNumber--;
+							}
+							if(game.gameOver) game.currentPlayer = (game.currentPlayer%2)+1;
+						}
+					}
+				}
+				else{//Second player's turn
+					if(game.player2 instanceof LocalPlayerObject){//Second player is local (not on the network)
+						if(LANGlobal.undoRequested){//First player requested the undo
+							//undo once, switch players
+							getPlayer(game.currentPlayer, game).endMove();
+						}
+						else{//Second player requested the undo
+							//undo twice, don't switch players
+							if(game.moveNumber>1){
+								lastMove = game.moveList.thisMove;
+								game.gamePiece[lastMove.getX()][lastMove.getY()].setTeam((byte)0,game);
+								game.moveList = game.moveList.nextMove;
+								game.moveNumber--;
+							}
+							if(game.gameOver) game.currentPlayer = (game.currentPlayer%2)+1;
+						}
+					}
+					else{//Second player is on the network (not local)
+						if(LANGlobal.undoRequested){//Second player requested the undo
+							//undo twice, don't switch players
+							if(game.moveNumber>1){
+								lastMove = game.moveList.thisMove;
+								game.gamePiece[lastMove.getX()][lastMove.getY()].setTeam((byte)0,game);
+								game.moveList = game.moveList.nextMove;
+								game.moveNumber--;
+							}
+							if(game.gameOver) game.currentPlayer = (game.currentPlayer%2)+1;
+						}
+						else{//First player requested the undo
+							//undo once, switch players
+							GameAction.getPlayer(game.currentPlayer, game).endMove();
+						}
+					}
+				}
+				
+				LANGlobal.undoRequested = false;
+			}
+			else if(gameLocation==NetGlobal.GAME_LOCATION){//Inside a net game
+				if(game.currentPlayer==1){//First player's turn
+					if(game.player1 instanceof NetPlayerObject){//First player is on the network (not local)
+						if(NetGlobal.undoRequested){//First player requested the undo
+							//undo twice, don't switch players
+							if(game.moveNumber>1){
+								lastMove = game.moveList.thisMove;
+								game.gamePiece[lastMove.getX()][lastMove.getY()].setTeam((byte)0,game);
+								game.moveList = game.moveList.nextMove;
+								game.moveNumber--;
+							}
+							if(game.gameOver) game.currentPlayer = (game.currentPlayer%2)+1;
+						}
+						else{//Second player requested the undo
+							//undo once, switch players
+							GameAction.getPlayer(game.currentPlayer, game).endMove();
+						}
+					}
+					else{//First player is local (not on the network)
+						if(NetGlobal.undoRequested){//Second player requested the undo
+							//undo once, switch players
+							getPlayer(game.currentPlayer, game).endMove();
+						}
+						else{//First player requested the undo
+							//undo twice, don't switch players
+							if(game.moveNumber>1){
+								lastMove = game.moveList.thisMove;
+								game.gamePiece[lastMove.getX()][lastMove.getY()].setTeam((byte)0,game);
+								game.moveList = game.moveList.nextMove;
+								game.moveNumber--;
+							}
+							if(game.gameOver) game.currentPlayer = (game.currentPlayer%2)+1;
+						}
+					}
+				}
+				else{//Second player's turn
+					if(game.player2 instanceof NetPlayerObject){//Second player is local (not on the network)
+						if(NetGlobal.undoRequested){//First player requested the undo
+							//undo once, switch players
+							getPlayer(game.currentPlayer, game).endMove();
+						}
+						else{//Second player requested the undo
+							//undo twice, don't switch players
+							if(game.moveNumber>1){
+								lastMove = game.moveList.thisMove;
+								game.gamePiece[lastMove.getX()][lastMove.getY()].setTeam((byte)0,game);
+								game.moveList = game.moveList.nextMove;
+								game.moveNumber--;
+							}
+							if(game.gameOver) game.currentPlayer = (game.currentPlayer%2)+1;
+						}
+					}
+					else{//Second player is on the network (not local)
+						if(NetGlobal.undoRequested){//Second player requested the undo
+							//undo twice, don't switch players
+							if(game.moveNumber>1){
+								lastMove = game.moveList.thisMove;
+								game.gamePiece[lastMove.getX()][lastMove.getY()].setTeam((byte)0,game);
+								game.moveList = game.moveList.nextMove;
+								game.moveNumber--;
+							}
+							if(game.gameOver) game.currentPlayer = (game.currentPlayer%2)+1;
+						}
+						else{//First player requested the undo
+							//undo once, switch players
+							GameAction.getPlayer(game.currentPlayer, game).endMove();
+						}
+					}
+				}
+				
+				NetGlobal.undoRequested = false;
+			}
+			
+			//Reset the game if it's already ended
+			if(game.gameOver){
+				game.moveList.replay(0,game);
+				game.start();
 			}
 		}
 		
-		polyXY = new Point[n][n];
+		game.board.postInvalidate();
 	}
 	
-	public boolean makeMove(int X, int Y, int team){
-    	for(int i=getN()-1;i>-1;i--){
-    		for(int j=getN()-1;j>-1;j--){
-    			if(X>getPolyXY()[i][j].x && Y>getPolyXY()[i][j].y){
-    				if(gameboard[i][j]==0){
-    					gameboard[i][j] = team;
-    					return true;
-    				}
-    				else{
-    					return false;
-    				}
-    			}
-    		}
-    	}
-    	return false;
-    }
-	
-	public int getN(){
-		return n;
+	public static class AnnounceWinner{
+		public AnnounceWinner(final int team, final GameObject game){
+			game.handler.post(new Runnable(){
+				public void run(){
+					game.winnerMsg = insert(game.board.getContext().getString(R.string.winner), getPlayer(team, game).getName());
+					game.winnerText.setText(game.winnerMsg);
+					game.winnerText.setVisibility(View.VISIBLE);
+					game.winnerText.invalidate();
+					game.timerText.setVisibility(View.GONE);
+					game.timerText.invalidate();
+				}
+			});
+		}
 	}
 	
-	public int[][] getGameboard(){
-		return gameboard;
+	public static String insert(String text, String name){
+		String inserted = text.replaceAll("#",name);
+		return inserted;
 	}
 	
-	public Point[][] getPolyXY(){
-		return polyXY;
+	public static PlayingEntity getPlayer(int i, GameObject game){
+		if(i==1){
+			return game.player1;
+		}
+		else if(i==2){
+			return game.player2;
+		}
+		else{
+			return null;
+		}
+	}
+
+	final static String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	public static String pointToString(Point p, GameObject game){
+		if(game.moveNumber==2 && game.moveList.thisMove.equals(game.moveList.nextMove.thisMove)) return "SWAP";
+		String str = "";
+		str += alphabet.charAt(p.y);
+		str += (p.x+1);
+		return str;
 	}
 	
-	public void setPolyXY(int x, int y, Point cord){
-		polyXY[x][y] = cord;
+	public static Point stringToPoint(String str, GameObject game){
+		if(game.moveNumber==1 && str.equals("SWAP")) return new Point(-1,-1);
+		if(str.equals("SWAP")) return new Point(game.moveList.thisMove.getX(),game.moveList.thisMove.getY());
+		int x = Integer.parseInt(str.substring(1))-1;
+		char y = str.charAt(0);
+		
+		return new Point(x, alphabet.indexOf(y));
 	}
+	
+	public static String md5(String s) {
+		MessageDigest digest;
+	    try {
+	        digest = MessageDigest.getInstance("MD5");
+	        digest.update(s.getBytes(),0,s.length());
+	        String hash = new BigInteger(1, digest.digest()).toString(16);
+	        return hash;
+	    } catch (NoSuchAlgorithmException e) {
+	        e.printStackTrace();
+	    }
+	    return "";
+	}
+
 }

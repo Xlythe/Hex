@@ -1,7 +1,6 @@
 package com.sam.hex;
 
 import android.graphics.Bitmap;
-import android.graphics.Point;
 
 public class BoardTools {
 	static double spaceH; // Horizontal
@@ -20,43 +19,11 @@ public class BoardTools {
 		return spaceH;
 
 	}
-	public static void undo(){
-		if(!Global.moveList.isEmpty()){
-			Point lastMove = Global.moveList.get(Global.moveList.size()-1);
-			
-			if(Global.currentPlayer==(byte)1) Global.player2.undo(lastMove);
-			else Global.player1.undo(lastMove);
-			
-			Global.moveList.remove(Global.moveList.size()-1);
-			//Reset the game if it's already ended
-			if(!Global.gameRunning){
-				GameAction.checkedFlagReset();
-				for(int x=0;x<Global.gridSize;x++){
-    				for(int y=0;y<Global.gridSize;y++){
-    					if(Global.gamePiece[x][y].getTeam()==(byte)1){
-    						Global.gamePiece[x][y].setColor(Global.player1Color);
-    					}
-    					else if(Global.gamePiece[x][y].getTeam()==(byte)2){
-    						Global.gamePiece[x][y].setColor(Global.player2Color);
-    					}
-    				}
-    			}
-				Global.gameRunning=true;
-				Global.game = new GameObject();
-				Global.currentPlayer=(byte) ((Global.currentPlayer%2)+1);
-				if(Global.currentPlayer==(byte)1) Global.player2.undo(lastMove);
-				else Global.player1.undo(lastMove);
-			}
-			
-			Global.currentPlayer=(byte) ((Global.currentPlayer%2)+1);
-		}
-		
-		Global.board.postInvalidate();
-	}
-	public static Bitmap getBackground(int w, int h) {
+	
+	public static Bitmap getBackground(int w, int h, GameObject game) {
 		Bitmap background =Bitmap.createBitmap(Global.windowWidth, Global.windowHeight,Bitmap.Config.ARGB_8888); //the background is drawn to this bitmap. 
-		RegularPolygonGameObject[][] gamePeace = Global.gamePiece;
-		double radius = BoardTools.radiusCalculator(Global.windowWidth, Global.windowHeight,Global.gridSize);
+		RegularPolygonGameObject[][] gamePeace = game.gamePiece;
+		double radius = BoardTools.radiusCalculator(Global.windowWidth, Global.windowHeight,game.gridSize);
 		double hrad = radius * Math.sqrt(3) / 2; // Horizontal radius
 		int yOffset = (int) ((Global.windowHeight - ((3 * radius / 2)
 				* (gamePeace[0].length - 1) + 2 * radius)) / 2);
@@ -84,9 +51,9 @@ public class BoardTools {
 						+ (cY - cX * slope2)) { // if above line 1 == above line
 					// 2
 					// if((y+x)/(((double)h+(double)w))<.5==((double)h/(double)w>y/x)){
-					background.setPixel((int) x, (int) y, Global.player1Color);
+					background.setPixel((int) x, (int) y, game.player1.getColor());
 				} else {
-					background.setPixel((int) x, (int) y, Global.player2Color);
+					background.setPixel((int) x, (int) y, game.player2.getColor());
 				}
 				// (((h*w)-h)>y/x)
 			}
@@ -95,23 +62,22 @@ public class BoardTools {
 
 	}
 
-	public static byte[][] teamGrid() { //not yet in use but will be used to send netcode
-		byte[][] loyalty = new byte[Global.gridSize][Global.gridSize];
-		RegularPolygonGameObject[][] gamePeace = Global.gamePiece;
+	public static byte[][] teamGrid(GameObject game) { //not yet in use but will be used to send netcode
+		byte[][] loyalty = new byte[game.gridSize][game.gridSize];
+		RegularPolygonGameObject[][] gamePeace = game.gamePiece;
 		for (int x = 0; x < gamePeace.length; x++)
 			for (int y = 0; y < gamePeace[0].length; y++)
 				loyalty[x][y] = gamePeace[x][y].getTeam();
 		return loyalty;
 	}
-	public static void clearBoard(){
-		for(RegularPolygonGameObject[] things:Global.gamePiece)
+	public static void clearBoard(GameObject game){
+		for(RegularPolygonGameObject[] things:game.gamePiece)
 			for(RegularPolygonGameObject guy:things)
-				if(guy!=null)guy.setTeam((byte)0);
+				if(guy!=null)guy.setTeam((byte)0,game);
 	}
-	@SuppressWarnings("unused")
-	public static void setBoard(){
-		for(RegularPolygonGameObject[] things:Global.gamePiece)
-			for(RegularPolygonGameObject guy:things)
+	public static void setBoard(GameObject game){
+		for(RegularPolygonGameObject[] things:game.gamePiece)
+			for(@SuppressWarnings("unused") RegularPolygonGameObject guy:things)
 				guy= new RegularPolygonGameObject();
 	}
 }

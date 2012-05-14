@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="preferences">
+        <PreferenceCategory
+            	android:key="lanPlayerCategory"
+                android:title=" ">
+	        <EditTextPreference
+	            android:title="@string/lanPlayerNameTitle"
+	            android:summary="@string/lanPlayerNameSummary"
+	            android:key="lanPlayerName"
+	            android:defaultValue="Player" />
+	        <ListPreference
+	            android:title="@string/lanPlayerTypeTitle"
+	            android:summary="@string/lanPlayerTypeSummary"
+	            android:key="lanPlayerType"
+	            android:defaultValue="0"
+	            android:entries="@array/lanPlayerArray"
+	            android:entryValues="@array/lanPlayerValues" />
+	        <net.margaritov.preference.colorpicker.ColorPickerPreference
+			    android:title="@string/lanPlayerColorTitle"
+			    android:summary="@string/lanPlayerColorSummary"
+			    android:key="lanPlayerColor"
+			    android:defaultValue="@integer/COLOR_BLUE" />
+	    </PreferenceCategory>
+</PreferenceScreen>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="player1Array">
+        <item>Humain</item>
+        <item>Ordinateur (Will)</item>
+        <item>Ordinateur (Bee)</item>
+    </string-array>
+    <string-array name="player2Array">
+        <item>Humain</item>
+        <item>Ordinateur (Will)</item>
+        <item>Ordinateur (Bee)</item>
+    </string-array>
+    <string-array name="gameSizeArray">
+        <item>7x7</item>
+        <item>9x9</item>
+        <item>11x11</item>
+        <item>Coutume</item>
+    </string-array>
+    <string-array name="availablePlayers">
+        <item>Balayage…</item>
+    </string-array>
+    <string-array name="gameLocationArray">
+        <item>Même périphérique</item>
+        <!-- <item>LAN</item> -->
+        <item>En ligne</item>
+    </string-array>
+    <string-array name="netPositionArray">
+        <item>Spectateur</item>
+        <item>Premier joueur</item>
+        <item>Deuxième joueur</item>
+    </string-array>
+    <string-array name="timerTypeArray">
+        <item>Pas de minuterie</item>
+        <item>Par coup</item>
+        <item>Match en entier</item>
+    </string-array>
+    <string-array name="netTimerArray">
+        <item>Pas de minuterie</item>
+        <item>5minutes</item>
+        <item>10minutes</item>
+        <item>15minutes</item>
+        <item>20minutes</item>
+        <item>30minutes</item>
+        <item>45minutes</item>
+        <item>1heure</item>
+        <item>1heure 30minutes</item>
+        <item>2heures</item>
+    </string-array>
+    <string-array name="netAdditionalTimeArray">
+        <item>+0secondes/déplacer</item>
+        <item>+10secondes/déplacer</item>
+        <item>+15secondes/déplacer</item>
+        <item>+20secondes/déplacer</item>
+        <item>+30secondes/déplacer</item>
+        <item>+45secondes/déplacer</item>
+        <item>+1minute/déplacer</item>
+    </string-array>
+</resources>

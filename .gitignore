@@ -12,13 +12,14 @@ tmp/**/*
 #ignore the binary
 bin/*
 
-#eclipse stuff
+#eclips stuff
 .project
 .classpath
-.settings
  
 .~lock.designDoc.odt#
 
 *.class
 
 scr
+
+gen/*

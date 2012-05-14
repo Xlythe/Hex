@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="player1Array">
+        <item>Človek</item>
+        <item>Počítač (Will)</item>
+        <item>Počítač (Bee)</item>
+    </string-array>
+    <string-array name="player2Array">
+        <item>Človek</item>
+        <item>Počítač (Will)</item>
+        <item>Počítač (Bee)</item>
+    </string-array>
+    <string-array name="gameSizeArray">
+        <item>7x7</item>
+        <item>9x9</item>
+        <item>11x11</item>
+        <item>Zvyk</item>
+    </string-array>
+    <string-array name="availablePlayers">
+        <item>Snímanie…</item>
+    </string-array>
+    <string-array name="gameLocationArray">
+        <item>Rovnaké zariadenie</item>
+        <!-- <item>LAN</item> -->
+        <item>Online</item>
+    </string-array>
+    <string-array name="netPositionArray">
+        <item>Divák</item>
+        <item>Prvý hráč</item>
+        <item>Druhý hráč</item>
+    </string-array>
+    <string-array name="timerTypeArray">
+        <item>Nie časovač</item>
+        <item>Za ťah</item>
+        <item>Celý zápas</item>
+    </string-array>
+    <string-array name="netTimerArray">
+        <item>Nie časovač</item>
+        <item>5minút</item>
+        <item>10minút</item>
+        <item>15minút</item>
+        <item>20minút</item>
+        <item>30minút</item>
+        <item>45minút</item>
+        <item>1hodina</item>
+        <item>1hodina 30minút</item>
+        <item>2hodín</item>
+    </string-array>
+    <string-array name="netAdditionalTimeArray">
+        <item>+0sekundy/pohyb</item>
+        <item>+10sekundy/pohyb</item>
+        <item>+15sekundy/pohyb</item>
+        <item>+20sekundy/pohyb</item>
+        <item>+30sekundy/pohyb</item>
+        <item>+45sekundy/pohyb</item>
+        <item>+1minút/pohyb</item>
+    </string-array>
+</resources>

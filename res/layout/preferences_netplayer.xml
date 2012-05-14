@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="preferences">
+        <PreferenceCategory
+            	android:key="netPlayerCategory"
+                android:title=" ">
+	        <EditTextPreference
+	            android:title="@string/netUsernameTitle"
+	            android:summary="@string/netUsernameSummary"
+	            android:key="netUsername"
+	            android:defaultValue="" />
+	        <EditTextPreference
+	            android:title="@string/netPasswordTitle"
+	            android:summary="@string/netPasswordSummary"
+	            android:key="visibleNetPassword"
+	            android:defaultValue=""
+	            android:inputType="textPassword" />
+	        <EditTextPreference
+	            android:title="@string/netPasswordTitle"
+	            android:summary="@string/netPasswordSummary"
+	            android:key="netPassword"
+	            android:defaultValue=""
+	            android:inputType="textPassword" />
+	        <EditTextPreference
+	            android:key="netPosition"
+	            android:defaultValue="0" />
+	        <EditTextPreference
+	            android:key="netGridSize"
+	            android:defaultValue="0" />
+	        <EditTextPreference
+	            android:key="netTimerTime"
+	            android:defaultValue="0" />
+	        <EditTextPreference
+	            android:key="netAdditionalTimerTime"
+	            android:defaultValue="0" />
+	        <CheckBoxPreference
+	            android:key="netRatedGame"
+	            android:defaultValue="true" />
+	    </PreferenceCategory>
+</PreferenceScreen>

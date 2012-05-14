@@ -1,0 +1,30 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/ActionBarCompat" >
+    <Button 
+        android:layout_width="70dp"
+        android:layout_height="50dp"
+        android:layout_alignParentLeft="true"
+        android:id="@+id/home"
+        android:background="@drawable/actionbar_home"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_toRightOf="@id/home"
+        android:text="@string/app_name"
+        android:textColor="@color/white"
+        android:padding="5dp"
+        android:gravity="center_vertical"
+        android:textAppearance="?android:attr/textAppearanceLarge"/>
+    <Button 
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentRight="true"
+        android:id="@+id/quit"
+        android:background="@drawable/actionbar_quit"/>
+    <Button 
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_toLeftOf="@id/quit"
+        android:id="@+id/newgame"
+        android:background="@drawable/actionbar_newgame"/>
+</RelativeLayout>

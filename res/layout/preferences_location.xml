@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="preferences">
+    	<ListPreference
+            android:title="@string/gameLocationTitle"
+            android:summary="@string/gameLocationSummary"
+            android:key="gameLocation"
+            android:defaultValue="0"
+            android:entries="@array/gameLocationArray"
+            android:entryValues="@array/gameLocationValues" />
+</PreferenceScreen>

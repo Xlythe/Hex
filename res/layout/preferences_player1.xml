@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="preferences">
+        <PreferenceCategory
+            	android:key="player1Category"
+                android:title=" ">
+	        <EditTextPreference
+	            android:title="@string/player1NameTitle"
+	            android:summary="@string/player1NameSummary"
+	            android:key="player1Name"
+	            android:defaultValue="Player1" />
+	        <ListPreference
+	            android:title="@string/player1TypeTitle"
+	            android:summary="@string/player1TypeSummary"
+	            android:key="player1Type"
+	            android:defaultValue="0"
+	            android:entries="@array/player1Array"
+	            android:entryValues="@array/player1Values" />
+	        <net.margaritov.preference.colorpicker.ColorPickerPreference
+			    android:title="@string/player1ColorTitle"
+			    android:summary="@string/player1ColorSummary"
+			    android:key="player1Color"
+			    android:defaultValue="@integer/COLOR_BLUE" />
+	    </PreferenceCategory>
+</PreferenceScreen>

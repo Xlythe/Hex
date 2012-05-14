@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="preferences">
+	    <PreferenceCategory
+                android:title=" ">
+	       <Preference
+	            android:title="@string/resetTitle"
+	            android:summary="@string/resetSummary"
+	            android:key="resetPref"/>
+	    </PreferenceCategory>
+</PreferenceScreen>

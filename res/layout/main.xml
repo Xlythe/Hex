@@ -1,64 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:baselineAligned="false" >
-
-	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
-	    android:orientation="vertical"
-	    android:layout_weight="1" >
-
-	    <TextView
-	        android:id="@+id/textView1"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:gravity="center"
-	        android:text="@string/frontpage"
-	        android:textAppearance="?android:attr/textAppearanceLarge" />
-	
-	    <ImageView
-	        android:id="@+id/imageView1"
-	        android:layout_width="71dp"
-	        android:layout_height="0dip"
-	        android:layout_gravity="center"
-	        android:layout_weight="1"
-	        android:contentDescription="@string/frontpage"
-	        android:src="@drawable/icon_large" />
-	    
-	</LinearLayout>
-	
-	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
-	    android:orientation="vertical"
-	    android:layout_weight="1" >
-	    
-	    <Button
-	        android:id="@+id/startButton"
-	        android:layout_width="240dp"
-	        android:layout_height="0dp"
-	        android:layout_gravity="center"
-	        android:layout_weight="1"
-	        android:text="@string/start" />
-	    <Button
-	        android:id="@+id/instructionsButton"
-	        android:layout_width="240dp"
-	        android:layout_height="0dp"
-	        android:layout_gravity="center"
-	        android:layout_weight="1"
-	        android:text="@string/rules" />
-	
-	    <Button
-	        android:id="@+id/optionsButton"
-	        android:layout_width="240dp"
-	        android:layout_height="0dp"
-	        android:layout_gravity="center"
-	        android:layout_weight="1"
-	        android:text="@string/options" />
-	    
-	</LinearLayout>
-
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    
+        <!-- Include Action Bar -->
+        <include layout="@layout/main_actionbar"/>
+ 
+        <!--  Include Fragmented dashboard -->
+        <include layout="@layout/main_dashboard"/>
+ 
 </LinearLayout>

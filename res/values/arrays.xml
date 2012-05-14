@@ -2,23 +2,33 @@
 <resources>
     <string-array name="player1Array">
         <item>Human</item>
-        <item>Computer</item>
+        <item>Computer (Will)</item>
+        <item>Computer (Bee)</item>
     </string-array>
     <string-array name="player1Values">
         <item>0</item>
         <item>1</item>
+        <item>4</item>
     </string-array>
     <string-array name="player2Array">
         <item>Human</item>
-        <item>Computer</item>
-        <!-- <item>Local Network Player</item>
-        <item>Online Player</item> -->
+        <item>Computer (Will)</item>
+        <item>Computer (Bee)</item>
     </string-array>
     <string-array name="player2Values">
         <item>0</item>
         <item>1</item>
-        <!-- <item>2</item>
-        <item>3</item> -->
+        <item>4</item>
+    </string-array>
+    <string-array name="lanPlayerArray">
+        <item>Human</item>
+        <item>Computer (Will)</item>
+        <item>Computer (Bee)</item>
+    </string-array>
+    <string-array name="lanPlayerValues">
+        <item>0</item>
+        <item>1</item>
+        <item>4</item>
     </string-array>
     <string-array name="gameSizeArray">
         <item>7x7</item>
@@ -32,15 +42,101 @@
         <item>11</item>
         <item>0</item>
     </string-array>
-    <string-array name="aiLabels">
-        <item>Easy</item>
-        <item>Hard</item>
-    </string-array>
-    <string-array name="aiValues">
-        <item>0</item>
-        <item>1</item>
-    </string-array>
     <string-array name="availablePlayers">
         <item>Scanning…</item>
     </string-array>
+    <string-array name="gameLocationArray">
+        <item>Same Device</item>
+        <!-- <item>LAN</item> -->
+        <item>Online</item>
+    </string-array>
+    <string-array name="gameLocationValues">
+        <item>0</item>
+        <!-- <item>1</item> -->
+        <item>2</item>
+    </string-array>
+    <string-array name="netGameSizeArray">
+        <item>8x8</item>
+        <item>9x9</item>
+        <item>10x10</item>
+        <item>11x11</item>
+        <item>12x12</item>
+        <item>13x13</item>
+        <item>14x14</item>
+        <item>15x15</item>
+        <item>19x19</item>
+    </string-array>
+    <integer-array name="netGameSizeValues">
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>19</item>
+    </integer-array>
+    <string-array name="netPositionArray">
+        <item>Spectator</item>
+        <item>First Player</item>
+        <item>Second Player</item>
+    </string-array>
+    <integer-array name="netPositionValues">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </integer-array>
+    <string-array name="timerTypeArray">
+        <item>No timer</item>
+        <item>Per move</item>
+        <item>Entire match</item>
+    </string-array>
+    <string-array name="timerTypeValues">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="netTimerArray">
+        <item>No timer</item>
+        <item>5min</item>
+        <item>10min</item>
+        <item>15min</item>
+        <item>20min</item>
+        <item>30min</item>
+        <item>45min</item>
+        <item>1hr</item>
+        <item>1hr 30min</item>
+        <item>2hr</item>
+    </string-array>
+    <integer-array name="netTimerValues">
+        <item>0</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>30</item>
+        <item>45</item>
+        <item>60</item>
+        <item>90</item>
+        <item>120</item>
+    </integer-array>
+    <string-array name="netAdditionalTimeArray">
+        <item>+0sec/move</item>
+        <item>+10sec/move</item>
+        <item>+15sec/move</item>
+        <item>+20sec/move</item>
+        <item>+30sec/move</item>
+        <item>+45sec/move</item>
+        <item>+1min/move</item>
+    </string-array>
+    <integer-array name="netAdditionalTimeValues">
+        <item>0</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>30</item>
+        <item>45</item>
+        <item>60</item>
+    </integer-array>
 </resources>

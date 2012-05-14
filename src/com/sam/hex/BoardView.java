@@ -1,43 +1,90 @@
 package com.sam.hex;
 
+import com.sam.hex.net.NetGlobal;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Path;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.PathShape;
 import android.graphics.drawable.shapes.RectShape;
+import android.util.AttributeSet;
 import android.view.View;
 import android.graphics.Color;
 
+/**
+ * @author Will Harmon
+ **/
 public class BoardView extends View{
 	private ShapeDrawable[][] mDrawable;
 	private ShapeDrawable[][] mOutline;
 	private ShapeDrawable backgroundTopBottom;
 	private ShapeDrawable backgroundLeft;
 	private ShapeDrawable backgroundRight;
+	public GameObject game;
 	
 	public BoardView(Context context){
 		super(context);
-		calculateGrid(context);
+		if(Global.viewLocation==Global.GAME_LOCATION){
+			game = Global.game;
+		}
+		else if(Global.viewLocation==NetGlobal.GAME_LOCATION){
+			game = NetGlobal.game;
+		}
+		calculateGrid();
 	}
+	public BoardView(Context context, AttributeSet attrs){
+        super(context, attrs);
+        if(Global.viewLocation==Global.GAME_LOCATION){
+			game = Global.game;
+		}
+		else if(Global.viewLocation==NetGlobal.GAME_LOCATION){
+			game = NetGlobal.game;
+		}
+        calculateGrid();
+    }
+    public BoardView(Context context, AttributeSet attrs, int defStyle){
+        super(context, attrs, defStyle);
+        if(Global.viewLocation==Global.GAME_LOCATION){
+			game = Global.game;
+		}
+		else if(Global.viewLocation==NetGlobal.GAME_LOCATION){
+			game = NetGlobal.game;
+		}
+        calculateGrid();
+    }
 	
 	protected void onDraw(Canvas canvas){
-		int n = Global.gridSize;
+		int n = game.gridSize;
 		
+		colorBackground();
 		backgroundTopBottom.draw(canvas);
 		backgroundLeft.draw(canvas);
 		backgroundRight.draw(canvas);
 		for(int xc=0;xc<n;xc++)
 			for(int yc=0;yc<n;yc++){
 				mOutline[xc][yc].draw(canvas);
-				mDrawable[xc][yc].getPaint().setColor(Global.gamePiece[xc][yc].getColor());
+				mDrawable[xc][yc].getPaint().setColor(game.gamePiece[xc][yc].getColor());
 				mDrawable[xc][yc].draw(canvas);
 			}
-		
+		game.player1Icon.setColorFilter(game.player1.getColor());
+		game.player2Icon.setColorFilter(game.player2.getColor());
+		if(game.currentPlayer==1 && !game.gameOver){
+			game.player1Icon.setAlpha(255);
+			game.player2Icon.setAlpha(80);
+		}
+		else if(game.currentPlayer==2 && !game.gameOver){
+			game.player1Icon.setAlpha(80);
+			game.player2Icon.setAlpha(255);
+		}
+		else{
+			game.player1Icon.setAlpha(80);
+			game.player2Icon.setAlpha(80);
+		}
 	}
 	@Override
-	protected void onSizeChanged(int w, int h, int oldw, int oldh){
-		int n = Global.gridSize;
+	public void onSizeChanged(int w, int h, int oldw, int oldh){
+		int n = game.gridSize;
 		mDrawable = new ShapeDrawable[n][n];
 		mOutline=new ShapeDrawable[n][n];
 		Global.windowHeight=getHeight();
@@ -45,11 +92,11 @@ public class BoardView extends View{
 		//Size of border
 		int border=1;
 		
-		double radius=BoardTools.radiusCalculator(Global.windowWidth, Global.windowHeight, Global.gridSize); 
+		double radius=BoardTools.radiusCalculator(Global.windowWidth, Global.windowHeight, game.gridSize); 
 		double hrad = radius * Math.sqrt(3) / 2;
 		int yOffset = (int) ((Global.windowHeight - ((3 * radius / 2)
-				* (Global.gamePiece[0].length - 1) + 2 * radius)) / 2);
-		int xOffset = (int) ((Global.windowWidth - (hrad * Global.gamePiece.length*2+hrad*(Global.gamePiece.length-1))) / 2);
+				* (game.gamePiece[0].length - 1) + 2 * radius)) / 2);
+		int xOffset = (int) ((Global.windowWidth - (hrad * game.gamePiece.length*2+hrad*(game.gamePiece.length-1))) / 2);
 		
 		
         //Shape of a hexagon
@@ -66,24 +113,21 @@ public class BoardView extends View{
         if(Global.windowHeight>Global.windowWidth){
         	Path left = new Path();
 	        left.moveTo(0, 0);
-	        left.lineTo((float) (Global.gridSize*hrad*2), 0);
+	        left.lineTo((float) (game.gridSize*hrad*2), 0);
 	        left.lineTo(0, Global.windowHeight);
 	        left.close();
 	        Path right = new Path();
 	        right.moveTo(Global.windowWidth, Global.windowHeight);
-	        right.lineTo((float) (Global.windowWidth-(Global.gridSize*hrad*2)), Global.windowHeight);
+	        right.lineTo((float) (Global.windowWidth-(game.gridSize*hrad*2)), Global.windowHeight);
 	        right.lineTo(Global.windowWidth, 0);
 	        right.close();
 	        
 	        backgroundTopBottom = new ShapeDrawable(new RectShape());
 	        backgroundTopBottom.setBounds(0,0,Global.windowWidth,Global.windowHeight);
-	        backgroundTopBottom.getPaint().setColor(Global.player2Color);
 	        backgroundLeft = new ShapeDrawable(new PathShape(left, Global.windowWidth, Global.windowHeight));
 	        backgroundLeft.setBounds(0,(int) (yOffset+hrad),Global.windowWidth,Global.windowHeight);
-	        backgroundLeft.getPaint().setColor(Global.player1Color);
 	        backgroundRight = new ShapeDrawable(new PathShape(right, Global.windowWidth, Global.windowHeight));
 	        backgroundRight.setBounds(0,0,Global.windowWidth,(int) (Global.windowHeight-(yOffset+hrad)));
-	        backgroundRight.getPaint().setColor(Global.player1Color);
         }
         else{
         	Path left = new Path();
@@ -99,15 +143,11 @@ public class BoardView extends View{
 	        
         	backgroundTopBottom = new ShapeDrawable(new RectShape());
 	        backgroundTopBottom.setBounds(0,0,Global.windowWidth,Global.windowHeight);
-	        backgroundTopBottom.getPaint().setColor(Global.player1Color);
 	        backgroundLeft = new ShapeDrawable(new PathShape(left, Global.windowWidth, Global.windowHeight));
 	        backgroundLeft.setBounds(0,0,Global.windowWidth,Global.windowHeight);
-	        backgroundLeft.getPaint().setColor(Global.player2Color);
 	        backgroundRight = new ShapeDrawable(new PathShape(right, Global.windowWidth, Global.windowHeight));
 	        backgroundRight.setBounds(0,0,Global.windowWidth,Global.windowHeight);
-	        backgroundRight.getPaint().setColor(Global.player2Color);
         }
-        
               
 		for(int xc=0;xc<n;xc++)
 			for(int yc=0;yc<n;yc++){
@@ -118,15 +158,28 @@ public class BoardView extends View{
 				mOutline[xc][yc] = new ShapeDrawable(new PathShape(path, (int)hrad*2, (int)radius*2));
 				mOutline[xc][yc].setBounds((int)(x-hrad),(int)(y),(int)(x+hrad),(int)(y+radius*2));
 				mOutline[xc][yc].getPaint().setColor(Color.BLACK);
-				Global.gamePiece[xc][yc].set(x-hrad, y, radius);
+				game.gamePiece[xc][yc].set(x-hrad, y, radius);
 				
 			}
 	}
 	
-	public void calculateGrid(Context context){
-		if(Global.gamePiece[0][0]==null)
-		for(int xc=0;xc<Global.gridSize;xc++)
-			for(int yc=0;yc<Global.gridSize;yc++)
-				Global.gamePiece[xc][yc]=new RegularPolygonGameObject();
+	public void calculateGrid(){
+		if(game.gamePiece[0][0]==null)
+		for(int xc=0;xc<game.gridSize;xc++)
+			for(int yc=0;yc<game.gridSize;yc++)
+				game.gamePiece[xc][yc]=new RegularPolygonGameObject();
+	}
+	
+	private void colorBackground(){
+		if(Global.windowHeight>Global.windowWidth){
+	        backgroundTopBottom.getPaint().setColor(game.player2.getColor());
+	        backgroundLeft.getPaint().setColor(game.player1.getColor());
+	        backgroundRight.getPaint().setColor(game.player1.getColor());
+        }
+        else{
+	        backgroundTopBottom.getPaint().setColor(game.player1.getColor());
+	        backgroundLeft.getPaint().setColor(game.player2.getColor());
+	        backgroundRight.getPaint().setColor(game.player2.getColor());
+        }
 	}
 }

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="@string/timerTitle"
+        android:textColor="@color/white"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+    
+    <Spinner
+        android:id="@+id/timerType"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:defaultValue="0"
+        android:entries="@array/timerTypeArray"
+        android:entryValues="@array/timerTypeValues" />
+    
+    <EditText
+        android:id="@+id/timer"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:defaultValue="0"
+        android:inputType="number" />
+
+</LinearLayout>

@@ -263,6 +263,7 @@ public class Preferences extends PreferenceActivity {
     @SuppressWarnings("deprecation")
 	private void loadPreferences(){
     	setContentView(R.layout.preferences);
+        screen = (PreferenceScreen) findPreference("preferences");
     	TextView title = (TextView) findViewById(R.id.actionbarTitle);
     	int gameLoc;
     	if(!in_submenu){
@@ -283,10 +284,10 @@ public class Preferences extends PreferenceActivity {
             	addPreferencesFromResource(R.layout.preferences_general);
 	    		
 	    		//Hide hidden preferences
-            	PreferenceScreen general = (PreferenceScreen) findPreference("generalScreen");
-	            general.removePreference(findPreference("customGameSizePref"));
-	            general.removePreference(findPreference("timerTypePref"));
-	            general.removePreference(findPreference("timerPref"));
+            	screen = (PreferenceScreen) findPreference("generalScreen");
+            	screen.removePreference(findPreference("customGameSizePref"));
+            	screen.removePreference(findPreference("timerTypePref"));
+            	screen.removePreference(findPreference("timerPref"));
             }
             else if(in_p1){
 	        	addPreferencesFromResource(R.layout.preferences_player1);
@@ -319,8 +320,6 @@ public class Preferences extends PreferenceActivity {
             general.removePreference(findPreference("netRatedGame"));
         }
     	addPreferencesFromResource(R.layout.preferences_reset);
-    	
-        screen = (PreferenceScreen) findPreference("preferences");
         
         Button home = (Button) findViewById(R.id.home);
         home.setOnClickListener(new View.OnClickListener() {

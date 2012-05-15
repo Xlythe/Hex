@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="preferences">
+    <PreferenceCategory
+        android:title=" ">
+	    <Preference
+	        android:title="Game Options"
+	        android:key="general">
+	    </Preference>
+	    <Preference
+	        android:title="Player 1"
+	        android:key="p1">
+	    </Preference>
+	    <Preference
+	        android:title="Player 2"
+	        android:key="p2">
+	    </Preference>
+    </PreferenceCategory>
+</PreferenceScreen>

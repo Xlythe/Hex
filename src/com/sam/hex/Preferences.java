@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -29,6 +30,10 @@ import android.widget.TextView;
  * @author Will Harmon
  **/
 public class Preferences extends PreferenceActivity {
+	private static final int GENERAL = 0;
+	private static final int PLAYER1 = 1;
+	private static final int PLAYER2 = 2;
+	
 	SharedPreferences settings;
 	PreferenceScreen screen;
 	Preference p1Pref;
@@ -38,13 +43,44 @@ public class Preferences extends PreferenceActivity {
 	Preference gridPref;
 	Preference timerPref;
 	Preference passwordPref;
+	Preference general;
+	Preference p1;
+	Preference p2;
+	
+	private boolean in_submenu = false;
+	private boolean in_general = false;
+	private boolean in_p1 = false;
+	private boolean in_p2 = false;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         settings = PreferenceManager.getDefaultSharedPreferences(this);
         
+        if(getIntent().getExtras()!=null) {
+        	in_submenu = true;
+        	Bundle extras = getIntent().getExtras();
+        	int type = extras.getInt("type");
+
+        	if(type==GENERAL){
+        		in_general=true;
+        	}
+        	else if(type==PLAYER1){
+        		in_p1=true;
+        	}
+        	else if(type==PLAYER2){
+        		in_p2=true;
+        	}
+        }
+        
         loadPreferences();
+    }
+    
+    @Override
+    public void onResume(){
+    	super.onResume();
+    	
+    	setListeners();
     }
     
     class locListener implements OnPreferenceChangeListener{        
@@ -144,17 +180,27 @@ public class Preferences extends PreferenceActivity {
         }
     }
     
-    @Override
-    public void onResume(){
-    	super.onResume();
-    	
-    	setListeners();
+    class menuListener implements OnPreferenceClickListener{
+    	int type;
+    	menuListener(int type){
+    		this.type = type;
+    	}
+		@Override
+		public boolean onPreferenceClick(Preference preference) {
+			final Intent intent = new Intent(getBaseContext(),Preferences.class);
+			intent.putExtra("type", type);
+			startActivity(intent);
+			return false;
+		}
     }
     
-    private void setListeners(){
+    @SuppressWarnings("deprecation")
+	private void setListeners(){
     	//Hide player2 unless the game location is on a single phone
     	Preference gameLoc = findPreference("gameLocation"); 
-    	gameLoc.setOnPreferenceChangeListener(new locListener());
+    	if(gameLoc!=null){
+    		gameLoc.setOnPreferenceChangeListener(new locListener());
+    	}
     	
     	//Change the summary to show the player's name
         p1Pref = findPreference("player1Name");
@@ -175,7 +221,9 @@ public class Preferences extends PreferenceActivity {
         
         //Set up the code to return everything to default
         resetPref = findPreference("resetPref");
-        resetPref.setOnPreferenceClickListener(new resetListener());
+        if(resetPref!=null){
+        	resetPref.setOnPreferenceClickListener(new resetListener());
+        }
         
         //Allow for custom grid sizes
         gridPref = findPreference("gameSizePref");
@@ -196,26 +244,58 @@ public class Preferences extends PreferenceActivity {
         if(passwordPref!=null){
 	        passwordPref.setOnPreferenceChangeListener(new passwordListener());
         }
+        
+        //Set up the abstract menu
+        general = findPreference("general");
+        if(general!=null){
+        	general.setOnPreferenceClickListener(new menuListener(GENERAL));
+        }
+        p1 = findPreference("p1");
+        if(p1!=null){
+        	p1.setOnPreferenceClickListener(new menuListener(PLAYER1));
+        }
+        p2 = findPreference("p2");
+        if(p2!=null){
+        	p2.setOnPreferenceClickListener(new menuListener(PLAYER2));
+        }
     }
     
-    private void loadPreferences(){
+    @SuppressWarnings("deprecation")
+	private void loadPreferences(){
     	setContentView(R.layout.preferences);
     	TextView title = (TextView) findViewById(R.id.actionbarTitle);
-    	addPreferencesFromResource(R.layout.preferences_location);
-        ListPreference val = (ListPreference) findPreference("gameLocation");
-        if(val.getValue().equals("0")){
-            title.setText(this.getText(R.string.preferences));
-        	addPreferencesFromResource(R.layout.preferences_general);
-        	addPreferencesFromResource(R.layout.preferences_player1);
-    		addPreferencesFromResource(R.layout.preferences_player2);
-    		
-    		//Hide hidden preferences
-        	PreferenceCategory general = (PreferenceCategory) findPreference("generalCategory");
-            general.removePreference(findPreference("customGameSizePref"));
-            general.removePreference(findPreference("timerTypePref"));
-            general.removePreference(findPreference("timerPref"));
+    	int gameLoc;
+    	if(!in_submenu){
+	    	addPreferencesFromResource(R.layout.preferences_location);
+	        ListPreference val = (ListPreference) findPreference("gameLocation");
+	        gameLoc = Integer.parseInt(val.getValue());
     	}
-        else if(val.getValue().equals("1")){
+    	else{
+    		gameLoc=0;
+    	}
+        if(gameLoc==0){
+            title.setText(this.getText(R.string.preferences));
+            
+            if(!in_submenu){
+            	addPreferencesFromResource(R.layout.preferences_abstract);
+            }
+            else if(in_general){
+            	addPreferencesFromResource(R.layout.preferences_general);
+	    		
+	    		//Hide hidden preferences
+            	PreferenceScreen general = (PreferenceScreen) findPreference("generalScreen");
+	            general.removePreference(findPreference("customGameSizePref"));
+	            general.removePreference(findPreference("timerTypePref"));
+	            general.removePreference(findPreference("timerPref"));
+            }
+            else if(in_p1){
+	        	addPreferencesFromResource(R.layout.preferences_player1);
+            }
+            else if(in_p2){
+	    		addPreferencesFromResource(R.layout.preferences_player2);
+            }
+    	}
+        else if(gameLoc==1){
         	addPreferencesFromResource(R.layout.preferences_general);
         	addPreferencesFromResource(R.layout.preferences_lanplayer);
 
@@ -225,7 +305,7 @@ public class Preferences extends PreferenceActivity {
             general.removePreference(findPreference("timerTypePref"));
             general.removePreference(findPreference("timerPref"));
         }
-        else if(val.getValue().equals("2")){
+        else if(gameLoc==2){
             title.setText(this.getText(R.string.preferences_net));
         	addPreferencesFromResource(R.layout.preferences_netplayer);
         	

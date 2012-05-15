@@ -16,7 +16,7 @@ import org.xml.sax.XMLReader;
 
 import com.sam.hex.GameAction;
 import com.sam.hex.GameObject;
-import com.sam.hex.PlayingEntity;
+import com.sam.hex.PlayerObject;
 
 import android.graphics.Point;
 import android.os.Handler;
@@ -24,10 +24,7 @@ import android.os.Handler;
 /**
  * @author Will Harmon
  **/
-public class NetPlayerObject implements PlayingEntity {
-	private String name;
-	private int color;
-	private long timeLeft;
+public class NetPlayerObject extends PlayerObject {
 	private int team;
 	private MoveListener listener;
 	private LinkedList<Point> hex = new LinkedList<Point>();
@@ -38,6 +35,7 @@ public class NetPlayerObject implements PlayingEntity {
 	private int sid;
 	
 	public NetPlayerObject(int team, GameObject game, Handler handler, Runnable newgame) {
+		super(team, game);
 		this.team = team;
 		this.game = game;
 		this.server = NetGlobal.server;
@@ -292,36 +290,6 @@ public class NetPlayerObject implements PlayingEntity {
 	@Override
 	public void endMove() {
 		hex.add(new Point(-1,-1));
-	}
-
-	@Override
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	@Override
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public void setColor(int color) {
-		this.color = color;
-	}
-
-	@Override
-	public int getColor() {
-		return color;
-	}
-
-	@Override
-	public void setTime(long time) {
-		this.timeLeft = time;
-	}
-
-	@Override
-	public long getTime() {
-		return timeLeft;
 	}
 
 	@Override

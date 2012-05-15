@@ -56,7 +56,5 @@
         <item name="android:background">@color/black</item>
     </style>
     
-	<style name="LightTheme" parent="@android:style/Theme.Holo.Light.NoActionBar">
-	    
-	</style>
+	<style name="LightTheme" parent="@android:style/Theme.Holo.Light.NoActionBar"/>
 </resources>

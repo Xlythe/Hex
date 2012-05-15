@@ -9,17 +9,13 @@ import com.sam.hex.BoardTools;
 import com.sam.hex.GameAction;
 import com.sam.hex.GameObject;
 import com.sam.hex.PlayerObject;
-import com.sam.hex.PlayingEntity;
 
 import android.graphics.Point;
 
 /**
  * @author Will Harmon
  **/
-public class GameAI implements PlayingEntity { 
-	private String name;
-	private int color;
-	private long timeLeft;
+public class GameAI extends PlayerObject { 
 	private int team;//1 is left-right, 2 is top-down
 	private byte[][] gameBoard;
 	private int[] n={0,0},m = {0,0};//n is the leftmost AI move, m is the rightmost AI move
@@ -31,6 +27,7 @@ public class GameAI implements PlayingEntity {
 	private GameObject game;
 	
 	public GameAI(int team, GameObject game){
+		super(team, game);
 		this.team=team;
 		this.game=game;
 		while(rand_a==0 && rand_b==0){
@@ -455,14 +452,6 @@ public class GameAI implements PlayingEntity {
 	}
 
 	@Override
-	public void win() {
-	}
-
-	@Override
-	public void lose() {
-	}
-
-	@Override
 	public boolean supportsSave() {
 //		if(team==(byte)1){
 //			return Global.player2 instanceof PlayerObject;
@@ -474,47 +463,7 @@ public class GameAI implements PlayingEntity {
 	}
 
 	@Override
-	public void endMove() {
-		skipMove = true;
-	}
-
-	@Override
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	@Override
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public void setColor(int color) {
-		this.color = color;
-	}
-
-	@Override
-	public int getColor() {
-		return color;
-	}
-
-	@Override
-	public void setTime(long time) {
-		this.timeLeft = time;
-	}
-
-	@Override
-	public long getTime() {
-		return timeLeft;
-	}
-
-	@Override
 	public void setMove(Object o, Point hex) {
-	}
-
-	@Override
-	public boolean giveUp() {
-		return false;
 	}
 	
 	/*  Bah, ignore this for now.

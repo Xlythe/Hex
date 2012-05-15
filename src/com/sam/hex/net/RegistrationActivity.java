@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Calendar;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -24,11 +23,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 
 /**
@@ -55,8 +54,6 @@ public class RegistrationActivity extends Activity {
         final EditText username = (EditText) findViewById(R.id.username);
         final EditText password = (EditText) findViewById(R.id.password);
         final EditText email = (EditText) findViewById(R.id.email);
-        final Calendar cal = Calendar.getInstance();
-        final DatePicker birth = (DatePicker) findViewById(R.id.birthday);
         final EditText about = (EditText) findViewById(R.id.about);
         enter.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -64,12 +61,8 @@ public class RegistrationActivity extends Activity {
 					@Override
 					public void run() {
 						try {
-							int birthDay = birth.getDayOfMonth();
-					        int birthMonth = birth.getMonth();
-					        int birthYear = birth.getYear();
 		            		String registrationUrl = String.format("http://www.iggamecenter.com/api_user_add.php?app_id=%s&app_code=%s&name=%s&password=%s", NetGlobal.id, URLEncoder.encode(NetGlobal.passcode,"UTF-8"), URLEncoder.encode(username.getText().toString(),"UTF-8"), URLEncoder.encode(password.getText().toString(),"UTF-8"));
 		            		if(!email.equals("")) registrationUrl += "&email="+URLEncoder.encode(email.getText().toString(),"UTF-8");
-		            		if(birthYear!=cal.get(Calendar.YEAR) && birthMonth!=cal.get(Calendar.MONTH) && birthDay!=cal.get(Calendar.DAY_OF_MONTH)) registrationUrl += "&birthDay="+birthDay+"&birthMonth="+birthMonth+"&birthYear="+birthYear;
 		            		if(!about.equals("")) registrationUrl += "&about="+URLEncoder.encode(about.getText().toString(),"UTF-8");
 							URL url = new URL(registrationUrl);
 							SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -88,7 +81,9 @@ public class RegistrationActivity extends Activity {
 				            	finish();
 			            	}
 			            	else{
+			            		Looper.prepare();
 			                	new AlertDialog.Builder(RegistrationActivity.this).setMessage(parsedDataset.getErrorMessage()).setNeutralButton(RegistrationActivity.this.getString(R.string.okay), null).show();
+			                	Looper.loop();
 			            	}
 						} catch (MalformedURLException e) {
 							e.printStackTrace();

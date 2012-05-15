@@ -8,14 +8,13 @@ import android.graphics.Point;
 import com.sam.hex.GameAction;
 import com.sam.hex.GameObject;
 import com.sam.hex.PlayerObject;
-import com.sam.hex.PlayingEntity;
 
 /** The "Bee" class.
   * Purpose: To play the game of Hex
   * @author Konstantin Lopyrev
   * @version June 2006
  */
-public class BeeGameAI implements PlayingEntity
+public class BeeGameAI extends PlayerObject
 {
     private final int RED = 1, BLUE = 2, EMPTY = 0;
     private final int MAX_DEPTH = 2, BEAM_SIZE = 5;
@@ -24,9 +23,6 @@ public class BeeGameAI implements PlayingEntity
     private int team;
     private LinkedList<AIHistoryObject> history = new LinkedList<AIHistoryObject>();//List of the AI's state. Used when Undo is called.
     private int gridSize;
-    private String name;
-	private int color;
-	private long timeLeft;
 	private GameObject game;
     private boolean skipMove = false;
     private EvaluationNode[] [] nodesArray;
@@ -38,6 +34,7 @@ public class BeeGameAI implements PlayingEntity
     */
     public BeeGameAI (int team, GameObject game)
     {
+    	super(team, game);
 	    this.team = team;
 	    this.game = game;
 		// Creates the pieces array that stores the board inside Bee
@@ -766,17 +763,6 @@ public class BeeGameAI implements PlayingEntity
 		skipMove = true;
 	}
 
-
-	@Override
-	public void win() {
-	}
-
-
-	@Override
-	public void lose() {
-	}
-
-
 	@Override
 	public boolean supportsSave() {
 //		if(team==1){
@@ -794,45 +780,8 @@ public class BeeGameAI implements PlayingEntity
 		skipMove = true;
 	}
 
-
-	@Override
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	@Override
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public void setColor(int color) {
-		this.color = color;
-	}
-
-	@Override
-	public int getColor() {
-		return color;
-	}
-
-	@Override
-	public void setTime(long time) {
-		this.timeLeft = time;
-	}
-
-	@Override
-	public long getTime() {
-		return timeLeft;
-	}
-
-
 	@Override
 	public void setMove(Object o, Point hex) {
-	}
-
-	@Override
-	public boolean giveUp() {
-		return false;
 	}
 }
 

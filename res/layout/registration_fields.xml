@@ -59,19 +59,6 @@
 	        android:layout_height="wrap_content"
 	        android:padding="5dp"
 	        android:textColor="@color/black"
-	        android:text="@string/field_birthday"
-	        android:textAppearance="?android:attr/textAppearanceLarge" />
-	    
-	    <DatePicker
-	        android:id="@+id/birthday"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content" />
-	    
-	    <TextView
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:padding="5dp"
-	        android:textColor="@color/black"
 	        android:text="@string/field_about"
 	        android:textAppearance="?android:attr/textAppearanceLarge" />
 	    
@@ -79,7 +66,7 @@
 	        android:id="@+id/about"
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
-	        android:inputType="text"
+	        android:inputType="textMultiLine"
 	        android:hint="@null" />
 	    
 	    <Button 

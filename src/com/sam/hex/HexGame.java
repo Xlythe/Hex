@@ -283,7 +283,7 @@ public class HexGame extends Activity {
     		game.player1.setName(prefs.getString("player1Name", "Player1"));
     		game.player2.setName(prefs.getString("player2Name", "Player2"));
     	}
-    	if(gameLocation==LANGlobal.GAME_LOCATION){
+    	else if(gameLocation==LANGlobal.GAME_LOCATION){
     		//Playing over LAN
     		if(LANGlobal.localPlayer.firstMove){
     			game.player1.setName(LANGlobal.localPlayer.playerName);
@@ -312,7 +312,12 @@ public class HexGame extends Activity {
      * Does not invalidate the board
      * */
     public static void setColors(SharedPreferences prefs, int gameLocation, GameObject game){
-    	if(gameLocation==1){
+    	if(gameLocation==Global.GAME_LOCATION){
+    		//Playing on the same phone
+    		game.player1.setColor(prefs.getInt("player1Color", Global.player1DefaultColor));
+    		game.player2.setColor(prefs.getInt("player2Color", Global.player2DefaultColor));
+    	}
+    	else if(gameLocation==LANGlobal.GAME_LOCATION){
     		//Playing over LAN
     		if(LANGlobal.localPlayer.firstMove){
     			game.player1.setColor(LANGlobal.localPlayer.playerColor);
@@ -323,15 +328,10 @@ public class HexGame extends Activity {
         		game.player2.setColor(LANGlobal.localPlayer.playerColor);
     		}
     	}
-    	else if(gameLocation==2){
+    	else if(gameLocation==NetGlobal.GAME_LOCATION){
     		//Playing on the net
     		game.player1.setColor(Global.player1DefaultColor);
     		game.player2.setColor(Global.player2DefaultColor);
-    	}
-    	else{
-    		//Playing on the same phone
-    		game.player1.setColor(prefs.getInt("player1Color", Global.player1DefaultColor));
-    		game.player2.setColor(prefs.getInt("player2Color", Global.player2DefaultColor));
     	}
     }
     
@@ -443,7 +443,7 @@ public class HexGame extends Activity {
     	    	    || Integer.decode(prefs.getString("timerTypePref", "0")) != game.timer.type
     	    	    || Integer.decode(prefs.getString("timerPref", "0"))*60*1000 != game.timer.totalTime;
     	}
-    	if(gameLocation==LANGlobal.GAME_LOCATION){
+    	else if(gameLocation==LANGlobal.GAME_LOCATION){
     		return !(Integer.decode(prefs.getString("lanPlayerType", "0")) == (int) game.player1Type || Integer.decode(prefs.getString("lanPlayerType", "0")) == (int) game.player2Type);
     	}
     	else if(gameLocation==NetGlobal.GAME_LOCATION){

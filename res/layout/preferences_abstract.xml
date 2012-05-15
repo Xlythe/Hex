@@ -4,15 +4,15 @@
     <PreferenceCategory
         android:title=" ">
 	    <Preference
-	        android:title="Game Options"
+	        android:title="@string/abstractGeneralTitle"
 	        android:key="general">
 	    </Preference>
 	    <Preference
-	        android:title="Player 1"
+	        android:title="@string/abstractP1Title"
 	        android:key="p1">
 	    </Preference>
 	    <Preference
-	        android:title="Player 2"
+	        android:title="@string/abstractP2Title"
 	        android:key="p2">
 	    </Preference>
     </PreferenceCategory>

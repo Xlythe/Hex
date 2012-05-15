@@ -51,6 +51,10 @@
     <string name="resetTitle">Reset to Defaults</string>
     <string name="resetSummary">Reset all settings to their defaults</string>
     
+    <string name="abstractGeneralTitle">Game Options</string>
+    <string name="abstractP1Title">Player 1</string>
+    <string name="abstractP2Title">Player 2</string>
+    
     <!-- Main page -->
     <string name="frontpage">Welcome to Hex</string>
     

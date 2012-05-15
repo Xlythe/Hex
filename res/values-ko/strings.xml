@@ -51,6 +51,10 @@
     <string name="resetTitle">기본값으로 재설정</string>
     <string name="resetSummary">모든 설정을 기본값으로 재설정</string>
     
+    <string name="abstractGeneralTitle">게임 옵션</string>
+    <string name="abstractP1Title">선수 1</string>
+    <string name="abstractP2Title">선수 2</string>
+    
     <!-- Main page -->
     <string name="frontpage">헥스(Hex)</string>
     

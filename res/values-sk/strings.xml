@@ -50,6 +50,10 @@
     <string name="resetTitle">Obnoviť pôvodné nastavenia</string>
     <string name="resetSummary">Obnoviť všetky pôvodné nastavenia</string>
     
+    <string name="abstractGeneralTitle">Možnosti hry</string>
+    <string name="abstractP1Title">Hráč 1</string>
+    <string name="abstractP2Title">Hráč 2</string>
+    
     <!-- Main page -->
     <string name="frontpage">Vítajte v Hex</string>
     

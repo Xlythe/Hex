@@ -51,6 +51,10 @@
     <string name="resetTitle">Restaurar valores predeterminados</string>
     <string name="resetSummary">Restablecer todas las configuraciones a sus valores predeterminados</string>
     
+    <string name="abstractGeneralTitle">Opciones del juego</string>
+    <string name="abstractP1Title">El jugador 1</string>
+    <string name="abstractP2Title">El jugador 2</string>
+    
     <!-- Main page -->
     <string name="frontpage">Bienvenido a Hex</string>
     

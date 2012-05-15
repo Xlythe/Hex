@@ -51,6 +51,10 @@
     <string name="resetTitle">Восстановить значения по умолчанию</string>
     <string name="resetSummary">Сброс всех настроек к значениям по умолчанию</string>
     
+    <string name="abstractGeneralTitle">Параметры игры</string>
+    <string name="abstractP1Title">Игрок 1</string>
+    <string name="abstractP2Title">Игрок 2</string>
+    
     <!-- Main page -->
     <string name="frontpage">Добро пожаловать в Hex</string>
     

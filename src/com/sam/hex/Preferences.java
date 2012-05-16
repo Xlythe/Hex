@@ -36,6 +36,7 @@ public class Preferences extends PreferenceActivity {
 	
 	SharedPreferences settings;
 	PreferenceScreen screen;
+	PreferenceScreen generalScreen;
 	Preference p1Pref;
 	Preference p2Pref;
 	Preference lanPlPref;
@@ -43,7 +44,7 @@ public class Preferences extends PreferenceActivity {
 	Preference gridPref;
 	Preference timerPref;
 	Preference passwordPref;
-	Preference general;
+	Preference options;
 	Preference p1;
 	Preference p2;
 	
@@ -109,7 +110,8 @@ public class Preferences extends PreferenceActivity {
         	//Clear everything
     		PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit().clear().commit();
     		//Reload settings
-    		screen.removeAll();
+    		if(screen!=null) screen.removeAll();
+    		if(generalScreen!=null) generalScreen.removeAll();
         	loadPreferences();
         	setListeners();
             return false;
@@ -246,9 +248,9 @@ public class Preferences extends PreferenceActivity {
         }
         
         //Set up the abstract menu
-        general = findPreference("general");
-        if(general!=null){
-        	general.setOnPreferenceClickListener(new menuListener(GENERAL));
+        options = findPreference("general");
+        if(options!=null){
+        	options.setOnPreferenceClickListener(new menuListener(GENERAL));
         }
         p1 = findPreference("p1");
         if(p1!=null){
@@ -283,10 +285,10 @@ public class Preferences extends PreferenceActivity {
             	addPreferencesFromResource(R.layout.preferences_general);
 	    		
 	    		//Hide hidden preferences
-            	screen = (PreferenceScreen) findPreference("generalScreen");
-            	screen.removePreference(findPreference("customGameSizePref"));
-            	screen.removePreference(findPreference("timerTypePref"));
-            	screen.removePreference(findPreference("timerPref"));
+            	generalScreen = (PreferenceScreen) findPreference("generalScreen");
+            	generalScreen.removePreference(findPreference("customGameSizePref"));
+            	generalScreen.removePreference(findPreference("timerTypePref"));
+            	generalScreen.removePreference(findPreference("timerPref"));
             }
             else if(in_p1){
 	        	addPreferencesFromResource(R.layout.preferences_player1);
@@ -356,7 +358,7 @@ public class Preferences extends PreferenceActivity {
 	    			settings.edit().putString("customGameSizePref", input+"").commit();
 	    			settings.edit().putString("gameSizePref", "0").commit();
 	    			gridPref.setSummary(GameAction.insert(getApplicationContext().getString(R.string.gameSizeSummary_onChange), settings.getString("customGameSizePref", "7")));
-	        		screen.removeAll();
+	    			generalScreen.removeAll();
 	            	loadPreferences();
 	            	setListeners();
     			}

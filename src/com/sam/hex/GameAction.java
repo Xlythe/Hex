@@ -91,15 +91,12 @@ public class GameAction {
 			game.moveNumber--;
 			
 			if(gameLocation==Global.GAME_LOCATION){
-				//Determine who is a human
-				boolean p1 = game.player1 instanceof PlayerObject;
-				boolean p2 = game.player2 instanceof PlayerObject;
 				if(game.gameOver) game.currentPlayer = (game.currentPlayer%2)+1;
 				
-				if(game.currentPlayer==1 && p1){//It's a human's turn
-					game.player2.undoCalled();//Tell the other player we're going back a turn
+				if(getPlayer(game.currentPlayer, game) instanceof PlayerObject){
+					getPlayer(game.currentPlayer%2+1, game).undoCalled();
 					
-					if(!p2){//If the other person isn't a human, undo again
+					if(!(getPlayer(game.currentPlayer%2+1, game) instanceof PlayerObject)){
 						if(game.moveNumber>1){
 							lastMove = game.moveList.thisMove;
 							game.gamePiece[lastMove.getX()][lastMove.getY()].setTeam((byte)0,game);
@@ -111,42 +108,15 @@ public class GameAction {
 						}
 					}
 					else{
-						//Otherwise, cede the turn to the other player
 						getPlayer(game.currentPlayer, game).endMove();
 					}
 				}
-				else if(game.currentPlayer==1 && !p1){
+				else{
 					if(!game.gameOver){
-						game.player1.undoCalled();
+						getPlayer(game.currentPlayer, game).undoCalled();
 					}
 				}
-				else if(game.currentPlayer==2 && p2){
-					game.player1.undoCalled();
-					
-					//If the other person isn't a (local) human
-					if(!p1){
-						//Undo again
-						if(game.moveNumber>1){
-							lastMove = game.moveList.thisMove;
-							game.gamePiece[lastMove.getX()][lastMove.getY()].setTeam((byte)0,game);
-							game.moveList = game.moveList.nextMove;
-							game.moveNumber--;
-						}
-						else{
-							getPlayer(game.currentPlayer, game).endMove();
-						}
-					}
-					else{
-						//Otherwise, cede the turn to the other player
-						getPlayer(game.currentPlayer, game).endMove();
-					}
-				}
-				else if(game.currentPlayer==2 && !p2){
-					if(!game.gameOver) {
-						game.player2.undoCalled();
-					}
-				}
-				if(game.gameOver && ((game.currentPlayer==2 && p1) || (game.currentPlayer==1 && p2))) game.currentPlayer = (game.currentPlayer%2)+1;
+				if(game.gameOver && (getPlayer(game.currentPlayer%2+1, game) instanceof PlayerObject)) game.currentPlayer = (game.currentPlayer%2)+1;
 			}
 			else if(gameLocation==LANGlobal.GAME_LOCATION){//Inside a LAN game
 				if(game.currentPlayer==1){//First player's turn

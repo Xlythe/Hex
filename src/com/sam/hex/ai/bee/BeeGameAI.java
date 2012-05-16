@@ -7,24 +7,21 @@ import android.graphics.Point;
 
 import com.sam.hex.GameAction;
 import com.sam.hex.GameObject;
-import com.sam.hex.PlayerObject;
+import com.sam.hex.ai.template.AI;
 
 /** The "Bee" class.
   * Purpose: To play the game of Hex
   * @author Konstantin Lopyrev
   * @version June 2006
  */
-public class BeeGameAI extends PlayerObject
+public class BeeGameAI extends AI
 {
-    private final int RED = 1, BLUE = 2, EMPTY = 0;
+    private final static int RED = 1, BLUE = 2, EMPTY = 0;
     private final int MAX_DEPTH = 2, BEAM_SIZE = 5;
     private int[] [] pieces;
     private HashMap lookUpTable;
-    private int team;
     private LinkedList<AIHistoryObject> history = new LinkedList<AIHistoryObject>();//List of the AI's state. Used when Undo is called.
     private int gridSize;
-	private GameObject game;
-    private boolean skipMove = false;
     private EvaluationNode[] [] nodesArray;
 
     /** Constructor for the Bee object
@@ -35,8 +32,6 @@ public class BeeGameAI extends PlayerObject
     public BeeGameAI (int team, GameObject game)
     {
     	super(team, game);
-	    this.team = team;
-	    this.game = game;
 		// Creates the pieces array that stores the board inside Bee
 	    gridSize = game.gridSize;
 		pieces = new int [gridSize + 2] [gridSize + 2];
@@ -71,7 +66,7 @@ public class BeeGameAI extends PlayerObject
     @Override
     public void getPlayerTurn()
     {
-    	skipMove = false;
+    	super.getPlayerTurn();
     	AIHistoryObject state = new AIHistoryObject(pieces, lookUpTable);
 		history.add(state);
 		int moveNumber = game.moveNumber;
@@ -90,7 +85,7 @@ public class BeeGameAI extends PlayerObject
 		if (lastMove == null)
 		{
 		    pieces [pieces.length / 2] [pieces.length / 2] = team;
-		    if(!skipMove) GameAction.makeMove(this, (byte) team, new Point(pieces.length / 2 - 1, pieces.length / 2 - 1), game);
+		    if(!getSkipMove()) GameAction.makeMove(this, (byte) team, new Point(pieces.length / 2 - 1, pieces.length / 2 - 1), game);
 		}
 		// If a move has been made already,
 		// Bee records the move in the pieces array
@@ -103,7 +98,7 @@ public class BeeGameAI extends PlayerObject
 		    int x = bestMove.x - 1;
 		    int y = bestMove.y - 1;
 		    
-		    if(!skipMove) GameAction.makeMove(this, (byte) team, new Point(y, gridSize-1-x), game);
+		    if(!getSkipMove()) GameAction.makeMove(this, (byte) team, new Point(y, gridSize-1-x), game);
 		}
 	}
     
@@ -115,28 +110,7 @@ public class BeeGameAI extends PlayerObject
 			lookUpTable = previousState.lookUpTable;
 			history.remove(history.size()-1);
 		}
-		skipMove = true;
-	}
-
-
-	@Override
-	public void newgameCalled() {
-		skipMove = true;
-	}
-	
-	@Override
-	public boolean supportsUndo() {
-		if(team==1){
-			return game.player2 instanceof PlayerObject;
-		}
-		else{
-			return game.player1 instanceof PlayerObject;
-		}
-	}
-
-	@Override
-	public boolean supportsNewgame() {
-		return true;
+		super.undoCalled();
 	}
 
 
@@ -757,32 +731,6 @@ public class BeeGameAI extends PlayerObject
 	}
 	return value;
     }
-
-	@Override
-	public void quit() {
-		skipMove = true;
-	}
-
-	@Override
-	public boolean supportsSave() {
-//		if(team==1){
-//			return Global.player2 instanceof PlayerObject;
-//		}
-//		else{
-//			return Global.player1 instanceof PlayerObject;
-//		}
-		return false;
-	}
-
-
-	@Override
-	public void endMove() {
-		skipMove = true;
-	}
-
-	@Override
-	public void setMove(Object o, Point hex) {
-	}
 }
 
 

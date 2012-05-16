@@ -263,7 +263,6 @@ public class Preferences extends PreferenceActivity {
     @SuppressWarnings("deprecation")
 	private void loadPreferences(){
     	setContentView(R.layout.preferences);
-        screen = (PreferenceScreen) findPreference("preferences");
     	TextView title = (TextView) findViewById(R.id.actionbarTitle);
     	int gameLoc;
     	if(!in_submenu){
@@ -320,7 +319,7 @@ public class Preferences extends PreferenceActivity {
             general.removePreference(findPreference("netRatedGame"));
         }
     	addPreferencesFromResource(R.layout.preferences_reset);
-        
+        screen = (PreferenceScreen) findPreference("preferences");
         Button home = (Button) findViewById(R.id.home);
         home.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {

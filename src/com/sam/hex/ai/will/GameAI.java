@@ -8,28 +8,23 @@ import java.util.Random;
 import com.sam.hex.BoardTools;
 import com.sam.hex.GameAction;
 import com.sam.hex.GameObject;
-import com.sam.hex.PlayerObject;
+import com.sam.hex.ai.template.AI;
 
 import android.graphics.Point;
 
 /**
  * @author Will Harmon
  **/
-public class GameAI extends PlayerObject { 
-	private int team;//1 is left-right, 2 is top-down
+public class GameAI extends AI { 
 	private byte[][] gameBoard;
 	private int[] n={0,0},m = {0,0};//n is the leftmost AI move, m is the rightmost AI move
 	private List<List<List<Integer>>> pairs = new ArrayList<List<List<Integer>>>();//List of pair-pieces
 	private List<AIHistoryObject> history = new LinkedList<AIHistoryObject>();//List of the AI's state. Used when Undo is called.
 	private int rand_a = 0;
 	private int rand_b = 0;
-	private boolean skipMove = false;
-	private GameObject game;
 	
 	public GameAI(int team, GameObject game){
 		super(team, game);
-		this.team=team;
-		this.game=game;
 		while(rand_a==0 && rand_b==0){
 			rand_a = new Random().nextInt(3)-1;
 			rand_b = new Random().nextInt(3)-1;
@@ -58,7 +53,7 @@ public class GameAI extends PlayerObject {
 	
 	@Override
 	public void getPlayerTurn() {
-		skipMove = false;
+		super.getPlayerTurn();
 		this.gameBoard=BoardTools.teamGrid(game);
 		AIHistoryObject state = new AIHistoryObject(pairs, n, m);
 		history.add(state);
@@ -74,7 +69,7 @@ public class GameAI extends PlayerObject {
 			m = previousState.m;
 			history.remove(history.size()-1);
 		}
-		skipMove = true;
+		super.undoCalled();
 	}
 	
 	private boolean right(){
@@ -422,48 +417,7 @@ public class GameAI extends PlayerObject {
 	}
 	
 	private void sendMove(int x, int y){
-		if(!skipMove) GameAction.makeMove(this, (byte) team, new Point(x,y), game);
-		else skipMove = false;
-	}
-
-	@Override
-	public void newgameCalled() {
-		skipMove = true;
-	}
-
-	@Override
-	public boolean supportsUndo() {
-		if(team==1){
-			return game.player2 instanceof PlayerObject;
-		}
-		else{
-			return game.player1 instanceof PlayerObject;
-		}
-	}
-
-	@Override
-	public boolean supportsNewgame() {
-		return true;
-	}
-
-	@Override
-	public void quit() {
-		skipMove = true;
-	}
-
-	@Override
-	public boolean supportsSave() {
-//		if(team==(byte)1){
-//			return Global.player2 instanceof PlayerObject;
-//		}
-//		else{
-//			return Global.player1 instanceof PlayerObject;
-//		}
-		return false;
-	}
-
-	@Override
-	public void setMove(Object o, Point hex) {
+		if(!getSkipMove()) GameAction.makeMove(this, (byte) team, new Point(x,y), game);
 	}
 	
 	/*  Bah, ignore this for now.

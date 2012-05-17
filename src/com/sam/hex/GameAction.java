@@ -65,14 +65,15 @@ public class GameAction {
 		game.board.postInvalidate();
 	}
 	
-	public static boolean makeMove(PlayingEntity player, byte team, Point hex, GameObject game){
-		if(player!=null && game.gamePiece[hex.x][hex.y].getTeam() == 0){
-			setTeam(team,hex.x,hex.y,game);
+	public static boolean makeMove(PlayingEntity player, int team, Point hex, GameObject game){
+		if(player==null) return false;
+		else if(game.gamePiece[hex.x][hex.y].getTeam() == 0){
+			setTeam((byte) team,hex.x,hex.y,game);
 			return true;
 		}
-		else if(player!=null && game.moveNumber==2 && game.gamePiece[hex.x][hex.y].getTeam() == 1){//Swap rule
+		else if(game.moveNumber==2 && game.gamePiece[hex.x][hex.y].getTeam() == 1){//Swap rule
 	    	if(game.swap){
-				setTeam(team,hex.x,hex.y,game);
+				setTeam((byte) team,hex.x,hex.y,game);
 				return true;
 	    	}
 		}

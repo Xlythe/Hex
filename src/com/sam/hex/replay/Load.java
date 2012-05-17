@@ -32,8 +32,8 @@ public class Load implements Runnable{
 
 				Global.game = new GameObject(gridSize, swap);
 				
-				Global.game.player1=new PlayerObject((byte)1,Global.game);
-				Global.game.player2=new PlayerObject((byte)2,Global.game);
+				Global.game.player1=new PlayerObject(1,Global.game);
+				Global.game.player2=new PlayerObject(2,Global.game);
 	        	
 				Global.game.player1Type = (Integer) inputStream.readObject();
 	        	Global.game.player2Type = (Integer) inputStream.readObject();
@@ -49,7 +49,7 @@ public class Load implements Runnable{
 				
 				inputStream.close();
 				
-				Global.game.currentPlayer=(Global.game.moveNumber%2)+1;
+				Global.game.currentPlayer=((Global.game.moveNumber+1)%2)+1;
 				HexGame.replay = true;
 				HexGame.replayRunning = false;
 				HexGame.startNewGame = false;

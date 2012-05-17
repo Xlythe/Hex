@@ -67,10 +67,10 @@ public class GameObject implements Runnable {
 	}
 	
 	public void stop(){
+		game=false;
 		timer.stop();
 		player1.quit();
 		player2.quit();
-		game=false;
 		gameOver=true;
 		gameThread.setPriority(Thread.MIN_PRIORITY);
 	}

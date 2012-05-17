@@ -7,12 +7,14 @@ import com.sam.hex.net.MoveListener;
 import android.graphics.Point;
 
 public class PlayerObject implements PlayingEntity {
+	private static final int SET = 0;
+	private static final int GET = 1;
 	private String name;
 	private int color;
 	private long timeLeft;
-	private int team;
-	private LinkedList<Point> hex = new LinkedList<Point>();
-	private GameObject game;
+	public final int team;
+	public final GameObject game;
+	private final LinkedList<Point> hex = new LinkedList<Point>();
 	
 	public PlayerObject(int team, GameObject game) {
 		this.team=team;
@@ -21,23 +23,26 @@ public class PlayerObject implements PlayingEntity {
 	
 	@Override
 	public void getPlayerTurn() {
+		if(hex(GET,null).size()>0 && hex(GET,null).get(0).equals(new Point(-1,-1))){
+			hex(GET,null).clear();
+		}
 		while (true) {
-			while (hex.size()==0) {
+			while (hex(GET,null).size()==0) {
 				try {
 					Thread.sleep(80);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
-			if (hex.get(0).equals(new Point(-1,-1))){
-				hex.remove(0);
+			if (hex(GET,null).get(0).equals(new Point(-1,-1))){
+				hex(GET,null).remove(0);
 				break;
 			}
-			if (GameAction.makeMove(this, (byte) team, hex.get(0), game)) {
-				hex.remove(0);
+			if (GameAction.makeMove(this, team, hex(GET,null).get(0), game)) {
+				hex(GET,null).remove(0);
 				break;
 			}
-			hex.remove(0);
+			hex(GET,null).remove(0);
 		}
 	}
 	
@@ -80,7 +85,7 @@ public class PlayerObject implements PlayingEntity {
 
 	@Override
 	public void endMove() {
-		hex.add(new Point(-1,-1));
+		hex(SET, new Point(-1,-1));
 	}
 
 	@Override
@@ -114,16 +119,21 @@ public class PlayerObject implements PlayingEntity {
 	}
 
 	@Override
-	public void setMove(Object o, Point hex) {
-		if(o instanceof GameAction && game.currentPlayer==team){
-			this.hex = new LinkedList<Point>();
-			this.hex.add(hex);
-		}
-		else if(o instanceof MoveListener) this.hex.add(hex);
+	public void setMove(final Object o, final Point point) {
+		if(o instanceof GameAction && game.currentPlayer==team) hex(SET,point);
+		else if(o instanceof MoveListener) hex.add(point);
 	}
 
 	@Override
 	public boolean giveUp() {
 		return false;
+	}
+	
+	private synchronized LinkedList<Point> hex(int type, Point point){
+		if(type==SET){
+			hex.clear();
+			hex.add(point);
+		}
+		return hex;
 	}
 }

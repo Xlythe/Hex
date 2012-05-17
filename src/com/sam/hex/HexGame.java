@@ -38,6 +38,7 @@ public class HexGame extends Activity {
 	public static boolean replay = false;
 	public static boolean replayRunning = false;
 	private static Intent intent;
+    private Thread replayThread;
 	
     /** Called when the activity is first created. */
     @Override
@@ -143,7 +144,7 @@ public class HexGame extends Activity {
 				for(int xc = 0; xc < game.gamePiece.length; xc++){
 					for(int yc=0; yc<game.gamePiece[0].length; yc++)
 						if(game.gamePiece[xc][yc].contains(x, y)){
-							if(game!=null)GameAction.setPiece(new Point(xc,yc),game);
+							if(game!=null && !replayRunning)GameAction.setPiece(new Point(xc,yc),game);
 							return false;
 						}
 				}
@@ -454,15 +455,10 @@ public class HexGame extends Activity {
     	}
     }
     
-    private Thread replayThread;
     private void replay(int time){
-    	//Create our board
     	applyBoard();
     	Global.game.clearBoard();
         
-    	if(Global.game.moveNumber>1) Global.game.currentPlayer=(Global.game.currentPlayer%2)+1;
-	    
-    	replayRunning = true;
 		replayThread = new Thread(new Replay(time, new Handler(), new Runnable(){
 			public void run(){
 				Global.game.timerText.setVisibility(View.GONE);

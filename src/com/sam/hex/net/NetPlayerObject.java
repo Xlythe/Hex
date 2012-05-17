@@ -25,10 +25,8 @@ import android.os.Handler;
  * @author Will Harmon
  **/
 public class NetPlayerObject extends PlayerObject {
-	private int team;
 	private MoveListener listener;
 	private LinkedList<Point> hex = new LinkedList<Point>();
-	private GameObject game;
 	private String server;
 	private int uid;
 	private String session_id;
@@ -36,8 +34,6 @@ public class NetPlayerObject extends PlayerObject {
 	
 	public NetPlayerObject(int team, GameObject game, Handler handler, Runnable newgame) {
 		super(team, game);
-		this.team = team;
-		this.game = game;
 		this.server = NetGlobal.server;
 		this.uid = NetGlobal.uid;
 		this.session_id = NetGlobal.session_id;
@@ -91,7 +87,7 @@ public class NetPlayerObject extends PlayerObject {
 				hex.remove(0);
 				break;
 			}
-			else if (GameAction.makeMove(this, (byte) team, hex.get(0), game)) {
+			else if (GameAction.makeMove(this, team, hex.get(0), game)) {
 				hex.remove(0);
 				break;
 			}
@@ -289,6 +285,7 @@ public class NetPlayerObject extends PlayerObject {
 
 	@Override
 	public void endMove() {
+		hex.clear();
 		hex.add(new Point(-1,-1));
 	}
 

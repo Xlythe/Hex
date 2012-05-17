@@ -16,10 +16,10 @@ import com.sam.hex.ai.template.AI;
  */
 public class BeeGameAI extends AI
 {
-    private final static int RED = 1, BLUE = 2, EMPTY = 0;
+    private final static int RED = 1, BLUE = 2;
     private final int MAX_DEPTH = 2, BEAM_SIZE = 5;
     private int[] [] pieces;
-    private HashMap lookUpTable;
+    private HashMap<BigInteger,Integer> lookUpTable;
     private LinkedList<AIHistoryObject> history = new LinkedList<AIHistoryObject>();//List of the AI's state. Used when Undo is called.
     private int gridSize;
     private EvaluationNode[] [] nodesArray;
@@ -42,14 +42,14 @@ public class BeeGameAI extends AI
 		    pieces [i] [pieces.length - 1] = RED;
 		    pieces [pieces.length - 1] [i] = BLUE;
 		}
-		lookUpTable = new HashMap ();
+		lookUpTable = new HashMap<BigInteger,Integer>();
     }
     
     public class AIHistoryObject{
     	int[][] pieces;
-    	HashMap lookUpTable;
+    	HashMap<BigInteger,Integer> lookUpTable;
     	
-    	public AIHistoryObject(int[][] pieces, HashMap lookUpTable) {
+    	public AIHistoryObject(int[][] pieces, HashMap<BigInteger,Integer> lookUpTable) {
     		this.pieces = new int[pieces.length][pieces.length];
     		for(int i=0;i<pieces.length;i++){
     			for(int j=0;j<pieces.length;j++){
@@ -79,13 +79,12 @@ public class BeeGameAI extends AI
 		catch(Exception e){
 			lastMove=null;
 		}
-		System.out.println("Last move: "+lastMove);
 		// If Bee is to make the first move in the game,
 		// it makes it in the centre of the board.
 		if (lastMove == null)
 		{
 		    pieces [pieces.length / 2] [pieces.length / 2] = team;
-		    if(!getSkipMove()) GameAction.makeMove(this, (byte) team, new Point(pieces.length / 2 - 1, pieces.length / 2 - 1), game);
+		    if(!getSkipMove()) GameAction.makeMove(this, team, new Point(pieces.length / 2 - 1, pieces.length / 2 - 1), game);
 		}
 		// If a move has been made already,
 		// Bee records the move in the pieces array
@@ -93,12 +92,12 @@ public class BeeGameAI extends AI
 		else
 		{
 		    pieces [lastMove.x + 1] [lastMove.y + 1] = team == 1 ? 2: 1;
-		    Point bestMove = getBestMove ();
+		    Point bestMove = getBestMove();
 		    pieces [bestMove.x] [bestMove.y] = team;
 		    int x = bestMove.x - 1;
 		    int y = bestMove.y - 1;
 		    
-		    if(!getSkipMove()) GameAction.makeMove(this, (byte) team, new Point(y, gridSize-1-x), game);
+		    if(!getSkipMove()) GameAction.makeMove(this, team, new Point(y, gridSize-1-x), game);
 		}
 	}
     
@@ -117,7 +116,7 @@ public class BeeGameAI extends AI
     /** Gets the best move on the board
     *@return    the point containing the move coordinates
      */
-    private Point getBestMove ()
+    private Point getBestMove()
     {
 	// Initially sets the best move to an invalid move with
 	// the lowest possible move value
@@ -169,21 +168,24 @@ public class BeeGameAI extends AI
     */
     private int expand (int depth, int previousBest, int currentColour, EvaluationNode[] [] nodesArray)
     {
+	// Break early if the move is no longer needed
+	if(getSkipMove()) return 0;
+		
 	// If depth is maximum depth, evaluates the branch using
 	// a board evaluation instead of expanding it.
 	if (depth == MAX_DEPTH)
-	    return evaluate ();
+	    return evaluate();
 	int bestValue = currentColour == RED ? Integer.MIN_VALUE:
 	Integer.MAX_VALUE;
 
 	// Gets all the moves possible to make.
-	Iterator iter = getMoves ().iterator ();
+	Iterator<Move> iter = getMoves().iterator();
 
 	// Considers only the several best moves that are possible to make.
-	for (int i = 0 ; i < BEAM_SIZE && iter.hasNext () ; i++)
+	for (int i = 0 ; i < BEAM_SIZE && iter.hasNext() ; i++)
 	{
 	    // Gets the move value of the next move.
-	    Move nextMove = (Move) iter.next ();
+	    Move nextMove = (Move) iter.next();
 	    pieces [nextMove.row] [nextMove.column] = currentColour;
 	    int value = expand (depth + 1, bestValue,
 		    currentColour == RED ? BLUE:
@@ -207,12 +209,12 @@ public class BeeGameAI extends AI
 	// If no moves are possible at this depth,
 	// returns the evaluation of the board.
 	if (bestValue == Integer.MAX_VALUE || bestValue == Integer.MIN_VALUE)
-	    bestValue = evaluate ();
+	    bestValue = evaluate();
 	return bestValue;
     }
 
 
-    private ArrayList getMoves ()
+    private ArrayList<Move> getMoves()
     {
 	// Builds the evaluation board for the current position
     nodesArray = new EvaluationNode [pieces.length] [pieces.length];
@@ -266,12 +268,12 @@ public class BeeGameAI extends AI
 		    // than the second minimum value of its neighbours.
 		    int min = 100000;
 		    int secondMin = 100000;
-		    Iterator iter = nodesArray [i] [j].redNeighbours.iterator ();
+		    Iterator<EvaluationNode> iter = nodesArray [i] [j].redNeighbours.iterator();
 
-		    while (iter.hasNext ())
+		    while (iter.hasNext())
 		    {
 
-			EvaluationNode next = (EvaluationNode) iter.next ();
+			EvaluationNode next = (EvaluationNode) iter.next();
 			int number = redA [next.row] [next.column];
 			if (number < secondMin)
 			{
@@ -310,11 +312,11 @@ public class BeeGameAI extends AI
 			continue;
 		    int min = 100000;
 		    int secondMin = 100000;
-		    Iterator iter = nodesArray [i] [j].redNeighbours.iterator ();
+		    Iterator<EvaluationNode> iter = nodesArray [i] [j].redNeighbours.iterator();
 
-		    while (iter.hasNext ())
+		    while (iter.hasNext())
 		    {
-			EvaluationNode next = (EvaluationNode) iter.next ();
+			EvaluationNode next = (EvaluationNode) iter.next();
 			int number = redB [next.row] [next.column];
 			if (number < secondMin)
 			{
@@ -353,11 +355,11 @@ public class BeeGameAI extends AI
 			continue;
 		    int min = 100000;
 		    int secondMin = 100000;
-		    Iterator iter = nodesArray [i] [j].blueNeighbours.iterator ();
+		    Iterator<EvaluationNode> iter = nodesArray [i] [j].blueNeighbours.iterator();
 
-		    while (iter.hasNext ())
+		    while (iter.hasNext())
 		    {
-			EvaluationNode next = (EvaluationNode) iter.next ();
+			EvaluationNode next = (EvaluationNode) iter.next();
 			int number = blueA [next.row] [next.column];
 			if (number < secondMin)
 			{
@@ -395,11 +397,11 @@ public class BeeGameAI extends AI
 			continue;
 		    int min = 100000;
 		    int secondMin = 100000;
-		    Iterator iter = nodesArray [i] [j].blueNeighbours.iterator ();
+		    Iterator<EvaluationNode> iter = nodesArray [i] [j].blueNeighbours.iterator();
 
-		    while (iter.hasNext ())
+		    while (iter.hasNext())
 		    {
-			EvaluationNode next = (EvaluationNode) iter.next ();
+			EvaluationNode next = (EvaluationNode) iter.next();
 			int number = blueB [next.row] [next.column];
 			if (number < secondMin)
 			{
@@ -422,7 +424,7 @@ public class BeeGameAI extends AI
 		}
 	    }
 	}
-	ArrayList moves = new ArrayList ();
+	ArrayList<Move> moves = new ArrayList<Move>();
 
 	// Adds each move to the moves array
 	// with the move value of the sum of its two-distances.
@@ -447,14 +449,14 @@ public class BeeGameAI extends AI
     /** Evaluates the current board.
     *@return    the board value
     */
-    private int evaluate ()
+    private int evaluate()
     {
 	// Checks if the board has been
 	// evaluated before and if it has, returns the previous value.
-	BigInteger piecesString = piecesString ();
-	Integer piecesValue = (Integer) lookUpTable.get (piecesString);
+	BigInteger piecesString = piecesString();
+	Integer piecesValue = lookUpTable.get (piecesString);
 	if (piecesValue != null)
-	    return piecesValue.intValue ();
+	    return piecesValue.intValue();
 
 	// Builds the evaluation board for the current position
 	nodesArray = new EvaluationNode [pieces.length] [pieces.length];
@@ -508,12 +510,12 @@ public class BeeGameAI extends AI
 		    // than the second minimum value of its neighbours.
 		    int min = 100000;
 		    int secondMin = 100000;
-		    Iterator iter = nodesArray [i] [j].redNeighbours.iterator ();
+		    Iterator<EvaluationNode> iter = nodesArray [i] [j].redNeighbours.iterator();
 
-		    while (iter.hasNext ())
+		    while (iter.hasNext())
 		    {
 
-			EvaluationNode next = (EvaluationNode) iter.next ();
+			EvaluationNode next = (EvaluationNode) iter.next();
 			int number = redA [next.row] [next.column];
 			if (number < secondMin)
 			{
@@ -552,11 +554,11 @@ public class BeeGameAI extends AI
 			continue;
 		    int min = 100000;
 		    int secondMin = 100000;
-		    Iterator iter = nodesArray [i] [j].redNeighbours.iterator ();
+		    Iterator<EvaluationNode> iter = nodesArray [i] [j].redNeighbours.iterator();
 
-		    while (iter.hasNext ())
+		    while (iter.hasNext())
 		    {
-			EvaluationNode next = (EvaluationNode) iter.next ();
+			EvaluationNode next = (EvaluationNode) iter.next();
 			int number = redB [next.row] [next.column];
 			if (number < secondMin)
 			{
@@ -595,11 +597,11 @@ public class BeeGameAI extends AI
 			continue;
 		    int min = 100000;
 		    int secondMin = 100000;
-		    Iterator iter = nodesArray [i] [j].blueNeighbours.iterator ();
+		    Iterator<EvaluationNode> iter = nodesArray [i] [j].blueNeighbours.iterator();
 
-		    while (iter.hasNext ())
+		    while (iter.hasNext())
 		    {
-			EvaluationNode next = (EvaluationNode) iter.next ();
+			EvaluationNode next = (EvaluationNode) iter.next();
 			int number = blueA [next.row] [next.column];
 			if (number < secondMin)
 			{
@@ -638,11 +640,11 @@ public class BeeGameAI extends AI
 			continue;
 		    int min = 100000;
 		    int secondMin = 100000;
-		    Iterator iter = nodesArray [i] [j].blueNeighbours.iterator ();
+		    Iterator<EvaluationNode> iter = nodesArray [i] [j].blueNeighbours.iterator();
 
-		    while (iter.hasNext ())
+		    while (iter.hasNext())
 		    {
-			EvaluationNode next = (EvaluationNode) iter.next ();
+			EvaluationNode next = (EvaluationNode) iter.next();
 			int number = blueB [next.row] [next.column];
 			if (number < secondMin)
 			{
@@ -716,7 +718,7 @@ public class BeeGameAI extends AI
     /** Creates a BigInteger representation of the current board to use in the look-up table
     *@return    the BigInteger representation
     */
-    private BigInteger piecesString ()
+    private BigInteger piecesString()
     {
 	BigInteger value =
 	    new BigInteger (Integer.toString ((pieces.length - 2)));
@@ -739,7 +741,7 @@ public class BeeGameAI extends AI
   * @author Konstantin Lopyrev
   * @version June 2006
  */
-class Move implements Comparable
+class Move implements Comparable<Move>
 {
     public int row;
     public int column;
@@ -761,9 +763,9 @@ class Move implements Comparable
     *@param other   the object to compare to
     *@return    0 if equals, -ve if less than, +ve if greater than
     */
-    public int compareTo (Object other)
+    public int compareTo (Move other)
     {
-	return this.value - ((Move) other).value;
+	return this.value - other.value;
     }
 }
 /** The "EvaluationNode" class.
@@ -773,8 +775,8 @@ class Move implements Comparable
  */
 class EvaluationNode
 {
-    public HashSet redNeighbours;
-    public HashSet blueNeighbours;
+    public HashSet<EvaluationNode> redNeighbours;
+    public HashSet<EvaluationNode> blueNeighbours;
     public int row;
     public int column;
 
@@ -786,8 +788,8 @@ class EvaluationNode
     {
 	this.row = row;
 	this.column = column;
-	redNeighbours = new HashSet ();
-	blueNeighbours = new HashSet ();
+	redNeighbours = new HashSet<EvaluationNode>();
+	blueNeighbours = new HashSet<EvaluationNode>();
     }
 
 
@@ -807,9 +809,9 @@ class EvaluationNode
 	    {
 		if (pieces [i] [j] != 0)
 		    continue;
-		nodesArray [i] [j].redNeighbours = nodesArray [i] [j].getNeighbours (1, new HashSet (), nodesArray, pieces);
+		nodesArray [i] [j].redNeighbours = nodesArray [i] [j].getNeighbours (1, new HashSet<EvaluationNode>(), nodesArray, pieces);
 		nodesArray [i] [j].redNeighbours.remove (nodesArray [i] [j]);
-		nodesArray [i] [j].blueNeighbours = nodesArray [i] [j].getNeighbours (2, new HashSet (), nodesArray, pieces);
+		nodesArray [i] [j].blueNeighbours = nodesArray [i] [j].getNeighbours (2, new HashSet<EvaluationNode>(), nodesArray, pieces);
 		nodesArray [i] [j].blueNeighbours.remove (nodesArray [i] [j]);
 	    }
     }
@@ -820,13 +822,13 @@ class EvaluationNode
     *@param piecesVisited   stores the pieces that have been visited already so that they are not touched again
     *@return    the neighbours of the piece in a HashSet
     */
-    private HashSet getNeighbours (int colour, HashSet piecesVisited, EvaluationNode[] [] nodesArray, int[] [] pieces)
+    private HashSet<EvaluationNode> getNeighbours (int colour, HashSet<EvaluationNode> piecesVisited, EvaluationNode[] [] nodesArray, int[] [] pieces)
     {
 	// If the current piece has been visited already,
 	// returns an empty HashSet
 	if (piecesVisited.contains (this))
-	    return new HashSet ();
-	HashSet returnValue = new HashSet ();
+	    return new HashSet<EvaluationNode>();
+	HashSet<EvaluationNode> returnValue = new HashSet<EvaluationNode>();
 	if (pieces [row] [column] == colour)
 	    piecesVisited.add (this);
 
@@ -865,7 +867,7 @@ class EvaluationNode
     /** Returns a hashCode for the current EvaluationNode
     *@return    the hash code
     */
-    public int hashCode ()
+    public int hashCode()
     {
 	return row * 100 + column;
     }

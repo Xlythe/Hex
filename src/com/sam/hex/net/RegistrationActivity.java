@@ -121,7 +121,7 @@ public class RegistrationActivity extends Activity {
         	};
 
         	AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        	builder.setMessage(getApplicationContext().getString(R.string.cantConnect)).setPositiveButton(getApplicationContext().getString(R.string.yes), dialogClickListener).setNegativeButton(getApplicationContext().getString(R.string.no), dialogClickListener).show();
+        	builder.setMessage(getApplicationContext().getString(R.string.cantConnect)).setPositiveButton(getApplicationContext().getString(R.string.yes), dialogClickListener).setNegativeButton(getApplicationContext().getString(R.string.no), dialogClickListener).setCancelable(false).show();
     	}
     }
     

@@ -38,4 +38,14 @@
         android:padding="5dp"
         android:gravity="center_vertical"
         android:textAppearance="?android:attr/textAppearanceMedium"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_alignParentRight="true"
+        android:text="@string/claimVictory"
+        android:id="@+id/claimVictory"
+        android:textColor="@color/black"
+        android:padding="5dp"
+        android:gravity="center_vertical"
+        android:visibility="gone"/>
 </RelativeLayout>

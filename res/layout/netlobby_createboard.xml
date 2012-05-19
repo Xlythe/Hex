@@ -9,21 +9,6 @@
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
 	    android:orientation="vertical">
-    
-	    <TextView
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:padding="5dp"
-	        android:text="@string/gameSizeTitle"
-	        android:textAppearance="?android:attr/textAppearanceLarge" />
-	    
-	    <Spinner
-	        android:id="@+id/gameSize"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:defaultValue="8"
-	        android:entries="@array/netGameSizeArray"
-	        android:entryValues="@array/netGameSizeValues" />
 	    
 	    <TextView
 	        android:layout_width="wrap_content"
@@ -39,6 +24,21 @@
 	        android:defaultValue="1"
 	        android:entries="@array/netPositionArray"
 	        android:entryValues="@array/netPositionValues" />
+    
+	    <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:padding="5dp"
+	        android:text="@string/gameSizeTitle"
+	        android:textAppearance="?android:attr/textAppearanceLarge" />
+	    
+	    <Spinner
+	        android:id="@+id/gameSize"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:defaultValue="8"
+	        android:entries="@array/netGameSizeArray"
+	        android:entryValues="@array/netGameSizeValues" />
 	    
 	    <TextView
 	        android:layout_width="wrap_content"

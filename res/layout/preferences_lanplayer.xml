@@ -2,8 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="preferences">
         <PreferenceCategory
-            	android:key="lanPlayerCategory"
-                android:title=" ">
+            	android:key="lanPlayerCategory">
 	        <EditTextPreference
 	            android:title="@string/lanPlayerNameTitle"
 	            android:summary="@string/lanPlayerNameSummary"

@@ -111,23 +111,29 @@ public class BoardView extends View{
         
 		//Draw background
         if(Global.windowHeight>Global.windowWidth){
+	        int smallHeight = (int) (yOffset+2*hrad/3);
+	        int smallLength = (int) ((game.gridSize-1)*hrad);
+	        int largeHeight = (int) (Global.windowHeight-smallHeight);
+	        int largeLength = largeHeight*smallLength/smallHeight;
+	        
         	Path left = new Path();
-	        left.moveTo(0, 0);
-	        left.lineTo((float) (game.gridSize*hrad*2), 0);
-	        left.lineTo(0, Global.windowHeight);
+	        left.moveTo(0, Global.windowHeight);
+	        left.lineTo(0, Global.windowHeight-largeHeight);
+	        left.lineTo(largeLength, Global.windowHeight-largeHeight);
 	        left.close();
+	        
 	        Path right = new Path();
-	        right.moveTo(Global.windowWidth, Global.windowHeight);
-	        right.lineTo((float) (Global.windowWidth-(game.gridSize*hrad*2)), Global.windowHeight);
-	        right.lineTo(Global.windowWidth, 0);
+	        right.moveTo(Global.windowWidth, 0);
+	        right.lineTo(Global.windowWidth, largeHeight);
+	        right.lineTo(Global.windowWidth-largeLength, largeHeight);
 	        right.close();
 	        
 	        backgroundTopBottom = new ShapeDrawable(new RectShape());
 	        backgroundTopBottom.setBounds(0,0,Global.windowWidth,Global.windowHeight);
 	        backgroundLeft = new ShapeDrawable(new PathShape(left, Global.windowWidth, Global.windowHeight));
-	        backgroundLeft.setBounds(0,(int) (yOffset+hrad),Global.windowWidth,Global.windowHeight);
+	        backgroundLeft.setBounds(0,0,Global.windowWidth,Global.windowHeight);
 	        backgroundRight = new ShapeDrawable(new PathShape(right, Global.windowWidth, Global.windowHeight));
-	        backgroundRight.setBounds(0,0,Global.windowWidth,(int) (Global.windowHeight-(yOffset+hrad)));
+	        backgroundRight.setBounds(0,0,Global.windowWidth,Global.windowHeight);
         }
         else{
         	Path left = new Path();

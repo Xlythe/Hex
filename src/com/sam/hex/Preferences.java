@@ -22,7 +22,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -328,10 +327,6 @@ public class Preferences extends PreferenceActivity {
             	finish();
             }
         });
-        
-        ListView list = getListView();
-        View ads = View.inflate(this, R.layout.preferences_ads, null);
-        list.addFooterView(ads);
     }
     
     /**

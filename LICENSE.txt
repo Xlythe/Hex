@@ -1,6 +1,6 @@
 Copyright (c) 2012 SLSW All rights reserved.
  
-Developed by: 	Xlythe
+Developed by: Xlythe
 		University of Illinois, University of Waterloo
 		https://play.google.com/store/apps/details?id=com.sam.hex
 

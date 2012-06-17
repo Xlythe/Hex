@@ -113,7 +113,7 @@ public class BoardView extends View{
         if(Global.windowHeight>Global.windowWidth){
 	        int smallHeight = (int) (yOffset+2*hrad/3);
 	        int smallLength = (int) ((game.gridSize-1)*hrad);
-	        int largeHeight = (int) (Global.windowHeight-smallHeight);
+	        int largeHeight = (int) (Global.windowHeight-smallHeight-hrad);
 	        int largeLength = largeHeight*smallLength/smallHeight;
 	        
         	Path left = new Path();

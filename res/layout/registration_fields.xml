@@ -54,21 +54,6 @@
 	        android:inputType="textEmailAddress"
 	        android:hint="@null" />
 	    
-	    <TextView
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:padding="5dp"
-	        android:textColor="@color/black"
-	        android:text="@string/field_about"
-	        android:textAppearance="?android:attr/textAppearanceLarge" />
-	    
-	    <EditText
-	        android:id="@+id/about"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:inputType="textMultiLine"
-	        android:hint="@null" />
-	    
 	    <Button 
 	        android:id="@+id/loginEnter"
 	        android:layout_width="fill_parent"

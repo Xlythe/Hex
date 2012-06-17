@@ -15,6 +15,9 @@ bin/*
 #eclips stuff
 .project
 .classpath
+proguard-project.txt
+project.properties
+default.properties
  
 .~lock.designDoc.odt#
 

@@ -7,6 +7,7 @@
     
     <!-- Preferences -->
     <string name="preferences">Nastavenia</string>
+    <string name="preferences_net">Nastavenia (Online)</string>
     <string name="gameLocationTitle">Herný mód</string>
     <string name="gameLocationSummary">Hraj na rovnakom zariadení, cez sieť, alebo online!</string>
     <string name="gameSizeTitle">Veľkosť Plochy</string>
@@ -60,7 +61,7 @@
     <!-- Buttons from top to bottom -->
     <string name="start">Začať novú hru</string>
     <string name="resume">Vrátiť sa do hry</string>
-    <string name="online">Play Online</string>
+    <string name="online">Hrať Online</string>
     <string name="rules">Ako hrať?</string>
     <string name="options">Nastavenia</string>
     
@@ -83,7 +84,7 @@
     <string name="instructions">Hes hrajú dvaja hráči, ktorí otáčajú tabličky naopak a umiestňujú ich na hracej doske. Hráči majú rozdielne farby (červená a modrá).  \n\n
         (Prevzaté z <a href="http://www.hexwiki.org/index.php?title=Rules">hexwiki.org</a>)</string>
     
-    <!-- Quit -->
+    <!-- Confirmation -->
     <string name="confirmExit">Chcete skutočne skončiť?</string>
     <string name="confirmNewgame">Chcete spustiť novú hru?</string>
     

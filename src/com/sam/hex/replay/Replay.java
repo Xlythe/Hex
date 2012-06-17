@@ -6,7 +6,6 @@ import com.sam.hex.GameAction;
 import com.sam.hex.GameObject;
 import com.sam.hex.Global;
 import com.sam.hex.HexGame;
-import com.sam.hex.lan.LANGlobal;
 import com.sam.hex.net.NetGlobal;
 import com.sam.hex.net.NetHexGame;
 
@@ -33,12 +32,10 @@ public class Replay implements Runnable {
 	public void run() {
 		handler.post(hideAnnouncementText);
 		if(gameLocation==Global.GAME_LOCATION) HexGame.replayRunning = true;
-		else if(gameLocation==LANGlobal.GAME_LOCATION){}
 		else if(gameLocation==NetGlobal.GAME_LOCATION) NetHexGame.replayRunning = true;
 		game.moveList.replay(time, game);
 		game.board.postInvalidate();
 		if(gameLocation==Global.GAME_LOCATION) HexGame.replayRunning = false;
-		else if(gameLocation==LANGlobal.GAME_LOCATION){}
 		else if(gameLocation==NetGlobal.GAME_LOCATION) NetHexGame.replayRunning = false;
 		if(game.gameOver){
 			game.currentPlayer = game.currentPlayer%2+1;

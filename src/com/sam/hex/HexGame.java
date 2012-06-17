@@ -24,8 +24,6 @@ import android.graphics.Point;
 
 import com.sam.hex.ai.bee.BeeGameAI;
 import com.sam.hex.ai.will.GameAI;
-import com.sam.hex.lan.LANGlobal;
-import com.sam.hex.lan.LocalPlayerObject;
 import com.sam.hex.net.NetGlobal;
 import com.sam.hex.net.NetPlayerObject;
 import com.sam.hex.replay.FileExplore;
@@ -284,17 +282,6 @@ public class HexGame extends Activity {
     		game.player1.setName(prefs.getString("player1Name", "Player1"));
     		game.player2.setName(prefs.getString("player2Name", "Player2"));
     	}
-    	else if(gameLocation==LANGlobal.GAME_LOCATION){
-    		//Playing over LAN
-    		if(LANGlobal.localPlayer.firstMove){
-    			game.player1.setName(LANGlobal.localPlayer.playerName);
-        		game.player2.setName(prefs.getString("lanPlayerName", "Player"));
-    		}
-    		else{
-    			game.player1.setName(prefs.getString("lanPlayerName", "Player"));
-        		game.player2.setName(LANGlobal.localPlayer.playerName);
-    		}
-    	}
     	else if(gameLocation==NetGlobal.GAME_LOCATION){
     		//Playing over the net
     		for(int i=0;i<NetGlobal.members.size();i++){
@@ -318,17 +305,6 @@ public class HexGame extends Activity {
     		game.player1.setColor(prefs.getInt("player1Color", Global.player1DefaultColor));
     		game.player2.setColor(prefs.getInt("player2Color", Global.player2DefaultColor));
     	}
-    	else if(gameLocation==LANGlobal.GAME_LOCATION){
-    		//Playing over LAN
-    		if(LANGlobal.localPlayer.firstMove){
-    			game.player1.setColor(LANGlobal.localPlayer.playerColor);
-        		game.player2.setColor(prefs.getInt("lanPlayerColor", Global.player1DefaultColor));
-    		}
-    		else{
-    			game.player1.setColor(prefs.getInt("lanPlayerColor", Global.player1DefaultColor));
-        		game.player2.setColor(LANGlobal.localPlayer.playerColor);
-    		}
-    	}
     	else if(gameLocation==NetGlobal.GAME_LOCATION){
     		//Playing on the net
     		game.player1.setColor(Global.player1DefaultColor);
@@ -342,15 +318,6 @@ public class HexGame extends Activity {
     		//Playing on the same phone
     		gridSize=Integer.decode(prefs.getString("gameSizePref", "7"));
     		if(gridSize==0) gridSize=Integer.decode(prefs.getString("customGameSizePref", "7"));
-    	}
-    	else if(gameLocation==LANGlobal.GAME_LOCATION){
-    		//Playing over LAN
-    		if(LANGlobal.localPlayer.firstMove){
-    			gridSize=LANGlobal.localPlayer.gridSize;
-    		}
-    		else{
-    			gridSize=Integer.decode(prefs.getString("gameSizePref", "7"));
-    		}
     	}
     	else if(gameLocation==NetGlobal.GAME_LOCATION){
     		//Playing over the net
@@ -366,18 +333,7 @@ public class HexGame extends Activity {
     public static void setType(SharedPreferences prefs, int gameLocation, GameObject game){
     	if(gameLocation==Global.GAME_LOCATION){
     		game.player1Type=(byte)Integer.parseInt(prefs.getString("player1Type", "0"));
-        	game.player2Type=(byte)Integer.parseInt(prefs.getString("player2Type", "0"));
-    	}
-    	else if(gameLocation==LANGlobal.GAME_LOCATION){
-    		//Playing over LAN
-    		if(LANGlobal.localPlayer.firstMove){
-    			game.player1Type=(byte)2;
-    			game.player2Type=(byte)Integer.parseInt(prefs.getString("lanPlayerType", "0"));
-    		}
-    		else{
-    			game.player1Type=(byte)Integer.parseInt(prefs.getString("lanPlayerType", "0"));
-    			game.player2Type=(byte)2;
-    		}
+        	game.player2Type=(byte)Integer.parseInt(prefs.getString("player2Type", "1"));
     	}
     	else if(gameLocation==NetGlobal.GAME_LOCATION){
     		//Playing over the net
@@ -405,7 +361,6 @@ public class HexGame extends Activity {
     public static void setPlayer1(GameObject game, Runnable newgame){
     	if(game.player1Type==0) game.player1=new PlayerObject(1,game);
 		else if(game.player1Type==1) game.player1=new GameAI(1,game);
-		else if(game.player1Type==2) game.player1=new LocalPlayerObject(1,game);
 		else if(game.player1Type==3) game.player1=new NetPlayerObject(1, game, new Handler(), newgame);
 		else if(game.player1Type==4) game.player1=new BeeGameAI(1,game);
     }
@@ -413,7 +368,6 @@ public class HexGame extends Activity {
     public static void setPlayer2(GameObject game, Runnable newgame){
 		if(game.player2Type==0) game.player2=new PlayerObject(2,game);
 		else if(game.player2Type==1) game.player2=new GameAI(2,game);
-		else if(game.player2Type==2) game.player2=new LocalPlayerObject(2,game);
 		else if(game.player2Type==3) game.player2=new NetPlayerObject(2, game, new Handler(), newgame);
 		else if(game.player2Type==4) game.player2=new BeeGameAI(2,game);
     }
@@ -443,9 +397,6 @@ public class HexGame extends Activity {
     	    		|| Integer.decode(prefs.getString("player2Type", "0")) != (int) game.player2Type 
     	    	    || Integer.decode(prefs.getString("timerTypePref", "0")) != game.timer.type
     	    	    || Integer.decode(prefs.getString("timerPref", "0"))*60*1000 != game.timer.totalTime;
-    	}
-    	else if(gameLocation==LANGlobal.GAME_LOCATION){
-    		return !(Integer.decode(prefs.getString("lanPlayerType", "0")) == (int) game.player1Type || Integer.decode(prefs.getString("lanPlayerType", "0")) == (int) game.player2Type);
     	}
     	else if(gameLocation==NetGlobal.GAME_LOCATION){
     		return (game!=null && game.gameOver);

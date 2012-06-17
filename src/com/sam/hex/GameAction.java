@@ -4,8 +4,6 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import com.sam.hex.lan.LANGlobal;
-import com.sam.hex.lan.LocalPlayerObject;
 import com.sam.hex.net.NetGlobal;
 import com.sam.hex.net.NetPlayerObject;
 
@@ -118,78 +116,6 @@ public class GameAction {
 					}
 				}
 				if(game.gameOver && (getPlayer(game.currentPlayer%2+1, game) instanceof PlayerObject)) game.currentPlayer = (game.currentPlayer%2)+1;
-			}
-			else if(gameLocation==LANGlobal.GAME_LOCATION){//Inside a LAN game
-				if(game.currentPlayer==1){//First player's turn
-					if(game.player1 instanceof LocalPlayerObject){//First player is on the network (not local)
-						if(LANGlobal.undoRequested){//First player requested the undo
-							//undo twice, don't switch players
-							if(game.moveNumber>1){
-								lastMove = game.moveList.thisMove;
-								game.gamePiece[lastMove.getX()][lastMove.getY()].setTeam((byte)0,game);
-								game.moveList = game.moveList.nextMove;
-								game.moveNumber--;
-							}
-							if(game.gameOver) game.currentPlayer = (game.currentPlayer%2)+1;
-						}
-						else{//Second player requested the undo
-							//undo once, switch players
-							GameAction.getPlayer(game.currentPlayer, game).endMove();
-						}
-					}
-					else{//First player is local (not on the network)
-						if(LANGlobal.undoRequested){//Second player requested the undo
-							//undo once, switch players
-							getPlayer(game.currentPlayer, game).endMove();
-						}
-						else{//First player requested the undo
-							//undo twice, don't switch players
-							if(game.moveNumber>1){
-								lastMove = game.moveList.thisMove;
-								game.gamePiece[lastMove.getX()][lastMove.getY()].setTeam((byte)0,game);
-								game.moveList = game.moveList.nextMove;
-								game.moveNumber--;
-							}
-							if(game.gameOver) game.currentPlayer = (game.currentPlayer%2)+1;
-						}
-					}
-				}
-				else{//Second player's turn
-					if(game.player2 instanceof LocalPlayerObject){//Second player is local (not on the network)
-						if(LANGlobal.undoRequested){//First player requested the undo
-							//undo once, switch players
-							getPlayer(game.currentPlayer, game).endMove();
-						}
-						else{//Second player requested the undo
-							//undo twice, don't switch players
-							if(game.moveNumber>1){
-								lastMove = game.moveList.thisMove;
-								game.gamePiece[lastMove.getX()][lastMove.getY()].setTeam((byte)0,game);
-								game.moveList = game.moveList.nextMove;
-								game.moveNumber--;
-							}
-							if(game.gameOver) game.currentPlayer = (game.currentPlayer%2)+1;
-						}
-					}
-					else{//Second player is on the network (not local)
-						if(LANGlobal.undoRequested){//Second player requested the undo
-							//undo twice, don't switch players
-							if(game.moveNumber>1){
-								lastMove = game.moveList.thisMove;
-								game.gamePiece[lastMove.getX()][lastMove.getY()].setTeam((byte)0,game);
-								game.moveList = game.moveList.nextMove;
-								game.moveNumber--;
-							}
-							if(game.gameOver) game.currentPlayer = (game.currentPlayer%2)+1;
-						}
-						else{//First player requested the undo
-							//undo once, switch players
-							GameAction.getPlayer(game.currentPlayer, game).endMove();
-						}
-					}
-				}
-				
-				LANGlobal.undoRequested = false;
 			}
 			else if(gameLocation==NetGlobal.GAME_LOCATION){//Inside a net game
 				if(game.currentPlayer==1){//First player's turn

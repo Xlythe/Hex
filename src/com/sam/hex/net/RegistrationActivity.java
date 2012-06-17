@@ -54,7 +54,6 @@ public class RegistrationActivity extends Activity {
         final EditText username = (EditText) findViewById(R.id.username);
         final EditText password = (EditText) findViewById(R.id.password);
         final EditText email = (EditText) findViewById(R.id.email);
-        final EditText about = (EditText) findViewById(R.id.about);
         enter.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	new Thread(new Runnable(){
@@ -63,7 +62,6 @@ public class RegistrationActivity extends Activity {
 						try {
 		            		String registrationUrl = String.format("http://www.iggamecenter.com/api_user_add.php?app_id=%s&app_code=%s&name=%s&password=%s", NetGlobal.id, URLEncoder.encode(NetGlobal.passcode,"UTF-8"), URLEncoder.encode(username.getText().toString(),"UTF-8"), URLEncoder.encode(password.getText().toString(),"UTF-8"));
 		            		if(!email.equals("")) registrationUrl += "&email="+URLEncoder.encode(email.getText().toString(),"UTF-8");
-		            		if(!about.equals("")) registrationUrl += "&about="+URLEncoder.encode(about.getText().toString(),"UTF-8");
 							URL url = new URL(registrationUrl);
 							SAXParserFactory spf = SAXParserFactory.newInstance();
 			                SAXParser parser = spf.newSAXParser();

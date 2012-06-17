@@ -1,4 +1,4 @@
-Welcome to Hex, the hexagon connection game. 
+Welcome to Hex, the hexagon connection game.
 Help us make the game better!
 
 If you want to write an AI:
@@ -10,7 +10,7 @@ If you'd rather write your own board game based off ours, email me at xlythe@gma
 
 Copyright (c) 2012 SLSW All rights reserved.
  
-Developed by: 	Xlythe
+Developed by: Xlythe
 		University of Illinois, University of Waterloo
 		https://play.google.com/store/apps/details?id=com.sam.hex
 

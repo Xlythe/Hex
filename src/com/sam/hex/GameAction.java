@@ -60,7 +60,7 @@ public class GameAction {
 		game.moveList.makeMove(x, y, t, System.currentTimeMillis()-game.moveStart, game.moveNumber);
 		game.gamePiece[x][y].setTeam(t,game);
 		game.moveNumber++;
-		game.board.postInvalidate();
+		game.views.board.postInvalidate();
 	}
 	
 	public static boolean makeMove(PlayingEntity player, int team, Point hex, GameObject game){
@@ -197,19 +197,19 @@ public class GameAction {
 			}
 		}
 		
-		game.board.postInvalidate();
+		game.views.board.postInvalidate();
 	}
 	
 	public static class AnnounceWinner{
 		public AnnounceWinner(final int team, final GameObject game){
-			game.handler.post(new Runnable(){
+			game.views.handler.post(new Runnable(){
 				public void run(){
-					game.winnerMsg = insert(game.board.getContext().getString(R.string.winner), getPlayer(team, game).getName());
-					game.winnerText.setText(game.winnerMsg);
-					game.winnerText.setVisibility(View.VISIBLE);
-					game.winnerText.invalidate();
-					game.timerText.setVisibility(View.GONE);
-					game.timerText.invalidate();
+					game.winnerMsg = insert(game.views.board.getContext().getString(R.string.winner), getPlayer(team, game).getName());
+					game.views.winnerText.setText(game.winnerMsg);
+					game.views.winnerText.setVisibility(View.VISIBLE);
+					game.views.winnerText.invalidate();
+					game.views.timerText.setVisibility(View.GONE);
+					game.views.timerText.invalidate();
 				}
 			});
 		}

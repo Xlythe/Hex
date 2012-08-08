@@ -31,9 +31,9 @@ public class Timer implements Runnable{
 	public void start(){
 		refresh=true;
 		if(type!=0){
-			game.handler.post(new Runnable(){
+			game.views.handler.post(new Runnable(){
 				public void run(){
-					game.timerText.setVisibility(View.VISIBLE);
+					game.views.timerText.setVisibility(View.VISIBLE);
 				}
 			});
 			new Thread(this).start();
@@ -56,7 +56,7 @@ public class Timer implements Runnable{
 				}
 				else{
 					GameAction.getPlayer(currentPlayer, game).endMove();
-					game.board.postInvalidate();
+					game.views.board.postInvalidate();
 				}
 			}
 			
@@ -73,14 +73,14 @@ public class Timer implements Runnable{
 	}
 	
 	private void displayTime(){
-		game.handler.post(new Runnable(){
+		game.views.handler.post(new Runnable(){
 			public void run(){
 				long millis = GameAction.getPlayer(game.currentPlayer, game).getTime();
 		        int seconds = (int) (millis / 1000);
 		        int minutes = seconds / 60;
 		        seconds = seconds % 60;
-		        game.timerText.setText(GameAction.insert(game.board.getContext().getString(R.string.timer),String.format("%d:%02d", minutes, seconds)));
-		        game.timerText.invalidate();
+		        game.views.timerText.setText(GameAction.insert(game.views.board.getContext().getString(R.string.timer),String.format("%d:%02d", minutes, seconds)));
+		        game.views.timerText.invalidate();
 			}
 		});
 	}

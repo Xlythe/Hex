@@ -2,20 +2,13 @@ package com.sam.hex.net;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
-
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-
 import com.sam.hex.DialogBox;
 import com.sam.hex.GameAction;
 import com.sam.hex.R;
+import com.sam.hex.net.igGC.ParsedDataset;
+import com.sam.hex.net.igGC.igGameCenter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -64,17 +57,7 @@ public class LoginActivity extends Activity {
 					public void run() {
 						try {
 							String encryptedPassword = GameAction.md5(password.getText().toString());
-		            		String registrationUrl = String.format("http://www.iggamecenter.com/api_login.php?app_id=%s&app_code=%s&login=%s&password=%s&md5=1", NetGlobal.id, URLEncoder.encode(NetGlobal.passcode,"UTF-8"), URLEncoder.encode(username.getText().toString(),"UTF-8"), URLEncoder.encode(encryptedPassword,"UTF-8"));
-		            		System.out.println(registrationUrl);
-		            		URL url = new URL(registrationUrl);
-							SAXParserFactory spf = SAXParserFactory.newInstance();
-			                SAXParser parser = spf.newSAXParser();
-			                XMLReader reader = parser.getXMLReader();
-			                XMLHandler handler = new XMLHandler();
-			                reader.setContentHandler(handler);
-			                reader.parse(new InputSource(url.openStream()));
-			                
-			                ParsedDataset parsedDataset = handler.getParsedData();
+			                ParsedDataset parsedDataset = igGameCenter.login(username.getText().toString(), encryptedPassword, "");
 			            	if(!parsedDataset.error){
 				            	settings.edit().putString("netUsername", username.getText().toString()).commit();
 				            	settings.edit().putString("netPassword", encryptedPassword).commit();

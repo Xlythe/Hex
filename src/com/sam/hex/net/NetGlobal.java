@@ -2,15 +2,12 @@ package com.sam.hex.net;
 
 import java.util.ArrayList;
 import com.sam.hex.GameObject;
+import com.sam.hex.net.igGC.ParsedDataset;
 
 /**
  * @author Will Harmon
  **/
 public class NetGlobal{
-	//Our ids to connect to igGC
-	public static final int id = 17;
-	public static final String passcode = "wihamo8984";
-	
 	//Hex game id
 	public static final int gid = 12;
 	

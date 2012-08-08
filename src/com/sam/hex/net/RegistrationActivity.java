@@ -2,18 +2,11 @@ package com.sam.hex.net;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
-
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-
 import com.sam.hex.R;
+import com.sam.hex.net.igGC.ParsedDataset;
+import com.sam.hex.net.igGC.igGameCenter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -60,17 +53,7 @@ public class RegistrationActivity extends Activity {
 					@Override
 					public void run() {
 						try {
-		            		String registrationUrl = String.format("http://www.iggamecenter.com/api_user_add.php?app_id=%s&app_code=%s&name=%s&password=%s", NetGlobal.id, URLEncoder.encode(NetGlobal.passcode,"UTF-8"), URLEncoder.encode(username.getText().toString(),"UTF-8"), URLEncoder.encode(password.getText().toString(),"UTF-8"));
-		            		if(!email.equals("")) registrationUrl += "&email="+URLEncoder.encode(email.getText().toString(),"UTF-8");
-							URL url = new URL(registrationUrl);
-							SAXParserFactory spf = SAXParserFactory.newInstance();
-			                SAXParser parser = spf.newSAXParser();
-			                XMLReader reader = parser.getXMLReader();
-			                XMLHandler handler = new XMLHandler();
-			                reader.setContentHandler(handler);
-			                reader.parse(new InputSource(url.openStream()));
-			                
-			                ParsedDataset parsedDataset = handler.getParsedData();
+			                ParsedDataset parsedDataset = igGameCenter.register(username.getText().toString(), password.getText().toString(), email.getText().toString());
 			            	if(!parsedDataset.error){
 				            	settings.edit().putString("netUsername", username.getText().toString()).commit();
 				            	settings.edit().putString("netPassword", password.getText().toString()).commit();

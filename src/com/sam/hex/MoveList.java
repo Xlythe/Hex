@@ -36,11 +36,11 @@ public class MoveList implements Serializable {
 		if (thisMove==null) return;
 		if (nextMove!=null) nextMove.replay(time, game);
 		try {
-			if(HexGame.replayRunning) Thread.sleep(time);
+			if(game.views.board.replayRunning) Thread.sleep(time);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		game.gamePiece[thisMove.getX()][thisMove.getY()].setTeam(thisMove.getTeam(),game);
-		game.board.postInvalidate();
+		game.views.board.postInvalidate();
 	}	
 }

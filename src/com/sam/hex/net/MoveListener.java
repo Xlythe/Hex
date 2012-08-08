@@ -2,17 +2,8 @@ package com.sam.hex.net;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
-
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-
 import android.content.DialogInterface;
 import android.os.Handler;
 
@@ -20,6 +11,8 @@ import com.sam.hex.DialogBox;
 import com.sam.hex.GameAction;
 import com.sam.hex.GameObject;
 import com.sam.hex.R;
+import com.sam.hex.net.igGC.ParsedDataset;
+import com.sam.hex.net.igGC.igGameCenter;
 
 /**
  * @author Will Harmon
@@ -30,24 +23,17 @@ public class MoveListener implements Runnable{
 	private Handler handler;
 	private Runnable newgame;
 	private NetPlayerObject player;
-	private String server;
-	private int lasteid;
-	private int uid;
-	private String session_id;
-	private int sid;
 	private GameObject game;
 	public boolean giveup = false;
 	private boolean dontAskTwice = false;
-	public MoveListener(GameObject game, int team, Handler handler, Runnable newgame, NetPlayerObject player, String server, int uid, String session_id, int sid){
+	private igGameCenter igGC;
+	public MoveListener(GameObject game, int team, Handler handler, Runnable newgame, NetPlayerObject player, igGameCenter igGC){
 		this.game = game;
 		this.team = team;
 		this.handler = handler;
 		this.newgame = newgame;
 		this.player = player;
-		this.server = server;
-		this.uid = uid;
-		this.session_id = session_id;
-		this.sid = sid;
+		this.igGC = igGC;
 		new Thread(this).start();
 	}
 
@@ -55,24 +41,14 @@ public class MoveListener implements Runnable{
 	public void run() {
 		while(listen){
 			try {
-				String lobbyUrl = String.format("http://%s.iggamecenter.com/api_handler.php?app_id=%s&app_code=%s&uid=%s&session_id=%s&sid=%s&lasteid=%s&cmd=REFRESH", URLEncoder.encode(server,"UTF-8"), NetGlobal.id, URLEncoder.encode(NetGlobal.passcode,"UTF-8"), uid, URLEncoder.encode(session_id,"UTF-8"), sid, lasteid);
-				URL url = new URL(lobbyUrl);
-				SAXParserFactory spf = SAXParserFactory.newInstance();
-	            SAXParser parser = spf.newSAXParser();
-	            XMLReader reader = parser.getXMLReader();
-	            XMLHandler xmlHandler = new XMLHandler();
-	            reader.setContentHandler(xmlHandler);
-	            reader.parse(new InputSource(url.openStream()));
-	            
-	            final ParsedDataset parsedDataset = xmlHandler.getParsedData();
+	            final ParsedDataset parsedDataset = igGC.refresh(NetGlobal.lasteid);
 	        	if(!parsedDataset.error){
-	        		if(lasteid!=0){
+	        		if(NetGlobal.lasteid!=0){
 	        			for(int i=0;i<parsedDataset.messages.size();i++){
 		        			WaitingRoomActivity.messages.add(parsedDataset.messages.get(i).name+": "+parsedDataset.messages.get(i).msg);
 		        		}
 	        		}
 	        		if(parsedDataset.lasteid!=0){
-	        			lasteid = parsedDataset.lasteid;
 	        			NetGlobal.lasteid = parsedDataset.lasteid;
 	        		}
         			NetGlobal.members = parsedDataset.players;
@@ -106,8 +82,7 @@ public class MoveListener implements Runnable{
 	        		}
         			if(parsedDataset.undoRequested){
         				try {
-	    	        		String undoUrl = String.format("http://%s.iggamecenter.com/api_handler.php?app_id=%s&app_code=%s&uid=%s&session_id=%s&sid=%s&cmd=UNDO&type=FORBID&lasteid=%s", URLEncoder.encode(server,"UTF-8"), NetGlobal.id, URLEncoder.encode(NetGlobal.passcode,"UTF-8"), uid, URLEncoder.encode(session_id,"UTF-8"), sid, NetGlobal.lasteid);
-							new URL(undoUrl).openStream();
+	    	        		igGC.forbidUndo(NetGlobal.lasteid);
 						} catch (MalformedURLException e) {
 							e.printStackTrace();
 						} catch (IOException e) {
@@ -175,8 +150,8 @@ public class MoveListener implements Runnable{
     					}
     					else if(!dontAskTwice){
     						dontAskTwice=true;
-	    					new DialogBox(game.board.getContext(),
-	    							GameAction.insert(game.board.getContext().getString(R.string.newLANGame), player.getName()),
+	    					new DialogBox(game.views.board.getContext(),
+	    							GameAction.insert(game.views.board.getContext().getString(R.string.newLANGame), player.getName()),
 	    	    					new DialogInterface.OnClickListener() {
 	    	    	    	    	    public void onClick(DialogInterface dialog, int which) {
 	    	    	    	    	        switch (which){
@@ -191,8 +166,8 @@ public class MoveListener implements Runnable{
 	    	    	    	    	        }
 	    	    	    	    	    }
 	    	    	    	    	},
-	    	    	    	    	game.board.getContext().getString(R.string.yes), 
-	    	    					game.board.getContext().getString(R.string.no));
+	    	    	    	    	game.views.board.getContext().getString(R.string.yes), 
+	    	    					game.views.board.getContext().getString(R.string.no));
     					}
     				}
 	        	}

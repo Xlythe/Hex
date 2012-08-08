@@ -2,22 +2,16 @@ package com.sam.hex.net;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-
 import com.sam.hex.Global;
 import com.sam.hex.Preferences;
 import com.sam.hex.R;
+import com.sam.hex.net.igGC.ParsedDataset;
+import com.sam.hex.net.igGC.igGameCenter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -106,19 +100,8 @@ public class WaitingRoomActivity extends Activity {
 				new Thread(new Runnable(){
 		    		public void run(){
 		    			try {
-		    				String lobbyUrl = String.format("http://%s.iggamecenter.com/api_handler.php?app_id=%s&app_code=%s&uid=%s&session_id=%s&sid=%s&cmd=START&lasteid=%s", URLEncoder.encode(NetGlobal.server, "UTF-8"), NetGlobal.id, URLEncoder.encode(NetGlobal.passcode,"UTF-8"), NetGlobal.uid, URLEncoder.encode(NetGlobal.session_id,"UTF-8"), NetGlobal.sid, NetGlobal.lasteid);
-		    				URL url = new URL(lobbyUrl);
-		    				SAXParserFactory spf = SAXParserFactory.newInstance();
-		    	            SAXParser parser = spf.newSAXParser();
-		    	            XMLReader reader = parser.getXMLReader();
-		    	            XMLHandler xmlHandler = new XMLHandler();
-		    	            reader.setContentHandler(xmlHandler);
-		    	            reader.parse(new InputSource(url.openStream()));
-		    	            
-		    	            ParsedDataset parsedDataset = xmlHandler.getParsedData();
-		    	        	if(!parsedDataset.error){
-		    	        	}
-		    	        	else{
+		    	            ParsedDataset parsedDataset = igGameCenter.ready(NetGlobal.server, NetGlobal.uid, NetGlobal.session_id, NetGlobal.sid, NetGlobal.lasteid);
+		    	        	if(parsedDataset.error){
 		    	        		System.out.println(parsedDataset.getErrorMessage());
 		    	        	}
 		    			} catch (MalformedURLException e) {
@@ -175,11 +158,9 @@ public class WaitingRoomActivity extends Activity {
         	    public void onClick(DialogInterface dialog, int which) {
         	        switch (which){
         	        case DialogInterface.BUTTON_POSITIVE:
-        	            //Yes button clicked
         	        	android.os.Process.killProcess(android.os.Process.myPid());
         	            break;
         	        case DialogInterface.BUTTON_NEGATIVE:
-        	            //No button clicked
         	        	//Do nothing
         	            break;
         	        }
@@ -204,19 +185,8 @@ public class WaitingRoomActivity extends Activity {
     	new Thread(new Runnable(){
     		public void run(){
     			try {
-    				String lobbyUrl = String.format("http://%s.iggamecenter.com/api_handler.php?app_id=%s&app_code=%s&uid=%s&session_id=%s&sid=%s&cmd=MSG&message=%s&lasteid=%s", URLEncoder.encode(NetGlobal.server, "UTF-8"), NetGlobal.id, URLEncoder.encode(NetGlobal.passcode,"UTF-8"), NetGlobal.uid, URLEncoder.encode(NetGlobal.session_id,"UTF-8"), NetGlobal.sid, URLEncoder.encode(message,"UTF-8"), NetGlobal.lasteid);
-    				URL url = new URL(lobbyUrl);
-    				SAXParserFactory spf = SAXParserFactory.newInstance();
-    	            SAXParser parser = spf.newSAXParser();
-    	            XMLReader reader = parser.getXMLReader();
-    	            XMLHandler xmlHandler = new XMLHandler();
-    	            reader.setContentHandler(xmlHandler);
-    	            reader.parse(new InputSource(url.openStream()));
-    	            
-    	            ParsedDataset parsedDataset = xmlHandler.getParsedData();
-    	        	if(!parsedDataset.error){
-    	        	}
-    	        	else{
+    	            ParsedDataset parsedDataset = igGameCenter.sendMessage(NetGlobal.server, NetGlobal.uid, NetGlobal.session_id, NetGlobal.sid, message, NetGlobal.lasteid);
+    	        	if(parsedDataset.error){
     	        		System.out.println(parsedDataset.getErrorMessage());
     	        	}
     			} catch (MalformedURLException e) {
@@ -335,14 +305,12 @@ public class WaitingRoomActivity extends Activity {
 	    	        		int scored = 0;
 	    	        		if(NetGlobal.ratedGame) scored++;
 	    	        		try {
-	    	        			String boardUrl = String.format("http://%s.iggamecenter.com/api_handler.php?app_id=%s&app_code=%s&uid=%s&session_id=%s&sid=%s&cmd=SETUP&boardSize=%s&timerTotal=%s&timerInc=%s&scored=%s&lasteid=%s", URLEncoder.encode(NetGlobal.server, "UTF-8"), NetGlobal.id, URLEncoder.encode(NetGlobal.passcode,"UTF-8"), NetGlobal.uid, URLEncoder.encode(NetGlobal.session_id,"UTF-8"), NetGlobal.sid, NetGlobal.gridSize, NetGlobal.timerTime*60, NetGlobal.additionalTimerTime, scored, NetGlobal.lasteid);
-		    	        		String placeUrl = String.format("http://%s.iggamecenter.com/api_handler.php?app_id=%s&app_code=%s&uid=%s&session_id=%s&sid=%s&cmd=PLACE&place=%s&lasteid=%s", URLEncoder.encode(NetGlobal.server, "UTF-8"), NetGlobal.id, URLEncoder.encode(NetGlobal.passcode,"UTF-8"), NetGlobal.uid, URLEncoder.encode(NetGlobal.session_id,"UTF-8"), NetGlobal.sid, NetGlobal.place, NetGlobal.lasteid);
-	    	        			if(previousGridSize!=NetGlobal.gridSize || previousTime!=NetGlobal.timerTime || previousAdditionalTime!=NetGlobal.additionalTimerTime || previousRatedGame!=NetGlobal.ratedGame) new URL(boardUrl).openStream();
-	    	        			new URL(placeUrl).openStream();
+	    	        			if(previousGridSize!=NetGlobal.gridSize || previousTime!=NetGlobal.timerTime || previousAdditionalTime!=NetGlobal.additionalTimerTime || previousRatedGame!=NetGlobal.ratedGame) igGameCenter.editBoard(NetGlobal.server, NetGlobal.uid, NetGlobal.session_id, NetGlobal.sid, NetGlobal.gridSize, NetGlobal.timerTime*60, NetGlobal.additionalTimerTime, scored, NetGlobal.lasteid);
+	    	        			igGameCenter.changePlace(NetGlobal.server, NetGlobal.uid, NetGlobal.session_id, NetGlobal.sid, NetGlobal.place, NetGlobal.lasteid);
 	    	        		} catch (MalformedURLException e) {
-	    	        		e.printStackTrace();
+	    	        		    e.printStackTrace();
 	    	        		} catch (IOException e) {
-	    	        		e.printStackTrace();
+	    	        		    e.printStackTrace();
 	    	        		}
     	        		}}).start();
     	            break;

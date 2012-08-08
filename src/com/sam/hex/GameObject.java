@@ -7,7 +7,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class GameObject implements Runnable {
-	private boolean game=true;
+	private boolean game = true;
 	public final RegularPolygonGameObject[][] gamePiece;
 	public final int gridSize;
 	public final boolean swap;
@@ -22,17 +22,8 @@ public class GameObject implements Runnable {
 	public long moveStart;
 	public Thread gameThread;
 	public Timer timer;
-	public BoardView board;
-	public TextView timerText;
-	public TextView winnerText;
 	public String winnerMsg = "";
-	public ImageButton replayForward;
-	public ImageButton replayPlayPause;
-	public ImageButton replayBack;
-	public RelativeLayout replayButtons;
-	public ImageButton player1Icon;
-	public ImageButton player2Icon;
-	public Handler handler;
+    public final Views views;
 
 	public GameObject(int gridSize, boolean swap) {
 		gameThread = new Thread(this, "runningGame"); //Create a new thread.
@@ -51,12 +42,13 @@ public class GameObject implements Runnable {
 		currentPlayer = 1;
 		game=true;
 		gameOver=false;
+		views = new Views();
 	}
 	
 	public void start(){
-		if(gameOver) handler.post(new Runnable(){
+		if(gameOver) views.handler.post(new Runnable(){
 			public void run(){
-				winnerText.setVisibility(View.GONE);
+				views.winnerText.setVisibility(View.GONE);
 			}
 		});
 		gameOver=false;
@@ -84,7 +76,7 @@ public class GameObject implements Runnable {
 					GameAction.getPlayer((currentPlayer%2)+1, this).setTime(timer.totalTime);
 				}
 				GameAction.getPlayer((currentPlayer%2)+1, this).setTime(GameAction.getPlayer((currentPlayer%2)+1, this).getTime() + timer.additionalTime);
-				board.postInvalidate();
+				views.board.postInvalidate();
 				GameAction.getPlayer(currentPlayer, this).getPlayerTurn();
 			}
 			
@@ -94,7 +86,7 @@ public class GameObject implements Runnable {
 	}
 	
 	private void announceWinner(int team){
-		board.postInvalidate();
+		views.board.postInvalidate();
 		new GameAction.AnnounceWinner(team, this);
 	}
 	
@@ -124,6 +116,19 @@ public class GameObject implements Runnable {
 				gamePiece[i][j] = new RegularPolygonGameObject();
 			}
     	}
-		board.postInvalidate();
+		views.board.postInvalidate();
+	}
+	
+	public class Views{
+		public BoardView board;
+		public TextView timerText;
+		public TextView winnerText;
+		public ImageButton replayForward;
+		public ImageButton replayPlayPause;
+		public ImageButton replayBack;
+		public RelativeLayout replayButtons;
+		public ImageButton player1Icon;
+		public ImageButton player2Icon;
+		public Handler handler;
 	}
 }

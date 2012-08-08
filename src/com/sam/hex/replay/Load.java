@@ -51,7 +51,7 @@ public class Load implements Runnable{
 				
 				Global.game.currentPlayer=((Global.game.moveNumber+1)%2)+1;
 				HexGame.replay = true;
-				HexGame.replayRunning = false;
+				Global.game.views.board.replayRunning = false;
 				HexGame.startNewGame = false;
 				
 				//Does not support saving PlayingEntities yet

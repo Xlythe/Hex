@@ -5,10 +5,12 @@ import com.sam.hex.net.NetGlobal;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Path;
+import android.graphics.Point;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.PathShape;
 import android.graphics.drawable.shapes.RectShape;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.graphics.Color;
 
@@ -22,36 +24,31 @@ public class BoardView extends View{
 	private ShapeDrawable backgroundLeft;
 	private ShapeDrawable backgroundRight;
 	public GameObject game;
+	public boolean replayRunning = false;
 	
 	public BoardView(Context context){
 		super(context);
-		if(Global.viewLocation==Global.GAME_LOCATION){
-			game = Global.game;
-		}
-		else if(Global.viewLocation==NetGlobal.GAME_LOCATION){
-			game = NetGlobal.game;
-		}
-		calculateGrid();
+		getGame();
 	}
 	public BoardView(Context context, AttributeSet attrs){
         super(context, attrs);
-        if(Global.viewLocation==Global.GAME_LOCATION){
-			game = Global.game;
-		}
-		else if(Global.viewLocation==NetGlobal.GAME_LOCATION){
-			game = NetGlobal.game;
-		}
-        calculateGrid();
+        getGame();
     }
     public BoardView(Context context, AttributeSet attrs, int defStyle){
         super(context, attrs, defStyle);
-        if(Global.viewLocation==Global.GAME_LOCATION){
-			game = Global.game;
-		}
-		else if(Global.viewLocation==NetGlobal.GAME_LOCATION){
-			game = NetGlobal.game;
-		}
-        calculateGrid();
+        getGame();
+    }
+    
+    private void getGame(){
+    	switch(Global.viewLocation){
+    	case(Global.GAME_LOCATION):
+    		game = Global.game;
+    	    break;
+    	case(NetGlobal.GAME_LOCATION):
+    		game = NetGlobal.game;
+    	    break;
+    	}
+        this.setOnTouchListener(new TouchListener(game));
     }
 	
 	protected void onDraw(Canvas canvas){
@@ -61,25 +58,25 @@ public class BoardView extends View{
 		backgroundTopBottom.draw(canvas);
 		backgroundLeft.draw(canvas);
 		backgroundRight.draw(canvas);
-		for(int xc=0;xc<n;xc++)
-			for(int yc=0;yc<n;yc++){
-				mOutline[xc][yc].draw(canvas);
-				mDrawable[xc][yc].getPaint().setColor(game.gamePiece[xc][yc].getColor());
-				mDrawable[xc][yc].draw(canvas);
+		for(int x=0;x<n;x++)
+			for(int y=0;y<n;y++){
+				mOutline[x][y].draw(canvas);
+				mDrawable[x][y].getPaint().setColor(game.gamePiece[x][y].getColor());
+				mDrawable[x][y].draw(canvas);
 			}
-		game.player1Icon.setColorFilter(game.player1.getColor());
-		game.player2Icon.setColorFilter(game.player2.getColor());
+		game.views.player1Icon.setColorFilter(game.player1.getColor());
+		game.views.player2Icon.setColorFilter(game.player2.getColor());
 		if(game.currentPlayer==1 && !game.gameOver){
-			game.player1Icon.setAlpha(255);
-			game.player2Icon.setAlpha(80);
+			game.views.player1Icon.setAlpha(255);
+			game.views.player2Icon.setAlpha(80);
 		}
 		else if(game.currentPlayer==2 && !game.gameOver){
-			game.player1Icon.setAlpha(80);
-			game.player2Icon.setAlpha(255);
+			game.views.player1Icon.setAlpha(80);
+			game.views.player2Icon.setAlpha(255);
 		}
 		else{
-			game.player1Icon.setAlpha(80);
-			game.player2Icon.setAlpha(80);
+			game.views.player1Icon.setAlpha(80);
+			game.views.player2Icon.setAlpha(80);
 		}
 	}
 	@Override
@@ -169,13 +166,6 @@ public class BoardView extends View{
 			}
 	}
 	
-	public void calculateGrid(){
-		if(game.gamePiece[0][0]==null)
-		for(int xc=0;xc<game.gridSize;xc++)
-			for(int yc=0;yc<game.gridSize;yc++)
-				game.gamePiece[xc][yc]=new RegularPolygonGameObject();
-	}
-	
 	private void colorBackground(){
 		if(Global.windowHeight>Global.windowWidth){
 	        backgroundTopBottom.getPaint().setColor(game.player2.getColor());
@@ -188,4 +178,27 @@ public class BoardView extends View{
 	        backgroundRight.getPaint().setColor(game.player2.getColor());
         }
 	}
+	
+	private class TouchListener implements OnTouchListener{
+    	GameObject game;
+    	public TouchListener(GameObject game){
+    		this.game = game;
+    	}
+    	public boolean onTouch(View v, MotionEvent event){
+    		int eventaction = event.getAction();
+    		if(eventaction==MotionEvent.ACTION_UP){
+    			int x = (int)event.getX();
+				int y = (int)event.getY();
+				for(int xc = 0; xc < game.gamePiece.length; xc++){
+					for(int yc=0; yc<game.gamePiece[0].length; yc++)
+						if(game.gamePiece[xc][yc].contains(x, y)){
+							if(game!=null && !replayRunning)GameAction.setPiece(new Point(xc,yc),game);
+							return false;
+						}
+				}
+    		}
+    		
+			return true;
+    	}
+    }
 }

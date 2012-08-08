@@ -36,7 +36,7 @@ public class Save{
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		showSavedDialog(game.board.getContext().getString(R.string.saved));
+		showSavedDialog(game.views.board.getContext().getString(R.string.saved));
 	}
     
     class save implements Runnable{
@@ -88,12 +88,12 @@ public class Save{
 	}
 	
 	public void showSavingDialog(){
-        final EditText editText = new EditText(game.board.getContext());
+        final EditText editText = new EditText(game.views.board.getContext());
         editText.setInputType(InputType.TYPE_CLASS_TEXT);
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
         editText.setText(dateFormat.format(date) + "");
-        AlertDialog.Builder builder = new AlertDialog.Builder(game.board.getContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(game.views.board.getContext());
         builder     
         .setTitle("Enter a filename")
         .setView(editText)
@@ -104,15 +104,15 @@ public class Save{
     			saveGame(fileName);
     		}
         })
-        .setNegativeButton(game.board.getContext().getString(R.string.cancel), null)
+        .setNegativeButton(game.views.board.getContext().getString(R.string.cancel), null)
         .show();
     }
 	
 	private void showSavedDialog(String message){
-        AlertDialog.Builder builder = new AlertDialog.Builder(game.board.getContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(game.views.board.getContext());
         builder     
         .setTitle(message)
-        .setNeutralButton(game.board.getContext().getString(R.string.okay), null)
+        .setNeutralButton(game.views.board.getContext().getString(R.string.okay), null)
         .show();
     }
 }

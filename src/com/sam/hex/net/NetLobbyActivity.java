@@ -2,21 +2,15 @@ package com.sam.hex.net;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.LinkedList;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-
 import com.sam.hex.DialogBox;
 import com.sam.hex.Preferences;
 import com.sam.hex.R;
+import com.sam.hex.net.igGC.ParsedDataset;
+import com.sam.hex.net.igGC.igGameCenter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -97,11 +91,9 @@ public class NetLobbyActivity extends Activity {
             	    public void onClick(DialogInterface dialog, int which) {
             	        switch (which){
             	        case DialogInterface.BUTTON_POSITIVE:
-            	            //Yes button clicked
             	        	startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
             	            break;
             	        case DialogInterface.BUTTON_NEGATIVE:
-            	            //No button clicked
             	        	finish();
             	            break;
             	        }
@@ -115,16 +107,7 @@ public class NetLobbyActivity extends Activity {
     			@Override
     			public void run() {
     				try {
-                		String loginUrl = String.format("http://www.iggamecenter.com/api_login.php?app_id=%s&app_code=%s&login=%s&password=%s&networkuid=%s&md5=1", NetGlobal.id, URLEncoder.encode(NetGlobal.passcode,"UTF-8"), URLEncoder.encode(prefs.getString("netUsername", ""),"UTF-8"), URLEncoder.encode(prefs.getString("netPassword", ""),"UTF-8"), URLEncoder.encode(NetGlobal.android_id,"UTF-8"));
-    					URL url = new URL(loginUrl);
-    					SAXParserFactory spf = SAXParserFactory.newInstance();
-    	                SAXParser parser = spf.newSAXParser();
-    	                XMLReader reader = parser.getXMLReader();
-    	                XMLHandler xmlHandler = new XMLHandler();
-    	                reader.setContentHandler(xmlHandler);
-    	                reader.parse(new InputSource(url.openStream()));
-    	                
-    	                ParsedDataset parsedDataset = xmlHandler.getParsedData();
+    	                ParsedDataset parsedDataset = igGameCenter.login(prefs.getString("netUsername", ""), prefs.getString("netPassword", ""), NetGlobal.android_id);
     	                if(!parsedDataset.error){
     	                	NetGlobal.uid = parsedDataset.getUid();
     	                	NetGlobal.session_id = parsedDataset.getSession_id();
@@ -229,16 +212,7 @@ public class NetLobbyActivity extends Activity {
     	        		try {
     	        			NetGlobal.server = NetGlobal.sessions.get(position).server;
     	        			NetGlobal.sid = NetGlobal.sessions.get(position).sid;
-	    	        		String registrationUrl = String.format("http://%s.iggamecenter.com/api_handler.php?app_id=%s&app_code=%s&uid=%s&session_id=%s&sid=%s", URLEncoder.encode(NetGlobal.server, "UTF-8"), NetGlobal.id, URLEncoder.encode(NetGlobal.passcode,"UTF-8"), NetGlobal.uid, URLEncoder.encode(NetGlobal.session_id,"UTF-8"), NetGlobal.sid);
-	    	        		URL url = new URL(registrationUrl);
-	    	        		SAXParserFactory spf = SAXParserFactory.newInstance();
-	    	        		SAXParser parser = spf.newSAXParser();
-	    	        		XMLReader reader = parser.getXMLReader();
-	    	        		XMLHandler xmlHandler = new XMLHandler();
-	    	        		reader.setContentHandler(xmlHandler);
-	    	        		reader.parse(new InputSource(url.openStream()));
-	
-	    	        		ParsedDataset parsedDataset = xmlHandler.getParsedData();
+	    	        		ParsedDataset parsedDataset = igGameCenter.joinGame(NetGlobal.server, NetGlobal.uid, NetGlobal.session_id, NetGlobal.sid);
 	    	        		if(!parsedDataset.error){
 	    	        			NetGlobal.members = NetGlobal.sessions.get(position).members;
 	    	        			WaitingRoomActivity.messages = new LinkedList<String>();
@@ -337,16 +311,7 @@ public class NetLobbyActivity extends Activity {
 			            	NetGlobal.ratedGame = ratedGame.isChecked();
 			            	settings.edit().putBoolean("netRatedGame", NetGlobal.ratedGame);
 	    	        		try {
-		    	        		String registrationUrl = String.format("http://www.iggamecenter.com/api_board_create.php?app_id=%s&app_code=%s&uid=%s&session_id=%s&gid=%s&place=%s", NetGlobal.id, URLEncoder.encode(NetGlobal.passcode,"UTF-8"), NetGlobal.uid, URLEncoder.encode(NetGlobal.session_id,"UTF-8"), NetGlobal.gid, NetGlobal.place);
-		    	        		URL url = new URL(registrationUrl);
-		    	        		SAXParserFactory spf = SAXParserFactory.newInstance();
-		    	        		SAXParser parser = spf.newSAXParser();
-		    	        		XMLReader reader = parser.getXMLReader();
-		    	        		XMLHandler xmlHandler = new XMLHandler();
-		    	        		reader.setContentHandler(xmlHandler);
-		    	        		reader.parse(new InputSource(url.openStream()));
-		
-		    	        		ParsedDataset parsedDataset = xmlHandler.getParsedData();
+		    	        		ParsedDataset parsedDataset = igGameCenter.createBoard(NetGlobal.uid, NetGlobal.session_id, NetGlobal.gid, NetGlobal.place);
 		    	        		if(!parsedDataset.error){
 			    	        		NetGlobal.sid = parsedDataset.getSid();
 			    	        		NetGlobal.server = parsedDataset.getServer();
@@ -354,8 +319,7 @@ public class NetLobbyActivity extends Activity {
 			    	        		//Apply board configuration
 			    	        		int scored = 0;
 			    	        		if(NetGlobal.ratedGame) scored++;
-			    	        		String boardUrl = String.format("http://%s.iggamecenter.com/api_handler.php?app_id=%s&app_code=%s&uid=%s&session_id=%s&sid=%s&cmd=SETUP&boardSize=%s&timerTotal=%s&timerInc=%s&scored=%s", URLEncoder.encode(NetGlobal.server, "UTF-8"), NetGlobal.id, URLEncoder.encode(NetGlobal.passcode,"UTF-8"), NetGlobal.uid, URLEncoder.encode(NetGlobal.session_id,"UTF-8"), NetGlobal.sid, NetGlobal.gridSize, NetGlobal.timerTime*60, NetGlobal.additionalTimerTime, scored);
-			    	        		new URL(boardUrl).openStream();
+			    	        		igGameCenter.editBoard(NetGlobal.server, NetGlobal.uid, NetGlobal.session_id, NetGlobal.sid, NetGlobal.gridSize, NetGlobal.timerTime*60, NetGlobal.additionalTimerTime, scored, NetGlobal.lasteid);
 			    	        		
 		    	        			WaitingRoomActivity.messages = new LinkedList<String>();
 			    	        		startActivity(new Intent(getBaseContext(),WaitingRoomActivity.class));

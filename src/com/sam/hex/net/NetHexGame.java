@@ -2,17 +2,8 @@ package com.sam.hex.net;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
-
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -48,6 +39,8 @@ import com.sam.hex.R;
 import com.sam.hex.BoardView;
 import com.sam.hex.Timer;
 import com.sam.hex.net.NetGlobal;
+import com.sam.hex.net.igGC.ParsedDataset;
+import com.sam.hex.net.igGC.igGameCenter;
 import com.sam.hex.replay.Save;
 
 /**
@@ -55,7 +48,6 @@ import com.sam.hex.replay.Save;
  **/
 public class NetHexGame extends Activity {
 	public static boolean startNewGame = true;
-	public static boolean replayRunning = false;
 	public static boolean justStart = false;
 	private Runnable startnewgame = new Runnable(){
 		public void run(){
@@ -80,8 +72,7 @@ public class NetHexGame extends Activity {
     
     public void applyBoard(){
     	Global.viewLocation = NetGlobal.GAME_LOCATION;
-    	NetGlobal.game.board=new BoardView(this);
-    	NetGlobal.game.board.setOnTouchListener(new HexGame.TouchListener(NetGlobal.game));
+    	NetGlobal.game.views.board=new BoardView(this);
     	setContentView(R.layout.game_net);
         GamePagerAdapter gameAdapter = new GamePagerAdapter(NetGlobal.game);
     	ViewPager gamePager = (ViewPager) findViewById(R.id.board);
@@ -126,35 +117,35 @@ public class NetHexGame extends Activity {
             }
         });
         
-        NetGlobal.game.player1Icon = (ImageButton) this.findViewById(R.id.p1);
-        NetGlobal.game.player2Icon = (ImageButton) this.findViewById(R.id.p2);
+        NetGlobal.game.views.player1Icon = (ImageButton) this.findViewById(R.id.p1);
+        NetGlobal.game.views.player2Icon = (ImageButton) this.findViewById(R.id.p2);
         
-        NetGlobal.game.timerText = (TextView) this.findViewById(R.id.timer);
+        NetGlobal.game.views.timerText = (TextView) this.findViewById(R.id.timer);
         if(NetGlobal.game.timer.type==0 || NetGlobal.game.gameOver){
-        	NetGlobal.game.timerText.setVisibility(View.GONE);
+        	NetGlobal.game.views.timerText.setVisibility(View.GONE);
         } 
-        NetGlobal.game.winnerText = (TextView) this.findViewById(R.id.winner);
-        if(NetGlobal.game.gameOver) NetGlobal.game.winnerText.setText(NetGlobal.game.winnerMsg);
-        NetGlobal.game.handler = new Handler();
+        NetGlobal.game.views.winnerText = (TextView) this.findViewById(R.id.winner);
+        if(NetGlobal.game.gameOver) NetGlobal.game.views.winnerText.setText(NetGlobal.game.winnerMsg);
+        NetGlobal.game.views.handler = new Handler();
 
-        NetGlobal.game.replayForward = (ImageButton) this.findViewById(R.id.replayForward);
-        NetGlobal.game.replayPlayPause = (ImageButton) this.findViewById(R.id.replayPlayPause);
-        NetGlobal.game.replayBack = (ImageButton) this.findViewById(R.id.replayBack);
-        NetGlobal.game.replayButtons = (RelativeLayout) this.findViewById(R.id.replayButtons);
+        NetGlobal.game.views.replayForward = (ImageButton) this.findViewById(R.id.replayForward);
+        NetGlobal.game.views.replayPlayPause = (ImageButton) this.findViewById(R.id.replayPlayPause);
+        NetGlobal.game.views.replayBack = (ImageButton) this.findViewById(R.id.replayBack);
+        NetGlobal.game.views.replayButtons = (RelativeLayout) this.findViewById(R.id.replayButtons);
 	    
 	    new Thread(new Runnable(){
         	public void run(){
         		while(!NetGlobal.game.gameOver){
-        			NetGlobal.game.handler.post(new Runnable(){
+        			NetGlobal.game.views.handler.post(new Runnable(){
         	    		public void run(){
         	    			if(GameAction.getPlayer(NetGlobal.game.currentPlayer, NetGlobal.game) instanceof NetPlayerObject 
         	    					&& !(GameAction.getPlayer(NetGlobal.game.currentPlayer%2+1, NetGlobal.game) instanceof NetPlayerObject))
         	    				for(int i=0;i<NetGlobal.members.size();i++){
         	    					if(NetGlobal.members.get(i).place==NetGlobal.game.currentPlayer){
         	    						if(NetGlobal.members.get(i).lastRefresh>300){
-	        	    						NetGlobal.game.handler.post(new Runnable(){
+	        	    						NetGlobal.game.views.handler.post(new Runnable(){
 	        	    							public void run(){
-	        	    								NetGlobal.game.timerText.setVisibility(View.GONE);
+	        	    								NetGlobal.game.views.timerText.setVisibility(View.GONE);
 	        	    							}
 	        	    						});
 	        	    						final Handler buttonHandler = new Handler();
@@ -165,16 +156,7 @@ public class NetHexGame extends Activity {
 													new Thread(new Runnable(){
 											    		public void run(){
 											    			try {
-											    				String lobbyUrl = String.format("http://%s.iggamecenter.com/api_handler.php?app_id=%s&app_code=%s&uid=%s&session_id=%s&sid=%s&cmd=end&type=CLAIMQUIT&lasteid=%s", URLEncoder.encode(NetGlobal.server, "UTF-8"), NetGlobal.id, URLEncoder.encode(NetGlobal.passcode,"UTF-8"), NetGlobal.uid, URLEncoder.encode(NetGlobal.session_id,"UTF-8"), NetGlobal.sid, NetGlobal.lasteid);
-											    				URL url = new URL(lobbyUrl);
-											    				SAXParserFactory spf = SAXParserFactory.newInstance();
-											    	            SAXParser parser = spf.newSAXParser();
-											    	            XMLReader reader = parser.getXMLReader();
-											    	            XMLHandler xmlHandler = new XMLHandler();
-											    	            reader.setContentHandler(xmlHandler);
-											    	            reader.parse(new InputSource(url.openStream()));
-											    	            
-											    	            ParsedDataset parsedDataset = xmlHandler.getParsedData();
+											    	            ParsedDataset parsedDataset = igGameCenter.claimVictory(NetGlobal.server, NetGlobal.uid, NetGlobal.session_id, NetGlobal.sid, NetGlobal.lasteid);
 											    	        	if(!parsedDataset.error){
 											    	        		buttonHandler.post(new Runnable() {
 																		@Override
@@ -206,7 +188,7 @@ public class NetHexGame extends Activity {
         	    						}
         	    						else{
             	    						if(NetGlobal.game.timer.type!=0 || !NetGlobal.game.gameOver){
-            	    				        	NetGlobal.game.timerText.setVisibility(View.VISIBLE);
+            	    				        	NetGlobal.game.views.timerText.setVisibility(View.VISIBLE);
             	    				        } 
             	    						Button button = (Button) NetHexGame.this.findViewById(R.id.claimVictory);
             	    						button.setVisibility(View.GONE);
@@ -272,7 +254,7 @@ public class NetHexGame extends Activity {
     		GameAction.checkedFlagReset(NetGlobal.game);
 	    	
 	    	//Apply everything
-	    	NetGlobal.game.board.invalidate();
+	    	NetGlobal.game.views.board.invalidate();
     	}
     }
     
@@ -351,9 +333,9 @@ public class NetHexGame extends Activity {
         @Override
         public Object instantiateItem(View collection, int position) {
             if(position==0){
-            	((ViewPager) collection).addView(game.board,0);
+            	((ViewPager) collection).addView(game.views.board,0);
                 
-                return game.board;
+                return game.views.board;
             }
             if(position==1){
             	this.inWaitingRoom = true;
@@ -386,19 +368,19 @@ public class NetHexGame extends Activity {
                 	    		public void run(){
                 	    			WaitingRoomActivity.refreshPlayers(waitingRoom, NetHexGame.this);
                 	    			WaitingRoomActivity.refreshMessages(waitingRoom);
-                	    			game.player1Icon.setColorFilter(game.player1.getColor());
-                	    			game.player2Icon.setColorFilter(game.player2.getColor());
+                	    			game.views.player1Icon.setColorFilter(game.player1.getColor());
+                	    			game.views.player2Icon.setColorFilter(game.player2.getColor());
                 	    			if(game.currentPlayer==1 && !game.gameOver){
-                	    				game.player1Icon.setAlpha(255);
-                	    				game.player2Icon.setAlpha(80);
+                	    				game.views.player1Icon.setAlpha(255);
+                	    				game.views.player2Icon.setAlpha(80);
                 	    			}
                 	    			else if(game.currentPlayer==2 && !game.gameOver){
-                	    				game.player1Icon.setAlpha(80);
-                	    				game.player2Icon.setAlpha(255);
+                	    				game.views.player1Icon.setAlpha(80);
+                	    				game.views.player2Icon.setAlpha(255);
                 	    			}
                 	    			else{
-                	    				game.player1Icon.setAlpha(80);
-                	    				game.player2Icon.setAlpha(80);
+                	    				game.views.player1Icon.setAlpha(80);
+                	    				game.views.player2Icon.setAlpha(80);
                 	    			}
                 	    		}});
                 			try {
@@ -415,7 +397,7 @@ public class NetHexGame extends Activity {
                 return waitingRoom;
             }
             
-            return game.board;
+            return game.views.board;
         }
         
 	    /**

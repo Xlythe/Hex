@@ -41,8 +41,7 @@ public class HexGame extends Activity {
         if(HexGame.startNewGame){
         	initializeNewGame();//Must be set up immediately
         }
-        applyBoard();
-        
+
         if(intent!=getIntent()){
 	        intent = getIntent();
 	        if (intent.getData() != null) {
@@ -55,6 +54,8 @@ public class HexGame extends Activity {
 				}
 	        }
         }
+
+        applyBoard();
     }
     
     private void applyBoard(){
@@ -159,9 +160,9 @@ public class HexGame extends Activity {
     public void onResume(){
     	super.onResume();
     	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-    	
+
     	//Check if settings were changed and we need to run a new game
-    	 if(Global.game.views.board.replayRunning){
+    	 if(Global.game.views.board != null && Global.game.views.board.replayRunning){
      		//Do nothing
      	}
     	 else if(replay){

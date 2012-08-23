@@ -10,7 +10,7 @@
         android:title="@string/player2TypeTitle"
         android:summary="@string/player2TypeSummary"
         android:key="player2Type"
-        android:defaultValue="1"
+        android:defaultValue="@integer/HUMAN"
         android:entries="@array/player2Array"
         android:entryValues="@array/player2Values" />
     <net.margaritov.preference.colorpicker.ColorPickerPreference

@@ -4,4 +4,7 @@
 	<integer name="COLOR_GREEN">0xff00ff00</integer>
 	<integer name="COLOR_RED">0xffff0000</integer>
 	<integer name="COLOR_BLUE">0xff0000ff</integer>
+	<integer name="HUMAN">0</integer>
+	<integer name="WILL">1</integer>
+	<integer name="BEE">2</integer>
 </resources>

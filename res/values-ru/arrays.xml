@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="player1Array">
-        <item>человек</item>
-        <item>компьютер (Will)</item>
-        <item>компьютер (Bee)</item>
+        <item>Человек</item>
+        <item>Компьютер (Will)</item>
+        <item>Компьютер (Bee)</item>
     </string-array>
     <string-array name="player2Array">
-        <item>человек</item>
-        <item>компьютер (Will)</item>
-        <item>компьютер (Bee)</item>
+        <item>Человек</item>
+        <item>Компьютер (Will)</item>
+        <item>Компьютер (Bee)</item>
     </string-array>
     <string-array name="gameSizeArray">
         <item>7x7</item>
         <item>9x9</item>
         <item>11x11</item>
-        <item>обычай</item>
+        <item>Свой</item>
     </string-array>
     <string-array name="availablePlayers">
-        <item>сканирование…</item>
+        <item>Сканирование…</item>
     </string-array>
     <string-array name="gameLocationArray">
         <item>То же устройство</item>
@@ -25,17 +25,17 @@
         <item>Интернет</item>
     </string-array>
     <string-array name="netPositionArray">
-        <item>зритель</item>
+        <item>Наблюдатель</item>
         <item>Первый игрок</item>
         <item>Второй игрок</item>
     </string-array>
     <string-array name="timerTypeArray">
-        <item>Нет таймер</item>
-        <item>На ходу</item>
-        <item>Весь матч</item>
+        <item>Без таймера</item>
+        <item>На каждый ход</item>
+        <item>На весь матч</item>
     </string-array>
     <string-array name="netTimerArray">
-        <item>без таймера</item>
+        <item>Без таймера</item>
         <item>5минут</item>
         <item>10минут</item>
         <item>15минут</item>
@@ -47,12 +47,12 @@
         <item>2часа</item>
     </string-array>
     <string-array name="netAdditionalTimeArray">
-        <item>+0секунд/двигаться</item>
-        <item>+10секунд/двигаться</item>
-        <item>+15секунд/двигаться</item>
-        <item>+20секунд/двигаться</item>
-        <item>+30секунд/двигаться</item>
-        <item>+45секунд/двигаться</item>
-        <item>+1минут/двигаться</item>
+        <item>+0секунд/ход</item>
+        <item>+10секунд/ход</item>
+        <item>+15секунд/ход</item>
+        <item>+20секунд/ход</item>
+        <item>+30секунд/ход</item>
+        <item>+45секунд/ход</item>
+        <item>+1минут/ход</item>
     </string-array>
 </resources>

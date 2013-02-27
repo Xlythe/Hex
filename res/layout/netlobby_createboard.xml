@@ -3,96 +3,96 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-   	android:isScrollContainer="true">
+       android:isScrollContainer="true">
 
-	<LinearLayout 
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:orientation="vertical">
-	    
-	    <TextView
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:padding="5dp"
-	        android:text="@string/position"
-	        android:textAppearance="?android:attr/textAppearanceLarge" />
-	    
-	    <Spinner
-	        android:id="@+id/position"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:defaultValue="1"
-	        android:entries="@array/netPositionArray"
-	        android:entryValues="@array/netPositionValues" />
+    <LinearLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="@string/position"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+        
+        <Spinner
+            android:id="@+id/position"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:defaultValue="1"
+            android:entries="@array/netPositionArray"
+            android:entryValues="@array/netPositionValues" />
     
-	    <TextView
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:padding="5dp"
-	        android:text="@string/gameSizeTitle"
-	        android:textAppearance="?android:attr/textAppearanceLarge" />
-	    
-	    <Spinner
-	        android:id="@+id/gameSize"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:defaultValue="8"
-	        android:entries="@array/netGameSizeArray"
-	        android:entryValues="@array/netGameSizeValues" />
-	    
-	    <TextView
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:padding="5dp"
-	        android:text="@string/timerTitle"
-	        android:textAppearance="?android:attr/textAppearanceLarge" />
-	    
-	    <LinearLayout 
-	        android:layout_width="fill_parent"
-	    	android:layout_height="wrap_content"
-	    	android:orientation="horizontal">
-	        
-	        <Spinner
-		        android:id="@+id/timerTime"
-		        android:layout_width="fill_parent"
-		        android:layout_height="wrap_content"
-		        android:layout_weight="1"
-		        android:defaultValue="1"
-		        android:entries="@array/netTimerArray"
-		        android:entryValues="@array/netTimerValues" />
-	        
-	        <Spinner
-		        android:id="@+id/additionalTimerTime"
-		        android:layout_width="fill_parent"
-		        android:layout_height="wrap_content"
-		        android:layout_weight="1"
-		        android:defaultValue="1"
-		        android:entries="@array/netAdditionalTimeArray"
-		        android:entryValues="@array/netAdditionalTimeValues" />
-	        
-	    </LinearLayout>
-	    
-	    <RelativeLayout 
-	        android:layout_width="fill_parent"
-	    	android:layout_height="wrap_content"
-	    	android:orientation="horizontal">
-	        
-	        <TextView
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_alignParentLeft="true"
-		        android:padding="5dp"
-		        android:text="@string/rated"
-		        android:textAppearance="?android:attr/textAppearanceLarge" />
-	        
-	        <CheckBox 
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-	            android:id="@+id/ratedGame"
-	            android:layout_alignParentRight="true"/>
-	        
-	    </RelativeLayout>
-	    
-	</LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="@string/gameSizeTitle"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+        
+        <Spinner
+            android:id="@+id/gameSize"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:defaultValue="8"
+            android:entries="@array/netGameSizeArray"
+            android:entryValues="@array/netGameSizeValues" />
+        
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="@string/timerTitle"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+        
+        <LinearLayout 
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            
+            <Spinner
+                android:id="@+id/timerTime"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:defaultValue="1"
+                android:entries="@array/netTimerArray"
+                android:entryValues="@array/netTimerValues" />
+            
+            <Spinner
+                android:id="@+id/additionalTimerTime"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:defaultValue="1"
+                android:entries="@array/netAdditionalTimeArray"
+                android:entryValues="@array/netAdditionalTimeValues" />
+            
+        </LinearLayout>
+        
+        <RelativeLayout 
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:padding="5dp"
+                android:text="@string/rated"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+            
+            <CheckBox 
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ratedGame"
+                android:layout_alignParentRight="true"/>
+            
+        </RelativeLayout>
+        
+    </LinearLayout>
 
 </ScrollView>

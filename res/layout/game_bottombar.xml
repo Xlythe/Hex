@@ -23,33 +23,33 @@
         android:layout_height="fill_parent"
         android:visibility="gone"
         android:id="@+id/replayButtons">
-	    <ImageButton 
-	        android:layout_width="wrap_content"
-	        android:layout_height="fill_parent"
-        	android:layout_alignParentRight="true"
-	        android:id="@+id/replayForward"
-	        android:src="@drawable/ic_media_ff"
-	        android:clickable="true"
-	        android:background="@null"
-	        android:contentDescription="@null"/>
-	    <ImageButton 
-	        android:layout_width="wrap_content"
-	        android:layout_height="fill_parent"
-	        android:layout_toLeftOf="@id/replayForward"
-	        android:id="@+id/replayPlayPause"
-	        android:src="@drawable/ic_media_pause"
-	        android:clickable="true"
-	        android:background="@null"
-	        android:contentDescription="@null"/>
-	    <ImageButton 
-	        android:layout_width="wrap_content"
-	        android:layout_height="fill_parent"
-	        android:layout_toLeftOf="@id/replayPlayPause"
-	        android:id="@+id/replayBack"
-	        android:src="@drawable/ic_media_rew"
-	        android:clickable="true"
-	        android:background="@null"
-	        android:contentDescription="@null"/>
+        <ImageButton 
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_alignParentRight="true"
+            android:id="@+id/replayForward"
+            android:src="@drawable/ic_media_ff"
+            android:clickable="true"
+            android:background="@null"
+            android:contentDescription="@null"/>
+        <ImageButton 
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_toLeftOf="@id/replayForward"
+            android:id="@+id/replayPlayPause"
+            android:src="@drawable/ic_media_pause"
+            android:clickable="true"
+            android:background="@null"
+            android:contentDescription="@null"/>
+        <ImageButton 
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_toLeftOf="@id/replayPlayPause"
+            android:id="@+id/replayBack"
+            android:src="@drawable/ic_media_rew"
+            android:clickable="true"
+            android:background="@null"
+            android:contentDescription="@null"/>
     </RelativeLayout>
     <TextView
         android:layout_width="wrap_content"

@@ -2,17 +2,17 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="preferences">
     <PreferenceCategory>
-	    <Preference
-	        android:title="@string/abstractGeneralTitle"
-	        android:key="general">
-	    </Preference>
-	    <Preference
-	        android:title="@string/abstractP1Title"
-	        android:key="p1">
-	    </Preference>
-	    <Preference
-	        android:title="@string/abstractP2Title"
-	        android:key="p2">
-	    </Preference>
+        <Preference
+            android:title="@string/abstractGeneralTitle"
+            android:key="general">
+        </Preference>
+        <Preference
+            android:title="@string/abstractP1Title"
+            android:key="p1">
+        </Preference>
+        <Preference
+            android:title="@string/abstractP2Title"
+            android:key="p2">
+        </Preference>
     </PreferenceCategory>
 </PreferenceScreen>

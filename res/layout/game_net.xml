@@ -1,15 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="@color/white" >
     
-        <!-- Include Action Bar -->
-        <include layout="@layout/game_actionbar_net"/>
-        
-        <!-- Include seperator -->
-        <include layout="@layout/game_separator"/>
-		
-        <!-- Include game board -->
-		<include layout="@layout/game_board_net"/>
- 
+    <android.support.v4.view.ViewPager
+        android:id="@+id/board"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"/>
+    
+    <include 
+        layout="@layout/game_bottombar"
+        android:layout_weight="1"/>
+
 </LinearLayout>

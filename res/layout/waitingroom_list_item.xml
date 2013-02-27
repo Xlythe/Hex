@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent"
-	android:layout_height="wrap_content">
-	<ImageButton 
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+    <ImageButton 
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:id="@+id/image1"
@@ -11,12 +11,12 @@
         android:background="@null"
         android:contentDescription="@null"/>
     <TextView android:id="@+id/text1"
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:textAppearance="?android:attr/textAppearanceLarge"
-	    android:gravity="center_vertical"
-	    android:paddingLeft="6dip"
-	    android:textColor="@color/black"
-	    android:background="@drawable/background_drawable"
-	    android:minHeight="?android:attr/listPreferredItemHeight" />
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:gravity="center_vertical"
+        android:paddingLeft="6dip"
+        android:textColor="@color/black"
+        android:background="@drawable/background_drawable"
+        android:minHeight="?android:attr/listPreferredItemHeight" />
 </LinearLayout>

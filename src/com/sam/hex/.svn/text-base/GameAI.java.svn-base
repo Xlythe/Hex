@@ -3,52 +3,52 @@ package com.sam.hex;
 
 
 public class GameAI implements playingEntity { 
-	byte team;
-	byte difficalty;
-	byte[][] gameBoard;
-	
-	
-	public GameAI(byte teamNumberT,byte difficaltyT){
-		team=teamNumberT;
-		difficalty=difficaltyT;
-		
-	}
+    byte team;
+    byte difficalty;
+    byte[][] gameBoard;
+    
+    
+    public GameAI(byte teamNumberT,byte difficaltyT){
+        team=teamNumberT;
+        difficalty=difficaltyT;
+        
+    }
 
-	public void getPlayerTurn(byte[][] gameBoard) { // for net play
-		 this.gameBoard=gameBoard;
-		 makeMove();
-	}
+    public void getPlayerTurn(byte[][] gameBoard) { // for net play
+         this.gameBoard=gameBoard;
+         makeMove();
+    }
 
-	@Override
-	public void getPlayerTurn() { // with out net play
-		this.gameBoard=BoardTools.teamGrid();
-		makeMove();
-	}
-	public void makeMove(){ // lets you make a move
-		  
-		try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();}
-			
-		int moves=1;
-		for(int x=0; x<gameBoard.length; x++){
-			for(int y=0; y<gameBoard[x].length; y++){
-				if(gameBoard[x][y]==0) moves++;
-			}
-		}
-		moves*=Math.random();
-		for(int x=0; x<gameBoard.length; x++){
-			for(int y=0; y<gameBoard[x].length; y++){
-				if(gameBoard[x][y]==0) moves--;
-				if(moves==0) {Global.gamePiece[x][y].setTeam(team);
-				moves=-10;
-				}
-				
-			}
-		}
-	}
-	
+    @Override
+    public void getPlayerTurn() { // with out net play
+        this.gameBoard=BoardTools.teamGrid();
+        makeMove();
+    }
+    public void makeMove(){ // lets you make a move
+          
+        try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();}
+            
+        int moves=1;
+        for(int x=0; x<gameBoard.length; x++){
+            for(int y=0; y<gameBoard[x].length; y++){
+                if(gameBoard[x][y]==0) moves++;
+            }
+        }
+        moves*=Math.random();
+        for(int x=0; x<gameBoard.length; x++){
+            for(int y=0; y<gameBoard[x].length; y++){
+                if(gameBoard[x][y]==0) moves--;
+                if(moves==0) {Global.gamePiece[x][y].setTeam(team);
+                moves=-10;
+                }
+                
+            }
+        }
+    }
+    
 }
 

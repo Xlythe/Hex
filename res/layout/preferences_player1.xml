@@ -14,8 +14,8 @@
         android:entries="@array/player1Array"
         android:entryValues="@array/player1Values" />
     <net.margaritov.preference.colorpicker.ColorPickerPreference
-	    android:title="@string/player1ColorTitle"
-	    android:summary="@string/player1ColorSummary"
-	    android:key="player1Color"
-	    android:defaultValue="@integer/COLOR_BLUE" />
+        android:title="@string/player1ColorTitle"
+        android:summary="@string/player1ColorSummary"
+        android:key="player1Color"
+        android:defaultValue="@integer/COLOR_BLUE" />
 </PreferenceScreen>

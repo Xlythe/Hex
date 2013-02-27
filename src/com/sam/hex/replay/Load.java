@@ -15,51 +15,51 @@ import com.sam.hex.Timer;
  * @author Will Harmon
  **/
 public class Load implements Runnable{
-	private File file;
-	public Load(File file){
-		this.file = file;
-	}
-	@Override
-	public void run() {
-		try {
-			HexGame.stopGame(Global.game);
-    		if(file!=null){
-	            //Construct the ObjectInputStream object
-	        	ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file));
+    private File file;
+    public Load(File file){
+        this.file = file;
+    }
+    @Override
+    public void run() {
+        try {
+            HexGame.stopGame(Global.game);
+            if(file!=null){
+                //Construct the ObjectInputStream object
+                ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file));
 
-				int gridSize = (Integer) inputStream.readObject();
-				boolean swap = (Boolean) inputStream.readObject();
+                int gridSize = (Integer) inputStream.readObject();
+                boolean swap = (Boolean) inputStream.readObject();
 
-				Global.game = new GameObject(gridSize, swap);
-				
-				Global.game.player1=new PlayerObject(1,Global.game);
-				Global.game.player2=new PlayerObject(2,Global.game);
-	        	
-				Global.game.player1Type = (Integer) inputStream.readObject();
-	        	Global.game.player2Type = (Integer) inputStream.readObject();
-	        	Global.game.player1.setColor((Integer) inputStream.readObject());
-	            Global.game.player2.setColor((Integer) inputStream.readObject());
-				Global.game.player1.setName((String) inputStream.readObject());
-				Global.game.player2.setName((String) inputStream.readObject());
-				Global.game.moveList = (MoveList) inputStream.readObject();
-				Global.game.moveNumber = (Integer) inputStream.readObject();
-				int timertype = (Integer) inputStream.readObject();
-				long timerlength = (Long) inputStream.readObject();
-				Global.game.timer = new Timer(Global.game, timerlength, 0, timertype);
-				
-				inputStream.close();
-				
-				Global.game.currentPlayer=((Global.game.moveNumber+1)%2)+1;
-				HexGame.replay = true;
-				if(Global.game.views.board != null) Global.game.views.board.replayRunning = false;
-				HexGame.startNewGame = false;
-				
-				//Does not support saving PlayingEntities yet
-				Global.game.player1Type = 0;
-				Global.game.player2Type = 0;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+                Global.game = new GameObject(gridSize, swap);
+                
+                Global.game.player1=new PlayerObject(1,Global.game);
+                Global.game.player2=new PlayerObject(2,Global.game);
+                
+                Global.game.player1Type = (Integer) inputStream.readObject();
+                Global.game.player2Type = (Integer) inputStream.readObject();
+                Global.game.player1.setColor((Integer) inputStream.readObject());
+                Global.game.player2.setColor((Integer) inputStream.readObject());
+                Global.game.player1.setName((String) inputStream.readObject());
+                Global.game.player2.setName((String) inputStream.readObject());
+                Global.game.moveList = (MoveList) inputStream.readObject();
+                Global.game.moveNumber = (Integer) inputStream.readObject();
+                int timertype = (Integer) inputStream.readObject();
+                long timerlength = (Long) inputStream.readObject();
+                Global.game.timer = new Timer(Global.game, timerlength, 0, timertype);
+                
+                inputStream.close();
+                
+                Global.game.currentPlayer=((Global.game.moveNumber+1)%2)+1;
+                HexGame.replay = true;
+                if(Global.game.views.board != null) Global.game.views.board.replayRunning = false;
+                HexGame.startNewGame = false;
+                
+                //Does not support saving PlayingEntities yet
+                Global.game.player1Type = 0;
+                Global.game.player2Type = 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

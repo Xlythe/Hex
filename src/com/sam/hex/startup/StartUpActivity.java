@@ -30,7 +30,7 @@ public class StartUpActivity extends Activity {
         final Button instructionsButton = (Button) findViewById(R.id.instructionsButton);
         instructionsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	startActivity(new Intent(getBaseContext(),InstructionsActivity.class));
+                startActivity(new Intent(getBaseContext(),InstructionsActivity.class));
             }
         });
         
@@ -38,46 +38,46 @@ public class StartUpActivity extends Activity {
         final Button optionsButton = (Button) findViewById(R.id.optionsButton);
         optionsButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	startActivity(new Intent(getBaseContext(),Preferences.class));
+                startActivity(new Intent(getBaseContext(),Preferences.class));
             }
         });
     }
     
     @Override
     public void onResume(){
-    	super.onResume();
-    	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-    	
-    	//Refresh first button
+        super.onResume();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        
+        //Refresh first button
         final Button startButton = (Button) findViewById(R.id.startButton);
         startButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	startActivity(new Intent(getBaseContext(),HexGame.class));
+                startActivity(new Intent(getBaseContext(),HexGame.class));
             }
         });
         if(HexGame.startNewGame || HexGame.somethingChanged(prefs, Global.GAME_LOCATION, Global.game)){
-        	HexGame.startNewGame = true;
-        	startButton.setText(R.string.start);
-    	}
+            HexGame.startNewGame = true;
+            startButton.setText(R.string.start);
+        }
         else{ 
-        	startButton.setText(R.string.resume);
+            startButton.setText(R.string.resume);
         }
         
         //Refresh fourth button
         final Button onlineButton = (Button) findViewById(R.id.onlineButton);
         if(HexGame.somethingChanged(prefs, NetGlobal.GAME_LOCATION, NetGlobal.game)){
-        	onlineButton.setText(R.string.online);
-        	onlineButton.setOnClickListener(new View.OnClickListener() {
+            onlineButton.setText(R.string.online);
+            onlineButton.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                	startActivity(new Intent(getBaseContext(),NetLobbyActivity.class));
+                    startActivity(new Intent(getBaseContext(),NetLobbyActivity.class));
                 }
             });
-    	}
+        }
         else{ 
-        	onlineButton.setText(R.string.resume);
-        	onlineButton.setOnClickListener(new View.OnClickListener() {
+            onlineButton.setText(R.string.resume);
+            onlineButton.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                	startActivity(new Intent(getBaseContext(),NetHexGame.class));
+                    startActivity(new Intent(getBaseContext(),NetHexGame.class));
                 }
             });
         }

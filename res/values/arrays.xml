@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="player1Array">
-        <item>Human</item>
-        <item>Computer (Will)</item>
-        <item>Computer (Bee)</item>
+        <item>@string/playerTypeHuman</item>
+        <item>@string/playerTypeWill</item>
+        <item>@string/playerTypeBee</item>
     </string-array>
     <string-array name="player1Values">
         <item>0</item>
@@ -11,21 +11,11 @@
         <item>4</item>
     </string-array>
     <string-array name="player2Array">
-        <item>Human</item>
-        <item>Computer (Will)</item>
-        <item>Computer (Bee)</item>
+        <item>@string/playerTypeHuman</item>
+        <item>@string/playerTypeWill</item>
+        <item>@string/playerTypeBee</item>
     </string-array>
     <string-array name="player2Values">
-        <item>0</item>
-        <item>1</item>
-        <item>4</item>
-    </string-array>
-    <string-array name="lanPlayerArray">
-        <item>Human</item>
-        <item>Computer (Will)</item>
-        <item>Computer (Bee)</item>
-    </string-array>
-    <string-array name="lanPlayerValues">
         <item>0</item>
         <item>1</item>
         <item>4</item>

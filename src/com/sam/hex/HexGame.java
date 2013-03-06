@@ -15,10 +15,10 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.sam.hex.activity.DefaultActivity;
 import com.sam.hex.ai.bee.BeeGameAI;
 import com.sam.hex.ai.will.GameAI;
 import com.sam.hex.net.NetGlobal;
@@ -28,7 +28,7 @@ import com.sam.hex.replay.Load;
 import com.sam.hex.replay.Replay;
 import com.sam.hex.replay.Save;
 
-public class HexGame extends SherlockActivity {
+public class HexGame extends DefaultActivity {
     public static boolean startNewGame = true;
     public static boolean replay = false;
     private static Intent intent;

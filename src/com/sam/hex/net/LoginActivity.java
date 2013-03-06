@@ -20,17 +20,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.sam.hex.DialogBox;
 import com.sam.hex.GameAction;
 import com.sam.hex.R;
+import com.sam.hex.activity.DefaultActivity;
 import com.sam.hex.net.igGC.ParsedDataset;
 import com.sam.hex.net.igGC.igGameCenter;
 
 /**
  * @author Will Harmon
  **/
-public class LoginActivity extends SherlockActivity {
+public class LoginActivity extends DefaultActivity {
     SharedPreferences settings;
     Context context;
 

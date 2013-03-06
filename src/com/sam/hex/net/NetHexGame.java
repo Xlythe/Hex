@@ -29,7 +29,6 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -41,6 +40,7 @@ import com.sam.hex.HexGame;
 import com.sam.hex.Preferences;
 import com.sam.hex.R;
 import com.sam.hex.Timer;
+import com.sam.hex.activity.DefaultActivity;
 import com.sam.hex.net.igGC.ParsedDataset;
 import com.sam.hex.net.igGC.igGameCenter;
 import com.sam.hex.replay.Save;
@@ -48,7 +48,7 @@ import com.sam.hex.replay.Save;
 /**
  * @author Will Harmon
  **/
-public class NetHexGame extends SherlockActivity {
+public class NetHexGame extends DefaultActivity {
     public static boolean startNewGame = true;
     public static boolean justStart = false;
     private Runnable startnewgame = new Runnable() {

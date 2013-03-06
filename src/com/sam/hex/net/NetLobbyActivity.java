@@ -28,20 +28,20 @@ import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Spinner;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.sam.hex.DialogBox;
 import com.sam.hex.Preferences;
 import com.sam.hex.R;
+import com.sam.hex.activity.DefaultActivity;
 import com.sam.hex.net.igGC.ParsedDataset;
 import com.sam.hex.net.igGC.igGameCenter;
 
 /**
  * @author Will Harmon
  **/
-public class NetLobbyActivity extends SherlockActivity {
+public class NetLobbyActivity extends DefaultActivity {
     private boolean loginSucceeded = false;
     RefreshPlayerlist refreshPlayers;
     final Handler handler = new Handler();

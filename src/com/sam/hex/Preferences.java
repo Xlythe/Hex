@@ -22,12 +22,12 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.actionbarsherlock.app.SherlockPreferenceActivity;
+import com.sam.hex.activity.PreferenceActivity;
 
 /**
  * @author Will Harmon
  **/
-public class Preferences extends SherlockPreferenceActivity {
+public class Preferences extends PreferenceActivity {
     private static final int GENERAL = 0;
     private static final int PLAYER1 = 1;
     private static final int PLAYER2 = 2;
@@ -53,7 +53,7 @@ public class Preferences extends SherlockPreferenceActivity {
     private boolean in_p2 = false;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         settings = PreferenceManager.getDefaultSharedPreferences(this);
 

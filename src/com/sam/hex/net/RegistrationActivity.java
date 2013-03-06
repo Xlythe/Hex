@@ -21,15 +21,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.sam.hex.R;
+import com.sam.hex.activity.DefaultActivity;
 import com.sam.hex.net.igGC.ParsedDataset;
 import com.sam.hex.net.igGC.igGameCenter;
 
 /**
  * @author Will Harmon
  **/
-public class RegistrationActivity extends SherlockActivity {
+public class RegistrationActivity extends DefaultActivity {
     SharedPreferences settings;
 
     /** Called when the activity is first created. */

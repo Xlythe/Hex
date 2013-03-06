@@ -33,20 +33,20 @@ import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.sam.hex.Global;
 import com.sam.hex.Preferences;
 import com.sam.hex.R;
+import com.sam.hex.activity.DefaultActivity;
 import com.sam.hex.net.igGC.ParsedDataset;
 import com.sam.hex.net.igGC.igGameCenter;
 
 /**
  * @author Will Harmon
  **/
-public class WaitingRoomActivity extends SherlockActivity {
+public class WaitingRoomActivity extends DefaultActivity {
     public static LinkedList<String> messages = new LinkedList<String>();
     private RefreshGamePlayerlist refreshPlayers;
     private Runnable startGame = new Runnable() {

@@ -8,7 +8,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,9 +20,6 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -32,6 +28,10 @@ import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Spinner;
 
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.sam.hex.DialogBox;
 import com.sam.hex.Preferences;
 import com.sam.hex.R;
@@ -41,7 +41,7 @@ import com.sam.hex.net.igGC.igGameCenter;
 /**
  * @author Will Harmon
  **/
-public class NetLobbyActivity extends Activity {
+public class NetLobbyActivity extends SherlockActivity {
     private boolean loginSucceeded = false;
     RefreshPlayerlist refreshPlayers;
     final Handler handler = new Handler();
@@ -155,7 +155,7 @@ public class NetLobbyActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
+        MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.menu_game_net, menu);
         return true;
     }

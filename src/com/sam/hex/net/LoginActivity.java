@@ -7,7 +7,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.actionbarsherlock.app.SherlockActivity;
 import com.sam.hex.DialogBox;
 import com.sam.hex.GameAction;
 import com.sam.hex.R;
@@ -30,7 +30,7 @@ import com.sam.hex.net.igGC.igGameCenter;
 /**
  * @author Will Harmon
  **/
-public class LoginActivity extends Activity {
+public class LoginActivity extends SherlockActivity {
     SharedPreferences settings;
     Context context;
 

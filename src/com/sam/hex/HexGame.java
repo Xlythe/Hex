@@ -3,7 +3,6 @@ package com.sam.hex;
 import java.io.File;
 import java.util.Locale;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,14 +10,15 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.sam.hex.ai.bee.BeeGameAI;
 import com.sam.hex.ai.will.GameAI;
 import com.sam.hex.net.NetGlobal;
@@ -28,7 +28,7 @@ import com.sam.hex.replay.Load;
 import com.sam.hex.replay.Replay;
 import com.sam.hex.replay.Save;
 
-public class HexGame extends Activity {
+public class HexGame extends SherlockActivity {
     public static boolean startNewGame = true;
     public static boolean replay = false;
     private static Intent intent;
@@ -147,7 +147,7 @@ public class HexGame extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
+        MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.menu_game_local, menu);
         return true;
     }

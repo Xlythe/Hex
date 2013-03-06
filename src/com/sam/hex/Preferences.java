@@ -11,7 +11,6 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
@@ -23,10 +22,12 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.actionbarsherlock.app.SherlockPreferenceActivity;
+
 /**
  * @author Will Harmon
  **/
-public class Preferences extends PreferenceActivity {
+public class Preferences extends SherlockPreferenceActivity {
     private static final int GENERAL = 0;
     private static final int PLAYER1 = 1;
     private static final int PLAYER2 = 2;
@@ -288,6 +289,7 @@ public class Preferences extends PreferenceActivity {
             gameLoc = 0;
         }
         if(gameLoc == 0) {
+            getSupportActionBar().setTitle(R.string.preferences);
             if(!in_submenu) {
                 addPreferencesFromResource(R.layout.preferences_abstract);
             }
@@ -317,6 +319,7 @@ public class Preferences extends PreferenceActivity {
             general.removePreference(findPreference("timerPref"));
         }
         else if(gameLoc == 2) {
+            getSupportActionBar().setTitle(R.string.preferences_net);
             addPreferencesFromResource(R.layout.preferences_netplayer);
 
             // Hide hidden preferences

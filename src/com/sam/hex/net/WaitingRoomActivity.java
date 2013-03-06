@@ -9,7 +9,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,9 +18,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -37,6 +33,10 @@ import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.sam.hex.Global;
 import com.sam.hex.Preferences;
 import com.sam.hex.R;
@@ -46,7 +46,7 @@ import com.sam.hex.net.igGC.igGameCenter;
 /**
  * @author Will Harmon
  **/
-public class WaitingRoomActivity extends Activity {
+public class WaitingRoomActivity extends SherlockActivity {
     public static LinkedList<String> messages = new LinkedList<String>();
     private RefreshGamePlayerlist refreshPlayers;
     private Runnable startGame = new Runnable() {
@@ -136,7 +136,7 @@ public class WaitingRoomActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
+        MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.menu_waitingroom, menu);
         return true;
     }

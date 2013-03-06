@@ -7,7 +7,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,9 +20,6 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
@@ -33,6 +29,10 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.sam.hex.BoardView;
 import com.sam.hex.GameAction;
 import com.sam.hex.GameObject;
@@ -48,7 +48,7 @@ import com.sam.hex.replay.Save;
 /**
  * @author Will Harmon
  **/
-public class NetHexGame extends Activity {
+public class NetHexGame extends SherlockActivity {
     public static boolean startNewGame = true;
     public static boolean justStart = false;
     private Runnable startnewgame = new Runnable() {
@@ -230,7 +230,7 @@ public class NetHexGame extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
+        MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.menu_game_net, menu);
         return true;
     }

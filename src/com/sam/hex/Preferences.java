@@ -229,7 +229,7 @@ public class Preferences extends PreferenceActivity {
         }
         p2TypePref = (ListPreference) findPreference("player2Type");
         if(p2TypePref != null) {
-            p1TypePref.setSummary(GameAction.insert(getString(R.string.player2TypeSummary_onChange), p2TypePref.getEntry().toString()));
+            p2TypePref.setSummary(GameAction.insert(getString(R.string.player2TypeSummary_onChange), p2TypePref.getEntry().toString()));
             p2TypePref.setOnPreferenceChangeListener(new typeListener());
         }
 

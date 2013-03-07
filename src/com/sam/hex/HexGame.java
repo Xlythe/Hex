@@ -18,7 +18,7 @@ import android.widget.TextView;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.sam.hex.activity.DefaultActivity;
+import com.sam.hex.activity.GameActivity;
 import com.sam.hex.ai.bee.BeeGameAI;
 import com.sam.hex.ai.will.GameAI;
 import com.sam.hex.net.NetGlobal;
@@ -28,7 +28,7 @@ import com.sam.hex.replay.Load;
 import com.sam.hex.replay.Replay;
 import com.sam.hex.replay.Save;
 
-public class HexGame extends DefaultActivity {
+public class HexGame extends GameActivity {
     public static boolean startNewGame = true;
     public static boolean replay = false;
     private static Intent intent;
@@ -63,23 +63,23 @@ public class HexGame extends DefaultActivity {
     private void applyBoard() {
         Global.viewLocation = Global.GAME_LOCATION;
         setContentView(R.layout.game);
-        Global.game.views.board = (BoardView) findViewById(R.id.board);
+        game.views.board = (BoardView) findViewById(R.id.board);
 
-        Global.game.views.player1Icon = (ImageButton) findViewById(R.id.p1);
-        Global.game.views.player2Icon = (ImageButton) findViewById(R.id.p2);
+        game.views.player1Icon = (ImageButton) findViewById(R.id.p1);
+        game.views.player2Icon = (ImageButton) findViewById(R.id.p2);
 
-        Global.game.views.timerText = (TextView) findViewById(R.id.timer);
-        if(Global.game.timer.type == 0 || Global.game.gameOver) {
-            Global.game.views.timerText.setVisibility(View.GONE);
+        game.views.timerText = (TextView) findViewById(R.id.timer);
+        if(game.timer.type == 0 || game.gameOver) {
+            game.views.timerText.setVisibility(View.GONE);
         }
-        Global.game.views.winnerText = (TextView) findViewById(R.id.winner);
-        if(Global.game.gameOver) Global.game.views.winnerText.setText(Global.game.winnerMsg);
-        Global.game.views.handler = new Handler();
+        game.views.winnerText = (TextView) findViewById(R.id.winner);
+        if(game.gameOver) game.views.winnerText.setText(game.winnerMsg);
+        game.views.handler = new Handler();
 
-        Global.game.views.replayForward = (ImageButton) findViewById(R.id.replayForward);
-        Global.game.views.replayPlayPause = (ImageButton) findViewById(R.id.replayPlayPause);
-        Global.game.views.replayBack = (ImageButton) findViewById(R.id.replayBack);
-        Global.game.views.replayButtons = (RelativeLayout) findViewById(R.id.replayButtons);
+        game.views.replayForward = (ImageButton) findViewById(R.id.replayForward);
+        game.views.replayPlayPause = (ImageButton) findViewById(R.id.replayPlayPause);
+        game.views.replayBack = (ImageButton) findViewById(R.id.replayBack);
+        game.views.replayButtons = (RelativeLayout) findViewById(R.id.replayButtons);
     }
 
     private void initializeNewGame() {
@@ -87,31 +87,31 @@ public class HexGame extends DefaultActivity {
         startNewGame = false;
 
         // Stop the old game
-        stopGame(Global.game);
+        stopGame(game);
 
         // Create a new game object
-        Global.game = new GameObject(setGrid(prefs, Global.GAME_LOCATION), prefs.getBoolean("swapPref", true));
+        game = new GameObject(setGrid(prefs, Global.GAME_LOCATION), prefs.getBoolean("swapPref", true));
 
         // Set players
-        setType(prefs, Global.GAME_LOCATION, Global.game);
-        setPlayer1(Global.game, new Runnable() {
+        setType(prefs, Global.GAME_LOCATION, game);
+        setPlayer1(game, new Runnable() {
             public void run() {
                 initializeNewGame();
             }
         });
-        setPlayer2(Global.game, new Runnable() {
+        setPlayer2(game, new Runnable() {
             public void run() {
                 initializeNewGame();
             }
         });
-        setNames(prefs, Global.GAME_LOCATION, Global.game);
-        setColors(prefs, Global.GAME_LOCATION, Global.game);
+        setNames(prefs, Global.GAME_LOCATION, game);
+        setColors(prefs, Global.GAME_LOCATION, game);
         int timerType = Integer.parseInt(prefs.getString("timerTypePref", "0"));
-        Global.game.timer = new Timer(Global.game, Integer.parseInt(prefs.getString("timerPref", "0")), 0, timerType);
+        game.timer = new Timer(game, Integer.parseInt(prefs.getString("timerPref", "0")), 0, timerType);
 
         applyBoard();
-        Global.game.timer.start();
-        Global.game.start();
+        game.timer.start();
+        game.start();
     }
 
     @Override
@@ -120,28 +120,28 @@ public class HexGame extends DefaultActivity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Check if settings were changed and we need to run a new game
-        if(Global.game.views.board != null && Global.game.views.board.replayRunning) {
+        if(game.views.board != null && game.views.board.replayRunning) {
             // Do nothing
         }
         else if(replay) {
             replay = false;
             replay(800);
         }
-        else if(HexGame.startNewGame || somethingChanged(prefs, Global.GAME_LOCATION, Global.game)) {
+        else if(HexGame.startNewGame || somethingChanged(prefs, Global.GAME_LOCATION, game)) {
             initializeNewGame();
             applyBoard();
         }
         else {// Apply minor changes without stopping the current game
-            setColors(prefs, Global.GAME_LOCATION, Global.game);
-            setNames(prefs, Global.GAME_LOCATION, Global.game);
-            Global.game.moveList.replay(0, Global.game);
-            GameAction.checkedFlagReset(Global.game);
-            GameAction.checkWinPlayer(1, Global.game);
-            GameAction.checkWinPlayer(2, Global.game);
-            GameAction.checkedFlagReset(Global.game);
+            setColors(prefs, Global.GAME_LOCATION, game);
+            setNames(prefs, Global.GAME_LOCATION, game);
+            game.moveList.replay(0, game);
+            GameAction.checkedFlagReset(game);
+            GameAction.checkWinPlayer(1, game);
+            GameAction.checkWinPlayer(2, game);
+            GameAction.checkedFlagReset(game);
 
             // Apply everything
-            Global.game.views.board.invalidate();
+            game.views.board.invalidate();
         }
     }
 
@@ -157,7 +157,7 @@ public class HexGame extends DefaultActivity {
         // Handle item selection
         switch(item.getItemId()) {
         case R.id.settings:
-            Global.game.views.board.replayRunning = false;
+            game.views.board.replayRunning = false;
             startActivity(new Intent(getBaseContext(), Preferences.class));
             return true;
         case R.id.undo:
@@ -173,7 +173,7 @@ public class HexGame extends DefaultActivity {
             startActivity(new Intent(getBaseContext(), FileExplore.class));
             return true;
         case R.id.saveReplay:
-            Save save = new Save(Global.game);
+            Save save = new Save(game);
             save.showSavingDialog();
             return true;
         case R.id.quit:
@@ -189,7 +189,7 @@ public class HexGame extends DefaultActivity {
         super.onPause();
 
         // If the board's empty, just trigger "startNewGame"
-        if(Global.game == null || (Global.game.moveNumber == 1 && Global.game.timer.type == 0)) HexGame.startNewGame = true;
+        if(game == null || (game.moveNumber == 1 && game.timer.type == 0)) HexGame.startNewGame = true;
     }
 
     /**
@@ -300,7 +300,7 @@ public class HexGame extends DefaultActivity {
     }
 
     private void undo() {
-        GameAction.undo(Global.GAME_LOCATION, Global.game);
+        GameAction.undo(Global.GAME_LOCATION, game);
     }
 
     private void newGame() {
@@ -309,8 +309,8 @@ public class HexGame extends DefaultActivity {
                 switch(which) {
                 case DialogInterface.BUTTON_POSITIVE:
                     // Yes button clicked
-                    if(Global.game.player1.supportsNewgame() && Global.game.player2.supportsNewgame()) {
-                        Global.game.views.board.replayRunning = false;
+                    if(game.player1.supportsNewgame() && game.player2.supportsNewgame()) {
+                        game.views.board.replayRunning = false;
                         initializeNewGame();
                         applyBoard();
                     }
@@ -352,20 +352,20 @@ public class HexGame extends DefaultActivity {
 
     private void replay(int time) {
         applyBoard();
-        Global.game.clearBoard();
+        game.clearBoard();
 
         replayThread = new Thread(new Replay(time, new Handler(), new Runnable() {
             public void run() {
-                Global.game.views.timerText.setVisibility(View.GONE);
-                Global.game.views.winnerText.setVisibility(View.GONE);
+                game.views.timerText.setVisibility(View.GONE);
+                game.views.winnerText.setVisibility(View.GONE);
                 // Global.replayButtons.setVisibility(View.VISIBLE);
             }
         }, new Runnable() {
             public void run() {
-                if(Global.game.timer.type != 0) Global.game.views.timerText.setVisibility(View.VISIBLE);
+                if(game.timer.type != 0) game.views.timerText.setVisibility(View.VISIBLE);
                 // Global.replayButtons.setVisibility(View.GONE);
             }
-        }, Global.game), "replay");
+        }, game), "replay");
         replayThread.start();
     }
 
@@ -375,7 +375,7 @@ public class HexGame extends DefaultActivity {
                 switch(which) {
                 case DialogInterface.BUTTON_POSITIVE:
                     // Yes button clicked
-                    stopGame(Global.game);
+                    stopGame(game);
                     startNewGame = true;
                     finish();
                     break;

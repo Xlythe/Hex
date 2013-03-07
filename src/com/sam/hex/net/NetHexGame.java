@@ -40,7 +40,7 @@ import com.sam.hex.HexGame;
 import com.sam.hex.Preferences;
 import com.sam.hex.R;
 import com.sam.hex.Timer;
-import com.sam.hex.activity.DefaultActivity;
+import com.sam.hex.activity.GameActivity;
 import com.sam.hex.net.igGC.ParsedDataset;
 import com.sam.hex.net.igGC.igGameCenter;
 import com.sam.hex.replay.Save;
@@ -48,12 +48,12 @@ import com.sam.hex.replay.Save;
 /**
  * @author Will Harmon
  **/
-public class NetHexGame extends DefaultActivity {
+public class NetHexGame extends GameActivity {
     public static boolean startNewGame = true;
     public static boolean justStart = false;
     private Runnable startnewgame = new Runnable() {
         public void run() {
-            HexGame.stopGame(NetGlobal.game);
+            HexGame.stopGame(game);
             startActivity(new Intent(getBaseContext(), WaitingRoomActivity.class));
             finish();
         }
@@ -74,41 +74,41 @@ public class NetHexGame extends DefaultActivity {
 
     public void applyBoard() {
         Global.viewLocation = NetGlobal.GAME_LOCATION;
-        NetGlobal.game.views.board = new BoardView(this);
+        game.views.board = new BoardView(this);
         setContentView(R.layout.game_net);
-        GamePagerAdapter gameAdapter = new GamePagerAdapter(NetGlobal.game);
+        GamePagerAdapter gameAdapter = new GamePagerAdapter(game);
         ViewPager gamePager = (ViewPager) findViewById(R.id.board);
         gamePager.setAdapter(gameAdapter);
 
-        NetGlobal.game.views.player1Icon = (ImageButton) this.findViewById(R.id.p1);
-        NetGlobal.game.views.player2Icon = (ImageButton) this.findViewById(R.id.p2);
+        game.views.player1Icon = (ImageButton) this.findViewById(R.id.p1);
+        game.views.player2Icon = (ImageButton) this.findViewById(R.id.p2);
 
-        NetGlobal.game.views.timerText = (TextView) this.findViewById(R.id.timer);
-        if(NetGlobal.game.timer.type == 0 || NetGlobal.game.gameOver) {
-            NetGlobal.game.views.timerText.setVisibility(View.GONE);
+        game.views.timerText = (TextView) this.findViewById(R.id.timer);
+        if(game.timer.type == 0 || game.gameOver) {
+            game.views.timerText.setVisibility(View.GONE);
         }
-        NetGlobal.game.views.winnerText = (TextView) this.findViewById(R.id.winner);
-        if(NetGlobal.game.gameOver) NetGlobal.game.views.winnerText.setText(NetGlobal.game.winnerMsg);
-        NetGlobal.game.views.handler = new Handler();
+        game.views.winnerText = (TextView) this.findViewById(R.id.winner);
+        if(game.gameOver) game.views.winnerText.setText(game.winnerMsg);
+        game.views.handler = new Handler();
 
-        NetGlobal.game.views.replayForward = (ImageButton) this.findViewById(R.id.replayForward);
-        NetGlobal.game.views.replayPlayPause = (ImageButton) this.findViewById(R.id.replayPlayPause);
-        NetGlobal.game.views.replayBack = (ImageButton) this.findViewById(R.id.replayBack);
-        NetGlobal.game.views.replayButtons = (RelativeLayout) this.findViewById(R.id.replayButtons);
+        game.views.replayForward = (ImageButton) this.findViewById(R.id.replayForward);
+        game.views.replayPlayPause = (ImageButton) this.findViewById(R.id.replayPlayPause);
+        game.views.replayBack = (ImageButton) this.findViewById(R.id.replayBack);
+        game.views.replayButtons = (RelativeLayout) this.findViewById(R.id.replayButtons);
 
         new Thread(new Runnable() {
             public void run() {
-                while(!NetGlobal.game.gameOver) {
-                    NetGlobal.game.views.handler.post(new Runnable() {
+                while(!game.gameOver) {
+                    game.views.handler.post(new Runnable() {
                         public void run() {
-                            if(GameAction.getPlayer(NetGlobal.game.currentPlayer, NetGlobal.game) instanceof NetPlayerObject
-                                    && !(GameAction.getPlayer(NetGlobal.game.currentPlayer % 2 + 1, NetGlobal.game) instanceof NetPlayerObject)) for(int i = 0; i < NetGlobal.members
+                            if(GameAction.getPlayer(game.currentPlayer, game) instanceof NetPlayerObject
+                                    && !(GameAction.getPlayer(game.currentPlayer % 2 + 1, game) instanceof NetPlayerObject)) for(int i = 0; i < NetGlobal.members
                                     .size(); i++) {
-                                if(NetGlobal.members.get(i).place == NetGlobal.game.currentPlayer) {
+                                if(NetGlobal.members.get(i).place == game.currentPlayer) {
                                     if(NetGlobal.members.get(i).lastRefresh > 300) {
-                                        NetGlobal.game.views.handler.post(new Runnable() {
+                                        game.views.handler.post(new Runnable() {
                                             public void run() {
-                                                NetGlobal.game.views.timerText.setVisibility(View.GONE);
+                                                game.views.timerText.setVisibility(View.GONE);
                                             }
                                         });
                                         final Handler buttonHandler = new Handler();
@@ -128,9 +128,9 @@ public class NetHexGame extends DefaultActivity {
                                                                         button.setVisibility(View.GONE);
                                                                     }
                                                                 });
-                                                                NetGlobal.game.timer.stop();
-                                                                NetGlobal.game.timer = new Timer(NetGlobal.game, 0, 0, Timer.ENTIRE_MATCH);
-                                                                NetGlobal.game.timer.start();
+                                                                game.timer.stop();
+                                                                game.timer = new Timer(game, 0, 0, Timer.ENTIRE_MATCH);
+                                                                game.timer.start();
                                                             }
                                                             else {
                                                                 System.out.println(parsedDataset.getErrorMessage());
@@ -155,8 +155,8 @@ public class NetHexGame extends DefaultActivity {
                                         button.setVisibility(View.VISIBLE);
                                     }
                                     else {
-                                        if(NetGlobal.game.timer.type != 0 || !NetGlobal.game.gameOver) {
-                                            NetGlobal.game.views.timerText.setVisibility(View.VISIBLE);
+                                        if(game.timer.type != 0 || !game.gameOver) {
+                                            game.views.timerText.setVisibility(View.VISIBLE);
                                         }
                                         Button button = (Button) NetHexGame.this.findViewById(R.id.claimVictory);
                                         button.setVisibility(View.GONE);
@@ -181,29 +181,29 @@ public class NetHexGame extends DefaultActivity {
         startNewGame = false;
 
         // Stop the old game
-        HexGame.stopGame(NetGlobal.game);
+        HexGame.stopGame(game);
 
         // Create a new game object
-        NetGlobal.game = new GameObject(HexGame.setGrid(prefs, NetGlobal.GAME_LOCATION), true);
+        game = new GameObject(HexGame.setGrid(prefs, NetGlobal.GAME_LOCATION), true);
 
         // Set players
-        HexGame.setType(prefs, NetGlobal.GAME_LOCATION, NetGlobal.game);
-        HexGame.setPlayer1(NetGlobal.game, startnewgame);
-        HexGame.setPlayer2(NetGlobal.game, startnewgame);
-        HexGame.setNames(prefs, NetGlobal.GAME_LOCATION, NetGlobal.game);
-        HexGame.setColors(prefs, NetGlobal.GAME_LOCATION, NetGlobal.game);
+        HexGame.setType(prefs, NetGlobal.GAME_LOCATION, game);
+        HexGame.setPlayer1(game, startnewgame);
+        HexGame.setPlayer2(game, startnewgame);
+        HexGame.setNames(prefs, NetGlobal.GAME_LOCATION, game);
+        HexGame.setColors(prefs, NetGlobal.GAME_LOCATION, game);
         if(NetGlobal.timerTime == 0) {
-            NetGlobal.game.timer = new Timer(NetGlobal.game, 0, 0, Timer.NO_TIMER);
+            game.timer = new Timer(game, 0, 0, Timer.NO_TIMER);
         }
         else {
-            NetGlobal.game.timer = new Timer(NetGlobal.game, NetGlobal.timerTime, 0, Timer.ENTIRE_MATCH);
+            game.timer = new Timer(game, NetGlobal.timerTime, 0, Timer.ENTIRE_MATCH);
         }
 
         // Display board
         applyBoard();
 
         // Start the game object
-        NetGlobal.game.start();
+        game.start();
     }
 
     @Override
@@ -211,20 +211,20 @@ public class NetHexGame extends DefaultActivity {
         super.onResume();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         // Check if settings were changed and we need to run a new game
-        if(startNewGame || HexGame.somethingChanged(prefs, NetGlobal.GAME_LOCATION, NetGlobal.game)) {
+        if(startNewGame || HexGame.somethingChanged(prefs, NetGlobal.GAME_LOCATION, game)) {
             initializeNewGame();
         }
         else {// Apply minor changes without stopping the current game
-            HexGame.setColors(prefs, NetGlobal.GAME_LOCATION, NetGlobal.game);
-            HexGame.setNames(prefs, NetGlobal.GAME_LOCATION, NetGlobal.game);
-            NetGlobal.game.moveList.replay(0, NetGlobal.game);
-            GameAction.checkedFlagReset(NetGlobal.game);
-            GameAction.checkWinPlayer(1, NetGlobal.game);
-            GameAction.checkWinPlayer(2, NetGlobal.game);
-            GameAction.checkedFlagReset(NetGlobal.game);
+            HexGame.setColors(prefs, NetGlobal.GAME_LOCATION, game);
+            HexGame.setNames(prefs, NetGlobal.GAME_LOCATION, game);
+            game.moveList.replay(0, game);
+            GameAction.checkedFlagReset(game);
+            GameAction.checkWinPlayer(1, game);
+            GameAction.checkWinPlayer(2, game);
+            GameAction.checkedFlagReset(game);
 
             // Apply everything
-            NetGlobal.game.views.board.invalidate();
+            game.views.board.invalidate();
         }
     }
 
@@ -246,8 +246,8 @@ public class NetHexGame extends DefaultActivity {
                     case DialogInterface.BUTTON_POSITIVE:
                         // Yes button clicked
                         justStart = true;
-                        NetGlobal.game.player1.supportsNewgame();
-                        NetGlobal.game.player2.supportsNewgame();
+                        game.player1.supportsNewgame();
+                        game.player2.supportsNewgame();
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
                         // No button clicked
@@ -265,7 +265,7 @@ public class NetHexGame extends DefaultActivity {
             startActivity(new Intent(getBaseContext(), Preferences.class));
             return true;
         case R.id.saveReplay:
-            Save save = new Save(NetGlobal.game);
+            Save save = new Save(game);
             save.showSavingDialog();
             return true;
         case R.id.quit:
@@ -282,7 +282,7 @@ public class NetHexGame extends DefaultActivity {
                 switch(which) {
                 case DialogInterface.BUTTON_POSITIVE:
                     // Yes button clicked
-                    HexGame.stopGame(NetGlobal.game);
+                    HexGame.stopGame(game);
                     startNewGame = true;
                     finish();
                     break;

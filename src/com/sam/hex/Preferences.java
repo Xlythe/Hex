@@ -291,6 +291,7 @@ public class Preferences extends PreferenceActivity {
             getSupportActionBar().setTitle(R.string.preferences);
             if(!in_submenu) {
                 addPreferencesFromResource(R.layout.preferences_abstract);
+                addPreferencesFromResource(R.layout.preferences_reset);
             }
             else if(in_general) {
                 addPreferencesFromResource(R.layout.preferences_general);
@@ -311,7 +312,6 @@ public class Preferences extends PreferenceActivity {
             getSupportActionBar().setTitle(R.string.preferences_net);
             addPreferencesFromResource(R.layout.preferences_netplayer);
         }
-        addPreferencesFromResource(R.layout.preferences_reset);
         screen = (PreferenceScreen) findPreference("preferences");
     }
 

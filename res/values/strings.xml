@@ -12,7 +12,7 @@
     <string name="preferences">Settings (Local)</string>
     <string name="preferences_net">Settings (Online)</string>
     <string name="gameLocationTitle">Local or Online</string>
-    <string name="gameLocationSummary">Switch between playing on the same device or going online!</string>
+    <string name="gameLocationSummary">Switch between local settings and online settings</string>
     <string name="gameSizeTitle">Board Size</string>
     <string name="gameSizeSummary">Pick a size for the gameboard (Current: 7x7)</string>
     <string name="gameSizeSummary_onChange">Pick a size for the gameboard (Current: #x#)</string>

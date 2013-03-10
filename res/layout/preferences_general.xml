@@ -1,31 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="generalScreen">
-    <ListPreference
-        android:title="@string/gameSizeTitle"
-        android:summary="@string/gameSizeSummary"
-        android:key="gameSizePref"
-        android:defaultValue="7"
-        android:entries="@array/gameSizeArray"
-        android:entryValues="@array/gameSizeValues" />
-    <EditTextPreference
-        android:key="customGameSizePref"
-        android:defaultValue="7" />
-    <CheckBoxPreference
-        android:title="@string/swapTitle"
-        android:summary="@string/swapSummary"
-        android:defaultValue="true"
-        android:key="swapPref" />
-    <Preference
-        android:title="@string/timerTitle"
-        android:summary="@string/timerSummary"
-        android:key="timerOptionsPref" />
-    <ListPreference
-        android:key="timerTypePref"
-        android:defaultValue="0"
-        android:entries="@array/timerTypeArray"
-        android:entryValues="@array/timerTypeValues" />
-    <EditTextPreference
-        android:key="timerPref"
-        android:defaultValue="0" />
+    <PreferenceCategory
+        android:title="@string/preferences_title_options" >
+	    <ListPreference
+	        android:title="@string/gameSizeTitle"
+	        android:summary="@string/gameSizeSummary"
+	        android:key="gameSizePref"
+	        android:defaultValue="7"
+	        android:entries="@array/gameSizeArray"
+	        android:entryValues="@array/gameSizeValues" />
+	    <CheckBoxPreference
+	        android:title="@string/swapTitle"
+	        android:summary="@string/swapSummary"
+	        android:defaultValue="true"
+	        android:key="swapPref" />
+	    <Preference
+	        android:title="@string/timerTitle"
+	        android:summary="@string/timerSummary"
+	        android:key="timerOptionsPref" />
+	</PreferenceCategory>
 </PreferenceScreen>

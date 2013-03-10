@@ -6,6 +6,9 @@
     <string name="app_name">Hex</string>
     
     <!-- Preferences -->
+    <string name="preferences_title_options">Options</string>
+    <string name="preferences_title_reset">Reset</string>
+    
     <string name="preferences">Settings (Local)</string>
     <string name="preferences_net">Settings (Online)</string>
     <string name="gameLocationTitle">Local or Online</string>

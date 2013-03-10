@@ -11,7 +11,6 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
-import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.text.InputType;
@@ -296,11 +295,7 @@ public class Preferences extends PreferenceActivity {
             else if(in_general) {
                 addPreferencesFromResource(R.layout.preferences_general);
 
-                // Hide hidden preferences
                 generalScreen = (PreferenceScreen) findPreference("generalScreen");
-                generalScreen.removePreference(findPreference("customGameSizePref"));
-                generalScreen.removePreference(findPreference("timerTypePref"));
-                generalScreen.removePreference(findPreference("timerPref"));
             }
             else if(in_p1) {
                 addPreferencesFromResource(R.layout.preferences_player1);
@@ -311,25 +306,10 @@ public class Preferences extends PreferenceActivity {
         }
         else if(gameLoc == 1) {
             addPreferencesFromResource(R.layout.preferences_general);
-
-            // Hide hidden preferences
-            PreferenceCategory general = (PreferenceCategory) findPreference("generalCategory");
-            general.removePreference(findPreference("customGameSizePref"));
-            general.removePreference(findPreference("timerTypePref"));
-            general.removePreference(findPreference("timerPref"));
         }
         else if(gameLoc == 2) {
             getSupportActionBar().setTitle(R.string.preferences_net);
             addPreferencesFromResource(R.layout.preferences_netplayer);
-
-            // Hide hidden preferences
-            PreferenceCategory general = (PreferenceCategory) findPreference("netPlayerCategory");
-            general.removePreference(findPreference("netPassword"));
-            general.removePreference(findPreference("netPosition"));
-            general.removePreference(findPreference("netGridSize"));
-            general.removePreference(findPreference("netTimerTime"));
-            general.removePreference(findPreference("netAdditionalTimerTime"));
-            general.removePreference(findPreference("netRatedGame"));
         }
         addPreferencesFromResource(R.layout.preferences_reset);
         screen = (PreferenceScreen) findPreference("preferences");

@@ -1,11 +1,14 @@
 package com.sam.hex;
 
+import java.io.Serializable;
+
 import android.os.Handler;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class Game implements Runnable {
+public class Game implements Runnable, Serializable {
+    private static final long serialVersionUID = 1L;
     private boolean gameRunning = true;
     public final RegularPolygonGameObject[][] gamePiece;
     public int moveNumber;

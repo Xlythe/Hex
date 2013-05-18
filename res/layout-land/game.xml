@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:background="@color/white" >
+    android:background="@color/cream" >
 
     <com.sam.hex.BoardView
         android:id="@+id/board"

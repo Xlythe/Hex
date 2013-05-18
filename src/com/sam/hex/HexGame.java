@@ -28,6 +28,8 @@ import com.sam.hex.replay.Replay;
 import com.sam.hex.replay.Save;
 
 public class HexGame extends DefaultActivity {
+    private static final String GAME = "game";
+
     private Game game;
     private Thread replayThread;
     private boolean replay;
@@ -50,16 +52,30 @@ public class HexGame extends DefaultActivity {
         // Must be set up immediately
         initializeNewGame();
 
-        // Check to see if we should load a game
-        Intent intent = getIntent();
-        if(intent.getData() != null) {
-            Load load = new Load(new File(intent.getData().getPath()));
-            game = load.run(game.gameListener);
-            replay = true;
+        if(savedInstanceState != null) {
+            // Resume a game if one exists
+            GameListener gl = game.gameListener;
+            game = (Game) savedInstanceState.getSerializable(GAME);
+            game.gameListener = gl;
+        }
+        else {
+            // Check to see if we should load a game
+            Intent intent = getIntent();
+            if(intent.getData() != null) {
+                Load load = new Load(new File(intent.getData().getPath()));
+                game = load.run(game.gameListener);
+                replay = true;
+            }
         }
 
         // Load the UI
         applyBoard();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putSerializable(GAME, game);
     }
 
     private void applyBoard() {

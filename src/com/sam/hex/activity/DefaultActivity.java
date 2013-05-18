@@ -5,14 +5,14 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.sam.hex.R;
 
 /**
  * @author Will Harmon
  **/
-public class DefaultActivity extends SherlockActivity {
+public class DefaultActivity extends SherlockFragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

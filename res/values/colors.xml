@@ -8,4 +8,5 @@
     <drawable name="transparent">#00000000</drawable>
     <drawable name="white">#FFFFFFFF</drawable>
     <drawable name="black">#00000000</drawable>
+    <color name="cream">#F0F0F0</color>
 </resources>

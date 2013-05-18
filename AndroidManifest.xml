@@ -39,11 +39,7 @@
         </activity>
         <activity android:label="@string/preferences" android:name=".Preferences"  />
         <activity android:label="@string/rules" android:name=".startup.InstructionsActivity" />
-        <activity android:label="@string/login" android:name=".net.LoginActivity" />
-        <activity android:label="@string/register" android:name=".net.RegistrationActivity" />
-        <activity android:label="@string/net" android:name=".net.NetLobbyActivity" />
-        <activity android:label="@string/waitingroom" android:name=".net.WaitingRoomActivity" />
-        <activity android:label="@string/app_name" android:name=".net.NetHexGame" />
+        <activity android:label="@string/login" android:name=".playgames.LoginActivity" />
         <activity android:label="@string/app_name" android:name=".replay.FileExplore" />
         <meta-data android:name="com.google.android.gms.games.APP_ID" android:value="@string/app_id" />
     </application>

@@ -1,10 +1,12 @@
 package com.sam.hex.playgames;
 
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.google.android.gms.common.SignInButton;
 import com.sam.hex.R;
 
 /**
@@ -19,7 +21,7 @@ public class LoginActivity extends BaseGameActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.play_login);
 
-        Button mSignInButton = (Button) findViewById(R.id.loginEnter);
+        SignInButton mSignInButton = (SignInButton) findViewById(R.id.loginEnter);
         mSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -34,6 +36,13 @@ public class LoginActivity extends BaseGameActivity {
 
     @Override
     public void onSignInSucceeded() {}
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getSupportMenuInflater();
+        inflater.inflate(R.menu.menu_play_login, menu);
+        return true;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

@@ -4,8 +4,6 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import android.graphics.Point;
-
 public class GameAction {
     public static int LOCAL_GAME = 1;
     public static int NET_GAME = 2;
@@ -52,7 +50,7 @@ public class GameAction {
     }
 
     public static void setPiece(Point p, Game game) {
-        getPlayer(game.currentPlayer, game).setMove(new GameAction(), p);
+        getPlayer(game.currentPlayer, game).setMove(game, new GameAction(), p);
     }
 
     private static void setTeam(byte t, int x, int y, Game game) {
@@ -79,7 +77,7 @@ public class GameAction {
     }
 
     public static void undo(int gameLocation, Game game) {
-        if(game.moveNumber > 1 && game.player1.supportsUndo() && game.player2.supportsUndo()) {
+        if(game.moveNumber > 1 && game.player1.supportsUndo(game) && game.player2.supportsUndo(game)) {
             checkedFlagReset(game);
 
             // Remove the piece from the board and the movelist

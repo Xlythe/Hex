@@ -2,25 +2,22 @@ package com.sam.hex;
 
 import java.util.LinkedList;
 
-import android.graphics.Point;
-
 public class PlayerObject implements PlayingEntity {
+    private static final long serialVersionUID = 1L;
     private static final int SET = 0;
     private static final int GET = 1;
     private String name;
     private int color;
     private long timeLeft;
     public final int team;
-    public final Game game;
     private final LinkedList<Point> hex = new LinkedList<Point>();
 
-    public PlayerObject(int team, Game game) {
+    public PlayerObject(int team) {
         this.team = team;
-        this.game = game;
     }
 
     @Override
-    public void getPlayerTurn() {
+    public void getPlayerTurn(Game game) {
         if(hex(GET, null).size() > 0 && hex(GET, null).get(0).equals(new Point(-1, -1))) {
             hex(GET, null).clear();
         }
@@ -54,7 +51,7 @@ public class PlayerObject implements PlayingEntity {
     }
 
     @Override
-    public boolean supportsUndo() {
+    public boolean supportsUndo(Game game) {
         return true;
     }
 
@@ -115,7 +112,7 @@ public class PlayerObject implements PlayingEntity {
     }
 
     @Override
-    public void setMove(final Object o, final Point point) {
+    public void setMove(Game game, final Object o, final Point point) {
         if(o instanceof GameAction && game.currentPlayer == team) hex(SET, point);
     }
 

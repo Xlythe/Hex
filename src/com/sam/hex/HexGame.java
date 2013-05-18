@@ -75,7 +75,7 @@ public class HexGame extends DefaultActivity {
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putSerializable(GAME, game);
+        savedInstanceState.putSerializable(GAME, game.player1);
     }
 
     private void applyBoard() {
@@ -110,9 +110,11 @@ public class HexGame extends DefaultActivity {
         go.swap = prefs.getBoolean("swapPref", true);
 
         int timerType = Integer.parseInt(prefs.getString("timerTypePref", "0"));
-        go.timer = new Timer(null, Integer.parseInt(prefs.getString("timerPref", "0")), 0, timerType);
+        go.timer = new Timer(Integer.parseInt(prefs.getString("timerPref", "0")), 0, timerType);
 
         GameListener gl = new GameListener() {
+            private static final long serialVersionUID = 1L;
+
             @Override
             public void onWin(final PlayingEntity player) {
                 runOnUiThread(new Runnable() {
@@ -249,7 +251,7 @@ public class HexGame extends DefaultActivity {
         setColors(prefs, GameAction.LOCAL_GAME, game);
 
         applyBoard();
-        game.gameOptions.timer.start();
+        game.gameOptions.timer.start(game);
         game.start();
     }
 
@@ -421,19 +423,19 @@ public class HexGame extends DefaultActivity {
     }
 
     public static void setPlayer1(Game game, Runnable newgame) {
-        if(game.player1Type == 0) game.player1 = new PlayerObject(1, game);
-        else if(game.player1Type == 1) game.player1 = new GameAI(1, game);
+        if(game.player1Type == 0) game.player1 = new PlayerObject(1);
+        else if(game.player1Type == 1) game.player1 = new GameAI(1);
         // else if(game.player1Type == 3) game.player1 = new NetPlayerObject(1,
         // game, new Handler(), newgame);
-        else if(game.player1Type == 4) game.player1 = new BeeGameAI(1, game);
+        else if(game.player1Type == 4) game.player1 = new BeeGameAI(1, game.gameOptions.gridSize);
     }
 
     public static void setPlayer2(Game game, Runnable newgame) {
-        if(game.player2Type == 0) game.player2 = new PlayerObject(2, game);
-        else if(game.player2Type == 1) game.player2 = new GameAI(2, game);
+        if(game.player2Type == 0) game.player2 = new PlayerObject(2);
+        else if(game.player2Type == 1) game.player2 = new GameAI(2);
         // else if(game.player2Type == 3) game.player2 = new NetPlayerObject(2,
         // game, new Handler(), newgame);
-        else if(game.player2Type == 4) game.player2 = new BeeGameAI(2, game);
+        else if(game.player2Type == 4) game.player2 = new BeeGameAI(2, game.gameOptions.gridSize);
     }
 
     private void undo() {

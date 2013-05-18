@@ -34,8 +34,8 @@ public class Load {
                 go.swap = swap;
                 Game game = new Game(go, gl);
 
-                game.player1 = new PlayerObject(1, game);
-                game.player2 = new PlayerObject(2, game);
+                game.player1 = new PlayerObject(1);
+                game.player2 = new PlayerObject(2);
 
                 game.player1Type = (Integer) inputStream.readObject();
                 game.player2Type = (Integer) inputStream.readObject();
@@ -47,7 +47,7 @@ public class Load {
                 game.moveNumber = (Integer) inputStream.readObject();
                 int timertype = (Integer) inputStream.readObject();
                 long timerlength = (Long) inputStream.readObject();
-                game.gameOptions.timer = new Timer(game, timerlength, 0, timertype);
+                game.gameOptions.timer = new Timer(timerlength, 0, timertype);
 
                 inputStream.close();
 

@@ -1,26 +1,23 @@
 package com.sam.hex.ai.template;
 
-import android.graphics.Point;
-
 import com.sam.hex.Game;
 import com.sam.hex.PlayerObject;
 import com.sam.hex.PlayingEntity;
 
-public class AI implements PlayingEntity {
+public abstract class AI implements PlayingEntity {
+    private static final long serialVersionUID = 1L;
     private String name;
     private int color;
     private long timeLeft;
     public final int team;
-    public final Game game;
     private boolean skipMove = false;
 
-    public AI(int team, Game game) {
+    public AI(int team) {
         this.team = team;
-        this.game = game;
     }
 
     @Override
-    public void getPlayerTurn() {
+    public void getPlayerTurn(Game game) {
         setSkipMove(false);
     }
 
@@ -35,7 +32,7 @@ public class AI implements PlayingEntity {
     }
 
     @Override
-    public boolean supportsUndo() {
+    public boolean supportsUndo(Game game) {
         if(team == 1) {
             return game.player2 instanceof PlayerObject;
         }
@@ -55,19 +52,7 @@ public class AI implements PlayingEntity {
     }
 
     @Override
-    public void win() {}
-
-    @Override
-    public void lose() {}
-
-    @Override
     public boolean supportsSave() {
-        // if(team==1){
-        // return game.player2 instanceof PlayerObject;
-        // }
-        // else{
-        // return game.player1 instanceof PlayerObject;
-        // }
         return false;
     }
 
@@ -110,9 +95,6 @@ public class AI implements PlayingEntity {
     public boolean giveUp() {
         return false;
     }
-
-    @Override
-    public void setMove(Object o, Point hex) {}
 
     public boolean getSkipMove() {
         return skipMove;

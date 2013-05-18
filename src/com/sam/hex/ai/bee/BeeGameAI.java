@@ -8,10 +8,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import android.graphics.Point;
-
 import com.sam.hex.Game;
 import com.sam.hex.GameAction;
+import com.sam.hex.Point;
 import com.sam.hex.ai.template.AI;
 
 /**
@@ -41,10 +40,10 @@ public class BeeGameAI extends AI {
      * @param colour
      *            the colour of Bee
      */
-    public BeeGameAI(int team, Game game) {
-        super(team, game);
+    public BeeGameAI(int team, int gridSize) {
+        super(team);
         // Creates the pieces array that stores the board inside Bee
-        gridSize = game.gameOptions.gridSize;
+        this.gridSize = gridSize;
         pieces = new int[gridSize + 2][gridSize + 2];
         for(int i = 1; i < pieces.length - 1; i++) {
             pieces[i][0] = RED;
@@ -74,8 +73,8 @@ public class BeeGameAI extends AI {
      * Runs the Bee thread
      */
     @Override
-    public void getPlayerTurn() {
-        super.getPlayerTurn();
+    public void getPlayerTurn(Game game) {
+        super.getPlayerTurn(game);
         AIHistoryObject state = new AIHistoryObject(pieces, lookUpTable);
         history.add(state);
         int moveNumber = game.moveNumber;
@@ -622,6 +621,15 @@ public class BeeGameAI extends AI {
         }
         return value;
     }
+
+    @Override
+    public void win() {}
+
+    @Override
+    public void lose() {}
+
+    @Override
+    public void setMove(Game game, Object o, Point hex) {}
 }
 
 /**

@@ -5,11 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import android.graphics.Point;
-
 import com.sam.hex.BoardTools;
 import com.sam.hex.Game;
 import com.sam.hex.GameAction;
+import com.sam.hex.Point;
 import com.sam.hex.ai.template.AI;
 
 /**
@@ -26,8 +25,8 @@ public class GameAI extends AI {
     private int rand_a = 0;
     private int rand_b = 0;
 
-    public GameAI(int team, Game game) {
-        super(team, game);
+    public GameAI(int team) {
+        super(team);
         while(rand_a == 0 && rand_b == 0) {
             rand_a = new Random().nextInt(3) - 1;
             rand_b = new Random().nextInt(3) - 1;
@@ -56,12 +55,12 @@ public class GameAI extends AI {
     }
 
     @Override
-    public void getPlayerTurn() {
-        super.getPlayerTurn();
+    public void getPlayerTurn(Game game) {
+        super.getPlayerTurn(game);
         this.gameBoard = BoardTools.teamGrid(game);
         AIHistoryObject state = new AIHistoryObject(pairs, n, m);
         history.add(state);
-        makeMove();
+        makeMove(game);
     }
 
     @Override
@@ -84,7 +83,7 @@ public class GameAI extends AI {
         return n[0] - 2 >= 0 && n[1] - 1 >= 0 && n[1] + 1 <= gameBoard.length - 1;
     }
 
-    private void makeMove() {
+    private void makeMove(Game game) {
         /**
          * Will's AI
          * */
@@ -117,7 +116,7 @@ public class GameAI extends AI {
                 n[1] = mid;// vertical
                 m[0] = mid;
                 m[1] = mid;
-                sendMove(mid, mid);
+                sendMove(game, mid, mid);
 
                 return;
             }
@@ -126,7 +125,7 @@ public class GameAI extends AI {
                 n[y] = mid + rand_b;// vertical
                 m[x] = mid + rand_a;
                 m[y] = mid + rand_b;
-                sendMove(mid + rand_a, mid + rand_b);
+                sendMove(game, mid + rand_a, mid + rand_b);
 
                 return;
             }
@@ -167,12 +166,12 @@ public class GameAI extends AI {
                 if(gameBoard[pairs.get(i).get(0).get(x)][pairs.get(i).get(0).get(y)] == 0
                         || gameBoard[pairs.get(i).get(1).get(x)][pairs.get(i).get(1).get(y)] == 0) {
                     if(gameBoard[pairs.get(i).get(0).get(x)][pairs.get(i).get(0).get(y)] != 0) {
-                        sendMove(pairs.get(i).get(1).get(x), pairs.get(i).get(1).get(y));
+                        sendMove(game, pairs.get(i).get(1).get(x), pairs.get(i).get(1).get(y));
                         pairs.remove(i);
                         return;
                     }
                     else if(gameBoard[pairs.get(i).get(1).get(x)][pairs.get(i).get(1).get(y)] != 0) {
-                        sendMove(pairs.get(i).get(0).get(x), pairs.get(i).get(0).get(y));
+                        sendMove(game, pairs.get(i).get(0).get(x), pairs.get(i).get(0).get(y));
                         pairs.remove(i);
                         return;
                     }
@@ -188,14 +187,14 @@ public class GameAI extends AI {
                     m[0] = m[0] + 1;
                     m[1] = m[1] - 1;
 
-                    sendMove(m[x], m[y]);
+                    sendMove(game, m[x], m[y]);
                     return;
                 }
                 else if(gameBoard[m[x] + 1 * x + 0 * y][m[y] + 1 * y + 0 * x] == 0) {
                     m[0] = m[0];
                     m[1] = m[1] + 1;
 
-                    sendMove(m[x], m[y]);
+                    sendMove(game, m[x], m[y]);
                     return;
                 }
             }
@@ -204,7 +203,7 @@ public class GameAI extends AI {
                 m[0] = m[0] + 1;
                 m[1] = m[1];
 
-                sendMove(m[x], m[y]);
+                sendMove(game, m[x], m[y]);
                 return;
             }
             // Check if they were sneakier and played behind us
@@ -213,14 +212,14 @@ public class GameAI extends AI {
                     n[0] = n[0] - 1;
                     n[1] = n[1] + 1;
 
-                    sendMove(n[x], n[y]);
+                    sendMove(game, n[x], n[y]);
                     return;
                 }
                 else if(gameBoard[n[x] - 1 * x + 0 * y][n[y] - 1 * y + 0 * x] == 0) {
                     n[0] = n[0];
                     n[1] = n[1] - 1;
 
-                    sendMove(n[x], n[y]);
+                    sendMove(game, n[x], n[y]);
                     return;
                 }
             }
@@ -229,7 +228,7 @@ public class GameAI extends AI {
                 n[0] = n[0] - 1;
                 n[1] = n[1];
 
-                sendMove(n[x], n[y]);
+                sendMove(game, n[x], n[y]);
                 return;
             }
 
@@ -250,7 +249,7 @@ public class GameAI extends AI {
                     n[0] = n[0] - 2;
                     n[1] = n[1] + 1;
 
-                    sendMove(n[x], n[y]);
+                    sendMove(game, n[x], n[y]);
                     return;
                 }
                 else if(gameBoard[n[x] + 1 * x - 2 * y][n[y] + 1 * y - 2 * x] != 0 && gameBoard[n[x] - 1 * x - 1 * y][n[y] - 1 * y - 1 * x] == 0) {
@@ -268,7 +267,7 @@ public class GameAI extends AI {
                     n[0] = n[0] - 1;
                     n[1] = n[1] - 1;
 
-                    sendMove(n[x], n[y]);
+                    sendMove(game, n[x], n[y]);
                     return;
                 }
             }
@@ -290,7 +289,7 @@ public class GameAI extends AI {
                     m[0] = m[0] + 1;
                     m[1] = m[1] + 1;
 
-                    sendMove(m[x], m[y]);
+                    sendMove(game, m[x], m[y]);
                     return;
                 }
                 else if(gameBoard[m[x] + 1 * x + 1 * y][m[y] + 1 * y + 1 * x] != 0 && gameBoard[m[x] - 1 * x + 2 * y][m[y] - 1 * y + 2 * x] == 0) {
@@ -308,7 +307,7 @@ public class GameAI extends AI {
                     m[0] = m[0] + 2;
                     m[1] = m[1] - 1;
 
-                    sendMove(m[x], m[y]);
+                    sendMove(game, m[x], m[y]);
                     return;
                 }
             }
@@ -331,7 +330,7 @@ public class GameAI extends AI {
                 n[0] = n[0] - 2;
                 n[1] = n[1] + 1;
 
-                sendMove(n[x], n[y]);
+                sendMove(game, n[x], n[y]);
                 return;
             }
             else if(left() && rand == 1 && gameBoard[n[x] - 1 * x - 1 * y][n[y] - 1 * y - 1 * x] == 0) {
@@ -349,7 +348,7 @@ public class GameAI extends AI {
                 n[0] = n[0] - 1;
                 n[1] = n[1] - 1;
 
-                sendMove(n[x], n[y]);
+                sendMove(game, n[x], n[y]);
                 return;
             }
             // Extend right if we haven't gone left
@@ -368,7 +367,7 @@ public class GameAI extends AI {
                 m[0] = m[0] + 2;
                 m[1] = m[1] - 1;
 
-                sendMove(m[x], m[y]);
+                sendMove(game, m[x], m[y]);
                 return;
             }
             else if(right() && rand == 1 && gameBoard[m[x] + 1 * x + 1 * y][m[y] + 1 * y + 1 * x] == 0) {
@@ -386,14 +385,14 @@ public class GameAI extends AI {
                 m[0] = m[0] + 1;
                 m[1] = m[1] + 1;
 
-                sendMove(m[x], m[y]);
+                sendMove(game, m[x], m[y]);
                 return;
             }
 
             // Fill in the pairs after we've reached both sides of the map
             if(!left() && !right() && pairs.size() > 0) {
                 // Play a random pair
-                sendMove(pairs.get(0).get(1).get(x), pairs.get(0).get(1).get(y));
+                sendMove(game, pairs.get(0).get(1).get(x), pairs.get(0).get(1).get(y));
                 pairs.remove(0);
 
                 return;
@@ -416,7 +415,7 @@ public class GameAI extends AI {
                     moves--;
                 }
                 if(moves == 0) {
-                    sendMove(a, b);
+                    sendMove(game, a, b);
                     moves = -10;
                 }
             }
@@ -425,7 +424,16 @@ public class GameAI extends AI {
         return;
     }
 
-    private void sendMove(int x, int y) {
+    private void sendMove(Game game, int x, int y) {
         if(!getSkipMove()) GameAction.makeMove(this, (byte) team, new Point(x, y), game);
     }
+
+    @Override
+    public void win() {}
+
+    @Override
+    public void lose() {}
+
+    @Override
+    public void setMove(Game game, Object o, Point hex) {}
 }

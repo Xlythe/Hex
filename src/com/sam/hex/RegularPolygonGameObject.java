@@ -1,9 +1,12 @@
 package com.sam.hex;
 
+import java.io.Serializable;
+
 import sl.shapes.RegularPolygon;
 import android.graphics.Color;
 
-public class RegularPolygonGameObject {
+public class RegularPolygonGameObject implements Serializable {
+    private static final long serialVersionUID = 1L;
     private RegularPolygon Hex;
     private byte teamNumber = 0; // 1 is left-right, 2 is top-down
     private int objectColor = Color.WHITE;
@@ -238,12 +241,8 @@ public class RegularPolygonGameObject {
         return objectColor;
     }
 
-    public boolean contains(double ex, double why) { // TODO: hit detect MAY be
-                                                     // off slightly...
-
-        // return Math.abs(x-ex)<radius/2 && Math.abs(y-why)<radius/2; //very
-        // simplified!
-        return Hex.contains((int) ex, (int) why);
+    public boolean contains(double x, double y) {
+        return Hex.contains((int) x, (int) y);
     }
 
 }

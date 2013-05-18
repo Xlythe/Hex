@@ -1,9 +1,12 @@
 package com.sam.hex;
 
+import java.io.Serializable;
+
 /**
  * @author Will Harmon
  **/
-public class Timer implements Runnable {
+public class Timer implements Serializable {
+    private static final long serialVersionUID = 1L;
     public static final int NO_TIMER = 0;
     public static final int PER_MOVE = 1;
     public static final int ENTIRE_MATCH = 2;
@@ -13,22 +16,26 @@ public class Timer implements Runnable {
     public int type;
     public long totalTime;
     public long additionalTime;
-    public Game game;
     private int currentPlayer;
 
-    public Timer(Game game, long totalTime, long additionalTime, int type) {
-        this.game = game;
+    public Timer(long totalTime, long additionalTime, int type) {
         this.totalTime = totalTime * 60 * 1000;
         this.additionalTime = additionalTime * 1000;
         this.type = type;
         startTime = System.currentTimeMillis();
     }
 
-    public void start() {
+    public void start(final Game game) {
         refresh = true;
         if(type != 0) {
             game.gameListener.startTimer();
-            new Thread(this).start();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Timer t = Timer.this;
+                    t.run(game);
+                }
+            }).start();
         }
     }
 
@@ -36,16 +43,15 @@ public class Timer implements Runnable {
         refresh = false;
     }
 
-    @Override
-    public void run() {
+    public void run(Game game) {
         while(refresh) {
             elapsedTime = System.currentTimeMillis() - startTime;
             currentPlayer = game.currentPlayer;
 
             if(!game.gameOver) {
-                GameAction.getPlayer(currentPlayer, game).setTime(calculatePlayerTime(currentPlayer));
+                GameAction.getPlayer(currentPlayer, game).setTime(calculatePlayerTime(currentPlayer, game));
                 if(GameAction.getPlayer(currentPlayer, game).getTime() > 0) {
-                    displayTime();
+                    displayTime(game);
                 }
                 else {
                     PlayingEntity player = GameAction.getPlayer(currentPlayer, game);
@@ -63,11 +69,11 @@ public class Timer implements Runnable {
         }
     }
 
-    private long calculatePlayerTime(int player) {
+    private long calculatePlayerTime(int player, Game game) {
         return totalTime - elapsedTime + totalTime - GameAction.getPlayer(player % 2 + 1, game).getTime();
     }
 
-    private void displayTime() {
+    private void displayTime(Game game) {
         long millis = GameAction.getPlayer(game.currentPlayer, game).getTime();
         int seconds = (int) (millis / 1000);
         int minutes = seconds / 60;

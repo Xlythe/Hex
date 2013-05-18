@@ -19,16 +19,14 @@ public class Game implements Runnable, Serializable {
     public PlayingEntity player2;
     public int player1Type;
     public int player2Type;
-    public Thread gameThread;
     public long moveStart;
     public boolean replayRunning = false;
-    public GameListener gameListener;
+    public transient GameListener gameListener;
     public GameOptions gameOptions;
 
     public Game(GameOptions gameOptions, GameListener gameListener) {
         this.gameOptions = gameOptions;
         this.gameListener = gameListener;
-        gameThread = new Thread(this, "runningGame"); // Create a new thread.
 
         gamePiece = new RegularPolygonGameObject[gameOptions.gridSize][gameOptions.gridSize];
         for(int i = 0; i < gameOptions.gridSize; i++) {
@@ -48,12 +46,10 @@ public class Game implements Runnable, Serializable {
         gameListener.onStart();
         gameOver = false;
         gameRunning = true;
-        gameOptions.timer.game = this;
         player1.setTime(gameOptions.timer.totalTime);
         player2.setTime(gameOptions.timer.totalTime);
-        gameOptions.timer.start();
-        gameThread = new Thread(this, "runningGame");
-        gameThread.start();
+        gameOptions.timer.start(this);
+        new Thread(this, "runningGame").start();
     }
 
     public void stop() {
@@ -63,7 +59,6 @@ public class Game implements Runnable, Serializable {
         player1.quit();
         player2.quit();
         gameOver = true;
-        gameThread.setPriority(Thread.MIN_PRIORITY);
     }
 
     @Override
@@ -77,7 +72,7 @@ public class Game implements Runnable, Serializable {
                 player = GameAction.getPlayer(currentPlayer, this);
 
                 // Let the player make its move
-                player.getPlayerTurn();
+                player.getPlayerTurn(this);
 
                 // Update the timer
                 if(gameOptions.timer.type == 1) {
@@ -135,13 +130,14 @@ public class Game implements Runnable, Serializable {
         public Handler handler;
     }
 
-    public static class GameOptions {
+    public static class GameOptions implements Serializable {
+        private static final long serialVersionUID = 1L;
         public Timer timer;
         public int gridSize;
         public boolean swap;
     }
 
-    public static interface GameListener {
+    public static interface GameListener extends Serializable {
         public void onWin(PlayingEntity player);
 
         public void onClear();

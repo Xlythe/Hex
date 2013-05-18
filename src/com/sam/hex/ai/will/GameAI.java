@@ -1,8 +1,7 @@
 package com.sam.hex.ai.will;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 
 import com.sam.hex.BoardTools;
@@ -15,13 +14,14 @@ import com.sam.hex.ai.template.AI;
  * @author Will Harmon
  **/
 public class GameAI extends AI {
+    private static final long serialVersionUID = 1L;
     private byte[][] gameBoard;
     // n is the leftmost AI move, m is the rightmost AI move
     private int[] n = { 0, 0 }, m = { 0, 0 };
-    // List of pair-pieces
-    private List<List<List<Integer>>> pairs = new ArrayList<List<List<Integer>>>();
-    // List of the AI's state. Used when Undo is called.
-    private final List<AIHistoryObject> history = new LinkedList<AIHistoryObject>();
+    // ArrayList of pair-pieces
+    private ArrayList<ArrayList<ArrayList<Integer>>> pairs = new ArrayList<ArrayList<ArrayList<Integer>>>();
+    // ArrayList of the AI's state. Used when Undo is called.
+    private final ArrayList<AIHistoryObject> history = new ArrayList<AIHistoryObject>();
     private int rand_a = 0;
     private int rand_b = 0;
 
@@ -33,12 +33,13 @@ public class GameAI extends AI {
         }
     }
 
-    public class AIHistoryObject {
-        List<List<List<Integer>>> pairs = new ArrayList<List<List<Integer>>>();;
+    public class AIHistoryObject implements Serializable {
+        private static final long serialVersionUID = 1L;
+        ArrayList<ArrayList<ArrayList<Integer>>> pairs = new ArrayList<ArrayList<ArrayList<Integer>>>();;
         int[] n = { 0, 0 };
         int[] m = { 0, 0 };
 
-        public AIHistoryObject(List<List<List<Integer>>> pairs, int[] n, int[] m) {
+        public AIHistoryObject(ArrayList<ArrayList<ArrayList<Integer>>> pairs, int[] n, int[] m) {
             for(int i = 0; i < pairs.size(); i++) {
                 this.pairs.add(pairs.get(i));
             }
@@ -132,9 +133,9 @@ public class GameAI extends AI {
 
             // Add the edges as pairs after we've reached both sides of the map
             if(n[0] - 1 == 0) {
-                List<List<Integer>> pair = new LinkedList<List<Integer>>();
-                List<Integer> cord1 = new LinkedList<Integer>();
-                List<Integer> cord2 = new LinkedList<Integer>();
+                ArrayList<ArrayList<Integer>> pair = new ArrayList<ArrayList<Integer>>();
+                ArrayList<Integer> cord1 = new ArrayList<Integer>();
+                ArrayList<Integer> cord2 = new ArrayList<Integer>();
                 cord1.add(n[0] - 1);
                 cord1.add(n[1]);
                 pair.add(cord1);
@@ -146,9 +147,9 @@ public class GameAI extends AI {
                 n[0] = n[0] - 1;
             }
             if(m[0] + 1 == gameBoard.length - 1) {
-                List<List<Integer>> pair = new LinkedList<List<Integer>>();
-                List<Integer> cord1 = new LinkedList<Integer>();
-                List<Integer> cord2 = new LinkedList<Integer>();
+                ArrayList<ArrayList<Integer>> pair = new ArrayList<ArrayList<Integer>>();
+                ArrayList<Integer> cord1 = new ArrayList<Integer>();
+                ArrayList<Integer> cord2 = new ArrayList<Integer>();
                 cord1.add(m[0] + 1);
                 cord1.add(m[1]);
                 pair.add(cord1);
@@ -235,9 +236,9 @@ public class GameAI extends AI {
             // Check if we should extend to the left
             if(left()) {
                 if(gameBoard[n[x] - 1 * x - 1 * y][n[y] - 1 * y - 1 * x] != 0 && gameBoard[n[x] + 1 * x - 2 * y][n[y] + 1 * y - 2 * x] == 0) {
-                    List<List<Integer>> pair = new LinkedList<List<Integer>>();
-                    List<Integer> cord1 = new LinkedList<Integer>();
-                    List<Integer> cord2 = new LinkedList<Integer>();
+                    ArrayList<ArrayList<Integer>> pair = new ArrayList<ArrayList<Integer>>();
+                    ArrayList<Integer> cord1 = new ArrayList<Integer>();
+                    ArrayList<Integer> cord2 = new ArrayList<Integer>();
                     cord1.add(n[0] - 1);
                     cord1.add(n[1]);
                     pair.add(cord1);
@@ -253,9 +254,9 @@ public class GameAI extends AI {
                     return;
                 }
                 else if(gameBoard[n[x] + 1 * x - 2 * y][n[y] + 1 * y - 2 * x] != 0 && gameBoard[n[x] - 1 * x - 1 * y][n[y] - 1 * y - 1 * x] == 0) {
-                    List<List<Integer>> pair = new LinkedList<List<Integer>>();
-                    List<Integer> cord1 = new LinkedList<Integer>();
-                    List<Integer> cord2 = new LinkedList<Integer>();
+                    ArrayList<ArrayList<Integer>> pair = new ArrayList<ArrayList<Integer>>();
+                    ArrayList<Integer> cord1 = new ArrayList<Integer>();
+                    ArrayList<Integer> cord2 = new ArrayList<Integer>();
                     cord1.add(n[0]);
                     cord1.add(n[1] - 1);
                     pair.add(cord1);
@@ -275,9 +276,9 @@ public class GameAI extends AI {
             // Check if we should extend to the right
             if(right()) {
                 if(gameBoard[m[x] - 1 * x + 2 * y][m[y] - 1 * y + 2 * x] != 0 && gameBoard[m[x] + 1 * x + 1 * y][m[y] + 1 * y + 1 * x] == 0) {
-                    List<List<Integer>> pair = new LinkedList<List<Integer>>();
-                    List<Integer> cord1 = new LinkedList<Integer>();
-                    List<Integer> cord2 = new LinkedList<Integer>();
+                    ArrayList<ArrayList<Integer>> pair = new ArrayList<ArrayList<Integer>>();
+                    ArrayList<Integer> cord1 = new ArrayList<Integer>();
+                    ArrayList<Integer> cord2 = new ArrayList<Integer>();
                     cord1.add(m[0] + 1);
                     cord1.add(m[1]);
                     pair.add(cord1);
@@ -293,9 +294,9 @@ public class GameAI extends AI {
                     return;
                 }
                 else if(gameBoard[m[x] + 1 * x + 1 * y][m[y] + 1 * y + 1 * x] != 0 && gameBoard[m[x] - 1 * x + 2 * y][m[y] - 1 * y + 2 * x] == 0) {
-                    List<List<Integer>> pair = new LinkedList<List<Integer>>();
-                    List<Integer> cord1 = new LinkedList<Integer>();
-                    List<Integer> cord2 = new LinkedList<Integer>();
+                    ArrayList<ArrayList<Integer>> pair = new ArrayList<ArrayList<Integer>>();
+                    ArrayList<Integer> cord1 = new ArrayList<Integer>();
+                    ArrayList<Integer> cord2 = new ArrayList<Integer>();
                     cord1.add(m[0] + 1);
                     cord1.add(m[1]);
                     pair.add(cord1);
@@ -316,9 +317,9 @@ public class GameAI extends AI {
 
             // Extend left if we haven't gone right
             if(left() && rand == 0 && gameBoard[n[x] + 1 * x - 2 * y][n[y] + 1 * y - 2 * x] == 0) {
-                List<List<Integer>> pair = new LinkedList<List<Integer>>();
-                List<Integer> cord1 = new LinkedList<Integer>();
-                List<Integer> cord2 = new LinkedList<Integer>();
+                ArrayList<ArrayList<Integer>> pair = new ArrayList<ArrayList<Integer>>();
+                ArrayList<Integer> cord1 = new ArrayList<Integer>();
+                ArrayList<Integer> cord2 = new ArrayList<Integer>();
                 cord1.add(n[0] - 1);
                 cord1.add(n[1]);
                 pair.add(cord1);
@@ -334,9 +335,9 @@ public class GameAI extends AI {
                 return;
             }
             else if(left() && rand == 1 && gameBoard[n[x] - 1 * x - 1 * y][n[y] - 1 * y - 1 * x] == 0) {
-                List<List<Integer>> pair = new LinkedList<List<Integer>>();
-                List<Integer> cord1 = new LinkedList<Integer>();
-                List<Integer> cord2 = new LinkedList<Integer>();
+                ArrayList<ArrayList<Integer>> pair = new ArrayList<ArrayList<Integer>>();
+                ArrayList<Integer> cord1 = new ArrayList<Integer>();
+                ArrayList<Integer> cord2 = new ArrayList<Integer>();
                 cord1.add(n[0]);
                 cord1.add(n[1] - 1);
                 pair.add(cord1);
@@ -353,9 +354,9 @@ public class GameAI extends AI {
             }
             // Extend right if we haven't gone left
             if(right() && rand == 0 && gameBoard[m[x] - 1 * x + 2 * y][m[y] - 1 * y + 2 * x] == 0) {
-                List<List<Integer>> pair = new LinkedList<List<Integer>>();
-                List<Integer> cord1 = new LinkedList<Integer>();
-                List<Integer> cord2 = new LinkedList<Integer>();
+                ArrayList<ArrayList<Integer>> pair = new ArrayList<ArrayList<Integer>>();
+                ArrayList<Integer> cord1 = new ArrayList<Integer>();
+                ArrayList<Integer> cord2 = new ArrayList<Integer>();
                 cord1.add(m[0] + 1);
                 cord1.add(m[1]);
                 pair.add(cord1);
@@ -371,9 +372,9 @@ public class GameAI extends AI {
                 return;
             }
             else if(right() && rand == 1 && gameBoard[m[x] + 1 * x + 1 * y][m[y] + 1 * y + 1 * x] == 0) {
-                List<List<Integer>> pair = new LinkedList<List<Integer>>();
-                List<Integer> cord1 = new LinkedList<Integer>();
-                List<Integer> cord2 = new LinkedList<Integer>();
+                ArrayList<ArrayList<Integer>> pair = new ArrayList<ArrayList<Integer>>();
+                ArrayList<Integer> cord1 = new ArrayList<Integer>();
+                ArrayList<Integer> cord2 = new ArrayList<Integer>();
                 cord1.add(m[0] + 1);
                 cord1.add(m[1]);
                 pair.add(cord1);

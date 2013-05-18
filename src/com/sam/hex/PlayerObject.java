@@ -2,8 +2,6 @@ package com.sam.hex;
 
 import java.util.LinkedList;
 
-import com.sam.hex.net.MoveListener;
-
 import android.graphics.Point;
 
 public class PlayerObject implements PlayingEntity {
@@ -13,43 +11,43 @@ public class PlayerObject implements PlayingEntity {
     private int color;
     private long timeLeft;
     public final int team;
-    public final GameObject game;
+    public final Game game;
     private final LinkedList<Point> hex = new LinkedList<Point>();
-    
-    public PlayerObject(int team, GameObject game) {
-        this.team=team;
-        this.game=game;
+
+    public PlayerObject(int team, Game game) {
+        this.team = team;
+        this.game = game;
     }
-    
+
     @Override
     public void getPlayerTurn() {
-        if(hex(GET,null).size()>0 && hex(GET,null).get(0).equals(new Point(-1,-1))){
-            hex(GET,null).clear();
+        if(hex(GET, null).size() > 0 && hex(GET, null).get(0).equals(new Point(-1, -1))) {
+            hex(GET, null).clear();
         }
-        while (true) {
-            while (hex(GET,null).size()==0) {
+        while(true) {
+            while(hex(GET, null).size() == 0) {
                 try {
                     Thread.sleep(80);
-                } catch (InterruptedException e) {
+                }
+                catch(InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            if (hex(GET,null).get(0).equals(new Point(-1,-1))){
-                hex(GET,null).remove(0);
+            if(hex(GET, null).get(0).equals(new Point(-1, -1))) {
+                hex(GET, null).remove(0);
                 break;
             }
-            if (GameAction.makeMove(this, team, hex(GET,null).get(0), game)) {
-                hex(GET,null).remove(0);
+            if(GameAction.makeMove(this, team, hex(GET, null).get(0), game)) {
+                hex(GET, null).remove(0);
                 break;
             }
-            hex(GET,null).remove(0);
+            hex(GET, null).remove(0);
         }
     }
-    
+
     @Override
-    public void undoCalled(){
-    }
-    
+    public void undoCalled() {}
+
     @Override
     public void newgameCalled() {
         endMove();
@@ -71,12 +69,10 @@ public class PlayerObject implements PlayingEntity {
     }
 
     @Override
-    public void win() {
-    }
+    public void win() {}
 
     @Override
-    public void lose() {
-    }
+    public void lose() {}
 
     @Override
     public boolean supportsSave() {
@@ -85,7 +81,7 @@ public class PlayerObject implements PlayingEntity {
 
     @Override
     public void endMove() {
-        hex(SET, new Point(-1,-1));
+        hex(SET, new Point(-1, -1));
     }
 
     @Override
@@ -120,17 +116,16 @@ public class PlayerObject implements PlayingEntity {
 
     @Override
     public void setMove(final Object o, final Point point) {
-        if(o instanceof GameAction && game.currentPlayer==team) hex(SET,point);
-        else if(o instanceof MoveListener) hex.add(point);
+        if(o instanceof GameAction && game.currentPlayer == team) hex(SET, point);
     }
 
     @Override
     public boolean giveUp() {
         return false;
     }
-    
-    private synchronized LinkedList<Point> hex(int type, Point point){
-        if(type==SET){
+
+    private synchronized LinkedList<Point> hex(int type, Point point) {
+        if(type == SET) {
             hex.clear();
             hex.add(point);
         }

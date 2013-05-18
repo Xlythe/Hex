@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -24,6 +26,7 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.sam.hex.DialogBox;
+import com.sam.hex.HexGame;
 import com.sam.hex.R;
 
 public class FileExplore extends SherlockActivity {
@@ -189,24 +192,20 @@ public class FileExplore extends SherlockActivity {
                 // File picked
                 else {
                     new DialogBox(FileExplore.this, chosenFile, new DialogInterface.OnClickListener() {
+                        @Override
                         public void onClick(DialogInterface dialog, int which) {
                             switch(which) {
                             case DialogInterface.BUTTON_POSITIVE:
-                                Thread loading = new Thread(new ThreadGroup("Load"), new Load(new File(FileExplore.path + File.separator
-                                        + FileExplore.chosenFile)), "loading", 200000);
-                                loading.start();
-                                try {
-                                    loading.join();
-                                }
-                                catch(InterruptedException e) {
-                                    e.printStackTrace();
-                                }
+                                Intent intent = new Intent(FileExplore.this, HexGame.class);
+                                intent.setData(Uri.fromFile(new File(FileExplore.path + File.separator + FileExplore.chosenFile)));
+                                startActivity(intent);
                                 finish();
                                 break;
                             case DialogInterface.BUTTON_NEGATIVE:
                                 new File(path + "/" + chosenFile).delete();
                                 loadFileList();
                                 handle.post(new Runnable() {
+                                    @Override
                                     public void run() {
                                         loadFileList();
                                         refreshView();
@@ -228,6 +227,7 @@ public class FileExplore extends SherlockActivity {
                                                     }
                                                     new File(path + "/" + chosenFile).renameTo(new File(path + "/" + fileName));
                                                     handle.post(new Runnable() {
+                                                        @Override
                                                         public void run() {
                                                             loadFileList();
                                                             refreshView();

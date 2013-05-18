@@ -1,34 +1,34 @@
 package com.sam.hex.ai.template;
 
-import com.sam.hex.GameObject;
+import android.graphics.Point;
+
+import com.sam.hex.Game;
 import com.sam.hex.PlayerObject;
 import com.sam.hex.PlayingEntity;
-
-import android.graphics.Point;
 
 public class AI implements PlayingEntity {
     private String name;
     private int color;
     private long timeLeft;
     public final int team;
-    public final GameObject game;
+    public final Game game;
     private boolean skipMove = false;
-    
-    public AI(int team, GameObject game) {
-        this.team=team;
-        this.game=game;
+
+    public AI(int team, Game game) {
+        this.team = team;
+        this.game = game;
     }
-    
+
     @Override
     public void getPlayerTurn() {
         setSkipMove(false);
     }
-    
+
     @Override
-    public void undoCalled(){
+    public void undoCalled() {
         setSkipMove(true);
     }
-    
+
     @Override
     public void newgameCalled() {
         endMove();
@@ -36,10 +36,10 @@ public class AI implements PlayingEntity {
 
     @Override
     public boolean supportsUndo() {
-        if(team==1){
+        if(team == 1) {
             return game.player2 instanceof PlayerObject;
         }
-        else{
+        else {
             return game.player1 instanceof PlayerObject;
         }
     }
@@ -55,21 +55,19 @@ public class AI implements PlayingEntity {
     }
 
     @Override
-    public void win() {
-    }
+    public void win() {}
 
     @Override
-    public void lose() {
-    }
+    public void lose() {}
 
     @Override
     public boolean supportsSave() {
-//        if(team==1){
-//            return game.player2 instanceof PlayerObject;
-//        }
-//        else{
-//            return game.player1 instanceof PlayerObject;
-//        }
+        // if(team==1){
+        // return game.player2 instanceof PlayerObject;
+        // }
+        // else{
+        // return game.player1 instanceof PlayerObject;
+        // }
         return false;
     }
 
@@ -114,8 +112,7 @@ public class AI implements PlayingEntity {
     }
 
     @Override
-    public void setMove(Object o, Point hex) {
-    }
+    public void setMove(Object o, Point hex) {}
 
     public boolean getSkipMove() {
         return skipMove;

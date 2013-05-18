@@ -8,52 +8,54 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Environment;
 import android.text.InputType;
 import android.widget.EditText;
 
-import com.sam.hex.GameObject;
+import com.sam.hex.Game;
 import com.sam.hex.R;
 
 /**
  * @author Will Harmon
  **/
-public class Save{
+public class Save {
     public static String fileName;
-    private GameObject game;
-    
-    public Save(GameObject game){
+    private final Game game;
+
+    public Save(Game game) {
         this.game = game;
     }
-    
-    private void saveGame(String fileName){
+
+    private void saveGame(String fileName, Context context) {
         Thread saving = new Thread(new ThreadGroup("Save"), new save(), "saving", 200000);
         saving.start();
         try {
             saving.join();
-        } catch (InterruptedException e) {
+        }
+        catch(InterruptedException e) {
             e.printStackTrace();
         }
-        showSavedDialog(game.views.board.getContext().getString(R.string.saved));
+        showSavedDialog(context.getString(R.string.saved), context);
     }
-    
-    class save implements Runnable{
+
+    class save implements Runnable {
 
         @Override
         public void run() {
             createDirIfNoneExists(File.separator + "Hex" + File.separator);
             String file = Environment.getExternalStorageDirectory() + File.separator + "Hex" + File.separator + fileName;
-            if(file!=null){
-                if(!file.toLowerCase().endsWith(".rhex")){
+            if(file != null) {
+                if(!file.toLowerCase().endsWith(".rhex")) {
                     file = file + ".rhex";
                 }
                 try {
                     ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
 
-                    outputStream.writeObject(game.gridSize);
-                    outputStream.writeObject(game.swap);
+                    outputStream.writeObject(game.gameOptions.gridSize);
+                    outputStream.writeObject(game.gameOptions.swap);
                     outputStream.writeObject(game.player1Type);
                     outputStream.writeObject(game.player2Type);
                     outputStream.writeObject(game.player1.getColor());
@@ -62,57 +64,50 @@ public class Save{
                     outputStream.writeObject(game.player2.getName());
                     outputStream.writeObject(game.moveList);
                     outputStream.writeObject(game.moveNumber);
-                    outputStream.writeObject(0);//Timer type
-                    outputStream.writeObject((game.timer.totalTime/60)/1000);
-                    
+                    outputStream.writeObject(0);// Timer type
+                    outputStream.writeObject((game.gameOptions.timer.totalTime / 60) / 1000);
+
                     outputStream.flush();
                     outputStream.close();
-                } catch (IOException e) {
+                }
+                catch(IOException e) {
                     e.printStackTrace();
                 }
             }
         }
-        
+
     }
-    
+
     public static boolean createDirIfNoneExists(String path) {
         boolean ret = true;
 
         File file = new File(Environment.getExternalStorageDirectory(), path);
-        if (!file.exists()) {
-            if (!file.mkdirs()) {
+        if(!file.exists()) {
+            if(!file.mkdirs()) {
                 ret = false;
             }
         }
         return ret;
     }
-    
-    public void showSavingDialog(){
-        final EditText editText = new EditText(game.views.board.getContext());
+
+    public void showSavingDialog(final Context context) {
+        final EditText editText = new EditText(context);
         editText.setInputType(InputType.TYPE_CLASS_TEXT);
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
         editText.setText(dateFormat.format(date) + "");
-        AlertDialog.Builder builder = new AlertDialog.Builder(game.views.board.getContext());
-        builder     
-        .setTitle("Enter a filename")
-        .setView(editText)
-        .setPositiveButton("OK", new OnClickListener(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Enter a filename").setView(editText).setPositiveButton("OK", new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 fileName = editText.getText().toString();
-                saveGame(fileName);
+                saveGame(fileName, context);
             }
-        })
-        .setNegativeButton(game.views.board.getContext().getString(R.string.cancel), null)
-        .show();
+        }).setNegativeButton(context.getString(R.string.cancel), null).show();
     }
-    
-    private void showSavedDialog(String message){
-        AlertDialog.Builder builder = new AlertDialog.Builder(game.views.board.getContext());
-        builder     
-        .setTitle(message)
-        .setNeutralButton(game.views.board.getContext().getString(R.string.okay), null)
-        .show();
+
+    private void showSavedDialog(String message, Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(message).setNeutralButton(context.getString(R.string.okay), null).show();
     }
 }

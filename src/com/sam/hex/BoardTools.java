@@ -20,14 +20,14 @@ public class BoardTools {
 
     }
 
-    public static Bitmap getBackground(int w, int h, GameObject game) {
+    public static Bitmap getBackground(int width, int height, Game game) {
         // the background is drawn to this bitmap.
-        Bitmap background = Bitmap.createBitmap(Global.windowWidth, Global.windowHeight, Bitmap.Config.ARGB_8888);
+        Bitmap background = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         RegularPolygonGameObject[][] gamePeace = game.gamePiece;
-        double radius = BoardTools.radiusCalculator(Global.windowWidth, Global.windowHeight, game.gridSize);
+        double radius = BoardTools.radiusCalculator(width, height, game.gameOptions.gridSize);
         double hrad = radius * Math.sqrt(3) / 2; // Horizontal radius
-        int yOffset = (int) ((Global.windowHeight - ((3 * radius / 2) * (gamePeace[0].length - 1) + 2 * radius)) / 2);
-        int xOffset = (int) ((Global.windowWidth - (hrad * gamePeace.length * 2 + hrad * (gamePeace[0].length - 1))) / 2);
+        int yOffset = (int) ((height - ((3 * radius / 2) * (gamePeace[0].length - 1) + 2 * radius)) / 2);
+        int xOffset = (int) ((width - (hrad * gamePeace.length * 2 + hrad * (gamePeace[0].length - 1))) / 2);
         int aX = xOffset;
         int aY = yOffset + (int) radius / 2;
         int bX = xOffset + (int) ((gamePeace.length - 1) * hrad + gamePeace.length * hrad * 2);
@@ -40,26 +40,24 @@ public class BoardTools {
         int dY = yOffset + (int) radius / 4;
         double slope2 = (double) (dY - cY) / (dX - cX);
 
-        for(double x = 0; x < w; x++) {
-            for(double y = 0; y < h; y++) {
+        for(double x = 0; x < width; x++) {
+            for(double y = 0; y < height; y++) {
                 if(y > slope1 * x + (aY - aX * slope1) != y > slope2 * x + (cY - cX * slope2)) {
                     // if above line 1 == above line 2
-                    // if((y+x)/(((double)h+(double)w))<.5==((double)h/(double)w>y/x)){
                     background.setPixel((int) x, (int) y, game.player1.getColor());
                 }
                 else {
                     background.setPixel((int) x, (int) y, game.player2.getColor());
                 }
-                // (((h*w)-h)>y/x)
             }
         }
         return background;
 
     }
 
-    public static byte[][] teamGrid(GameObject game) {
+    public static byte[][] teamGrid(Game game) {
         // not yet in use but will be used to send netcode
-        byte[][] loyalty = new byte[game.gridSize][game.gridSize];
+        byte[][] loyalty = new byte[game.gameOptions.gridSize][game.gameOptions.gridSize];
         RegularPolygonGameObject[][] gamePeace = game.gamePiece;
         for(int x = 0; x < gamePeace.length; x++)
             for(int y = 0; y < gamePeace[0].length; y++)
@@ -67,13 +65,13 @@ public class BoardTools {
         return loyalty;
     }
 
-    public static void clearBoard(GameObject game) {
+    public static void clearBoard(Game game) {
         for(RegularPolygonGameObject[] things : game.gamePiece)
             for(RegularPolygonGameObject guy : things)
                 if(guy != null) guy.setTeam((byte) 0, game);
     }
 
-    public static void setBoard(GameObject game) {
+    public static void setBoard(Game game) {
         for(RegularPolygonGameObject[] things : game.gamePiece)
             for(@SuppressWarnings("unused")
             RegularPolygonGameObject guy : things)

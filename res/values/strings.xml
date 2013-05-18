@@ -4,6 +4,13 @@
     
     <!-- Application name -->
     <string name="app_name">Hex</string>
+    <string name="app_id">387298223585</string>
+    <string name="achievement_30_seconds">CgkI4cuX5qILEAIQAg</string>
+    <string name="achievement_fill_the_board">CgkI4cuX5qILEAIQAw</string>
+    <string name="achievement_novice">CgkI4cuX5qILEAIQBA</string>
+    <string name="achievement_intermediate">CgkI4cuX5qILEAIQBQ</string>
+    <string name="achievement_expert">CgkI4cuX5qILEAIQBg</string>
+    <string name="leaderboard_score">CgkI4cuX5qILEAIQAQ</string>
     
     <!-- Preferences -->
     <string name="preferences_title_options">Options</string>

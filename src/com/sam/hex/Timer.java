@@ -1,11 +1,9 @@
 package com.sam.hex;
 
-import android.view.View;
-
 /**
  * @author Will Harmon
  **/
-public class Timer implements Runnable{
+public class Timer implements Runnable {
     public static final int NO_TIMER = 0;
     public static final int PER_MOVE = 1;
     public static final int ENTIRE_MATCH = 2;
@@ -15,73 +13,65 @@ public class Timer implements Runnable{
     public int type;
     public long totalTime;
     public long additionalTime;
-    private GameObject game;
+    public Game game;
     private int currentPlayer;
-    
-    public Timer(GameObject game, long totalTime, long additionalTime, int type){
+
+    public Timer(Game game, long totalTime, long additionalTime, int type) {
         this.game = game;
-        this.totalTime = totalTime*60*1000;
-        this.additionalTime = additionalTime*1000;
+        this.totalTime = totalTime * 60 * 1000;
+        this.additionalTime = additionalTime * 1000;
         this.type = type;
         startTime = System.currentTimeMillis();
-        game.player1.setTime(this.totalTime);
-        game.player2.setTime(this.totalTime);
     }
-    
-    public void start(){
-        refresh=true;
-        if(type!=0){
-            game.views.handler.post(new Runnable(){
-                public void run(){
-                    game.views.timerText.setVisibility(View.VISIBLE);
-                }
-            });
+
+    public void start() {
+        refresh = true;
+        if(type != 0) {
+            game.gameListener.startTimer();
             new Thread(this).start();
         }
     }
-    
-    public void stop(){
-        refresh=false;
+
+    public void stop() {
+        refresh = false;
     }
-    
-    public void run(){
-        while(refresh){
-            elapsedTime = System.currentTimeMillis()-startTime;
+
+    @Override
+    public void run() {
+        while(refresh) {
+            elapsedTime = System.currentTimeMillis() - startTime;
             currentPlayer = game.currentPlayer;
-            
-            if(!game.gameOver){
+
+            if(!game.gameOver) {
                 GameAction.getPlayer(currentPlayer, game).setTime(calculatePlayerTime(currentPlayer));
-                if(GameAction.getPlayer(currentPlayer, game).getTime()>0){
+                if(GameAction.getPlayer(currentPlayer, game).getTime() > 0) {
                     displayTime();
                 }
-                else{
-                    GameAction.getPlayer(currentPlayer, game).endMove();
-                    game.views.board.postInvalidate();
+                else {
+                    PlayingEntity player = GameAction.getPlayer(currentPlayer, game);
+                    player.endMove();
+                    game.gameListener.onTurn(player);
                 }
             }
-            
+
             try {
                 Thread.sleep(1000);
-            } catch (InterruptedException e) {
+            }
+            catch(InterruptedException e) {
                 e.printStackTrace();
             }
         }
     }
-    
-    private long calculatePlayerTime(int player){
-        return totalTime-elapsedTime+totalTime-GameAction.getPlayer(player%2+1, game).getTime();
+
+    private long calculatePlayerTime(int player) {
+        return totalTime - elapsedTime + totalTime - GameAction.getPlayer(player % 2 + 1, game).getTime();
     }
-    
-    private void displayTime(){
-        game.views.handler.post(new Runnable(){
-            public void run(){
-                long millis = GameAction.getPlayer(game.currentPlayer, game).getTime();
-                int seconds = (int) (millis / 1000);
-                int minutes = seconds / 60;
-                seconds = seconds % 60;
-                game.views.timerText.setText(GameAction.insert(game.views.board.getContext().getString(R.string.timer),String.format("%d:%02d", minutes, seconds)));
-                game.views.timerText.invalidate();
-            }
-        });
+
+    private void displayTime() {
+        long millis = GameAction.getPlayer(game.currentPlayer, game).getTime();
+        int seconds = (int) (millis / 1000);
+        int minutes = seconds / 60;
+        seconds = seconds % 60;
+        game.gameListener.displayTime(minutes, seconds);
     }
 }

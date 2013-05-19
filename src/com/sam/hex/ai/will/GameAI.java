@@ -2,6 +2,7 @@ package com.sam.hex.ai.will;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Random;
 
 import com.sam.hex.BoardTools;
@@ -437,4 +438,20 @@ public class GameAI extends AI {
 
     @Override
     public void setMove(Game game, Object o, Point hex) {}
+
+    @Override
+    public Serializable getSaveState() {
+        return history;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void setSaveState(Serializable state) {
+        LinkedList<AIHistoryObject> history = (LinkedList<AIHistoryObject>) state;
+        this.history.clear();
+        for(AIHistoryObject ho : history) {
+            this.history.add(ho);
+        }
+        undoCalled();
+    }
 }

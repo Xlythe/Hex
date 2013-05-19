@@ -32,7 +32,7 @@ public interface PlayingEntity extends Serializable {
 
     /**
      * Will you allow a new game? Return true if your PlayingEntity supports new
-     * games Return false if it doesn't or if you want an asynchronous new game
+     * games. Return false if it doesn't or if you want an asynchronous new game
      * (such as in LAN or Net play)
      * */
     public boolean supportsNewgame();
@@ -49,6 +49,18 @@ public interface PlayingEntity extends Serializable {
      * false, the default human player will be saved instead.
      * */
     public boolean supportsSave();
+
+    /**
+     * Put everything you want to save in this one object. It will be passed to
+     * setSaveState() when the game is loaded up.
+     * */
+    public Serializable getSaveState();
+
+    /**
+     * What was once shall be again. You've been loaded so prepare to fight
+     * again.
+     * */
+    public void setSaveState(Serializable state);
 
     /**
      * The game is over. Die gracefully.

@@ -1,5 +1,8 @@
 package com.sam.hex;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import android.os.Handler;
@@ -40,6 +43,53 @@ public class Game implements Runnable, Serializable {
         currentPlayer = 1;
         gameRunning = true;
         gameOver = false;
+    }
+
+    private void writeObject(ObjectOutputStream outputStream) throws IOException {
+        outputStream.writeObject(gameOptions.gridSize);
+        outputStream.writeObject(gameOptions.swap);
+        outputStream.writeObject(player1Type);
+        outputStream.writeObject(player2Type);
+        outputStream.writeObject(player1.getColor());
+        outputStream.writeObject(player2.getColor());
+        outputStream.writeObject(player1.getName());
+        outputStream.writeObject(player2.getName());
+        outputStream.writeObject(moveList);
+        outputStream.writeObject(moveNumber);
+        outputStream.writeObject(0);// Timer type
+        outputStream.writeObject((gameOptions.timer.totalTime / 60) / 1000);
+    }
+
+    private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
+        int gridSize = (Integer) inputStream.readObject();
+        boolean swap = (Boolean) inputStream.readObject();
+        GameOptions go = new GameOptions();
+        go.gridSize = gridSize;
+        go.swap = swap;
+
+        player1 = new PlayerObject(1);
+        player2 = new PlayerObject(2);
+
+        player1Type = (Integer) inputStream.readObject();
+        player2Type = (Integer) inputStream.readObject();
+        player1.setColor((Integer) inputStream.readObject());
+        player2.setColor((Integer) inputStream.readObject());
+        player1.setName((String) inputStream.readObject());
+        player2.setName((String) inputStream.readObject());
+        moveList = (MoveList) inputStream.readObject();
+        moveNumber = (Integer) inputStream.readObject();
+        int timertype = (Integer) inputStream.readObject();
+        long timerlength = (Long) inputStream.readObject();
+        gameOptions.timer = new Timer(timerlength, 0, timertype);
+
+        inputStream.close();
+
+        currentPlayer = ((moveNumber + 1) % 2) + 1;
+        replayRunning = false;
+
+        // Does not support saving PlayingEntities yet
+        player1Type = 0;
+        player2Type = 0;
     }
 
     public void start() {

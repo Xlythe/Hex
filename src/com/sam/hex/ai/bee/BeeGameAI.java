@@ -1,6 +1,6 @@
 package com.sam.hex.ai.bee;
 
-import java.math.BigInteger;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,10 +20,11 @@ import com.sam.hex.ai.template.AI;
  * @version June 2006
  */
 public class BeeGameAI extends AI {
+    private static final long serialVersionUID = 1L;
     private final static int RED = 1, BLUE = 2;
     private final int MAX_DEPTH = 2, BEAM_SIZE = 5;
     private int[][] pieces;
-    private HashMap<BigInteger, Integer> lookUpTable;
+    private HashMap<Integer, Integer> lookUpTable;
 
     // List of the AI's state. Used when Undo is called.
     private final LinkedList<AIHistoryObject> history = new LinkedList<AIHistoryObject>();
@@ -51,14 +52,15 @@ public class BeeGameAI extends AI {
             pieces[i][pieces.length - 1] = RED;
             pieces[pieces.length - 1][i] = BLUE;
         }
-        lookUpTable = new HashMap<BigInteger, Integer>();
+        lookUpTable = new HashMap<Integer, Integer>();
     }
 
-    public class AIHistoryObject {
+    public class AIHistoryObject implements Serializable {
+        private static final long serialVersionUID = 1L;
         int[][] pieces;
-        HashMap<BigInteger, Integer> lookUpTable;
+        HashMap<Integer, Integer> lookUpTable;
 
-        public AIHistoryObject(int[][] pieces, HashMap<BigInteger, Integer> lookUpTable) {
+        public AIHistoryObject(int[][] pieces, HashMap<Integer, Integer> lookUpTable) {
             this.pieces = new int[pieces.length][pieces.length];
             for(int i = 0; i < pieces.length; i++) {
                 for(int j = 0; j < pieces.length; j++) {
@@ -396,7 +398,7 @@ public class BeeGameAI extends AI {
     private int evaluate() {
         // Checks if the board has been
         // evaluated before and if it has, returns the previous value.
-        BigInteger piecesString = piecesString();
+        Integer piecesString = piecesString();
         Integer piecesValue = lookUpTable.get(piecesString);
         if(piecesValue != null) return piecesValue.intValue();
 
@@ -599,7 +601,7 @@ public class BeeGameAI extends AI {
 
         // Stores the value of the current board in
         // the look-up table for future use.
-        lookUpTable.put(piecesString, new Integer(100 * (bluePotential - redPotential) - (blueMobility - redMobility)));
+        lookUpTable.put(piecesString, 100 * (bluePotential - redPotential) - (blueMobility - redMobility));
 
         // Returns the value of the board.
         return 100 * (bluePotential - redPotential) - (blueMobility - redMobility);
@@ -611,12 +613,12 @@ public class BeeGameAI extends AI {
      * 
      * @return the BigInteger representation
      */
-    private BigInteger piecesString() {
-        BigInteger value = new BigInteger(Integer.toString((pieces.length - 2)));
+    private Integer piecesString() {
+        Integer value = pieces.length - 2;
         for(int i = 1; i < pieces.length - 1; i++) {
             for(int j = 1; j < pieces.length - 1; j++) {
-                value = value.multiply(new BigInteger("3"));
-                value = value.add(new BigInteger(Integer.toString(pieces[i][j])));
+                value *= 3;
+                value += pieces[i][j];
             }
         }
         return value;
@@ -630,6 +632,22 @@ public class BeeGameAI extends AI {
 
     @Override
     public void setMove(Game game, Object o, Point hex) {}
+
+    @Override
+    public Serializable getSaveState() {
+        return history;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void setSaveState(Serializable state) {
+        LinkedList<AIHistoryObject> history = (LinkedList<AIHistoryObject>) state;
+        this.history.clear();
+        for(AIHistoryObject ho : history) {
+            this.history.add(ho);
+        }
+        undoCalled();
+    }
 }
 
 /**
@@ -679,7 +697,8 @@ class Move implements Comparable<Move> {
  * @author Konstantin Lopyrev
  * @version June 2006
  */
-class EvaluationNode {
+class EvaluationNode implements Serializable {
+    private static final long serialVersionUID = 1L;
     public HashSet<EvaluationNode> redNeighbours;
     public HashSet<EvaluationNode> blueNeighbours;
     public int row;

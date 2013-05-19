@@ -1,5 +1,6 @@
 package com.sam.hex;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 
 public class PlayerObject implements PlayingEntity {
@@ -128,4 +129,12 @@ public class PlayerObject implements PlayingEntity {
         }
         return hex;
     }
+
+    @Override
+    public Serializable getSaveState() {
+        return null;
+    }
+
+    @Override
+    public void setSaveState(Serializable state) {}
 }

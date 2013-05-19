@@ -2,6 +2,7 @@ package com.sam.hex.playgames;
 
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -31,11 +32,31 @@ public class LoginActivity extends BaseGameActivity {
         });
     }
 
-    @Override
-    public void onSignInFailed() {}
+    // private RoomConfig.Builder makeBasicRoomConfigBuilder() {
+    // return RoomConfig.builder(this)
+    // .setMessageReceivedListener(this)
+    // .setRoomStatusUpdateListener(this)
+    // }
 
     @Override
-    public void onSignInSucceeded() {}
+    public void onSignInSucceeded() {
+        // ...
+
+        if(getInvitationId() != null) {
+            // RoomConfigBuilder roomConfigBuilder =
+            // makeBasicRoomConfigBuilder();
+            // roomConfigBuilder.setInvitationIdToAccept(getInvitationId());
+            // getGamesClient().joinRoom(roomConfigBuilder.build());
+
+            // prevent screen from sleeping during handshake
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+            // go to game screen
+        }
+    }
+
+    @Override
+    public void onSignInFailed() {}
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -19,22 +19,23 @@ package com.sam.hex.playgames;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.google.android.gms.appstate.AppStateClient;
 import com.google.android.gms.games.GamesClient;
 import com.google.android.gms.plus.PlusClient;
+import com.sam.hex.activity.DefaultActivity;
 
 /**
  * Example base class for games. This implementation takes care of setting up
  * the GamesClient object and managing its lifecycle. Subclasses only need to
  * override the @link{#onSignInSucceeded} and @link{#onSignInFailed} abstract
  * methods. To initiate the sign-in flow, subclasses should call
- * @link{#beginUserInitiatedSignIn}.
+ * 
+ * @link{#beginUserInitiatedSignIn .
  * 
  * @author Bruno Oliveira (Google)
  * 
  */
-public abstract class BaseGameActivity extends SherlockFragmentActivity implements GameHelper.GameHelperListener {
+public abstract class BaseGameActivity extends DefaultActivity implements GameHelper.GameHelperListener {
 
     protected GameHelper mHelper;
 
@@ -59,7 +60,7 @@ public abstract class BaseGameActivity extends SherlockFragmentActivity implemen
     }
 
     @Override
-    protected void onCreate(Bundle b) {
+    public void onCreate(Bundle b) {
         super.onCreate(b);
         mHelper = new GameHelper(this);
         mHelper.setup(this, mRequestedClients);

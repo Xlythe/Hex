@@ -1,4 +1,4 @@
-package com.sam.hex;
+package com.sam.hex.playgames;
 
 import java.io.File;
 
@@ -17,9 +17,16 @@ import android.widget.TextView;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.sam.hex.BoardView;
+import com.sam.hex.Game;
 import com.sam.hex.Game.GameListener;
 import com.sam.hex.Game.GameOptions;
-import com.sam.hex.activity.DefaultActivity;
+import com.sam.hex.GameAction;
+import com.sam.hex.PlayerObject;
+import com.sam.hex.PlayingEntity;
+import com.sam.hex.Preferences;
+import com.sam.hex.R;
+import com.sam.hex.Timer;
 import com.sam.hex.ai.bee.BeeGameAI;
 import com.sam.hex.ai.will.GameAI;
 import com.sam.hex.replay.FileExplore;
@@ -27,7 +34,7 @@ import com.sam.hex.replay.Load;
 import com.sam.hex.replay.Replay;
 import com.sam.hex.replay.Save;
 
-public class HexGame extends DefaultActivity {
+public class NetHexGame extends BaseGameActivity {
     private static final String GAME = "game";
 
     private Game game;
@@ -532,5 +539,17 @@ public class HexGame extends DefaultActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(getString(R.string.confirmExit)).setPositiveButton(getString(R.string.yes), dialogClickListener)
                 .setNegativeButton(getString(R.string.no), dialogClickListener).show();
+    }
+
+    @Override
+    public void onSignInFailed() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onSignInSucceeded() {
+        // TODO Auto-generated method stub
+
     }
 }

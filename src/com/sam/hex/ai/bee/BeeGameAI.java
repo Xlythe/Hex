@@ -185,7 +185,7 @@ public class BeeGameAI extends AI
     for (int i = 0 ; i < BEAM_SIZE && iter.hasNext() ; i++)
     {
         // Gets the move value of the next move.
-        Move nextMove = (Move) iter.next();
+        Move nextMove = iter.next();
         pieces [nextMove.row] [nextMove.column] = currentColour;
         int value = expand (depth + 1, bestValue,
             currentColour == RED ? BLUE:
@@ -273,7 +273,7 @@ public class BeeGameAI extends AI
             while (iter.hasNext())
             {
 
-            EvaluationNode next = (EvaluationNode) iter.next();
+            EvaluationNode next = iter.next();
             int number = redA [next.row] [next.column];
             if (number < secondMin)
             {
@@ -316,7 +316,7 @@ public class BeeGameAI extends AI
 
             while (iter.hasNext())
             {
-            EvaluationNode next = (EvaluationNode) iter.next();
+            EvaluationNode next = iter.next();
             int number = redB [next.row] [next.column];
             if (number < secondMin)
             {
@@ -359,7 +359,7 @@ public class BeeGameAI extends AI
 
             while (iter.hasNext())
             {
-            EvaluationNode next = (EvaluationNode) iter.next();
+            EvaluationNode next = iter.next();
             int number = blueA [next.row] [next.column];
             if (number < secondMin)
             {
@@ -401,7 +401,7 @@ public class BeeGameAI extends AI
 
             while (iter.hasNext())
             {
-            EvaluationNode next = (EvaluationNode) iter.next();
+            EvaluationNode next = iter.next();
             int number = blueB [next.row] [next.column];
             if (number < secondMin)
             {
@@ -515,7 +515,7 @@ public class BeeGameAI extends AI
             while (iter.hasNext())
             {
 
-            EvaluationNode next = (EvaluationNode) iter.next();
+            EvaluationNode next = iter.next();
             int number = redA [next.row] [next.column];
             if (number < secondMin)
             {
@@ -558,7 +558,7 @@ public class BeeGameAI extends AI
 
             while (iter.hasNext())
             {
-            EvaluationNode next = (EvaluationNode) iter.next();
+            EvaluationNode next = iter.next();
             int number = redB [next.row] [next.column];
             if (number < secondMin)
             {
@@ -601,7 +601,7 @@ public class BeeGameAI extends AI
 
             while (iter.hasNext())
             {
-            EvaluationNode next = (EvaluationNode) iter.next();
+            EvaluationNode next = iter.next();
             int number = blueA [next.row] [next.column];
             if (number < secondMin)
             {
@@ -644,7 +644,7 @@ public class BeeGameAI extends AI
 
             while (iter.hasNext())
             {
-            EvaluationNode next = (EvaluationNode) iter.next();
+            EvaluationNode next = iter.next();
             int number = blueB [next.row] [next.column];
             if (number < secondMin)
             {
@@ -763,6 +763,7 @@ class Move implements Comparable<Move>
     *@param other   the object to compare to
     *@return    0 if equals, -ve if less than, +ve if greater than
     */
+    @Override
     public int compareTo (Move other)
     {
     return this.value - other.value;
@@ -867,6 +868,7 @@ class EvaluationNode
     /** Returns a hashCode for the current EvaluationNode
     *@return    the hash code
     */
+    @Override
     public int hashCode()
     {
     return row * 100 + column;
@@ -877,6 +879,7 @@ class EvaluationNode
     *@param other   the object to compare to
     *@return    true if equal, false otherwise
     */
+    @Override
     public boolean equals (Object other)
     {
     EvaluationNode otherNode = (EvaluationNode) other;

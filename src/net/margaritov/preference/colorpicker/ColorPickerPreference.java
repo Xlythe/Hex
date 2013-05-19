@@ -164,6 +164,7 @@ public class ColorPickerPreference
         }
     }
 
+    @Override
     public boolean onPreferenceClick(Preference preference) {
         ColorPickerDialog picker = new ColorPickerDialog(getContext(), getValue());
         picker.setOnColorChangedListener(this);

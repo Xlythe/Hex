@@ -50,6 +50,7 @@ public class WaitingRoomActivity extends DefaultActivity {
     public static LinkedList<String> messages = new LinkedList<String>();
     private RefreshGamePlayerlist refreshPlayers;
     private Runnable startGame = new Runnable() {
+        @Override
         public void run() {
             NetHexGame.startNewGame = true;
             startActivity(new Intent(getBaseContext(), NetHexGame.class));
@@ -65,6 +66,7 @@ public class WaitingRoomActivity extends DefaultActivity {
 
         Button submit = (Button) findViewById(R.id.submit);
         submit.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
                 sendMessage(WaitingRoomActivity.this.findViewById(R.id.body), (EditText) findViewById(R.id.sendMessage));
             }
@@ -72,6 +74,7 @@ public class WaitingRoomActivity extends DefaultActivity {
 
         EditText text = (EditText) findViewById(R.id.sendMessage);
         text.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if(actionId == EditorInfo.IME_ACTION_DONE || event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                     sendMessage(WaitingRoomActivity.this.findViewById(R.id.body), v);
@@ -85,8 +88,10 @@ public class WaitingRoomActivity extends DefaultActivity {
         Button start = new Button(this);
         start.setText(this.getString(R.string.ready));
         start.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
                 new Thread(new Runnable() {
+                    @Override
                     public void run() {
                         try {
                             ParsedDataset parsedDataset = igGameCenter.ready(NetGlobal.server, NetGlobal.uid, NetGlobal.session_id, NetGlobal.sid,
@@ -114,6 +119,7 @@ public class WaitingRoomActivity extends DefaultActivity {
         lobby.addFooterView(start);
 
         refreshPlayers = new RefreshGamePlayerlist(new Handler(), new Runnable() {
+            @Override
             public void run() {
                 refreshPlayers(WaitingRoomActivity.this.findViewById(R.id.body), WaitingRoomActivity.this);
                 refreshMessages(WaitingRoomActivity.this.findViewById(R.id.body));
@@ -153,6 +159,7 @@ public class WaitingRoomActivity extends DefaultActivity {
             return true;
         case R.id.quit:
             DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
                 public void onClick(DialogInterface dialog, int which) {
                     switch(which) {
                     case DialogInterface.BUTTON_POSITIVE:
@@ -182,6 +189,7 @@ public class WaitingRoomActivity extends DefaultActivity {
         }
 
         new Thread(new Runnable() {
+            @Override
             public void run() {
                 try {
                     ParsedDataset parsedDataset = igGameCenter.sendMessage(NetGlobal.server, NetGlobal.uid, NetGlobal.session_id, NetGlobal.sid, message,
@@ -290,6 +298,7 @@ public class WaitingRoomActivity extends DefaultActivity {
         builder.setMessage(this.getText(R.string.createBoard));
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch(which) {
                 case DialogInterface.BUTTON_POSITIVE:

@@ -46,6 +46,7 @@ public class GameAI extends AI {
             this.m[1] = m[1];
         }
         
+        @Override
         public String toString(){
             return pairs.toString()+" : "+n.toString()+" : "+m.toString();
         }

@@ -52,6 +52,7 @@ public class NetHexGame extends DefaultActivity {
     public static boolean startNewGame = true;
     public static boolean justStart = false;
     private Runnable startnewgame = new Runnable() {
+        @Override
         public void run() {
             HexGame.stopGame(NetGlobal.game);
             startActivity(new Intent(getBaseContext(), WaitingRoomActivity.class));
@@ -97,9 +98,11 @@ public class NetHexGame extends DefaultActivity {
         NetGlobal.game.views.replayButtons = (RelativeLayout) this.findViewById(R.id.replayButtons);
 
         new Thread(new Runnable() {
+            @Override
             public void run() {
                 while(!NetGlobal.game.gameOver) {
                     NetGlobal.game.views.handler.post(new Runnable() {
+                        @Override
                         public void run() {
                             if(GameAction.getPlayer(NetGlobal.game.currentPlayer, NetGlobal.game) instanceof NetPlayerObject
                                     && !(GameAction.getPlayer(NetGlobal.game.currentPlayer % 2 + 1, NetGlobal.game) instanceof NetPlayerObject)) for(int i = 0; i < NetGlobal.members
@@ -107,6 +110,7 @@ public class NetHexGame extends DefaultActivity {
                                 if(NetGlobal.members.get(i).place == NetGlobal.game.currentPlayer) {
                                     if(NetGlobal.members.get(i).lastRefresh > 300) {
                                         NetGlobal.game.views.handler.post(new Runnable() {
+                                            @Override
                                             public void run() {
                                                 NetGlobal.game.views.timerText.setVisibility(View.GONE);
                                             }
@@ -117,6 +121,7 @@ public class NetHexGame extends DefaultActivity {
                                             @Override
                                             public void onClick(View v) {
                                                 new Thread(new Runnable() {
+                                                    @Override
                                                     public void run() {
                                                         try {
                                                             ParsedDataset parsedDataset = igGameCenter.claimVictory(NetGlobal.server, NetGlobal.uid,
@@ -241,6 +246,7 @@ public class NetHexGame extends DefaultActivity {
         switch(item.getItemId()) {
         case R.id.newgame:
             DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
                 public void onClick(DialogInterface dialog, int which) {
                     switch(which) {
                     case DialogInterface.BUTTON_POSITIVE:
@@ -278,6 +284,7 @@ public class NetHexGame extends DefaultActivity {
 
     private void quit() {
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch(which) {
                 case DialogInterface.BUTTON_POSITIVE:
@@ -341,6 +348,7 @@ public class NetHexGame extends DefaultActivity {
 
                 Button submit = (Button) waitingRoom.findViewById(R.id.submit);
                 submit.setOnClickListener(new View.OnClickListener() {
+                    @Override
                     public void onClick(View v) {
                         WaitingRoomActivity.sendMessage(waitingRoom, (EditText) waitingRoom.findViewById(R.id.sendMessage));
                     }
@@ -348,6 +356,7 @@ public class NetHexGame extends DefaultActivity {
 
                 EditText text = (EditText) waitingRoom.findViewById(R.id.sendMessage);
                 text.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                    @Override
                     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                         if(actionId == EditorInfo.IME_ACTION_DONE || event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                             WaitingRoomActivity.sendMessage(waitingRoom, v);
@@ -359,9 +368,11 @@ public class NetHexGame extends DefaultActivity {
                 final Handler handler = new Handler();
 
                 new Thread(new Runnable() {
+                    @Override
                     public void run() {
                         while(inWaitingRoom) {
                             handler.post(new Runnable() {
+                                @Override
                                 public void run() {
                                     WaitingRoomActivity.refreshPlayers(waitingRoom, NetHexGame.this);
                                     WaitingRoomActivity.refreshMessages(waitingRoom);

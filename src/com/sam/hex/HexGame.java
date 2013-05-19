@@ -95,11 +95,13 @@ public class HexGame extends DefaultActivity {
         // Set players
         setType(prefs, Global.GAME_LOCATION, Global.game);
         setPlayer1(Global.game, new Runnable() {
+            @Override
             public void run() {
                 initializeNewGame();
             }
         });
         setPlayer2(Global.game, new Runnable() {
+            @Override
             public void run() {
                 initializeNewGame();
             }
@@ -305,6 +307,7 @@ public class HexGame extends DefaultActivity {
 
     private void newGame() {
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch(which) {
                 case DialogInterface.BUTTON_POSITIVE:
@@ -337,8 +340,8 @@ public class HexGame extends DefaultActivity {
         if(gameLocation == Global.GAME_LOCATION) {
             return (Integer.decode(prefs.getString("gameSizePref", "7")) != game.gridSize && Integer.decode(prefs.getString("gameSizePref", "7")) != 0)
                     || (Integer.decode(prefs.getString("customGameSizePref", "7")) != game.gridSize && Integer.decode(prefs.getString("gameSizePref", "7")) == 0)
-                    || Integer.decode(prefs.getString("player1Type", "1")) != (int) game.player1Type
-                    || Integer.decode(prefs.getString("player2Type", "0")) != (int) game.player2Type
+                    || Integer.decode(prefs.getString("player1Type", "1")) != game.player1Type
+                    || Integer.decode(prefs.getString("player2Type", "0")) != game.player2Type
                     || Integer.decode(prefs.getString("timerTypePref", "0")) != game.timer.type
                     || Integer.decode(prefs.getString("timerPref", "0")) * 60 * 1000 != game.timer.totalTime;
         }
@@ -355,12 +358,14 @@ public class HexGame extends DefaultActivity {
         Global.game.clearBoard();
 
         replayThread = new Thread(new Replay(time, new Handler(), new Runnable() {
+            @Override
             public void run() {
                 Global.game.views.timerText.setVisibility(View.GONE);
                 Global.game.views.winnerText.setVisibility(View.GONE);
                 // Global.replayButtons.setVisibility(View.VISIBLE);
             }
         }, new Runnable() {
+            @Override
             public void run() {
                 if(Global.game.timer.type != 0) Global.game.views.timerText.setVisibility(View.VISIBLE);
                 // Global.replayButtons.setVisibility(View.GONE);
@@ -371,6 +376,7 @@ public class HexGame extends DefaultActivity {
 
     private void quit() {
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch(which) {
                 case DialogInterface.BUTTON_POSITIVE:

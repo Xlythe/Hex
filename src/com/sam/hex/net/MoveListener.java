@@ -153,6 +153,7 @@ public class MoveListener implements Runnable{
                             new DialogBox(game.views.board.getContext(),
                                     GameAction.insert(game.views.board.getContext().getString(R.string.newLANGame), player.getName()),
                                     new DialogInterface.OnClickListener() {
+                                        @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             switch (which){
                                             case DialogInterface.BUTTON_POSITIVE:

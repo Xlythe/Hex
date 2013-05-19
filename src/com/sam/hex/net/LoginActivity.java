@@ -47,6 +47,7 @@ public class LoginActivity extends DefaultActivity {
         username.setText(settings.getString("netUsername", ""));
         final EditText password = (EditText) findViewById(R.id.password);
         enter.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
                 new Thread(new Runnable() {
                     @Override
@@ -64,6 +65,7 @@ public class LoginActivity extends DefaultActivity {
                             else {
                                 System.out.println(parsedDataset.getErrorMessage());
                                 new DialogBox(LoginActivity.this, context.getString(R.string.loginFailed), new DialogInterface.OnClickListener() {
+                                    @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         switch(which) {
                                         case DialogInterface.BUTTON_POSITIVE:
@@ -97,6 +99,7 @@ public class LoginActivity extends DefaultActivity {
 
         Button register = (Button) findViewById(R.id.registerEnter);
         register.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
                 startActivity(new Intent(getBaseContext(), RegistrationActivity.class));
                 finish();
@@ -110,6 +113,7 @@ public class LoginActivity extends DefaultActivity {
 
         if(!isOnline()) {
             DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
                 public void onClick(DialogInterface dialog, int which) {
                     switch(which) {
                     case DialogInterface.BUTTON_POSITIVE:

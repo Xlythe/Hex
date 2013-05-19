@@ -189,6 +189,7 @@ public class FileExplore extends SherlockActivity {
                 // File picked
                 else {
                     new DialogBox(FileExplore.this, chosenFile, new DialogInterface.OnClickListener() {
+                        @Override
                         public void onClick(DialogInterface dialog, int which) {
                             switch(which) {
                             case DialogInterface.BUTTON_POSITIVE:
@@ -207,6 +208,7 @@ public class FileExplore extends SherlockActivity {
                                 new File(path + "/" + chosenFile).delete();
                                 loadFileList();
                                 handle.post(new Runnable() {
+                                    @Override
                                     public void run() {
                                         loadFileList();
                                         refreshView();
@@ -228,6 +230,7 @@ public class FileExplore extends SherlockActivity {
                                                     }
                                                     new File(path + "/" + chosenFile).renameTo(new File(path + "/" + fileName));
                                                     handle.post(new Runnable() {
+                                                        @Override
                                                         public void run() {
                                                             loadFileList();
                                                             refreshView();

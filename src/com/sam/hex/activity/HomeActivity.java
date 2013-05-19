@@ -19,6 +19,6 @@ public class HomeActivity extends SherlockActivity {
         int titleId = Resources.getSystem().getIdentifier("action_bar_title", "id", "android");
         if(0 == titleId) titleId = com.actionbarsherlock.R.id.abs__action_bar_title;
         TextView title = (TextView) findViewById(titleId);
-        title.setTextColor(Color.WHITE);
+        if(title != null) title.setTextColor(Color.WHITE);
     }
 }

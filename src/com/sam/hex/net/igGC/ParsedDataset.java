@@ -28,6 +28,7 @@ public class ParsedDataset {
             this.uid = uid;
             this.server = server;
         }
+        @Override
         public String toString(){
             String str = "";
             for(int i=0;i<members.size();i++){
@@ -67,6 +68,7 @@ public class ParsedDataset {
             this.timerLeft = timerLeft;
             this.lastRefresh = lastRefresh;
         }
+        @Override
         public String toString(){
             return name;
         }

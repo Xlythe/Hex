@@ -32,6 +32,7 @@ public class Timer implements Runnable{
         refresh=true;
         if(type!=0){
             game.views.handler.post(new Runnable(){
+                @Override
                 public void run(){
                     game.views.timerText.setVisibility(View.VISIBLE);
                 }
@@ -44,6 +45,7 @@ public class Timer implements Runnable{
         refresh=false;
     }
     
+    @Override
     public void run(){
         while(refresh){
             elapsedTime = System.currentTimeMillis()-startTime;
@@ -74,6 +76,7 @@ public class Timer implements Runnable{
     
     private void displayTime(){
         game.views.handler.post(new Runnable(){
+            @Override
             public void run(){
                 long millis = GameAction.getPlayer(game.currentPlayer, game).getTime();
                 int seconds = (int) (millis / 1000);

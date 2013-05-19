@@ -2,7 +2,7 @@
     style="@style/ActionBarCompat" android:background="@color/white">
     <ImageButton 
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
+        android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:id="@+id/p1"
         android:src="@drawable/ic_menu_friend"
@@ -11,7 +11,7 @@
         android:contentDescription="@null"/>
     <ImageButton 
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
+        android:layout_height="match_parent"
         android:layout_toRightOf="@id/p1"
         android:id="@+id/p2"
         android:src="@drawable/ic_menu_friend"
@@ -20,12 +20,12 @@
         android:contentDescription="@null"/>
     <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
+        android:layout_height="match_parent"
         android:visibility="gone"
         android:id="@+id/replayButtons">
         <ImageButton 
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:id="@+id/replayForward"
             android:src="@drawable/ic_media_ff"
@@ -34,7 +34,7 @@
             android:contentDescription="@null"/>
         <ImageButton 
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_height="match_parent"
             android:layout_toLeftOf="@id/replayForward"
             android:id="@+id/replayPlayPause"
             android:src="@drawable/ic_media_pause"
@@ -43,7 +43,7 @@
             android:contentDescription="@null"/>
         <ImageButton 
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_height="match_parent"
             android:layout_toLeftOf="@id/replayPlayPause"
             android:id="@+id/replayBack"
             android:src="@drawable/ic_media_rew"
@@ -53,7 +53,7 @@
     </RelativeLayout>
     <TextView
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
+        android:layout_height="match_parent"
         android:layout_alignParentRight="true"
         android:text="@null"
         android:id="@+id/timer"
@@ -63,7 +63,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"/>
     <TextView
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
+        android:layout_height="match_parent"
         android:layout_alignParentRight="true"
         android:text="@null"
         android:id="@+id/winner"
@@ -73,7 +73,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"/>
     <Button
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
+        android:layout_height="match_parent"
         android:layout_alignParentRight="true"
         android:text="@string/claimVictory"
         android:id="@+id/claimVictory"

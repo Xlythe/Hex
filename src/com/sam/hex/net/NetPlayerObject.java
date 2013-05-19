@@ -33,6 +33,7 @@ public class NetPlayerObject extends PlayerObject {
     public void getPlayerTurn() {
         if(game.moveNumber>1 && !(GameAction.getPlayer((team%2+1),game) instanceof NetPlayerObject)){
             new Thread(new Runnable(){
+                @Override
                 public void run(){
                     try {
                         ParsedDataset parsedDataset = igGC.move(GameAction.pointToString(new Point(game.moveList.getmove().getX(),game.moveList.getmove().getY()),game), NetGlobal.lasteid);
@@ -86,6 +87,7 @@ public class NetPlayerObject extends PlayerObject {
     @Override
     public boolean supportsUndo() {
         new Thread(new Runnable(){
+            @Override
             public void run(){
                 try {
                     ParsedDataset parsedDataset = igGC.requestUndo((game.moveNumber-1), NetGlobal.lasteid);
@@ -110,6 +112,7 @@ public class NetPlayerObject extends PlayerObject {
     public boolean supportsNewgame() {
         if(!game.gameOver){
             new Thread(new Runnable(){
+                @Override
                 public void run(){
                     try {
                         ParsedDataset parsedDataset = igGC.quit(NetGlobal.lasteid);
@@ -129,6 +132,7 @@ public class NetPlayerObject extends PlayerObject {
             }).start();
         }
         new Thread(new Runnable(){
+            @Override
             public void run(){
                 try {
                     ParsedDataset parsedDataset = igGC.rematch(NetGlobal.lasteid);
@@ -153,6 +157,7 @@ public class NetPlayerObject extends PlayerObject {
     public void quit() {
         if(!game.gameOver){
             new Thread(new Runnable(){
+                @Override
                 public void run(){
                     try {
                         ParsedDataset parsedDataset = igGC.quit(NetGlobal.lasteid);
@@ -182,6 +187,7 @@ public class NetPlayerObject extends PlayerObject {
     public void lose() {
         if(game.moveNumber>1 && !(GameAction.getPlayer((team%2+1),game) instanceof NetPlayerObject)){
             new Thread(new Runnable(){
+                @Override
                 public void run(){
                     try {
                         ParsedDataset parsedDataset = igGC.move(GameAction.pointToString(new Point(game.moveList.getmove().getX(),game.moveList.getmove().getY()),game), NetGlobal.lasteid);

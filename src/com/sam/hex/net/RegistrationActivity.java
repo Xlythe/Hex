@@ -44,6 +44,7 @@ public class RegistrationActivity extends DefaultActivity {
         final EditText password = (EditText) findViewById(R.id.password);
         final EditText email = (EditText) findViewById(R.id.email);
         enter.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
                 new Thread(new Runnable() {
                     @Override
@@ -89,6 +90,7 @@ public class RegistrationActivity extends DefaultActivity {
 
         if(!isOnline()) {
             DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
                 public void onClick(DialogInterface dialog, int which) {
                     switch(which) {
                     case DialogInterface.BUTTON_POSITIVE:

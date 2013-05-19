@@ -46,6 +46,7 @@ public class NetLobbyActivity extends DefaultActivity {
     RefreshPlayerlist refreshPlayers;
     final Handler handler = new Handler();
     final Runnable updateResults = new Runnable() {
+        @Override
         public void run() {
             updateResultsInUi();
         }
@@ -73,6 +74,7 @@ public class NetLobbyActivity extends DefaultActivity {
         else {
             if(!isOnline()) {
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch(which) {
                         case DialogInterface.BUTTON_POSITIVE:
@@ -105,6 +107,7 @@ public class NetLobbyActivity extends DefaultActivity {
                         else {
                             System.out.println(parsedDataset.getErrorMessage());
                             new DialogBox(NetLobbyActivity.this, NetLobbyActivity.this.getString(R.string.loginFailed), new DialogInterface.OnClickListener() {
+                                @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     switch(which) {
                                     case DialogInterface.BUTTON_POSITIVE:
@@ -174,6 +177,7 @@ public class NetLobbyActivity extends DefaultActivity {
             return true;
         case R.id.quit:
             DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
                 public void onClick(DialogInterface dialog, int which) {
                     switch(which) {
                     case DialogInterface.BUTTON_POSITIVE:
@@ -300,6 +304,7 @@ public class NetLobbyActivity extends DefaultActivity {
         builder.setMessage(this.getText(R.string.createBoard));
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch(which) {
                 case DialogInterface.BUTTON_POSITIVE:

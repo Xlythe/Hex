@@ -51,6 +51,7 @@ public class BoardView extends View{
         this.setOnTouchListener(new TouchListener(game));
     }
     
+    @Override
     protected void onDraw(Canvas canvas){
         int n = game.gridSize;
         
@@ -98,7 +99,7 @@ public class BoardView extends View{
         
         //Shape of a hexagon
           Path path = new Path();
-        path.moveTo((float)0, (float)-radius);
+        path.moveTo(0, (float)-radius);
         path.lineTo((float)hrad, (float)-radius/2);
         path.lineTo((float)hrad, (float)radius/2);
         path.lineTo(0,(float)radius);
@@ -184,6 +185,7 @@ public class BoardView extends View{
         public TouchListener(GameObject game){
             this.game = game;
         }
+        @Override
         public boolean onTouch(View v, MotionEvent event){
             int eventaction = event.getAction();
             if(eventaction==MotionEvent.ACTION_UP){

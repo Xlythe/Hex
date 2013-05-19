@@ -29,6 +29,7 @@ public class StartUpActivity extends HomeActivity {
         // Second button
         final Button instructionsButton = (Button) findViewById(R.id.instructionsButton);
         instructionsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
                 startActivity(new Intent(getBaseContext(), InstructionsActivity.class));
             }
@@ -37,6 +38,7 @@ public class StartUpActivity extends HomeActivity {
         // Third button
         final Button optionsButton = (Button) findViewById(R.id.optionsButton);
         optionsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
                 startActivity(new Intent(getBaseContext(), Preferences.class));
             }
@@ -51,6 +53,7 @@ public class StartUpActivity extends HomeActivity {
         // Refresh first button
         final Button startButton = (Button) findViewById(R.id.startButton);
         startButton.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
                 startActivity(new Intent(getBaseContext(), HexGame.class));
             }
@@ -68,6 +71,7 @@ public class StartUpActivity extends HomeActivity {
         if(HexGame.somethingChanged(prefs, NetGlobal.GAME_LOCATION, NetGlobal.game)) {
             onlineButton.setText(R.string.online);
             onlineButton.setOnClickListener(new View.OnClickListener() {
+                @Override
                 public void onClick(View v) {
                     startActivity(new Intent(getBaseContext(), NetLobbyActivity.class));
                 }
@@ -76,6 +80,7 @@ public class StartUpActivity extends HomeActivity {
         else {
             onlineButton.setText(R.string.resume);
             onlineButton.setOnClickListener(new View.OnClickListener() {
+                @Override
                 public void onClick(View v) {
                     startActivity(new Intent(getBaseContext(), NetHexGame.class));
                 }

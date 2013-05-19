@@ -203,6 +203,7 @@ public class GameAction {
     public static class AnnounceWinner{
         public AnnounceWinner(final int team, final GameObject game){
             game.views.handler.post(new Runnable(){
+                @Override
                 public void run(){
                     game.winnerMsg = insert(game.views.board.getContext().getString(R.string.winner), getPlayer(team, game).getName());
                     game.views.winnerText.setText(game.winnerMsg);

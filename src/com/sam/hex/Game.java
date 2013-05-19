@@ -66,6 +66,7 @@ public class Game implements Runnable, Serializable {
         PlayingEntity player;
 
         // Loop the game
+        gameListener.onTurn(player1);
         while(gameRunning) {
             if(!checkForWinner()) {
                 moveStart = System.currentTimeMillis();

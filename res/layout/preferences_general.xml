@@ -7,13 +7,13 @@
 	        android:title="@string/gameSizeTitle"
 	        android:summary="@string/gameSizeSummary"
 	        android:key="gameSizePref"
-	        android:defaultValue="7"
+	        android:defaultValue="@integer/DEFAULT_BOARD_SIZE"
 	        android:entries="@array/gameSizeArray"
 	        android:entryValues="@array/gameSizeValues" />
 	    <CheckBoxPreference
 	        android:title="@string/swapTitle"
 	        android:summary="@string/swapSummary"
-	        android:defaultValue="true"
+	        android:defaultValue="@bool/DEFAULT_SWAP_ENABLED"
 	        android:key="swapPref" />
 	    <Preference
 	        android:title="@string/timerTitle"

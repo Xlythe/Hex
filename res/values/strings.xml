@@ -16,10 +16,7 @@
     <string name="preferences_title_options">Options</string>
     <string name="preferences_title_reset">Reset</string>
     
-    <string name="preferences">Settings (Local)</string>
-    <string name="preferences_net">Settings (Online)</string>
-    <string name="gameLocationTitle">Local or Online</string>
-    <string name="gameLocationSummary">Switch between local settings and online settings</string>
+    <string name="preferences">Settings</string>
     <string name="gameSizeTitle">Board Size</string>
     <string name="gameSizeSummary">Pick a size for the gameboard (Current: 7x7)</string>
     <string name="gameSizeSummary_onChange">Pick a size for the gameboard (Current: #x#)</string>
@@ -50,14 +47,6 @@
     <string name="player2TypeSummary_onChange">Type: #</string>
     <string name="player2ColorTitle">Player2\'s Color</string>
     <string name="player2ColorSummary">Pick a color for Player2</string>
-    
-    <string name="netUsernameTitle">Username</string>
-    <string name="netUsernameSummary">Username to sign into igGC</string>
-    <string name="netPasswordTitle">Password</string>
-    <string name="netPasswordSummary">Password to sign into igGC</string>
-    
-    <string name="resetTitle">Reset to Defaults</string>
-    <string name="resetSummary">Reset all settings to their defaults</string>
     
     <string name="abstractGeneralTitle">Game Options</string>
     <string name="abstractP1Title">Player 1</string>
@@ -95,53 +84,6 @@
     <!-- Confirmation -->
     <string name="confirmExit">Are you sure you want to exit?</string>
     <string name="confirmNewgame">Do you want to start a new game?</string>
-    
-    <!-- Local lobby -->
-    <string name="local">Local Lobby</string>
-    <string name="customIP">Enter an IP directly</string>
-    
-    <!-- LAN play -->
-    <string name="challenger"># challenges you. Accept?</string>
-    <string name="sendChallenge">Do you want to challenge #?</string>
-    <string name="challengeSent">Challenge sent</string>
-    <string name="newLANGame"># wants to play a new game. Accept?</string>
-    <string name="LANUndo"># wants to undo. Accept?</string>
-    <string name="LANplayAgain">The other player agreed to a new game.</string>
-    <string name="LANdontPlayAgain">The other player denied a new game.</string>
-    <string name="LANundoAccepted">The other player allowed an undo.</string>
-    <string name="LANundoDenied">The other player denied an undo.</string>
-    <string name="playerQuit">The other player left the game.</string>
-    <string name="wifiOff">Wifi is off. Enable?</string>
-    <string name="yourIP">Your ip address is: #</string>
-    <string name="yourIPWarning">That\'s your own ip</string>
-    
-    <!-- Net play -->
-    <string name="cantConnect">Can\'t connect to the internet. Want to try wifi?</string>
-    
-    <string name="net">Net Lobby</string>
-    <string name="createBoard">Create a Game Board</string>
-    <string name="position">Position</string>
-    <string name="waiting">Waiting…</string>
-    <string name="active">Active</string>
-    
-    <string name="register">Register</string>
-    <string name="field_username">Username (required):</string>
-    <string name="field_password">Password (required):</string>
-    <string name="field_email">Email:</string>
-    <string name="field_birthday">Birthday:</string>
-    <string name="field_about">About:</string>
-    
-    <string name="login">Login</string>
-    <string name="login_field_username">Username:</string>
-    <string name="login_field_password">Password:</string>
-    <string name="loginFailed">We couldn\'t log you in</string>
-    
-    <string name="waitingroom">Waiting Room</string>
-    <string name="sendAMessage">Send a message</string>
-    <string name="ready">Ready</string>
-    <string name="unready">Unready</string>
-    <string name="optionsChanged">Options changed</string>
-    <string name="rated">Rated Game:</string>
     
     <!-- Dialog Options -->
     <string name="yes">Yes</string>

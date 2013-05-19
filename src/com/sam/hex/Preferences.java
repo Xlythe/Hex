@@ -82,18 +82,6 @@ public class Preferences extends PreferenceActivity {
         setListeners();
     }
 
-    class locListener implements OnPreferenceChangeListener {
-        @Override
-        public boolean onPreferenceChange(Preference pref, Object newValue) {
-            settings.edit().putString(pref.getKey(), (String) newValue).commit();
-            screen.removeAll();
-            loadPreferences();
-
-            setListeners();
-            return true;
-        }
-    }
-
     class nameListener implements OnPreferenceChangeListener {
         @Override
         public boolean onPreferenceChange(Preference pref, Object newValue) {
@@ -102,25 +90,25 @@ public class Preferences extends PreferenceActivity {
         }
     }
 
-    class typeListener implements OnPreferenceChangeListener {
+    class p1typeListener implements OnPreferenceChangeListener {
         @Override
         public boolean onPreferenceChange(Preference pref, Object newValue) {
-            pref.setSummary(GameAction.insert(getString(R.string.player2TypeSummary_onChange), ((ListPreference) pref).getEntry().toString()));
+            String[] texts = getResources().getStringArray(R.array.player1Array);
+            String[] values = getResources().getStringArray(R.array.player1Values);
+            String value = getTextValue(texts, values, newValue);
+            pref.setSummary(GameAction.insert(getString(R.string.player2TypeSummary_onChange), value));
             return true;
         }
     }
 
-    class resetListener implements OnPreferenceClickListener {
+    class p2typeListener implements OnPreferenceChangeListener {
         @Override
-        public boolean onPreferenceClick(Preference pref) {
-            // Clear everything
-            PreferenceManager.getDefaultSharedPreferences(getBaseContext()).edit().clear().commit();
-            // Reload settings
-            if(screen != null) screen.removeAll();
-            if(generalScreen != null) generalScreen.removeAll();
-            loadPreferences();
-            setListeners();
-            return false;
+        public boolean onPreferenceChange(Preference pref, Object newValue) {
+            String[] texts = getResources().getStringArray(R.array.player2Array);
+            String[] values = getResources().getStringArray(R.array.player2Values);
+            String value = getTextValue(texts, values, newValue);
+            pref.setSummary(GameAction.insert(getString(R.string.player2TypeSummary_onChange), value));
+            return true;
         }
     }
 
@@ -133,7 +121,7 @@ public class Preferences extends PreferenceActivity {
                 return false;
             }
             else {
-                preference.setSummary(GameAction.insert(getString(R.string.gameSizeSummary_onChange), newValue.toString()));
+                preference.setSummary(GameAction.insert(getString(R.string.gameSizeSummary_onChange), newValue));
                 return true;
             }
         }
@@ -146,8 +134,8 @@ public class Preferences extends PreferenceActivity {
             View dialoglayout = inflater.inflate(R.layout.preferences_timer, null);
             final Spinner timerType = (Spinner) dialoglayout.findViewById(R.id.timerType);
             final EditText timer = (EditText) dialoglayout.findViewById(R.id.timer);
-            timer.setText(settings.getString("timerPref", "0"));
-            timerType.setSelection(Integer.parseInt(settings.getString("timerTypePref", "0")));
+            timer.setText(settings.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME)));
+            timerType.setSelection(Integer.valueOf(settings.getString("timerTypePref", getString(R.integer.DEFAULT_TIMER_TYPE))));
             timerType.setOnItemSelectedListener(new OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int arg2, long arg3) {
@@ -177,14 +165,6 @@ public class Preferences extends PreferenceActivity {
         }
     }
 
-    class passwordListener implements OnPreferenceChangeListener {
-        @Override
-        public boolean onPreferenceChange(Preference pref, Object newValue) {
-            settings.edit().putString("netPassword", GameAction.md5((String) newValue)).commit();
-            return false;
-        }
-    }
-
     class menuListener implements OnPreferenceClickListener {
         int type;
 
@@ -201,50 +181,49 @@ public class Preferences extends PreferenceActivity {
         }
     }
 
-    @SuppressWarnings("deprecation")
     private void setListeners() {
-        // Hide player2 unless the game location is on a single phone
-        Preference gameLoc = findPreference("gameLocation");
-        if(gameLoc != null) {
-            gameLoc.setOnPreferenceChangeListener(new locListener());
-        }
-
         // Change the summary to show the player's name
         p1NamePref = findPreference("player1Name");
         if(p1NamePref != null) {
-            p1NamePref.setSummary(GameAction.insert(getString(R.string.player1NameSummary_onChange), settings.getString("player1Name", "Player1")));
+            p1NamePref.setSummary(GameAction.insert(getString(R.string.player1NameSummary_onChange),
+                    settings.getString("player1Name", getString(R.string.DEFAULT_P1_NAME))));
             p1NamePref.setOnPreferenceChangeListener(new nameListener());
         }
         p2NamePref = findPreference("player2Name");
         if(p2NamePref != null) {
-            p2NamePref.setSummary(GameAction.insert(getString(R.string.player2NameSummary_onChange), settings.getString("player2Name", "Player2")));
+            p2NamePref.setSummary(GameAction.insert(getString(R.string.player2NameSummary_onChange),
+                    settings.getString("player2Name", getString(R.string.DEFAULT_P2_NAME))));
             p2NamePref.setOnPreferenceChangeListener(new nameListener());
         }
 
         // Change the summary to show the player's type
         p1TypePref = (ListPreference) findPreference("player1Type");
         if(p1TypePref != null) {
-            p1TypePref.setSummary(GameAction.insert(getString(R.string.player1TypeSummary_onChange), p1TypePref.getEntry().toString()));
-            p1TypePref.setOnPreferenceChangeListener(new typeListener());
+            String[] texts = getResources().getStringArray(R.array.player1Array);
+            String[] values = getResources().getStringArray(R.array.player1Values);
+            String newValue = settings.getString("player1Type", getString(R.string.DEFAULT_P1_NAME));
+            String value = getTextValue(texts, values, newValue);
+            p1TypePref.setSummary(GameAction.insert(getString(R.string.player1TypeSummary_onChange), value));
+            p1TypePref.setOnPreferenceChangeListener(new p1typeListener());
         }
         p2TypePref = (ListPreference) findPreference("player2Type");
         if(p2TypePref != null) {
-            p2TypePref.setSummary(GameAction.insert(getString(R.string.player2TypeSummary_onChange), p2TypePref.getEntry().toString()));
-            p2TypePref.setOnPreferenceChangeListener(new typeListener());
-        }
-
-        // Set up the code to return everything to default
-        resetPref = findPreference("resetPref");
-        if(resetPref != null) {
-            resetPref.setOnPreferenceClickListener(new resetListener());
+            String[] texts = getResources().getStringArray(R.array.player2Array);
+            String[] values = getResources().getStringArray(R.array.player2Values);
+            String newValue = settings.getString("player2Type", getString(R.string.DEFAULT_P2_NAME));
+            String value = getTextValue(texts, values, newValue);
+            p2TypePref.setSummary(GameAction.insert(getString(R.string.player2TypeSummary_onChange), value));
+            p2TypePref.setOnPreferenceChangeListener(new p2typeListener());
         }
 
         // Allow for custom grid sizes
         gridPref = findPreference("gameSizePref");
         if(gridPref != null) {
-            if(settings.getString("gameSizePref", "7").equals("0")) gridPref.setSummary(GameAction.insert(getString(R.string.gameSizeSummary_onChange),
-                    settings.getString("customGameSizePref", "7")));
-            else gridPref.setSummary(GameAction.insert(getString(R.string.gameSizeSummary_onChange), settings.getString("gameSizePref", "7")));
+            String defaultBoardSize = getString(R.integer.DEFAULT_BOARD_SIZE);
+            if(Integer.valueOf(settings.getString("gameSizePref", defaultBoardSize)) == 0) gridPref.setSummary(GameAction.insert(
+                    getString(R.string.gameSizeSummary_onChange), Integer.valueOf(settings.getString("customGameSizePref", defaultBoardSize))));
+            else gridPref.setSummary(GameAction.insert(getString(R.string.gameSizeSummary_onChange),
+                    Integer.valueOf(settings.getString("gameSizePref", defaultBoardSize))));
             gridPref.setOnPreferenceChangeListener(new gridListener());
         }
 
@@ -252,12 +231,6 @@ public class Preferences extends PreferenceActivity {
         timerPref = findPreference("timerOptionsPref");
         if(timerPref != null) {
             timerPref.setOnPreferenceClickListener(new timerListener());
-        }
-
-        // Encrypt the password
-        passwordPref = findPreference("visibleNetPassword");
-        if(passwordPref != null) {
-            passwordPref.setOnPreferenceChangeListener(new passwordListener());
         }
 
         // Set up the abstract menu
@@ -275,42 +248,22 @@ public class Preferences extends PreferenceActivity {
         }
     }
 
-    @SuppressWarnings("deprecation")
     private void loadPreferences() {
         setContentView(R.layout.preferences);
-        int gameLoc;
+        getSupportActionBar().setTitle(R.string.preferences);
         if(!in_submenu) {
-            addPreferencesFromResource(R.layout.preferences_location);
-            ListPreference val = (ListPreference) findPreference("gameLocation");
-            gameLoc = Integer.parseInt(val.getValue());
+            addPreferencesFromResource(R.layout.preferences_abstract);
         }
-        else {
-            gameLoc = 0;
-        }
-        if(gameLoc == 0) {
-            getSupportActionBar().setTitle(R.string.preferences);
-            if(!in_submenu) {
-                addPreferencesFromResource(R.layout.preferences_abstract);
-                addPreferencesFromResource(R.layout.preferences_reset);
-            }
-            else if(in_general) {
-                addPreferencesFromResource(R.layout.preferences_general);
-
-                generalScreen = (PreferenceScreen) findPreference("generalScreen");
-            }
-            else if(in_p1) {
-                addPreferencesFromResource(R.layout.preferences_player1);
-            }
-            else if(in_p2) {
-                addPreferencesFromResource(R.layout.preferences_player2);
-            }
-        }
-        else if(gameLoc == 1) {
+        else if(in_general) {
             addPreferencesFromResource(R.layout.preferences_general);
+
+            generalScreen = (PreferenceScreen) findPreference("generalScreen");
         }
-        else if(gameLoc == 2) {
-            getSupportActionBar().setTitle(R.string.preferences_net);
-            addPreferencesFromResource(R.layout.preferences_netplayer);
+        else if(in_p1) {
+            addPreferencesFromResource(R.layout.preferences_player1);
+        }
+        else if(in_p2) {
+            addPreferencesFromResource(R.layout.preferences_player2);
         }
         screen = (PreferenceScreen) findPreference("preferences");
     }
@@ -333,14 +286,25 @@ public class Preferences extends PreferenceActivity {
                     else if(input < 4) {
                         input = 4;
                     }
-                    settings.edit().putString("customGameSizePref", input + "").commit();
-                    settings.edit().putString("gameSizePref", "0").commit();
-                    gridPref.setSummary(GameAction.insert(getString(R.string.gameSizeSummary_onChange), settings.getString("customGameSizePref", "7")));
+                    settings.edit().putString("customGameSizePref", String.valueOf(input)).commit();
+                    settings.edit().putString("gameSizePref", String.valueOf(0)).commit();
+                    gridPref.setSummary(GameAction.insert(getString(R.string.gameSizeSummary_onChange),
+                            Integer.valueOf(settings.getString("customGameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE)))));
                     generalScreen.removeAll();
                     loadPreferences();
                     setListeners();
                 }
             }
         }).setNegativeButton(getString(R.string.cancel), null).show();
+    }
+
+    private String getTextValue(String[] texts, String[] values, Object value) {
+        for(int i = 0; i < values.length; i++) {
+            String s = values[i];
+            if(s.equals(value)) {
+                return texts[i];
+            }
+        }
+        return null;
     }
 }

@@ -218,8 +218,8 @@ public class GameAction {
         game.gameListener.onUndo();
     }
 
-    public static String insert(String text, String name) {
-        String inserted = text.replaceAll("#", name);
+    public static String insert(String text, Object name) {
+        String inserted = text.replaceAll("#", name.toString());
         return inserted;
     }
 

@@ -359,11 +359,11 @@ public class HexGame extends DefaultActivity {
     /**
      * Refreshes both player's colors Does not invalidate the board
      * */
-    public static void setColors(SharedPreferences prefs, int gameLocation, Game game) {
+    public void setColors(SharedPreferences prefs, int gameLocation, Game game) {
         if(gameLocation == GameAction.LOCAL_GAME) {
             // Playing on the same phone
-            game.player1.setColor(prefs.getInt("player1Color", 0));
-            game.player2.setColor(prefs.getInt("player2Color", 0));
+            game.player1.setColor(prefs.getInt("player1Color", getResources().getInteger(R.integer.DEFAULT_P1_COLOR)));
+            game.player2.setColor(prefs.getInt("player2Color", getResources().getInteger(R.integer.DEFAULT_P2_COLOR)));
         }
         else if(gameLocation == GameAction.NET_GAME) {
             // Playing on the net
@@ -372,12 +372,12 @@ public class HexGame extends DefaultActivity {
         }
     }
 
-    public static int setGrid(SharedPreferences prefs, int gameLocation) {
+    public int setGrid(SharedPreferences prefs, int gameLocation) {
         int gridSize = 0;
         if(gameLocation == GameAction.LOCAL_GAME) {
             // Playing on the same phone
-            gridSize = Integer.decode(prefs.getString("gameSizePref", "7"));
-            if(gridSize == 0) gridSize = Integer.decode(prefs.getString("customGameSizePref", "7"));
+            gridSize = Integer.valueOf(prefs.getString("gameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE)));
+            if(gridSize == 0) gridSize = Integer.valueOf(prefs.getString("customGameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE)));
         }
         else if(gameLocation == GameAction.NET_GAME) {
             // Playing over the net
@@ -471,17 +471,18 @@ public class HexGame extends DefaultActivity {
     /**
      * Returns true if a major setting was changed
      * */
-    public static boolean somethingChanged(SharedPreferences prefs, int gameLocation, Game game) {
+    public boolean somethingChanged(SharedPreferences prefs, int gameLocation, Game game) {
         if(game == null) return true;
         if(game.gameOptions.gridSize == 1) return true;
         if(gameLocation == GameAction.LOCAL_GAME) {
-            return (Integer.decode(prefs.getString("gameSizePref", "7")) != game.gameOptions.gridSize && Integer.decode(prefs.getString("gameSizePref", "7")) != 0)
-                    || (Integer.decode(prefs.getString("customGameSizePref", "7")) != game.gameOptions.gridSize && Integer.decode(prefs.getString(
-                            "gameSizePref", "7")) == 0)
-                    || Integer.decode(prefs.getString("player1Type", "1")) != game.player1Type
-                    || Integer.decode(prefs.getString("player2Type", "0")) != game.player2Type
-                    || Integer.decode(prefs.getString("timerTypePref", "0")) != game.gameOptions.timer.type
-                    || Integer.decode(prefs.getString("timerPref", "0")) * 60 * 1000 != game.gameOptions.timer.totalTime;
+            return (Integer.valueOf(prefs.getString("gameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE))) != game.gameOptions.gridSize && Integer
+                    .valueOf(prefs.getString("gameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE))) != 0)
+                    || (Integer.valueOf(prefs.getString("customGameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE))) != game.gameOptions.gridSize && Integer
+                            .valueOf(prefs.getString("gameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE))) == 0)
+                    || Integer.valueOf(prefs.getString("player1Type", getString(R.integer.DEFAULT_P1_ENTITY))) != game.player1Type
+                    || Integer.valueOf(prefs.getString("player2Type", getString(R.integer.DEFAULT_P2_ENTITY))) != game.player2Type
+                    || Integer.valueOf(prefs.getString("timerTypePref", getString(R.integer.DEFAULT_TIMER_TYPE))) != game.gameOptions.timer.type
+                    || Integer.valueOf(prefs.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME))) * 60 * 1000 != game.gameOptions.timer.totalTime;
         }
         else if(gameLocation == GameAction.NET_GAME) {
             return (game != null && game.gameOver);

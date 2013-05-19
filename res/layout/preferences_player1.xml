@@ -7,18 +7,18 @@
 	        android:title="@string/player1NameTitle"
 	        android:summary="@string/player1NameSummary"
 	        android:key="player1Name"
-	        android:defaultValue="Player1" />
+	        android:defaultValue="@string/DEFAULT_P1_NAME" />
 	    <ListPreference
 	        android:title="@string/player1TypeTitle"
 	        android:summary="@string/player1TypeSummary"
 	        android:key="player1Type"
-	        android:defaultValue="@integer/WILL"
+	        android:defaultValue="@integer/DEFAULT_P1_ENTITY"
 	        android:entries="@array/player1Array"
 	        android:entryValues="@array/player1Values" />
 	    <net.margaritov.preference.colorpicker.ColorPickerPreference
 	        android:title="@string/player1ColorTitle"
 	        android:summary="@string/player1ColorSummary"
 	        android:key="player1Color"
-	        android:defaultValue="@integer/COLOR_BLUE" />
+	        android:defaultValue="@integer/DEFAULT_P1_COLOR" />
     </PreferenceCategory>
 </PreferenceScreen>

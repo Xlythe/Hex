@@ -65,10 +65,10 @@ public class BoardView extends View {
         int windowHeight = getHeight();
         int windowWidth = getWidth();
         // Size of border
-        int margin = 10;
-        int border = 2 + margin;
-        int drawableBorder = 5 + border;
-        int shadowOffset = 3;
+        float margin = getContext().getResources().getDimension(R.dimen.hex_margin);
+        float border = margin + getContext().getResources().getDimension(R.dimen.hex_border);
+        float drawableBorder = border + getContext().getResources().getDimension(R.dimen.hex_drawable_border);
+        float shadowOffset = getContext().getResources().getDimension(R.dimen.hex_shadow_offset);
 
         double radius = BoardTools.radiusCalculator(windowWidth, windowHeight, game.gameOptions.gridSize);
         double hrad = radius * Math.sqrt(3) / 2;
@@ -90,15 +90,15 @@ public class BoardView extends View {
                 double x = ((hrad + yc * hrad + 2 * hrad * xc) + hrad + xOffset);
                 double y = (1.5 * radius * yc + radius) + yOffset;
                 mDrawable[xc][yc] = new ShapeDrawable(new PathShape(path, (int) hrad * 2, (int) radius * 2));
-                mDrawable[xc][yc].setBounds((int) (x - hrad), (int) (y), (int) (x + hrad) - drawableBorder, (int) (y + radius * 2) - drawableBorder);
+                mDrawable[xc][yc].setBounds((int) (x - hrad), (int) (y), (int) (x + hrad - drawableBorder), (int) (y + radius * 2 - drawableBorder));
                 mDrawableOutline[xc][yc] = new ShapeDrawable(new PathShape(path, (int) hrad * 2, (int) radius * 2));
-                mDrawableOutline[xc][yc].setBounds((int) (x - hrad), (int) (y), (int) (x + hrad) - border, (int) (y + radius * 2) - border);
+                mDrawableOutline[xc][yc].setBounds((int) (x - hrad), (int) (y), (int) (x + hrad - border), (int) (y + radius * 2 - border));
                 mDrawableOutline[xc][yc].getPaint().setAlpha(80);
                 mCell[xc][yc] = new ShapeDrawable(new PathShape(path, (int) hrad * 2, (int) radius * 2));
-                mCell[xc][yc].setBounds((int) (x - hrad), (int) (y), (int) (x + hrad) - margin, (int) (y + radius * 2) - margin);
+                mCell[xc][yc].setBounds((int) (x - hrad), (int) (y), (int) (x + hrad - margin), (int) (y + radius * 2 - margin));
                 mCell[xc][yc].getPaint().setColor(Color.WHITE);
                 mCellShadow[xc][yc] = new ShapeDrawable(new PathShape(path, (int) hrad * 2, (int) radius * 2));
-                mCellShadow[xc][yc].setBounds((int) (x - hrad), (int) (y) + shadowOffset, (int) (x + hrad) - margin, (int) (y + radius * 2) - margin);
+                mCellShadow[xc][yc].setBounds((int) (x - hrad), (int) (y + shadowOffset), (int) (x + hrad - margin), (int) (y + radius * 2 - margin));
                 mCellShadow[xc][yc].getPaint().setColor(Color.BLACK);
                 mCellShadow[xc][yc].getPaint().setAlpha(15);
                 game.gamePiece[xc][yc].set(x - hrad, y, radius);

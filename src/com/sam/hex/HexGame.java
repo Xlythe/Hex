@@ -75,7 +75,7 @@ public class HexGame extends DefaultActivity {
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putSerializable(GAME, game.player1);
+        savedInstanceState.putSerializable(GAME, game);
     }
 
     private void applyBoard() {

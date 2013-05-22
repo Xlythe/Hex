@@ -85,7 +85,7 @@ public class Preferences extends PreferenceActivity {
     class nameListener implements OnPreferenceChangeListener {
         @Override
         public boolean onPreferenceChange(Preference pref, Object newValue) {
-            pref.setSummary(GameAction.insert(getString(R.string.player2NameSummary_onChange), newValue.toString()));
+            pref.setSummary(String.format(getString(R.string.player2NameSummary_onChange), newValue.toString()));
             return true;
         }
     }
@@ -96,7 +96,7 @@ public class Preferences extends PreferenceActivity {
             String[] texts = getResources().getStringArray(R.array.player1Array);
             String[] values = getResources().getStringArray(R.array.player1Values);
             String value = getTextValue(texts, values, newValue);
-            pref.setSummary(GameAction.insert(getString(R.string.player2TypeSummary_onChange), value));
+            pref.setSummary(String.format(getString(R.string.player2TypeSummary_onChange), value));
             return true;
         }
     }
@@ -107,7 +107,7 @@ public class Preferences extends PreferenceActivity {
             String[] texts = getResources().getStringArray(R.array.player2Array);
             String[] values = getResources().getStringArray(R.array.player2Values);
             String value = getTextValue(texts, values, newValue);
-            pref.setSummary(GameAction.insert(getString(R.string.player2TypeSummary_onChange), value));
+            pref.setSummary(String.format(getString(R.string.player2TypeSummary_onChange), value));
             return true;
         }
     }
@@ -121,7 +121,7 @@ public class Preferences extends PreferenceActivity {
                 return false;
             }
             else {
-                preference.setSummary(GameAction.insert(getString(R.string.gameSizeSummary_onChange), newValue));
+                preference.setSummary(String.format(getString(R.string.gameSizeSummary_onChange), newValue));
                 return true;
             }
         }
@@ -185,13 +185,13 @@ public class Preferences extends PreferenceActivity {
         // Change the summary to show the player's name
         p1NamePref = findPreference("player1Name");
         if(p1NamePref != null) {
-            p1NamePref.setSummary(GameAction.insert(getString(R.string.player1NameSummary_onChange),
+            p1NamePref.setSummary(String.format(getString(R.string.player1NameSummary_onChange),
                     settings.getString("player1Name", getString(R.string.DEFAULT_P1_NAME))));
             p1NamePref.setOnPreferenceChangeListener(new nameListener());
         }
         p2NamePref = findPreference("player2Name");
         if(p2NamePref != null) {
-            p2NamePref.setSummary(GameAction.insert(getString(R.string.player2NameSummary_onChange),
+            p2NamePref.setSummary(String.format(getString(R.string.player2NameSummary_onChange),
                     settings.getString("player2Name", getString(R.string.DEFAULT_P2_NAME))));
             p2NamePref.setOnPreferenceChangeListener(new nameListener());
         }
@@ -203,7 +203,7 @@ public class Preferences extends PreferenceActivity {
             String[] values = getResources().getStringArray(R.array.player1Values);
             String newValue = settings.getString("player1Type", getString(R.string.DEFAULT_P1_NAME));
             String value = getTextValue(texts, values, newValue);
-            p1TypePref.setSummary(GameAction.insert(getString(R.string.player1TypeSummary_onChange), value));
+            p1TypePref.setSummary(String.format(getString(R.string.player1TypeSummary_onChange), value));
             p1TypePref.setOnPreferenceChangeListener(new p1typeListener());
         }
         p2TypePref = (ListPreference) findPreference("player2Type");
@@ -212,7 +212,7 @@ public class Preferences extends PreferenceActivity {
             String[] values = getResources().getStringArray(R.array.player2Values);
             String newValue = settings.getString("player2Type", getString(R.string.DEFAULT_P2_NAME));
             String value = getTextValue(texts, values, newValue);
-            p2TypePref.setSummary(GameAction.insert(getString(R.string.player2TypeSummary_onChange), value));
+            p2TypePref.setSummary(String.format(getString(R.string.player2TypeSummary_onChange), value));
             p2TypePref.setOnPreferenceChangeListener(new p2typeListener());
         }
 
@@ -220,9 +220,9 @@ public class Preferences extends PreferenceActivity {
         gridPref = findPreference("gameSizePref");
         if(gridPref != null) {
             String defaultBoardSize = getString(R.integer.DEFAULT_BOARD_SIZE);
-            if(Integer.valueOf(settings.getString("gameSizePref", defaultBoardSize)) == 0) gridPref.setSummary(GameAction.insert(
+            if(Integer.valueOf(settings.getString("gameSizePref", defaultBoardSize)) == 0) gridPref.setSummary(String.format(
                     getString(R.string.gameSizeSummary_onChange), Integer.valueOf(settings.getString("customGameSizePref", defaultBoardSize))));
-            else gridPref.setSummary(GameAction.insert(getString(R.string.gameSizeSummary_onChange),
+            else gridPref.setSummary(String.format(getString(R.string.gameSizeSummary_onChange),
                     Integer.valueOf(settings.getString("gameSizePref", defaultBoardSize))));
             gridPref.setOnPreferenceChangeListener(new gridListener());
         }
@@ -288,7 +288,7 @@ public class Preferences extends PreferenceActivity {
                     }
                     settings.edit().putString("customGameSizePref", String.valueOf(input)).commit();
                     settings.edit().putString("gameSizePref", String.valueOf(0)).commit();
-                    gridPref.setSummary(GameAction.insert(getString(R.string.gameSizeSummary_onChange),
+                    gridPref.setSummary(String.format(getString(R.string.gameSizeSummary_onChange),
                             Integer.valueOf(settings.getString("customGameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE)))));
                     generalScreen.removeAll();
                     loadPreferences();

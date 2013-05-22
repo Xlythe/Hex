@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Please note, # represents a variable. For example, # wins will write out Alex wins (or whatever their name is) -->
+    <!-- Please note, %s represents a variable. For example, %s wins will write out Alex wins (or whatever their name is) -->
     
     <!-- Application name -->
     <string name="app_name">Hex</string>
@@ -19,7 +19,7 @@
     <string name="preferences">Settings</string>
     <string name="gameSizeTitle">Board Size</string>
     <string name="gameSizeSummary">Pick a size for the gameboard (Current: 7x7)</string>
-    <string name="gameSizeSummary_onChange">Pick a size for the gameboard (Current: #x#)</string>
+    <string name="gameSizeSummary_onChange" formatted="false">Pick a size for the gameboard (Current: %sx%s)</string>
     <string name="customGameSizeSummary">Enter a grid size (Ex. 9)</string>
     <string name="swapTitle">Swap</string>
     <string name="swapSummary">Allow the second player to swap places during their first move</string>
@@ -32,19 +32,19 @@
     
     <string name="player1NameTitle">Player1\'s Name</string>
     <string name="player1NameSummary">Name: Player1</string>
-    <string name="player1NameSummary_onChange">Name: #</string>
+    <string name="player1NameSummary_onChange">Name: %s</string>
     <string name="player1TypeTitle">Player1\'s Type</string>
     <string name="player1TypeSummary">Type: Computer (Will)</string>
-    <string name="player1TypeSummary_onChange">Type: #</string>
+    <string name="player1TypeSummary_onChange">Type: %s</string>
     <string name="player1ColorTitle">Player1\'s Color</string>
     <string name="player1ColorSummary">Pick a color for Player1</string>
     
     <string name="player2NameTitle">Player2\'s Name</string>
     <string name="player2NameSummary">Name: Player2</string>
-    <string name="player2NameSummary_onChange">Name: #</string>
+    <string name="player2NameSummary_onChange">Name: %s</string>
     <string name="player2TypeTitle">Player2\'s Type</string>
     <string name="player2TypeSummary">Type: Human</string>
-    <string name="player2TypeSummary_onChange">Type: #</string>
+    <string name="player2TypeSummary_onChange">Type: %s</string>
     <string name="player2ColorTitle">Player2\'s Color</string>
     <string name="player2ColorSummary">Pick a color for Player2</string>
     
@@ -72,8 +72,8 @@
     <string name="quit">Quit</string>
     
     <!-- In game notifications -->
-    <string name="winner"># wins!</string>
-    <string name="timer">Time Left: #</string>
+    <string name="winner">%s wins!</string>
+    <string name="timer">Time Left: %s</string>
     <string name="saved">Saved!</string>
     <string name="claimVictory">Claim Victory</string>
     

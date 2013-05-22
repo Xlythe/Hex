@@ -15,7 +15,7 @@ import android.os.Environment;
 import android.text.InputType;
 import android.widget.EditText;
 
-import com.sam.hex.Game;
+import com.hex.core.Game;
 import com.sam.hex.R;
 
 /**
@@ -56,14 +56,14 @@ public class Save {
 
                     outputStream.writeObject(game.gameOptions.gridSize);
                     outputStream.writeObject(game.gameOptions.swap);
-                    outputStream.writeObject(game.player1Type);
-                    outputStream.writeObject(game.player2Type);
-                    outputStream.writeObject(game.player1.getColor());
-                    outputStream.writeObject(game.player2.getColor());
-                    outputStream.writeObject(game.player1.getName());
-                    outputStream.writeObject(game.player2.getName());
-                    outputStream.writeObject(game.moveList);
-                    outputStream.writeObject(game.moveNumber);
+                    outputStream.writeObject(game.getPlayer1().getType());
+                    outputStream.writeObject(game.getPlayer2().getType());
+                    outputStream.writeObject(game.getPlayer1().getColor());
+                    outputStream.writeObject(game.getPlayer2().getColor());
+                    outputStream.writeObject(game.getPlayer1().getName());
+                    outputStream.writeObject(game.getPlayer2().getName());
+                    outputStream.writeObject(game.getMoveList());
+                    outputStream.writeObject(game.getMoveNumber());
                     outputStream.writeObject(0);// Timer type
                     outputStream.writeObject((game.gameOptions.timer.totalTime / 60) / 1000);
 

@@ -10,6 +10,10 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.hex.core.Game;
+import com.hex.core.GameAction;
+import com.hex.core.Point;
+
 /**
  * @author Will Harmon
  **/
@@ -18,6 +22,7 @@ public class BoardView extends View {
     private ShapeDrawable[][] mDrawableOutline;
     private ShapeDrawable[][] mCell;
     private ShapeDrawable[][] mCellShadow;
+    private Hexagon[][] mHexagon;
     public Game game;
 
     public BoardView(Context context) {
@@ -45,11 +50,15 @@ public class BoardView extends View {
 
         for(int x = 0; x < n; x++)
             for(int y = 0; y < n; y++) {
+                int c = Color.TRANSPARENT;
+                if(game.gamePiece[x][y].getTeam() == game.getPlayer1().getTeam()) c = game.getPlayer1().getColor();
+                else if(game.gamePiece[x][y].getTeam() == game.getPlayer2().getTeam()) c = game.getPlayer2().getColor();
+                if(game.gamePiece[x][y].isWinningPath()) c = Color.GREEN;
                 mCellShadow[x][y].draw(canvas);
                 mCell[x][y].draw(canvas);
-                mDrawable[x][y].getPaint().setColor(game.gamePiece[x][y].getColor());
+                mDrawable[x][y].getPaint().setColor(c);
                 mDrawable[x][y].draw(canvas);
-                mDrawableOutline[x][y].getPaint().setColor(game.gamePiece[x][y].getColor());
+                mDrawableOutline[x][y].getPaint().setColor(c);
                 mDrawableOutline[x][y].draw(canvas);
             }
     }
@@ -62,6 +71,7 @@ public class BoardView extends View {
         mDrawableOutline = new ShapeDrawable[n][n];
         mCell = new ShapeDrawable[n][n];
         mCellShadow = new ShapeDrawable[n][n];
+        mHexagon = new Hexagon[n][n];
         int windowHeight = getHeight();
         int windowWidth = getWidth();
         // Size of border
@@ -101,7 +111,7 @@ public class BoardView extends View {
                 mCellShadow[xc][yc].setBounds((int) (x - hrad), (int) (y + shadowOffset), (int) (x + hrad - margin), (int) (y + radius * 2 - margin));
                 mCellShadow[xc][yc].getPaint().setColor(Color.BLACK);
                 mCellShadow[xc][yc].getPaint().setAlpha(15);
-                game.gamePiece[xc][yc].set(x - hrad, y, radius);
+                mHexagon[xc][yc] = new Hexagon(x - hrad, y, radius);
             }
         }
     }
@@ -121,7 +131,7 @@ public class BoardView extends View {
                 int y = (int) event.getY();
                 for(int xc = 0; xc < game.gamePiece.length; xc++) {
                     for(int yc = 0; yc < game.gamePiece[0].length; yc++) {
-                        if(game.gamePiece[xc][yc].contains(x, y)) {
+                        if(mHexagon[xc][yc].contains(x, y)) {
                             if(game != null && !game.replayRunning) GameAction.setPiece(new Point(xc, yc), game);
                             return false;
                         }
@@ -130,6 +140,52 @@ public class BoardView extends View {
             }
 
             return true;
+        }
+    }
+
+    public class Hexagon {
+        // Polygon coodinates.
+        private int[] polyY, polyX;
+        // Number of sides in the polygon.
+        private int polySides = 6;
+
+        public Hexagon(double x, double y, double r) {
+            polyX = getXCoordinates(x, y, r, 6, Math.PI / 2);
+            polyY = getYCoordinates(x, y, r, 6, Math.PI / 2);
+        }
+
+        public boolean contains(int x, int y) {
+            boolean oddTransitions = false;
+            for(int i = 0, j = polySides - 1; i < polySides; j = i++) {
+                if((polyY[i] < y && polyY[j] >= y) || (polyY[j] < y && polyY[i] >= y)) {
+                    if(polyX[i] + (y - polyY[i]) / (polyY[j] - polyY[i]) * (polyX[j] - polyX[i]) < x) {
+                        oddTransitions = !oddTransitions;
+                    }
+                }
+            }
+            return oddTransitions;
+        }
+
+        protected int[] getXCoordinates(double x, double y, double r, int vertexCount, double startAngle) {
+            int res[] = new int[vertexCount];
+            double addAngle = 2 * Math.PI / vertexCount;
+            double angle = startAngle;
+            for(int i = 0; i < vertexCount; i++) {
+                res[i] = (int) (Math.round(r * Math.cos(angle)) + x);
+                angle += addAngle;
+            }
+            return res;
+        }
+
+        protected int[] getYCoordinates(double x, double y, double r, int vertexCount, double startAngle) {
+            int res[] = new int[vertexCount];
+            double addAngle = 2 * Math.PI / vertexCount;
+            double angle = startAngle;
+            for(int i = 0; i < vertexCount; i++) {
+                res[i] = (int) (Math.round(r * Math.sin(angle)) + y);
+                angle += addAngle;
+            }
+            return res;
         }
     }
 }

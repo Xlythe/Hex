@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.ImageButton;
@@ -17,14 +16,19 @@ import android.widget.TextView;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.sam.hex.Game.GameListener;
-import com.sam.hex.Game.GameOptions;
+import com.hex.ai.BeeGameAI;
+import com.hex.ai.GameAI;
+import com.hex.core.Game;
+import com.hex.core.Game.GameListener;
+import com.hex.core.Game.GameOptions;
+import com.hex.core.GameAction;
+import com.hex.core.PlayerObject;
+import com.hex.core.PlayingEntity;
+import com.hex.core.Replay;
+import com.hex.core.Timer;
 import com.sam.hex.activity.DefaultActivity;
-import com.sam.hex.ai.bee.BeeGameAI;
-import com.sam.hex.ai.will.GameAI;
 import com.sam.hex.replay.FileExplore;
 import com.sam.hex.replay.Load;
-import com.sam.hex.replay.Replay;
 import com.sam.hex.replay.Save;
 
 public class HexGame extends DefaultActivity {
@@ -54,16 +58,15 @@ public class HexGame extends DefaultActivity {
 
         if(savedInstanceState != null) {
             // Resume a game if one exists
-            GameListener gl = game.gameListener;
             game = (Game) savedInstanceState.getSerializable(GAME);
-            game.gameListener = gl;
+            game.setGameListener(createGameListener());
         }
         else {
             // Check to see if we should load a game
             Intent intent = getIntent();
             if(intent.getData() != null) {
                 Load load = new Load(new File(intent.getData().getPath()));
-                game = load.run(game.gameListener);
+                game = load.run(createGameListener());
                 replay = true;
             }
         }
@@ -86,11 +89,11 @@ public class HexGame extends DefaultActivity {
         player1Icon = (ImageButton) findViewById(R.id.p1);
         player2Icon = (ImageButton) findViewById(R.id.p2);
         timerText = (TextView) findViewById(R.id.timer);
-        if(game.gameOptions.timer.type == 0 || game.gameOver) {
+        if(game.gameOptions.timer.type == 0 || game.isGameOver()) {
             timerText.setVisibility(View.GONE);
         }
         winnerText = (TextView) findViewById(R.id.winner);
-        if(game.gameOver) game.gameListener.onWin(GameAction.getPlayer(game.currentPlayer, game));
+        if(game.isGameOver() && game.getGameListener() != null) game.getGameListener().onWin(game.getCurrentPlayer());
 
         replayForward = (ImageButton) findViewById(R.id.replayForward);
         replayPlayPause = (ImageButton) findViewById(R.id.replayPlayPause);
@@ -112,20 +115,34 @@ public class HexGame extends DefaultActivity {
         int timerType = Integer.parseInt(prefs.getString("timerTypePref", "0"));
         go.timer = new Timer(Integer.parseInt(prefs.getString("timerPref", "0")), 0, timerType);
 
-        GameListener gl = new GameListener() {
-            private static final long serialVersionUID = 1L;
+        GameListener gl = createGameListener();
 
+        game = new Game(go, getPlayer(getPlayer1Type(prefs, GameAction.LOCAL_GAME), 1, go.gridSize), getPlayer(getPlayer2Type(prefs, GameAction.LOCAL_GAME), 2,
+                go.gridSize));
+        game.setGameListener(gl);
+
+        setNames(prefs, GameAction.LOCAL_GAME, game);
+        setColors(prefs, GameAction.LOCAL_GAME, game);
+
+        applyBoard();
+        game.gameOptions.timer.start(game);
+        game.start();
+    }
+
+    private GameListener createGameListener() {
+        return new GameListener() {
             @Override
             public void onWin(final PlayingEntity player) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        String winnerMsg = GameAction.insert(getString(R.string.winner), player.getName());
+                        String winnerMsg = String.format(getString(R.string.winner), player.getName());
                         winnerText.setText(winnerMsg);
                         winnerText.setVisibility(View.VISIBLE);
                         winnerText.invalidate();
                         timerText.setVisibility(View.GONE);
                         timerText.invalidate();
+                        board.invalidate();
                     }
                 });
             }
@@ -145,7 +162,7 @@ public class HexGame extends DefaultActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if(game.gameOver) winnerText.setVisibility(View.GONE);
+                        if(game.isGameOver()) winnerText.setVisibility(View.GONE);
                     }
                 });
             }
@@ -161,13 +178,13 @@ public class HexGame extends DefaultActivity {
                     @Override
                     public void run() {
                         board.postInvalidate();
-                        player1Icon.setColorFilter(game.player1.getColor());
-                        player2Icon.setColorFilter(game.player2.getColor());
-                        if(game.currentPlayer == 1 && !game.gameOver) {
+                        player1Icon.setColorFilter(game.getPlayer1().getColor());
+                        player2Icon.setColorFilter(game.getPlayer2().getColor());
+                        if(game.getCurrentPlayer().getTeam() == 1 && !game.isGameOver()) {
                             player1Icon.setAlpha(255);
                             player2Icon.setAlpha(80);
                         }
-                        else if(game.currentPlayer == 2 && !game.gameOver) {
+                        else if(game.getCurrentPlayer().getTeam() == 2 && !game.isGameOver()) {
                             player1Icon.setAlpha(80);
                             player2Icon.setAlpha(255);
                         }
@@ -180,11 +197,24 @@ public class HexGame extends DefaultActivity {
             }
 
             @Override
-            public void onReplay() {
+            public void onReplayStart() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.postInvalidate();
+                        timerText.setVisibility(View.GONE);
+                        winnerText.setVisibility(View.GONE);
+                    }
+                });
+            }
+
+            @Override
+            public void onReplayEnd() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        board.postInvalidate();
+                        if(game.gameOptions.timer.type != 0) timerText.setVisibility(View.VISIBLE);
                     }
                 });
             }
@@ -224,35 +254,12 @@ public class HexGame extends DefaultActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        timerText.setText(GameAction.insert(getString(R.string.timer), String.format("%d:%02d", minutes, seconds)));
+                        timerText.setText(String.format(getString(R.string.timer), String.format("%d:%02d", minutes, seconds)));
                         timerText.invalidate();
                     }
                 });
             }
         };
-
-        game = new Game(go, gl);
-
-        // Set players
-        setType(prefs, GameAction.LOCAL_GAME, game);
-        setPlayer1(game, new Runnable() {
-            @Override
-            public void run() {
-                initializeNewGame();
-            }
-        });
-        setPlayer2(game, new Runnable() {
-            @Override
-            public void run() {
-                initializeNewGame();
-            }
-        });
-        setNames(prefs, GameAction.LOCAL_GAME, game);
-        setColors(prefs, GameAction.LOCAL_GAME, game);
-
-        applyBoard();
-        game.gameOptions.timer.start(game);
-        game.start();
     }
 
     @Override
@@ -275,7 +282,7 @@ public class HexGame extends DefaultActivity {
         else {// Apply minor changes without stopping the current game
             setColors(prefs, GameAction.LOCAL_GAME, game);
             setNames(prefs, GameAction.LOCAL_GAME, game);
-            game.moveList.replay(0, game);
+            game.getMoveList().replay(0, game);
             GameAction.checkedFlagReset(game);
             GameAction.checkWinPlayer(1, game);
             GameAction.checkWinPlayer(2, game);
@@ -340,8 +347,8 @@ public class HexGame extends DefaultActivity {
     public void setNames(SharedPreferences prefs, int gameLocation, Game game) {
         if(gameLocation == GameAction.LOCAL_GAME) {
             // Playing on the same phone
-            game.player1.setName(prefs.getString("player1Name", "Player1"));
-            game.player2.setName(prefs.getString("player2Name", "Player2"));
+            game.getPlayer1().setName(prefs.getString("player1Name", "Player1"));
+            game.getPlayer2().setName(prefs.getString("player2Name", "Player2"));
         }
         else if(gameLocation == GameAction.NET_GAME) {
             // // Playing over the net
@@ -362,13 +369,13 @@ public class HexGame extends DefaultActivity {
     public void setColors(SharedPreferences prefs, int gameLocation, Game game) {
         if(gameLocation == GameAction.LOCAL_GAME) {
             // Playing on the same phone
-            game.player1.setColor(prefs.getInt("player1Color", getResources().getInteger(R.integer.DEFAULT_P1_COLOR)));
-            game.player2.setColor(prefs.getInt("player2Color", getResources().getInteger(R.integer.DEFAULT_P2_COLOR)));
+            game.getPlayer1().setColor(prefs.getInt("player1Color", getResources().getInteger(R.integer.DEFAULT_P1_COLOR)));
+            game.getPlayer2().setColor(prefs.getInt("player2Color", getResources().getInteger(R.integer.DEFAULT_P2_COLOR)));
         }
         else if(gameLocation == GameAction.NET_GAME) {
             // Playing on the net
-            game.player1.setColor(0);
-            game.player2.setColor(0);
+            game.getPlayer1().setColor(0);
+            game.getPlayer2().setColor(0);
         }
     }
 
@@ -390,52 +397,30 @@ public class HexGame extends DefaultActivity {
         return gridSize;
     }
 
-    public void setType(SharedPreferences prefs, int gameLocation, Game game) {
+    public int getPlayer1Type(SharedPreferences prefs, int gameLocation) {
         if(gameLocation == GameAction.LOCAL_GAME) {
-            game.player1Type = (byte) Integer.parseInt(prefs.getString("player1Type", "1"));
-            game.player2Type = (byte) Integer.parseInt(prefs.getString("player2Type", "0"));
+            return Integer.parseInt(prefs.getString("player1Type", "1"));
         }
-        else if(gameLocation == GameAction.NET_GAME) {
-            // // Playing over the net
-            // for(int i = 0; i < NetGlobal.members.size(); i++) {
-            // if(NetGlobal.members.get(i).place == 1) {
-            // if(prefs.getString("netUsername",
-            // "").toLowerCase(Locale.US).equals(NetGlobal.members.get(i).name.toLowerCase()))
-            // {
-            // game.player1Type = (byte) 0;
-            // }
-            // else {
-            // game.player1Type = (byte) 3;
-            // }
-            // }
-            // else if(NetGlobal.members.get(i).place == 2) {
-            // if(prefs.getString("netUsername",
-            // "").toLowerCase(Locale.US).equals(NetGlobal.members.get(i).name.toLowerCase()))
-            // {
-            // game.player2Type = (byte) 0;
-            // }
-            // else {
-            // game.player2Type = (byte) 3;
-            // }
-            // }
-            // }
-        }
+        return 0;
     }
 
-    public void setPlayer1(Game game, Runnable newgame) {
-        if(game.player1Type == 0) game.player1 = new PlayerObject(1);
-        else if(game.player1Type == 1) game.player1 = new GameAI(1);
-        // else if(game.player1Type == 3) game.player1 = new NetPlayerObject(1,
-        // game, new Handler(), newgame);
-        else if(game.player1Type == 4) game.player1 = new BeeGameAI(1, game.gameOptions.gridSize);
+    public int getPlayer2Type(SharedPreferences prefs, int gameLocation) {
+        if(gameLocation == GameAction.LOCAL_GAME) {
+            return Integer.parseInt(prefs.getString("player2Type", "0"));
+        }
+        return 0;
     }
 
-    public void setPlayer2(Game game, Runnable newgame) {
-        if(game.player2Type == 0) game.player2 = new PlayerObject(2);
-        else if(game.player2Type == 1) game.player2 = new GameAI(2);
-        // else if(game.player2Type == 3) game.player2 = new NetPlayerObject(2,
-        // game, new Handler(), newgame);
-        else if(game.player2Type == 4) game.player2 = new BeeGameAI(2, game.gameOptions.gridSize);
+    public PlayingEntity getPlayer(int type, int team, int gridSize) {
+        switch(type) {
+        case 0:
+            return new PlayerObject(team);
+        case 1:
+            return new GameAI(team);
+        case 4:
+            return new BeeGameAI(team, gridSize);
+        }
+        return null;
     }
 
     private void undo() {
@@ -449,7 +434,7 @@ public class HexGame extends DefaultActivity {
                 switch(which) {
                 case DialogInterface.BUTTON_POSITIVE:
                     // Yes button clicked
-                    if(game.player1.supportsNewgame() && game.player2.supportsNewgame()) {
+                    if(game.getPlayer1().supportsNewgame() && game.getPlayer2().supportsNewgame()) {
                         game.replayRunning = false;
                         initializeNewGame();
                         applyBoard();
@@ -479,13 +464,13 @@ public class HexGame extends DefaultActivity {
                     .valueOf(prefs.getString("gameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE))) != 0)
                     || (Integer.valueOf(prefs.getString("customGameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE))) != game.gameOptions.gridSize && Integer
                             .valueOf(prefs.getString("gameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE))) == 0)
-                    || Integer.valueOf(prefs.getString("player1Type", getString(R.integer.DEFAULT_P1_ENTITY))) != game.player1Type
-                    || Integer.valueOf(prefs.getString("player2Type", getString(R.integer.DEFAULT_P2_ENTITY))) != game.player2Type
+                    || Integer.valueOf(prefs.getString("player1Type", getString(R.integer.DEFAULT_P1_ENTITY))) != game.getPlayer1().getType()
+                    || Integer.valueOf(prefs.getString("player2Type", getString(R.integer.DEFAULT_P2_ENTITY))) != game.getPlayer2().getType()
                     || Integer.valueOf(prefs.getString("timerTypePref", getString(R.integer.DEFAULT_TIMER_TYPE))) != game.gameOptions.timer.type
                     || Integer.valueOf(prefs.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME))) * 60 * 1000 != game.gameOptions.timer.totalTime;
         }
         else if(gameLocation == GameAction.NET_GAME) {
-            return (game != null && game.gameOver);
+            return(game != null && game.isGameOver());
         }
         else {
             return true;
@@ -496,18 +481,7 @@ public class HexGame extends DefaultActivity {
         applyBoard();
         game.clearBoard();
 
-        replayThread = new Thread(new Replay(time, new Handler(), new Runnable() {
-            @Override
-            public void run() {
-                timerText.setVisibility(View.GONE);
-                winnerText.setVisibility(View.GONE);
-            }
-        }, new Runnable() {
-            @Override
-            public void run() {
-                if(game.gameOptions.timer.type != 0) timerText.setVisibility(View.VISIBLE);
-            }
-        }, game), "replay");
+        replayThread = new Thread(new Replay(time, game), "replay");
         replayThread.start();
     }
 

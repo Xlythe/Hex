@@ -24,7 +24,6 @@ import com.hex.core.Game.GameOptions;
 import com.hex.core.GameAction;
 import com.hex.core.PlayerObject;
 import com.hex.core.PlayingEntity;
-import com.hex.core.Replay;
 import com.hex.core.Timer;
 import com.sam.hex.activity.DefaultActivity;
 import com.sam.hex.replay.FileExplore;
@@ -60,6 +59,7 @@ public class HexGame extends DefaultActivity {
             // Resume a game if one exists
             game = (Game) savedInstanceState.getSerializable(GAME);
             game.setGameListener(createGameListener());
+            replay = true;
         }
         else {
             // Check to see if we should load a game
@@ -143,6 +143,11 @@ public class HexGame extends DefaultActivity {
                         timerText.setVisibility(View.GONE);
                         timerText.invalidate();
                         board.invalidate();
+
+                        if(game.getGameLength() < 30 * 1000) {
+                            // TODO Unlock the quick play achievement!
+                            // GamesClient gc = new GamesClient();
+                        }
                     }
                 });
             }
@@ -215,16 +220,6 @@ public class HexGame extends DefaultActivity {
                     public void run() {
                         board.postInvalidate();
                         if(game.gameOptions.timer.type != 0) timerText.setVisibility(View.VISIBLE);
-                    }
-                });
-            }
-
-            @Override
-            public void onTeamSet() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        board.postInvalidate();
                     }
                 });
             }
@@ -478,11 +473,7 @@ public class HexGame extends DefaultActivity {
     }
 
     private void replay(int time) {
-        applyBoard();
-        game.clearBoard();
-
-        replayThread = new Thread(new Replay(time, game), "replay");
-        replayThread.start();
+        game.replay(time);
     }
 
     private void quit() {

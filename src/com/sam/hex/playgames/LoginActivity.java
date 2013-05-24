@@ -8,6 +8,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.google.android.gms.common.SignInButton;
+import com.sam.hex.BaseGameActivity;
 import com.sam.hex.R;
 
 /**

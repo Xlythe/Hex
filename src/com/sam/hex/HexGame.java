@@ -27,16 +27,14 @@ import com.hex.core.Player;
 import com.hex.core.PlayerObject;
 import com.hex.core.PlayingEntity;
 import com.hex.core.Timer;
-import com.sam.hex.activity.DefaultActivity;
 import com.sam.hex.replay.FileExplore;
 import com.sam.hex.replay.Load;
 import com.sam.hex.replay.Save;
 
-public class HexGame extends DefaultActivity {
+public class HexGame extends BaseGameActivity {
     private static final String GAME = "game";
 
     private Game game;
-    private Thread replayThread;
     private boolean replay;
 
     BoardView board;
@@ -146,9 +144,24 @@ public class HexGame extends DefaultActivity {
                         timerText.invalidate();
                         board.invalidate();
 
+                        // Unlock the quick play achievement!
                         if(game.getGameLength() < 30 * 1000) {
-                            // TODO Unlock the quick play achievement!
-                            // GamesClient gc = new GamesClient();
+                            if(mIsSignedIn) {
+                                getGamesClient().unlockAchievement(getString(R.string.achievement_30_seconds));
+                            }
+                        }
+
+                        // Unlock the fill the board achievement!
+                        boolean boardFilled = true;
+                        for(int i = 0; i < game.gameOptions.gridSize; i++) {
+                            for(int j = 0; j < game.gameOptions.gridSize; j++) {
+                                if(game.gamePiece[i][j].getTeam() == 0) boardFilled = false;
+                            }
+                        }
+                        if(boardFilled) {
+                            if(mIsSignedIn) {
+                                getGamesClient().unlockAchievement(getString(R.string.achievement_fill_the_board));
+                            }
                         }
                     }
                 });
@@ -509,5 +522,18 @@ public class HexGame extends DefaultActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(getString(R.string.confirmExit)).setPositiveButton(getString(R.string.yes), dialogClickListener)
                 .setNegativeButton(getString(R.string.no), dialogClickListener).show();
+    }
+
+    boolean mIsSignedIn = false;
+
+    @Override
+    public void onSignInSucceeded() {
+        System.out.println("Signed in");
+        mIsSignedIn = true;
+    }
+
+    @Override
+    public void onSignInFailed() {
+        System.out.println("Sign in failed");
     }
 }

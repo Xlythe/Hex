@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.sam.hex.playgames;
+package com.sam.hex;
 
 import java.util.Vector;
 

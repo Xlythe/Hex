@@ -51,9 +51,9 @@ public class BoardView extends View {
         for(int x = 0; x < n; x++)
             for(int y = 0; y < n; y++) {
                 int c = Color.TRANSPARENT;
-                if(game.gamePiece[x][y].getTeam() == game.getPlayer1().getTeam()) c = game.getPlayer1().getColor();
-                else if(game.gamePiece[x][y].getTeam() == game.getPlayer2().getTeam()) c = game.getPlayer2().getColor();
-                if(game.gamePiece[x][y].isWinningPath()) c = Color.GREEN;
+                if(game.gamePieces[x][y].getTeam() == game.getPlayer1().getTeam()) c = game.getPlayer1().getColor();
+                else if(game.gamePieces[x][y].getTeam() == game.getPlayer2().getTeam()) c = game.getPlayer2().getColor();
+                if(game.gamePieces[x][y].isWinningPath()) c = Color.GREEN;
                 mCellShadow[x][y].draw(canvas);
                 mCell[x][y].draw(canvas);
                 mDrawable[x][y].getPaint().setColor(c);
@@ -82,8 +82,8 @@ public class BoardView extends View {
 
         double radius = BoardTools.radiusCalculator(windowWidth, windowHeight, game.gameOptions.gridSize);
         double hrad = radius * Math.sqrt(3) / 2;
-        int yOffset = (int) ((windowHeight - ((3 * radius / 2) * (game.gamePiece[0].length - 1) + 2 * radius)) / 2);
-        int xOffset = (int) ((windowWidth - (hrad * game.gamePiece.length * 2 + hrad * (game.gamePiece.length - 1))) / 2);
+        int yOffset = (int) ((windowHeight - ((3 * radius / 2) * (game.gamePieces[0].length - 1) + 2 * radius)) / 2);
+        int xOffset = (int) ((windowWidth - (hrad * game.gamePieces.length * 2 + hrad * (game.gamePieces.length - 1))) / 2);
 
         // Shape of a hexagon
         Path path = new Path();
@@ -129,8 +129,8 @@ public class BoardView extends View {
             if(eventaction == MotionEvent.ACTION_UP) {
                 int x = (int) event.getX();
                 int y = (int) event.getY();
-                for(int xc = 0; xc < game.gamePiece.length; xc++) {
-                    for(int yc = 0; yc < game.gamePiece[0].length; yc++) {
+                for(int xc = 0; xc < game.gamePieces.length; xc++) {
+                    for(int yc = 0; yc < game.gamePieces[0].length; yc++) {
                         if(mHexagon[xc][yc].contains(x, y)) {
                             if(game != null && !game.replayRunning) GameAction.setPiece(new Point(xc, yc), game);
                             return false;

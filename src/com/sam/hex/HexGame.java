@@ -66,7 +66,8 @@ public class HexGame extends BaseGameActivity {
             Intent intent = getIntent();
             if(intent.getData() != null) {
                 Load load = new Load(new File(intent.getData().getPath()));
-                game = load.run(createGameListener());
+                game = load.run();
+                game.setGameListener(createGameListener());
                 replay = true;
             }
         }
@@ -155,7 +156,7 @@ public class HexGame extends BaseGameActivity {
                         boolean boardFilled = true;
                         for(int i = 0; i < game.gameOptions.gridSize; i++) {
                             for(int j = 0; j < game.gameOptions.gridSize; j++) {
-                                if(game.gamePiece[i][j].getTeam() == 0) boardFilled = false;
+                                if(game.gamePieces[i][j].getTeam() == 0) boardFilled = false;
                             }
                         }
                         if(boardFilled) {

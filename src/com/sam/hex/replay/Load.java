@@ -1,9 +1,10 @@
 package com.sam.hex.replay;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 
 import com.hex.core.Game;
-import com.hex.core.Game.GameListener;
 
 /**
  * @author Will Harmon
@@ -15,10 +16,13 @@ public class Load {
         this.file = file;
     }
 
-    public Game run(GameListener gl) {
+    public Game run() {
         try {
             if(file != null) {
-                return Game.load(file);
+                ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(file));
+                String game = (String) inputStream.readObject();
+                inputStream.close();
+                return Game.load(game);
             }
         }
         catch(Exception e) {

@@ -16,12 +16,14 @@ import android.widget.TextView;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.hex.ai.AI;
 import com.hex.ai.BeeGameAI;
 import com.hex.ai.GameAI;
 import com.hex.core.Game;
 import com.hex.core.Game.GameListener;
 import com.hex.core.Game.GameOptions;
 import com.hex.core.GameAction;
+import com.hex.core.Player;
 import com.hex.core.PlayerObject;
 import com.hex.core.PlayingEntity;
 import com.hex.core.Timer;
@@ -459,8 +461,8 @@ public class HexGame extends DefaultActivity {
                     .valueOf(prefs.getString("gameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE))) != 0)
                     || (Integer.valueOf(prefs.getString("customGameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE))) != game.gameOptions.gridSize && Integer
                             .valueOf(prefs.getString("gameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE))) == 0)
-                    || Integer.valueOf(prefs.getString("player1Type", getString(R.integer.DEFAULT_P1_ENTITY))) != game.getPlayer1().getType()
-                    || Integer.valueOf(prefs.getString("player2Type", getString(R.integer.DEFAULT_P2_ENTITY))) != game.getPlayer2().getType()
+                    || !sameType(game.getPlayer1(), Integer.valueOf(prefs.getString("player1Type", getString(R.integer.DEFAULT_P1_ENTITY))))
+                    || !sameType(game.getPlayer2(), Integer.valueOf(prefs.getString("player2Type", getString(R.integer.DEFAULT_P2_ENTITY))))
                     || Integer.valueOf(prefs.getString("timerTypePref", getString(R.integer.DEFAULT_TIMER_TYPE))) != game.gameOptions.timer.type
                     || Integer.valueOf(prefs.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME))) * 60 * 1000 != game.gameOptions.timer.totalTime;
         }
@@ -470,6 +472,16 @@ public class HexGame extends DefaultActivity {
         else {
             return true;
         }
+    }
+
+    private boolean sameType(PlayingEntity player, int type) {
+        if(player.getType().equals(Player.Human)) {
+            return type == 0;
+        }
+        else if(player.getType().equals(Player.AI)) {
+            return ((AI) player).getAIType() == type;
+        }
+        return false;
     }
 
     private void replay(int time) {

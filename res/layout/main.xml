@@ -14,7 +14,38 @@
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:paddingLeft="40dp"
-        android:layout_marginTop="10dp" />
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp" />
+    
+    <LinearLayout
+        android:layout_below="@id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:orientation="vertical" >
+        
+        <TextView
+            android:id="@+id/timePlayed"
+            android:textSize="18sp"
+            android:layout_margin="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        
+        <TextView
+            android:id="@+id/gamesPlayed"
+            android:textSize="18sp"
+            android:layout_margin="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        
+        <TextView
+            android:id="@+id/gamesWon"
+            android:textSize="18sp"
+            android:layout_margin="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        
+    </LinearLayout>
     
     <com.sam.hex.view.HexagonLayout
         android:id="@+id/hexagonButtons"

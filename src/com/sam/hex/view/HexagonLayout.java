@@ -63,7 +63,7 @@ public class HexagonLayout extends View implements OnTouchListener {
     public void setUp() {
         setOnTouchListener(this);
         mRotation = 0;
-        mBackgroundColor = Color.WHITE;
+        mBackgroundColor = 0xfff1f1f1;
         mButtons = new Button[6];
         for(int i = 0; i < 6; i++) {
             mButtons[i] = new Button();
@@ -103,7 +103,7 @@ public class HexagonLayout extends View implements OnTouchListener {
         mTextY = (screenWidth - paint.ascent() - paint.descent()) / 2;
 
         mTextBackground = new ShapeDrawable(new OvalShape());
-        mTextBackground.getPaint().setColor(Color.WHITE);
+        mTextBackground.getPaint().setColor(mBackgroundColor);
         mTextBackground.setBounds((int) (center.x - textWidth / 2 - mTextPadding), (int) (center.y - textSize / 2 - mTextPadding), (int) (center.x + textWidth
                 / 2 + mTextPadding), (int) (center.y + textSize / 2 + mTextPadding));
     }

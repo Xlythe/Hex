@@ -145,22 +145,24 @@ public class GameActivity extends BaseGameActivity {
                         timerText.invalidate();
                         board.invalidate();
 
-                        // Unlock the quick play achievement!
-                        if(game.getGameLength() < 30 * 1000) {
-                            if(mIsSignedIn) {
+                        Stats.incrementTimePlayed(getApplicationContext(), game.getGameLength());
+                        Stats.incrementGamesPlayed(getApplicationContext());
+                        if(player.getTeam() == 1) Stats.incrementGamesWon(getApplicationContext());
+
+                        if(mIsSignedIn) {
+                            // Unlock the quick play achievement!
+                            if(game.getGameLength() < 30 * 1000) {
                                 getGamesClient().unlockAchievement(getString(R.string.achievement_30_seconds));
                             }
-                        }
 
-                        // Unlock the fill the board achievement!
-                        boolean boardFilled = true;
-                        for(int i = 0; i < game.gameOptions.gridSize; i++) {
-                            for(int j = 0; j < game.gameOptions.gridSize; j++) {
-                                if(game.gamePieces[i][j].getTeam() == 0) boardFilled = false;
+                            // Unlock the fill the board achievement!
+                            boolean boardFilled = true;
+                            for(int i = 0; i < game.gameOptions.gridSize; i++) {
+                                for(int j = 0; j < game.gameOptions.gridSize; j++) {
+                                    if(game.gamePieces[i][j].getTeam() == 0) boardFilled = false;
+                                }
                             }
-                        }
-                        if(boardFilled) {
-                            if(mIsSignedIn) {
+                            if(boardFilled) {
                                 getGamesClient().unlockAchievement(getString(R.string.achievement_fill_the_board));
                             }
                         }

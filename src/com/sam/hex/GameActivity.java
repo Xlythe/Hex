@@ -3,11 +3,14 @@ package com.sam.hex;
 import java.io.File;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
@@ -58,26 +61,24 @@ public class GameActivity extends BaseGameActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        // Must be set up immediately
-        initializeNewGame();
-
-        if(savedInstanceState != null) {
+        if(savedInstanceState != null && savedInstanceState.containsKey(GAME)) {
             // Resume a game if one exists
             game = (Game) savedInstanceState.getSerializable(GAME);
             game.setGameListener(createGameListener());
             replay = true;
             replayDuration = 0;
         }
-        else {
+        else if(getIntent().getData() != null) {
             // Check to see if we should load a game
-            Intent intent = getIntent();
-            if(intent.getData() != null) {
-                Load load = new Load(new File(intent.getData().getPath()));
-                game = load.run();
-                game.setGameListener(createGameListener());
-                replay = true;
-                replayDuration = 900;
-            }
+            Load load = new Load(new File(getIntent().getData().getPath()));
+            game = load.run();
+            game.setGameListener(createGameListener());
+            replay = true;
+            replayDuration = 900;
+        }
+        else {
+            // Create a new game
+            initializeNewGame();
         }
 
         // Load the UI
@@ -91,6 +92,12 @@ public class GameActivity extends BaseGameActivity {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stopGame(game);
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putSerializable(GAME, game);
@@ -99,16 +106,26 @@ public class GameActivity extends BaseGameActivity {
     private void applyBoard() {
         setContentView(R.layout.game);
 
-        getSupportActionBar().setCustomView(View.inflate(this, R.layout.actionbar_message, null));
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            timerText = (TextView) findViewById(R.id.timer);
+            winnerText = (TextView) findViewById(R.id.winner);
+        }
+        else {
+            LayoutInflater inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View v = inflator.inflate(R.layout.actionbar_message, null);
+            getSupportActionBar().setCustomView(v);
+            getSupportActionBar().setDisplayShowCustomEnabled(true);
+
+            winnerText = (TextView) v.findViewById(R.id.winner);
+            timerText = (TextView) v.findViewById(R.id.timer);
+        }
         board = (BoardView) findViewById(R.id.board);
         board.setGame(game);
         player1Icon = (ImageButton) findViewById(R.id.p1);
         player2Icon = (ImageButton) findViewById(R.id.p2);
-        timerText = (TextView) getSupportActionBar().getCustomView().findViewById(R.id.timer);
         if(game.gameOptions.timer.type == 0 || game.isGameOver()) {
             timerText.setVisibility(View.GONE);
         }
-        winnerText = (TextView) getSupportActionBar().getCustomView().findViewById(R.id.winner);
         if(game.isGameOver() && game.getGameListener() != null) game.getGameListener().onWin(game.getCurrentPlayer());
 
         replayForward = (ImageButton) findViewById(R.id.replayForward);
@@ -282,6 +299,7 @@ public class GameActivity extends BaseGameActivity {
 
             @Override
             public void displayTime(final int minutes, final int seconds) {
+                System.out.println("running!" + minutes + ", " + seconds);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

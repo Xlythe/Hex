@@ -23,6 +23,7 @@ import com.hex.core.Point;
  **/
 public class HexagonLayout extends View implements OnTouchListener {
     private int mRotation;
+    private double mShortRadius;
     private Point[] corners;
     private Point center;
 
@@ -139,8 +140,8 @@ public class HexagonLayout extends View implements OnTouchListener {
             mBorderShadow[i].draw(canvas);
             mBorder[i].draw(canvas);
             mButtons[i].getDrawable().draw(canvas);
-            canvas.drawText(mButtons[i].getText(), center.x - mButtonTextPaint.measureText(mButtons[i].getText()) / 2, mButtonTextPaint.getTextSize(),
-                    mButtonTextPaint);
+            canvas.drawText(mButtons[i].getText(), center.x - mButtonTextPaint.measureText(mButtons[i].getText()) / 2, center.y - (int) mShortRadius
+                    + mButtonTextPaint.getTextSize(), mButtonTextPaint);
         }
         canvas.restore();
     }
@@ -153,14 +154,16 @@ public class HexagonLayout extends View implements OnTouchListener {
 
         // Get the length of a side of the hexagon
         int s = boxLength / 2;
+        mShortRadius = ((boxLength / 4) * Math.sqrt(3));
+        double radiusDiffence = boxLength / 2 - mShortRadius;
 
         // Create an array of the corners
         corners = new Point[6];
-        corners[0] = new Point((boxLength - s) / 2, 0);
-        corners[1] = new Point(boxLength - (boxLength - s) / 2, 0);
-        corners[2] = new Point(boxLength, boxLength / 2);
-        corners[3] = new Point(boxLength - (boxLength - s) / 2, boxLength);
-        corners[4] = new Point((boxLength - s) / 2, boxLength);
+        corners[0] = new Point(boxLength / 4, (int) radiusDiffence);
+        corners[1] = new Point(3 * boxLength / 4, (int) radiusDiffence);
+        corners[2] = new Point(boxLength, (int) (boxLength / 2));
+        corners[3] = new Point(3 * boxLength / 4, (int) (boxLength - radiusDiffence));
+        corners[4] = new Point(boxLength / 4, (int) (boxLength - radiusDiffence));
         corners[5] = new Point(0, boxLength / 2);
 
         // Shape of a hexagon
@@ -185,15 +188,17 @@ public class HexagonLayout extends View implements OnTouchListener {
         Path edgePath = new Path();
         edgePath.moveTo(corners[0].x, corners[0].y);
         edgePath.lineTo(corners[1].x, corners[1].y);
-        edgePath.lineTo((int) (corners[1].x - mBorderWidth / 1.732), mBorderWidth);
-        edgePath.lineTo((int) (corners[0].x + mBorderWidth / 1.732), mBorderWidth);
+        edgePath.lineTo((int) (corners[1].x - mBorderWidth / 1.732), center.y - (int) mShortRadius + mBorderWidth);
+        edgePath.lineTo((int) (corners[0].x + mBorderWidth / 1.732), center.y - (int) mShortRadius + mBorderWidth);
         edgePath.close();
         // Shape of an edge
         Path shadowEdgePath = new Path();
         shadowEdgePath.moveTo(corners[0].x, corners[0].y);
         shadowEdgePath.lineTo(corners[1].x, corners[1].y);
-        shadowEdgePath.lineTo((int) (corners[1].x - (mBorderWidth + mBorderShadowWidth) / 1.732), (mBorderWidth + mBorderShadowWidth));
-        shadowEdgePath.lineTo((int) (corners[0].x + (mBorderWidth + mBorderShadowWidth) / 1.732), (mBorderWidth + mBorderShadowWidth));
+        shadowEdgePath.lineTo((int) (corners[1].x - (mBorderWidth + mBorderShadowWidth) / 1.732),
+                (center.y - (int) mShortRadius + mBorderWidth + mBorderShadowWidth));
+        shadowEdgePath.lineTo((int) (corners[0].x + (mBorderWidth + mBorderShadowWidth) / 1.732),
+                (center.y - (int) mShortRadius + mBorderWidth + mBorderShadowWidth));
         shadowEdgePath.close();
         for(int i = 0; i < 6; i++) {
             Triangle t = new Triangle(new Point(corners[(i + 1) % 6].x, corners[(i + 1) % 6].y), new Point(corners[(i + 2) % 6].x, corners[(i + 2) % 6].y),
@@ -211,7 +216,7 @@ public class HexagonLayout extends View implements OnTouchListener {
 
             mButtons[i].setTriangle(t);
 
-            mButtons[i].getDrawable().setBounds(center.x - s / 6, (int) (s * 0.866 / 2 - s / 6), center.x + s / 6, (int) (s * 0.866 / 2 + s / 6));
+            mButtons[i].getDrawable().setBounds(center.x - s / 6, (int) (s * 0.866 / 2), center.x + s / 6, (int) (s * 0.866 / 2 + s / 3));
 
             mBorder[i] = new ShapeDrawable(new PathShape(edgePath, w, h));
             mBorder[i].getPaint().setColor(mButtons[i].getColor());

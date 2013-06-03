@@ -49,9 +49,8 @@
     
     <com.sam.hex.view.HexagonLayout
         android:id="@+id/hexagonButtons"
-        android:layout_marginTop="20dp"
         android:layout_alignParentRight="true"
         android:layout_width="350dp"
-        android:layout_height="350dp" />
+        android:layout_height="match_parent" />
     
 </RelativeLayout>

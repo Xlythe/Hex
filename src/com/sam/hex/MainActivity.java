@@ -100,8 +100,8 @@ public class MainActivity extends SherlockFragmentActivity {
         title.setText(String.format(getString(R.string.main_title), Stats.getPlayer1Name(this)));
         long timePlayedInMillis = Stats.getTimePlayed(this);
         long timePlayedInHours = timePlayedInMillis / (1000 * 60 * 60);
-        long timePlayedInMintues = timePlayedInMillis / (1000 * 60) - timePlayedInHours * (1000 * 60 * 60);
-        long timePlayedInSeconds = timePlayedInMillis / (1000) - timePlayedInHours * (1000 * 60 * 60) - timePlayedInMintues * (1000 * 60);
+        long timePlayedInMintues = (timePlayedInMillis - timePlayedInHours * (1000 * 60 * 60)) / (1000 * 60);
+        long timePlayedInSeconds = (timePlayedInMillis - timePlayedInHours * (1000 * 60 * 60) - timePlayedInMintues * (1000 * 60)) / (1000);
         timePlayed.setText(String.format(getString(R.string.main_stats_time_played), timePlayedInHours, timePlayedInMintues, timePlayedInSeconds));
         gamesPlayed.setText(String.format(getString(R.string.main_stats_games_played), Stats.getGamesPlayed(this)));
         gamesWon.setText(String.format(getString(R.string.main_stats_games_won), Stats.getGamesWon(this)));

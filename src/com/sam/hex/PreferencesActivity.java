@@ -55,6 +55,7 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         settings = PreferenceManager.getDefaultSharedPreferences(this);
 
         if(getIntent().getExtras() != null) {

@@ -20,6 +20,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
 
 public class HistoryActivity extends SherlockActivity {
 
@@ -43,6 +44,7 @@ public class HistoryActivity extends SherlockActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         handle = new Handler();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         try {
             loadFileList();
             view = new ListView(this);
@@ -190,5 +192,17 @@ public class HistoryActivity extends SherlockActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch(item.getItemId()) {
+        case android.R.id.home:
+            finish();
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
     }
 }

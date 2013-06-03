@@ -10,6 +10,8 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.graphics.drawable.shapes.PathShape;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -61,6 +63,7 @@ public class HexagonLayout extends View implements OnTouchListener {
     }
 
     public void setUp() {
+        DisplayMetrics dm = getResources().getDisplayMetrics();
         setOnTouchListener(this);
         mRotation = 0;
         mBackgroundColor = 0xfff1f1f1;
@@ -68,19 +71,19 @@ public class HexagonLayout extends View implements OnTouchListener {
         for(int i = 0; i < 6; i++) {
             mButtons[i] = new Button();
         }
-        mBorderWidth = 60;
-        mBorderShadowWidth = 10;
+        mBorderWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, dm);
+        mBorderShadowWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, dm);
         mPressedColor = Color.LTGRAY;
-        mTextSize = 88;
+        mTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 44, dm);
         mTitle = "Hex";
         mTextPaint = new Paint();
         mTextPaint.setColor(Color.BLACK);
-        mTextPadding = 25;
+        mTextPadding = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, dm);
         mLinePaint = new Paint();
         mLinePaint.setColor(Color.LTGRAY);
         mButtonTextPaint = new Paint();
         mButtonTextPaint.setColor(Color.WHITE);
-        mButtonTextPaint.setTextSize(44);
+        mButtonTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, dm));
     }
 
     private void layoutText() {

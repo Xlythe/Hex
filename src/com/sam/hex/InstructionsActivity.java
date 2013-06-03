@@ -1,4 +1,4 @@
-package com.sam.hex.startup;
+package com.sam.hex;
 
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;

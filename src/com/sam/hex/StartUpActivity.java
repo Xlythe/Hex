@@ -1,12 +1,10 @@
-package com.sam.hex.startup;
+package com.sam.hex;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import com.sam.hex.HexGame;
-import com.sam.hex.Preferences;
 import com.sam.hex.R;
 import com.sam.hex.activity.HomeActivity;
 import com.sam.hex.view.HexagonLayout;

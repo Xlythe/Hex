@@ -140,7 +140,6 @@ public class GameActivity extends BaseGameActivity {
         // Stop the old game
         stopGame(game);
         timeGamePaused = 0;
-        whenGamePaused = 0;
 
         // Create a new game object
         GameOptions go = new GameOptions();
@@ -314,7 +313,10 @@ public class GameActivity extends BaseGameActivity {
     @Override
     public void onResume() {
         super.onResume();
-        timeGamePaused += System.currentTimeMillis() - whenGamePaused;
+        if(whenGamePaused != 0) {
+            timeGamePaused += System.currentTimeMillis() - whenGamePaused;
+            whenGamePaused = 0;
+        }
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Check if settings were changed and we need to run a new game

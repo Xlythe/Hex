@@ -115,7 +115,8 @@ public class HexagonLayout extends View implements OnTouchListener {
     protected void onDraw(Canvas canvas) {
         canvas.rotate(mRotation, center.x, center.y);
         mHexagon.draw(canvas);
-
+        
+        
         canvas.drawLine(corners[0].x, corners[0].y, center.x, center.y, mLinePaint);
         canvas.drawLine(corners[1].x, corners[1].y, center.x, center.y, mLinePaint);
         canvas.drawLine(corners[2].x, corners[2].y, center.x, center.y, mLinePaint);
@@ -148,20 +149,22 @@ public class HexagonLayout extends View implements OnTouchListener {
     @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
         // Create a box
-        int boxLength = Math.min(w, h);
-        center = new Point(boxLength / 2, boxLength / 2);
+        double boxLength = Math.min(w, h);
+        center = new Point((int)boxLength / 2, (int)boxLength / 2);
 
         // Get the length of a side of the hexagon
-        int s = (int) (boxLength * 0.548);
+        int s = (int) (boxLength/2);
+        double shortRadius =  ((boxLength /4) * Math.sqrt(3));
+        double radiusDiffence = boxLength /2 -shortRadius;
 
         // Create an array of the corners
         corners = new Point[6];
-        corners[0] = new Point((boxLength - s) / 2, 0);
-        corners[1] = new Point(boxLength - (boxLength - s) / 2, 0);
-        corners[2] = new Point(boxLength, boxLength / 2);
-        corners[3] = new Point(boxLength - (boxLength - s) / 2, boxLength);
-        corners[4] = new Point((boxLength - s) / 2, boxLength);
-        corners[5] = new Point(0, boxLength / 2);
+        corners[0] = new Point((int) ((boxLength) / 4), (int) radiusDiffence);
+        corners[1] = new Point((int) ((3*boxLength) / 4), (int)radiusDiffence);
+        corners[2] = new Point((int)boxLength,(int)( boxLength / 2));
+        corners[3] = new Point((int) (3*boxLength  / 4), (int)(boxLength-radiusDiffence));
+        corners[4] = new Point((int) ((boxLength)  / 4),(int) (boxLength-radiusDiffence));
+        corners[5] = new Point(0, (int)(boxLength / 2));
 
         // Shape of a hexagon
         Path hexagonPath = new Path();
@@ -211,14 +214,14 @@ public class HexagonLayout extends View implements OnTouchListener {
 
             mButtons[i].setTriangle(t);
 
-            mButtons[i].getDrawable().setBounds(center.x - s / 6, (int) (s * 0.866 / 2 - s / 6), center.x + s / 6, (int) (s * 0.866 / 2 + s / 6));
+            mButtons[i].getDrawable().setBounds((int)(center.x - s / 6), (int) (s * 0.866 / 2 - s / 6), (int)(center.x + s / 6), (int) (s * 0.866 / 2 + s / 6));
 
             mBorder[i] = new ShapeDrawable(new PathShape(edgePath, w, h));
             mBorder[i].getPaint().setColor(mButtons[i].getColor());
             mBorder[i].setBounds(0, 0, w, h);
 
             mBorderShadow[i] = new ShapeDrawable(new PathShape(shadowEdgePath, w, h));
-            mBorderShadow[i].getPaint().setColor(getDarkerColor(mButtons[i].getColor()));
+            mBorderShadow[i].getPaint().setColor(getDarkerColor(mButtons[i].getColor())); 
             mBorderShadow[i].setBounds(0, 0, w, h);
         }
 

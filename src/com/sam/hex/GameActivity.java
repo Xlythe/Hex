@@ -38,6 +38,8 @@ public class GameActivity extends BaseGameActivity {
     private Game game;
     private boolean replay;
     private int replayDuration;
+    private long timeGamePaused;
+    private long whenGamePaused;
 
     BoardView board;
     ImageButton player1Icon;
@@ -83,6 +85,12 @@ public class GameActivity extends BaseGameActivity {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        whenGamePaused = System.currentTimeMillis();
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putSerializable(GAME, game);
@@ -114,6 +122,8 @@ public class GameActivity extends BaseGameActivity {
 
         // Stop the old game
         stopGame(game);
+        timeGamePaused = 0;
+        whenGamePaused = 0;
 
         // Create a new game object
         GameOptions go = new GameOptions();
@@ -152,7 +162,7 @@ public class GameActivity extends BaseGameActivity {
                         timerText.invalidate();
                         board.invalidate();
 
-                        Stats.incrementTimePlayed(getApplicationContext(), game.getGameLength());
+                        Stats.incrementTimePlayed(getApplicationContext(), game.getGameLength() - timeGamePaused);
                         Stats.incrementGamesPlayed(getApplicationContext());
                         if(player.getTeam() == 1) Stats.incrementGamesWon(getApplicationContext());
 
@@ -286,6 +296,7 @@ public class GameActivity extends BaseGameActivity {
     @Override
     public void onResume() {
         super.onResume();
+        timeGamePaused += System.currentTimeMillis() - whenGamePaused;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Check if settings were changed and we need to run a new game
@@ -491,7 +502,7 @@ public class GameActivity extends BaseGameActivity {
                     || Integer.valueOf(prefs.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME))) * 60 * 1000 != game.gameOptions.timer.totalTime;
         }
         else if(gameLocation == GameAction.NET_GAME) {
-            return (game != null && game.isGameOver());
+            return(game != null && game.isGameOver());
         }
         else {
             return true;

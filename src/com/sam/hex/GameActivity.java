@@ -38,6 +38,8 @@ import com.sam.hex.view.BoardView;
 public class GameActivity extends BaseGameActivity {
     private static final String GAME = "game";
 
+    boolean mIsSignedIn = false;
+
     private Game game;
     private boolean replay;
     private int replayDuration;
@@ -197,6 +199,21 @@ public class GameActivity extends BaseGameActivity {
                             }
                             if(boardFilled) {
                                 getGamesClient().unlockAchievement(getString(R.string.achievement_fill_the_board));
+                            }
+
+                            // Unlock the Novice achievement!
+                            if(Stats.getGamesPlayed(getApplicationContext()) > 10) {
+                                getGamesClient().unlockAchievement(getString(R.string.achievement_novice));
+                            }
+
+                            // Unlock the Intermediate achievement!
+                            if(Stats.getGamesPlayed(getApplicationContext()) > 25) {
+                                getGamesClient().unlockAchievement(getString(R.string.achievement_intermediate));
+                            }
+
+                            // Unlock the Expert achievement!
+                            if(Stats.getGamesWon(getApplicationContext()) > 100) {
+                                getGamesClient().unlockAchievement(getString(R.string.achievement_expert));
                             }
                         }
                     }
@@ -565,8 +582,6 @@ public class GameActivity extends BaseGameActivity {
         builder.setMessage(getString(R.string.confirmExit)).setPositiveButton(getString(R.string.yes), dialogClickListener)
                 .setNegativeButton(getString(R.string.no), dialogClickListener).show();
     }
-
-    boolean mIsSignedIn = false;
 
     @Override
     public void onSignInSucceeded() {

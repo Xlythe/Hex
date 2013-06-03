@@ -3,8 +3,10 @@ package com.sam.hex;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
+import com.google.android.gms.common.SignInButton;
 import com.sam.hex.view.HexagonLayout;
 
 /**
@@ -12,6 +14,9 @@ import com.sam.hex.view.HexagonLayout;
  **/
 public class MainActivity extends BaseGameActivity {
     public static final int REQUEST_ACHIEVEMENTS = 1001;
+
+    SignInButton mSignInButton;
+    boolean mIsSignedIn = false;
 
     /** Called when the activity is first created. */
     @Override
@@ -76,7 +81,9 @@ public class MainActivity extends BaseGameActivity {
         achievementsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                startActivityForResult(getGamesClient().getAchievementsIntent(), REQUEST_ACHIEVEMENTS);
+                if(mIsSignedIn) {
+                    startActivityForResult(getGamesClient().getAchievementsIntent(), REQUEST_ACHIEVEMENTS);
+                }
             }
         });
 
@@ -87,6 +94,14 @@ public class MainActivity extends BaseGameActivity {
             @Override
             public void onClick() {
                 startActivity(new Intent(getBaseContext(), GameActivity.class));
+            }
+        });
+
+        mSignInButton = (SignInButton) findViewById(R.id.loginEnter);
+        mSignInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                beginUserInitiatedSignIn();
             }
         });
     }
@@ -111,14 +126,13 @@ public class MainActivity extends BaseGameActivity {
     }
 
     @Override
-    public void onSignInFailed() {
-        // TODO Auto-generated method stub
-
+    public void onSignInSucceeded() {
+        System.out.println("Signed in");
+        mIsSignedIn = true;
     }
 
     @Override
-    public void onSignInSucceeded() {
-        // TODO Auto-generated method stub
-
+    public void onSignInFailed() {
+        System.out.println("Sign in failed");
     }
 }

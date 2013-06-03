@@ -1,15 +1,16 @@
 package com.sam.hex.startup;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
+import android.widget.TextView;
 
 import com.sam.hex.HexGame;
 import com.sam.hex.Preferences;
 import com.sam.hex.R;
 import com.sam.hex.activity.HomeActivity;
-import com.sam.hex.playgames.LoginActivity;
+import com.sam.hex.view.HexagonLayout;
 
 /**
  * @author Will Harmon
@@ -20,47 +21,75 @@ public class StartUpActivity extends HomeActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        getSupportActionBar().hide();
 
-        // Second button
-        final Button instructionsButton = (Button) findViewById(R.id.instructionsButton);
-        instructionsButton.setOnClickListener(new View.OnClickListener() {
+        TextView title = (TextView) findViewById(R.id.title);
+        HexagonLayout hexagonLayout = (HexagonLayout) findViewById(R.id.hexagonButtons);
+        HexagonLayout.Button settingsButton = hexagonLayout.getButtons()[0];
+        HexagonLayout.Button donateButton = hexagonLayout.getButtons()[1];
+        HexagonLayout.Button rateButton = hexagonLayout.getButtons()[2];
+        HexagonLayout.Button instructionsButton = hexagonLayout.getButtons()[3];
+        HexagonLayout.Button achievementsButton = hexagonLayout.getButtons()[4];
+        HexagonLayout.Button playButton = hexagonLayout.getButtons()[5];
+
+        title.setText("Will's stats");
+
+        settingsButton.setTitle("settings");
+        settingsButton.setColor(0xcc5c57);
+        settingsButton.setDrawable(getResources().getDrawable(R.drawable.icon));
+        settingsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick() {
+                startActivity(new Intent(getBaseContext(), Preferences.class));
+            }
+        });
+
+        donateButton.setTitle("donate");
+        donateButton.setColor(0x5f6ec2);
+        donateButton.setDrawable(getResources().getDrawable(R.drawable.icon));
+        donateButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
+            @Override
+            public void onClick() {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.donate.hex")));
+            }
+        });
+
+        rateButton.setTitle("rate");
+        rateButton.setColor(0xcfca47);
+        rateButton.setDrawable(getResources().getDrawable(R.drawable.icon));
+        rateButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
+            @Override
+            public void onClick() {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.sam.hex")));
+            }
+        });
+
+        instructionsButton.setTitle("how to play");
+        instructionsButton.setColor(0xb7cf47);
+        instructionsButton.setDrawable(getResources().getDrawable(R.drawable.icon));
+        instructionsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
+            @Override
+            public void onClick() {
                 startActivity(new Intent(getBaseContext(), InstructionsActivity.class));
             }
         });
 
-        // Third button
-        final Button optionsButton = (Button) findViewById(R.id.optionsButton);
-        optionsButton.setOnClickListener(new View.OnClickListener() {
+        achievementsButton.setTitle("achievements");
+        achievementsButton.setColor(0xf48935);
+        achievementsButton.setDrawable(getResources().getDrawable(R.drawable.icon));
+        achievementsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getBaseContext(), Preferences.class));
-            }
+            public void onClick() {}
         });
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // Refresh first button
-        final Button startButton = (Button) findViewById(R.id.startButton);
-        startButton.setOnClickListener(new View.OnClickListener() {
+        playButton.setTitle("play");
+        playButton.setColor(0x4ba5e2);
+        playButton.setDrawable(getResources().getDrawable(R.drawable.icon));
+        playButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick() {
                 startActivity(new Intent(getBaseContext(), HexGame.class));
-            }
-        });
-        startButton.setText(R.string.start);
-
-        // Refresh fourth button
-        final Button onlineButton = (Button) findViewById(R.id.onlineButton);
-        onlineButton.setText(R.string.online);
-        onlineButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getBaseContext(), LoginActivity.class));
             }
         });
     }

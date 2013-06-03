@@ -2,7 +2,7 @@
 <resources>
     <!-- Please note, %s represents a variable. For example, %s wins will write out Alex wins (or whatever their name is) -->
     
-    <!-- Application name -->
+    <!-- Application name and constants -->
     <string name="app_name">Hex</string>
     <string name="app_id">387298223585</string>
     <string name="achievement_30_seconds">CgkI4cuX5qILEAIQAg</string>
@@ -11,6 +11,9 @@
     <string name="achievement_intermediate">CgkI4cuX5qILEAIQBQ</string>
     <string name="achievement_expert">CgkI4cuX5qILEAIQBg</string>
     <string name="leaderboard_score">CgkI4cuX5qILEAIQAQ</string>
+    
+    <!-- Main page -->
+    <string name="main_label_login">Login</string>
     
     <!-- Preferences -->
     <string name="preferences_title_options">Options</string>
@@ -51,9 +54,6 @@
     <string name="abstractGeneralTitle">Game Options</string>
     <string name="abstractP1Title">Player 1</string>
     <string name="abstractP2Title">Player 2</string>
-    
-    <!-- Main page -->
-    <string name="frontpage">Welcome to Hex</string>
     
     <!-- Buttons from top to bottom -->
     <string name="start">Start Game</string>

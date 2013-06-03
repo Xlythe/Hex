@@ -22,7 +22,6 @@ import android.os.Bundle;
 import com.google.android.gms.appstate.AppStateClient;
 import com.google.android.gms.games.GamesClient;
 import com.google.android.gms.plus.PlusClient;
-import com.sam.hex.GameHelper.GameHelperListener;
 import com.sam.hex.activity.DefaultActivity;
 
 /**

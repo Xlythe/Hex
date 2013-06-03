@@ -30,6 +30,7 @@ import com.hex.core.Timer;
 import com.sam.hex.replay.FileExplore;
 import com.sam.hex.replay.Load;
 import com.sam.hex.replay.Save;
+import com.sam.hex.view.BoardView;
 
 public class HexGame extends BaseGameActivity {
     private static final String GAME = "game";

@@ -1,4 +1,4 @@
-package com.sam.hex;
+package com.sam.hex.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -13,6 +13,8 @@ import android.view.View;
 import com.hex.core.Game;
 import com.hex.core.GameAction;
 import com.hex.core.Point;
+import com.sam.hex.BoardTools;
+import com.sam.hex.R;
 
 /**
  * @author Will Harmon
@@ -56,10 +58,12 @@ public class BoardView extends View {
                 if(game.gamePieces[x][y].isWinningPath()) c = Color.GREEN;
                 mCellShadow[x][y].draw(canvas);
                 mCell[x][y].draw(canvas);
+                if(c != Color.TRANSPARENT) {
+                    mDrawableOutline[x][y].getPaint().setColor(getLighterColor(c));
+                    mDrawableOutline[x][y].draw(canvas);
+                }
                 mDrawable[x][y].getPaint().setColor(c);
                 mDrawable[x][y].draw(canvas);
-                mDrawableOutline[x][y].getPaint().setColor(c);
-                mDrawableOutline[x][y].draw(canvas);
             }
     }
 
@@ -74,6 +78,7 @@ public class BoardView extends View {
         mHexagon = new Hexagon[n][n];
         int windowHeight = getHeight();
         int windowWidth = getWidth();
+
         // Size of border
         float margin = getContext().getResources().getDimension(R.dimen.hex_margin);
         float border = margin + getContext().getResources().getDimension(R.dimen.hex_border);
@@ -103,7 +108,7 @@ public class BoardView extends View {
                 mDrawable[xc][yc].setBounds((int) (x - hrad), (int) (y), (int) (x + hrad - drawableBorder), (int) (y + radius * 2 - drawableBorder));
                 mDrawableOutline[xc][yc] = new ShapeDrawable(new PathShape(path, (int) hrad * 2, (int) radius * 2));
                 mDrawableOutline[xc][yc].setBounds((int) (x - hrad), (int) (y), (int) (x + hrad - border), (int) (y + radius * 2 - border));
-                mDrawableOutline[xc][yc].getPaint().setAlpha(80);
+                mDrawableOutline[xc][yc].getPaint().setAlpha(200);
                 mCell[xc][yc] = new ShapeDrawable(new PathShape(path, (int) hrad * 2, (int) radius * 2));
                 mCell[xc][yc].setBounds((int) (x - hrad), (int) (y), (int) (x + hrad - margin), (int) (y + radius * 2 - margin));
                 mCell[xc][yc].getPaint().setColor(Color.WHITE);
@@ -114,6 +119,13 @@ public class BoardView extends View {
                 mHexagon[xc][yc] = new Hexagon(x - hrad, y, radius);
             }
         }
+    }
+
+    private int getLighterColor(int color) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        hsv[2] *= 1.1f;
+        return Color.HSVToColor(hsv);
     }
 
     private class TouchListener implements OnTouchListener {

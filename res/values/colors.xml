@@ -9,4 +9,6 @@
     <drawable name="white">#FFFFFFFF</drawable>
     <drawable name="black">#00000000</drawable>
     <color name="cream">#F0F0F0</color>
+    <color name="background">#D2D2D2</color>
+    <color name="bar_background">#333333</color>
 </resources>

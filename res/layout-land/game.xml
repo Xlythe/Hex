@@ -5,7 +5,7 @@
     android:orientation="horizontal"
     android:background="@color/cream" >
 
-    <com.sam.hex.BoardView
+    <com.sam.hex.view.BoardView
         android:id="@+id/board"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

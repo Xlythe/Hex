@@ -2,6 +2,6 @@
 <resources>
     <dimen name="hex_margin">6dp</dimen>
     <dimen name="hex_border">5dp</dimen>
-    <dimen name="hex_drawable_border">10dp</dimen>
+    <dimen name="hex_drawable_border">5dp</dimen>
     <dimen name="hex_shadow_offset">3dp</dimen>
 </resources>

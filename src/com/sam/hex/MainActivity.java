@@ -5,13 +5,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.sam.hex.view.HexagonLayout;
 
 /**
  * @author Will Harmon
  **/
-public class MainActivity extends SherlockFragmentActivity {
+public class MainActivity extends BaseGameActivity {
+    public static final int REQUEST_ACHIEVEMENTS = 1001;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -74,7 +75,9 @@ public class MainActivity extends SherlockFragmentActivity {
         achievementsButton.setDrawableResource(R.drawable.icon);
         achievementsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
-            public void onClick() {}
+            public void onClick() {
+                startActivityForResult(getGamesClient().getAchievementsIntent(), REQUEST_ACHIEVEMENTS);
+            }
         });
 
         playButton.setText(R.string.main_button_play);
@@ -105,5 +108,17 @@ public class MainActivity extends SherlockFragmentActivity {
         timePlayed.setText(String.format(getString(R.string.main_stats_time_played), timePlayedInHours, timePlayedInMintues, timePlayedInSeconds));
         gamesPlayed.setText(String.format(getString(R.string.main_stats_games_played), Stats.getGamesPlayed(this)));
         gamesWon.setText(String.format(getString(R.string.main_stats_games_won), Stats.getGamesWon(this)));
+    }
+
+    @Override
+    public void onSignInFailed() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onSignInSucceeded() {
+        // TODO Auto-generated method stub
+
     }
 }

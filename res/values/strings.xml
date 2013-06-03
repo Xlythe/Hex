@@ -14,7 +14,6 @@
     <string name="activity_title_instructions">How to Play</string>
     
     <!-- Main page -->
-    <string name="main_label_login">Login</string>
     <string name="main_title" formatted="false">%s\'s stats</string>
     <string name="main_stats_time_played" formatted="false">time played %02d:%02d:%02d</string>
     <string name="main_stats_games_played" formatted="false">games played %s</string>

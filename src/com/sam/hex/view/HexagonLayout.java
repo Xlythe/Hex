@@ -15,6 +15,7 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 
 import com.hex.core.Point;
 
@@ -147,14 +148,54 @@ public class HexagonLayout extends View implements OnTouchListener {
 
     @Override
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        int height = MeasureSpec.getSize(heightMeasureSpec);
-        setMeasuredDimension((int) (height * 1.1547), height);
-        System.out.println("height: " + height);
+        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) getLayoutParams();
+        int desiredHeight = MeasureSpec.getSize(heightMeasureSpec) - lp.topMargin - lp.bottomMargin;
+        int desiredWidth = (int) (desiredHeight * 1.1547);
+
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+
+        int width;
+        int height;
+
+        // Measure Width
+        if(widthMode == MeasureSpec.EXACTLY) {
+            // Must be this size
+            width = widthSize;
+        }
+        else if(widthMode == MeasureSpec.AT_MOST) {
+            // Can't be bigger than...
+            width = Math.min(desiredWidth, widthSize);
+        }
+        else {
+            // Be whatever you want
+            width = desiredWidth;
+        }
+
+        // Measure Height
+        if(heightMode == MeasureSpec.EXACTLY) {
+            // Must be this size
+            height = heightSize;
+        }
+        else if(heightMode == MeasureSpec.AT_MOST) {
+            // Can't be bigger than...
+            height = Math.min(desiredHeight, heightSize);
+        }
+        else {
+            // Be whatever you want
+            height = desiredHeight;
+        }
+
+        // MUST CALL THIS
+        setMeasuredDimension(width, height);
     }
 
     @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
+        w = (int) (h * 1.1547);
+
         // Create a box
         center = new Point(w / 2, h / 2);
 
@@ -165,7 +206,7 @@ public class HexagonLayout extends View implements OnTouchListener {
         corners = new Point[6];
         corners[0] = new Point(w / 4, 0);
         corners[1] = new Point(3 * w / 4, 0);
-        corners[2] = new Point(w, (h / 2));
+        corners[2] = new Point(w, h / 2);
         corners[3] = new Point(3 * w / 4, h);
         corners[4] = new Point(w / 4, h);
         corners[5] = new Point(0, h / 2);

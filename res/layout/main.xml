@@ -47,8 +47,16 @@
         
     </LinearLayout>
     
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/loginEnter"
+        android:layout_width="125dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp" />
+    
     <com.sam.hex.view.HexagonLayout
         android:id="@+id/hexagonButtons"
+        android:layout_marginTop="25dp"
         android:layout_alignParentRight="true"
         android:layout_width="wrap_content"
         android:layout_height="match_parent" />

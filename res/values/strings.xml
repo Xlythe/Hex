@@ -11,6 +11,7 @@
     <string name="achievement_intermediate">CgkI4cuX5qILEAIQBQ</string>
     <string name="achievement_expert">CgkI4cuX5qILEAIQBg</string>
     <string name="leaderboard_score">CgkI4cuX5qILEAIQAQ</string>
+    <string name="activity_title_instructions">How to Play</string>
     
     <!-- Main page -->
     <string name="main_label_login">Login</string>
@@ -56,11 +57,12 @@
     <string name="abstractP2Title">Player 2</string>
     
     <!-- Buttons from top to bottom -->
-    <string name="start">Start Game</string>
-    <string name="resume">Resume Game</string>
-    <string name="online">Play Online</string>
-    <string name="rules">How to Play</string>
-    <string name="options">Settings</string>
+    <string name="main_button_play">play</string>
+    <string name="main_button_settings">settings</string>
+    <string name="main_button_donate">donate</string>
+    <string name="main_button_history">history</string>
+    <string name="main_button_instructions">how to play</string>
+    <string name="main_button_achievements">achievements</string>
     
     <!-- Menu choices -->
     <string name="undo">Undo</string>

@@ -1,35 +1,27 @@
-package com.sam.hex.replay;
+package com.sam.hex;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockActivity;
-import com.sam.hex.DialogBox;
-import com.sam.hex.HexGame;
-import com.sam.hex.R;
 
-public class FileExplore extends SherlockActivity {
+public class HistoryActivity extends SherlockActivity {
 
     // Stores names of traversed directories
     ArrayList<String> str = new ArrayList<String>();
@@ -191,56 +183,10 @@ public class FileExplore extends SherlockActivity {
                 }
                 // File picked
                 else {
-                    new DialogBox(FileExplore.this, chosenFile, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch(which) {
-                            case DialogInterface.BUTTON_POSITIVE:
-                                Intent intent = new Intent(FileExplore.this, HexGame.class);
-                                intent.setData(Uri.fromFile(new File(FileExplore.path + File.separator + FileExplore.chosenFile)));
-                                startActivity(intent);
-                                finish();
-                                break;
-                            case DialogInterface.BUTTON_NEGATIVE:
-                                new File(path + "/" + chosenFile).delete();
-                                loadFileList();
-                                handle.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        loadFileList();
-                                        refreshView();
-                                    }
-                                });
-                                break;
-                            case DialogInterface.BUTTON_NEUTRAL:
-                                final EditText editText = new EditText(FileExplore.this);
-                                editText.setInputType(InputType.TYPE_CLASS_TEXT);
-                                AlertDialog.Builder builder = new AlertDialog.Builder(FileExplore.this);
-                                builder.setTitle(chosenFile).setView(editText)
-                                        .setPositiveButton(getApplicationContext().getString(R.string.okay), new OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                if(!editText.getText().toString().equals("")) {
-                                                    String fileName = editText.getText().toString();
-                                                    if(!fileName.toLowerCase().endsWith(".rhex")) {
-                                                        fileName += ".rhex";
-                                                    }
-                                                    new File(path + "/" + chosenFile).renameTo(new File(path + "/" + fileName));
-                                                    handle.post(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            loadFileList();
-                                                            refreshView();
-                                                        }
-                                                    });
-                                                }
-                                            }
-                                        }).setNegativeButton(getApplicationContext().getString(R.string.cancel), null).show();
-                                break;
-                            }
-                        }
-                    }, getApplicationContext().getString(R.string.loadReplay), getApplicationContext().getString(R.string.rename), getApplicationContext()
-                            .getString(R.string.delete));
+                    Intent intent = new Intent(HistoryActivity.this, GameActivity.class);
+                    intent.setData(Uri.fromFile(new File(HistoryActivity.path + File.separator + HistoryActivity.chosenFile)));
+                    startActivity(intent);
+                    finish();
                 }
             }
         });

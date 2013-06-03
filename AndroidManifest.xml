@@ -11,14 +11,14 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     
 
-    <application android:icon="@drawable/icon" android:label="@string/app_name" android:allowBackup="true" android:theme="@style/LightTheme" android:screenOrientation="landscape" >
-        <activity android:name=".startup.StartUpActivity" android:label="@string/app_name" >
+    <application android:icon="@drawable/icon" android:allowBackup="true" android:theme="@style/LightTheme" >
+        <activity android:label="@string/app_name" android:name=".startup.StartUpActivity" android:screenOrientation="landscape" >
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:label="@string/app_name" android:name=".HexGame" >
+        <activity android:label="@string/app_name" android:name=".HexGame" android:screenOrientation="landscape" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -37,11 +37,11 @@
                 <data android:pathPattern=".*\\.rhex" />
             </intent-filter>
         </activity>
-        <activity android:label="@string/preferences" android:name=".Preferences"  />
-        <activity android:label="@string/rules" android:name=".startup.InstructionsActivity" />
-        <activity android:label="@string/app_name" android:name=".playgames.LoginActivity" />
-        <activity android:label="@string/app_name" android:name=".playgames.NetHexGame" />
-        <activity android:label="@string/app_name" android:name=".replay.FileExplore" />
+        <activity android:label="@string/preferences" android:name=".Preferences" android:screenOrientation="landscape" />
+        <activity android:label="@string/rules" android:name=".startup.InstructionsActivity" android:screenOrientation="landscape" />
+        <activity android:label="@string/app_name" android:name=".playgames.LoginActivity" android:screenOrientation="landscape" />
+        <activity android:label="@string/app_name" android:name=".playgames.NetHexGame" android:screenOrientation="landscape" />
+        <activity android:label="@string/app_name" android:name=".replay.FileExplore" android:screenOrientation="landscape" />
         <meta-data android:name="com.google.android.gms.games.APP_ID" android:value="@string/app_id" />
     </application>
 

@@ -21,12 +21,13 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.sam.hex.activity.PreferenceActivity;
+import com.actionbarsherlock.app.SherlockPreferenceActivity;
+import com.actionbarsherlock.view.MenuItem;
 
 /**
  * @author Will Harmon
  **/
-public class Preferences extends PreferenceActivity {
+public class PreferencesActivity extends SherlockPreferenceActivity {
     private static final int GENERAL = 0;
     private static final int PLAYER1 = 1;
     private static final int PLAYER2 = 2;
@@ -82,6 +83,18 @@ public class Preferences extends PreferenceActivity {
         setListeners();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch(item.getItemId()) {
+        case android.R.id.home:
+            finish();
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
     class nameListener implements OnPreferenceChangeListener {
         @Override
         public boolean onPreferenceChange(Preference pref, Object newValue) {
@@ -130,7 +143,7 @@ public class Preferences extends PreferenceActivity {
     class timerListener implements OnPreferenceClickListener {
         @Override
         public boolean onPreferenceClick(Preference pref) {
-            LayoutInflater inflater = (LayoutInflater) Preferences.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) PreferencesActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View dialoglayout = inflater.inflate(R.layout.preferences_timer, null);
             final Spinner timerType = (Spinner) dialoglayout.findViewById(R.id.timerType);
             final EditText timer = (EditText) dialoglayout.findViewById(R.id.timer);
@@ -152,7 +165,7 @@ public class Preferences extends PreferenceActivity {
                     timer.setVisibility(View.GONE);
                 }
             });
-            AlertDialog.Builder builder = new AlertDialog.Builder(Preferences.this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(PreferencesActivity.this);
             builder.setView(dialoglayout).setPositiveButton(getString(R.string.okay), new OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -174,7 +187,7 @@ public class Preferences extends PreferenceActivity {
 
         @Override
         public boolean onPreferenceClick(Preference preference) {
-            final Intent intent = new Intent(getBaseContext(), Preferences.class);
+            final Intent intent = new Intent(getBaseContext(), PreferencesActivity.class);
             intent.putExtra("type", type);
             startActivity(intent);
             return false;
@@ -274,7 +287,7 @@ public class Preferences extends PreferenceActivity {
     private void showInputDialog(String message) {
         final EditText editText = new EditText(this);
         editText.setInputType(InputType.TYPE_CLASS_NUMBER);
-        AlertDialog.Builder builder = new AlertDialog.Builder(Preferences.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(PreferencesActivity.this);
         builder.setTitle(message).setView(editText).setPositiveButton(getString(R.string.okay), new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

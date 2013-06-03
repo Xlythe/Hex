@@ -27,12 +27,11 @@ import com.hex.core.Player;
 import com.hex.core.PlayerObject;
 import com.hex.core.PlayingEntity;
 import com.hex.core.Timer;
-import com.sam.hex.replay.FileExplore;
 import com.sam.hex.replay.Load;
 import com.sam.hex.replay.Save;
 import com.sam.hex.view.BoardView;
 
-public class HexGame extends BaseGameActivity {
+public class GameActivity extends BaseGameActivity {
     private static final String GAME = "game";
 
     private Game game;
@@ -197,6 +196,7 @@ public class HexGame extends BaseGameActivity {
             @Override
             public void onTurn(PlayingEntity player) {
                 runOnUiThread(new Runnable() {
+                    @SuppressWarnings("deprecation")
                     @Override
                     public void run() {
                         board.postInvalidate();
@@ -316,9 +316,12 @@ public class HexGame extends BaseGameActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch(item.getItemId()) {
+        case android.R.id.home:
+            finish();
+            return true;
         case R.id.settings:
             game.replayRunning = false;
-            startActivity(new Intent(getBaseContext(), Preferences.class));
+            startActivity(new Intent(getBaseContext(), PreferencesActivity.class));
             return true;
         case R.id.undo:
             undo();
@@ -328,9 +331,6 @@ public class HexGame extends BaseGameActivity {
             return true;
         case R.id.replay:
             replay(900);
-            return true;
-        case R.id.loadReplay:
-            startActivity(new Intent(getBaseContext(), FileExplore.class));
             return true;
         case R.id.saveReplay:
             Save save = new Save(game);

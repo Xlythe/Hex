@@ -3,7 +3,7 @@ package com.sam.hex.replay;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -44,11 +44,8 @@ public class Save implements Runnable {
                 file = file + ".rhex";
             }
             try {
-                ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(file));
-
-                outputStream.writeObject(game.save());
-
-                outputStream.flush();
+                OutputStreamWriter outputStream = new OutputStreamWriter(new FileOutputStream(file));
+                outputStream.write(game.save());
                 outputStream.close();
             }
             catch(IOException e) {

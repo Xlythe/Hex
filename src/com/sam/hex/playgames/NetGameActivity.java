@@ -3,7 +3,7 @@ package com.sam.hex.playgames;
 import com.sam.hex.BaseGameActivity;
 
 
-public class NetHexGame extends BaseGameActivity {
+public class NetGameActivity extends BaseGameActivity {
     // private static final String GAME = "game";
     //
     // private Game game;

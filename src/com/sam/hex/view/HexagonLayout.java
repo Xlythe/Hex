@@ -69,7 +69,7 @@ public class HexagonLayout extends View implements OnTouchListener {
         mBackgroundColor = 0xfff1f1f1;
         mButtons = new Button[6];
         for(int i = 0; i < 6; i++) {
-            mButtons[i] = new Button();
+            mButtons[i] = new Button(getContext());
         }
         mBorderWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, dm);
         mBorderShadowWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, dm);
@@ -140,7 +140,7 @@ public class HexagonLayout extends View implements OnTouchListener {
             mBorderShadow[i].draw(canvas);
             mBorder[i].draw(canvas);
             mButtons[i].getDrawable().draw(canvas);
-            canvas.drawText(mButtons[i].getTitle(), center.x - mButtonTextPaint.measureText(mButtons[i].getTitle()) / 2, mButtonTextPaint.getTextSize(),
+            canvas.drawText(mButtons[i].getText(), center.x - mButtonTextPaint.measureText(mButtons[i].getText()) / 2, mButtonTextPaint.getTextSize(),
                     mButtonTextPaint);
         }
         canvas.restore();
@@ -153,6 +153,7 @@ public class HexagonLayout extends View implements OnTouchListener {
         center = new Point((int)boxLength / 2, (int)boxLength / 2);
 
         // Get the length of a side of the hexagon
+        
         int s = (int) (boxLength/2);
         double shortRadius =  ((boxLength /4) * Math.sqrt(3));
         double radiusDiffence = boxLength /2 -shortRadius;
@@ -290,12 +291,17 @@ public class HexagonLayout extends View implements OnTouchListener {
     }
 
     public static class Button {
+        private Context context;
         private HexagonLayout.Button.OnClickListener onClickListener;
         private Drawable drawable;
-        private String title;
+        private String text;
         private int color;
         private Triangle triangle;
         private boolean pressed;
+
+        public Button(Context context) {
+            this.context = context;
+        }
 
         public static interface OnClickListener {
             public void onClick();
@@ -313,16 +319,24 @@ public class HexagonLayout extends View implements OnTouchListener {
             this.drawable = drawable;
         }
 
+        public void setDrawableResource(int id) {
+            setDrawable(context.getResources().getDrawable(id));
+        }
+
         public Drawable getDrawable() {
             return drawable;
         }
 
-        public void setTitle(String title) {
-            this.title = title;
+        public void setText(String text) {
+            this.text = text;
         }
 
-        public String getTitle() {
-            return title;
+        public void setText(int resId) {
+            setText(context.getString(resId));
+        }
+
+        public String getText() {
+            return text;
         }
 
         public void setColor(int color) {

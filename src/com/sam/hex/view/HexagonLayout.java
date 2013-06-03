@@ -23,14 +23,13 @@ import com.hex.core.Point;
  **/
 public class HexagonLayout extends View implements OnTouchListener {
     private int mRotation;
-    private double mShortRadius;
     private Point[] corners;
     private Point center;
 
     private ShapeDrawable mHexagon;
     private int mBackgroundColor;
 
-    private String mTitle;
+    private String mText;
     private float mTextX;
     private float mTextY;
     private float mTextSize;
@@ -76,7 +75,7 @@ public class HexagonLayout extends View implements OnTouchListener {
         mBorderShadowWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, dm);
         mPressedColor = Color.LTGRAY;
         mTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 44, dm);
-        mTitle = "Hex";
+        mText = "Hex";
         mTextPaint = new Paint();
         mTextPaint.setColor(Color.BLACK);
         mTextPadding = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, dm);
@@ -93,7 +92,7 @@ public class HexagonLayout extends View implements OnTouchListener {
 
         Paint paint = mTextPaint;
         if(mTextSize != 0f) paint.setTextSize(mTextSize);
-        float textWidth = paint.measureText(mTitle);
+        float textWidth = paint.measureText(mText);
         float width = screenWidth;
         float textSize = mTextSize;
         if(textWidth > width) {
@@ -102,9 +101,9 @@ public class HexagonLayout extends View implements OnTouchListener {
             mTextSize = textSize;
         }
         else {
-            mTextX = (screenHeight - textWidth) / 2;
+            mTextX = (screenWidth - textWidth) / 2;
         }
-        mTextY = (screenWidth - paint.ascent() - paint.descent()) / 2;
+        mTextY = (screenHeight - paint.ascent() - paint.descent()) / 2;
 
         mTextBackground = new ShapeDrawable(new OvalShape());
         mTextBackground.getPaint().setColor(mBackgroundColor);
@@ -132,7 +131,7 @@ public class HexagonLayout extends View implements OnTouchListener {
             }
         }
 
-        canvas.drawText(mTitle, mTextX, mTextY, mTextPaint);
+        canvas.drawText(mText, mTextX, mTextY, mTextPaint);
 
         canvas.save();
         for(int i = 0; i < 6; i++) {
@@ -140,31 +139,36 @@ public class HexagonLayout extends View implements OnTouchListener {
             mBorderShadow[i].draw(canvas);
             mBorder[i].draw(canvas);
             mButtons[i].getDrawable().draw(canvas);
-            canvas.drawText(mButtons[i].getText(), center.x - mButtonTextPaint.measureText(mButtons[i].getText()) / 2, center.y - (int) mShortRadius
-                    + mButtonTextPaint.getTextSize(), mButtonTextPaint);
+            canvas.drawText(mButtons[i].getText(), center.x - mButtonTextPaint.measureText(mButtons[i].getText()) / 2, mButtonTextPaint.getTextSize(),
+                    mButtonTextPaint);
         }
         canvas.restore();
     }
 
     @Override
+    public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        int height = MeasureSpec.getSize(heightMeasureSpec);
+        setMeasuredDimension((int) (height * 1.1547), height);
+        System.out.println("height: " + height);
+    }
+
+    @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
         // Create a box
-        int boxLength = Math.min(w, h);
-        center = new Point(boxLength / 2, boxLength / 2);
+        center = new Point(w / 2, h / 2);
 
         // Get the length of a side of the hexagon
-        int s = boxLength / 2;
-        mShortRadius = ((boxLength / 4) * Math.sqrt(3));
-        double radiusDiffence = boxLength / 2 - mShortRadius;
+        int s = w / 2;
 
         // Create an array of the corners
         corners = new Point[6];
-        corners[0] = new Point(boxLength / 4, (int) radiusDiffence);
-        corners[1] = new Point(3 * boxLength / 4, (int) radiusDiffence);
-        corners[2] = new Point(boxLength, (int) (boxLength / 2));
-        corners[3] = new Point(3 * boxLength / 4, (int) (boxLength - radiusDiffence));
-        corners[4] = new Point(boxLength / 4, (int) (boxLength - radiusDiffence));
-        corners[5] = new Point(0, boxLength / 2);
+        corners[0] = new Point(w / 4, 0);
+        corners[1] = new Point(3 * w / 4, 0);
+        corners[2] = new Point(w, (h / 2));
+        corners[3] = new Point(3 * w / 4, h);
+        corners[4] = new Point(w / 4, h);
+        corners[5] = new Point(0, h / 2);
 
         // Shape of a hexagon
         Path hexagonPath = new Path();
@@ -188,17 +192,15 @@ public class HexagonLayout extends View implements OnTouchListener {
         Path edgePath = new Path();
         edgePath.moveTo(corners[0].x, corners[0].y);
         edgePath.lineTo(corners[1].x, corners[1].y);
-        edgePath.lineTo((int) (corners[1].x - mBorderWidth / 1.732), center.y - (int) mShortRadius + mBorderWidth);
-        edgePath.lineTo((int) (corners[0].x + mBorderWidth / 1.732), center.y - (int) mShortRadius + mBorderWidth);
+        edgePath.lineTo((int) (corners[1].x - mBorderWidth / 1.732), mBorderWidth);
+        edgePath.lineTo((int) (corners[0].x + mBorderWidth / 1.732), mBorderWidth);
         edgePath.close();
         // Shape of an edge
         Path shadowEdgePath = new Path();
         shadowEdgePath.moveTo(corners[0].x, corners[0].y);
         shadowEdgePath.lineTo(corners[1].x, corners[1].y);
-        shadowEdgePath.lineTo((int) (corners[1].x - (mBorderWidth + mBorderShadowWidth) / 1.732),
-                (center.y - (int) mShortRadius + mBorderWidth + mBorderShadowWidth));
-        shadowEdgePath.lineTo((int) (corners[0].x + (mBorderWidth + mBorderShadowWidth) / 1.732),
-                (center.y - (int) mShortRadius + mBorderWidth + mBorderShadowWidth));
+        shadowEdgePath.lineTo((int) (corners[1].x - (mBorderWidth + mBorderShadowWidth) / 1.732), (mBorderWidth + mBorderShadowWidth));
+        shadowEdgePath.lineTo((int) (corners[0].x + (mBorderWidth + mBorderShadowWidth) / 1.732), (mBorderWidth + mBorderShadowWidth));
         shadowEdgePath.close();
         for(int i = 0; i < 6; i++) {
             Triangle t = new Triangle(new Point(corners[(i + 1) % 6].x, corners[(i + 1) % 6].y), new Point(corners[(i + 2) % 6].x, corners[(i + 2) % 6].y),
@@ -216,7 +218,7 @@ public class HexagonLayout extends View implements OnTouchListener {
 
             mButtons[i].setTriangle(t);
 
-            mButtons[i].getDrawable().setBounds(center.x - s / 6, (int) (s * 0.866 / 2), center.x + s / 6, (int) (s * 0.866 / 2 + s / 3));
+            mButtons[i].getDrawable().setBounds(center.x - s / 6, (int) (s * 0.866 / 2 - s / 6), center.x + s / 6, (int) (s * 0.866 / 2 + s / 6));
 
             mBorder[i] = new ShapeDrawable(new PathShape(edgePath, w, h));
             mBorder[i].getPaint().setColor(mButtons[i].getColor());
@@ -266,8 +268,20 @@ public class HexagonLayout extends View implements OnTouchListener {
         return mButtons;
     }
 
+    public void setText(String text) {
+        mText = text;
+    }
+
+    public void setText(int resId) {
+        setText(getContext().getString(resId));
+    }
+
+    public String getText() {
+        return mText;
+    }
+
     private class Triangle {
-        private Point a, b, c;
+        private final Point a, b, c;
 
         private Triangle(Point a, Point b, Point c) {
             this.a = a;
@@ -292,7 +306,7 @@ public class HexagonLayout extends View implements OnTouchListener {
     }
 
     public static class Button {
-        private Context context;
+        private final Context context;
         private HexagonLayout.Button.OnClickListener onClickListener;
         private Drawable drawable;
         private String text;

@@ -27,6 +27,8 @@ public class MainActivity extends SherlockFragmentActivity {
         HexagonLayout.Button achievementsButton = hexagonLayout.getButtons()[4];
         HexagonLayout.Button playButton = hexagonLayout.getButtons()[5];
 
+        hexagonLayout.setText(R.string.app_name);
+
         settingsButton.setText(R.string.main_button_settings);
         settingsButton.setColor(0xcc5c57);
         settingsButton.setDrawableResource(R.drawable.icon);

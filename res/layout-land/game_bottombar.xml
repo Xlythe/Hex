@@ -18,26 +18,6 @@
         android:clickable="false"
         android:background="@null"
         android:contentDescription="@null"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:text="@string/timer"
-        android:id="@+id/timer"
-        android:textColor="@color/black"
-        android:padding="5dp"
-        android:gravity="center_vertical|center_horizontal"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:text="@null"
-        android:id="@+id/winner"
-        android:textColor="@color/black"
-        android:padding="5dp"
-        android:gravity="center_vertical"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
     <Button
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

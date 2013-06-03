@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -36,6 +37,7 @@ public class GameActivity extends BaseGameActivity {
 
     private Game game;
     private boolean replay;
+    private int replayDuration;
 
     BoardView board;
     ImageButton player1Icon;
@@ -52,6 +54,7 @@ public class GameActivity extends BaseGameActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Must be set up immediately
         initializeNewGame();
@@ -61,6 +64,7 @@ public class GameActivity extends BaseGameActivity {
             game = (Game) savedInstanceState.getSerializable(GAME);
             game.setGameListener(createGameListener());
             replay = true;
+            replayDuration = 0;
         }
         else {
             // Check to see if we should load a game
@@ -70,6 +74,7 @@ public class GameActivity extends BaseGameActivity {
                 game = load.run();
                 game.setGameListener(createGameListener());
                 replay = true;
+                replayDuration = 900;
             }
         }
 
@@ -86,15 +91,16 @@ public class GameActivity extends BaseGameActivity {
     private void applyBoard() {
         setContentView(R.layout.game);
 
+        getSupportActionBar().setCustomView(View.inflate(this, R.layout.actionbar_message, null));
         board = (BoardView) findViewById(R.id.board);
         board.setGame(game);
         player1Icon = (ImageButton) findViewById(R.id.p1);
         player2Icon = (ImageButton) findViewById(R.id.p2);
-        timerText = (TextView) findViewById(R.id.timer);
+        timerText = (TextView) getSupportActionBar().getCustomView().findViewById(R.id.timer);
         if(game.gameOptions.timer.type == 0 || game.isGameOver()) {
             timerText.setVisibility(View.GONE);
         }
-        winnerText = (TextView) findViewById(R.id.winner);
+        winnerText = (TextView) getSupportActionBar().getCustomView().findViewById(R.id.winner);
         if(game.isGameOver() && game.getGameListener() != null) game.getGameListener().onWin(game.getCurrentPlayer());
 
         replayForward = (ImageButton) findViewById(R.id.replayForward);
@@ -288,7 +294,7 @@ public class GameActivity extends BaseGameActivity {
         }
         else if(replay) {
             replay = false;
-            replay(800);
+            replay(replayDuration);
         }
         else if(somethingChanged(prefs, GameAction.LOCAL_GAME, game)) {
             initializeNewGame();

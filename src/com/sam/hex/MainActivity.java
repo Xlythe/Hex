@@ -18,6 +18,7 @@ public class MainActivity extends SherlockFragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         getSupportActionBar().hide();
+        // this is a test
 
         TextView title = (TextView) findViewById(R.id.title);
         TextView timePlayed = (TextView) findViewById(R.id.timePlayed);

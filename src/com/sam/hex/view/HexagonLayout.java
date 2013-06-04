@@ -116,8 +116,7 @@ public class HexagonLayout extends View implements OnTouchListener {
     protected void onDraw(Canvas canvas) {
         canvas.rotate(mRotation, center.x, center.y);
         mHexagon.draw(canvas);
-        
-        
+
         canvas.drawLine(corners[0].x, corners[0].y, center.x, center.y, mLinePaint);
         canvas.drawLine(corners[1].x, corners[1].y, center.x, center.y, mLinePaint);
         canvas.drawLine(corners[2].x, corners[2].y, center.x, center.y, mLinePaint);
@@ -213,7 +212,6 @@ public class HexagonLayout extends View implements OnTouchListener {
         corners[4] = new Point(w / 4, h);
         corners[5] = new Point(0, h / 2);
 
-
         // Shape of a hexagon
         Path hexagonPath = new Path();
         hexagonPath.moveTo(corners[0].x, corners[0].y);
@@ -262,14 +260,14 @@ public class HexagonLayout extends View implements OnTouchListener {
 
             mButtons[i].setTriangle(t);
 
-            mButtons[i].getDrawable().setBounds((int)(center.x - s / 6), (int) (s * 0.866 / 2 - s / 6), (int)(center.x + s / 6), (int) (s * 0.866 / 2 + s / 6));
+            mButtons[i].getDrawable().setBounds((center.x - s / 6), (int) (s * 0.866 / 2 - s / 6), (center.x + s / 6), (int) (s * 0.866 / 2 + s / 6));
 
             mBorder[i] = new ShapeDrawable(new PathShape(edgePath, w, h));
             mBorder[i].getPaint().setColor(mButtons[i].getColor());
             mBorder[i].setBounds(0, 0, w, h);
 
             mBorderShadow[i] = new ShapeDrawable(new PathShape(shadowEdgePath, w, h));
-            mBorderShadow[i].getPaint().setColor(getDarkerColor(mButtons[i].getColor())); 
+            mBorderShadow[i].getPaint().setColor(getDarkerColor(mButtons[i].getColor()));
             mBorderShadow[i].setBounds(0, 0, w, h);
         }
 
@@ -278,9 +276,19 @@ public class HexagonLayout extends View implements OnTouchListener {
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        if(event.getAction() == MotionEvent.ACTION_UP) {
+        if(event.getAction() == MotionEvent.ACTION_DOWN) {
             for(Button b : mButtons) {
                 if(b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
+                    b.setPressed(true);
+                }
+                else {
+                    b.setPressed(false);
+                }
+            }
+        }
+        else if(event.getAction() == MotionEvent.ACTION_UP) {
+            for(Button b : mButtons) {
+                if(b.isPressed()) {
                     b.preformClick();
                 }
                 b.setPressed(false);
@@ -288,11 +296,10 @@ public class HexagonLayout extends View implements OnTouchListener {
         }
         else {
             for(Button b : mButtons) {
-                if(b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
-                    b.setPressed(true);
-                }
-                else {
-                    b.setPressed(false);
+                if(b.isPressed()) {
+                    if(!b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
+                        b.setPressed(false);
+                    }
                 }
             }
         }

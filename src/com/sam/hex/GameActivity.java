@@ -202,19 +202,13 @@ public class GameActivity extends BaseGameActivity {
                             }
 
                             // Unlock the Novice achievement!
-                            if(Stats.getGamesPlayed(getApplicationContext()) > 10) {
-                                getGamesClient().unlockAchievement(getString(R.string.achievement_novice));
-                            }
+                            getGamesClient().incrementAchievement(getString(R.string.achievement_novice), 1);
 
                             // Unlock the Intermediate achievement!
-                            if(Stats.getGamesPlayed(getApplicationContext()) > 25) {
-                                getGamesClient().unlockAchievement(getString(R.string.achievement_intermediate));
-                            }
+                            getGamesClient().incrementAchievement(getString(R.string.achievement_intermediate), 1);
 
                             // Unlock the Expert achievement!
-                            if(Stats.getGamesWon(getApplicationContext()) > 100) {
-                                getGamesClient().unlockAchievement(getString(R.string.achievement_expert));
-                            }
+                            getGamesClient().incrementAchievement(getString(R.string.achievement_expert), player.getTeam() % 2);
                         }
                     }
                 });
@@ -539,7 +533,7 @@ public class GameActivity extends BaseGameActivity {
                     || Integer.valueOf(prefs.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME))) * 60 * 1000 != game.gameOptions.timer.totalTime;
         }
         else if(gameLocation == GameAction.NET_GAME) {
-            return(game != null && game.isGameOver());
+            return (game != null && game.isGameOver());
         }
         else {
             return true;

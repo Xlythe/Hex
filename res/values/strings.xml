@@ -4,6 +4,7 @@
     
     <!-- Application name and constants -->
     <string name="app_name">Hex</string>
+
     <string name="app_id">307536683764</string>
     <string name="achievement_30_seconds">CgkI9MX11PkIEAIQCg</string>
     <string name="achievement_fill_the_board">CgkI9MX11PkIEAIQCw</string>
@@ -21,7 +22,6 @@
     
     <!-- Preferences -->
     <string name="preferences_title_options">Options</string>
-    <string name="preferences_title_reset">Reset</string>
     
     <string name="preferences">Settings</string>
     <string name="gameSizeTitle">Board Size</string>

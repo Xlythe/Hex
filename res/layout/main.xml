@@ -47,12 +47,25 @@
         
     </LinearLayout>
     
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/loginEnter"
-        android:layout_width="125dp"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="10dp" />
+        android:layout_margin="10dp"
+        android:layout_alignParentBottom="true" >
+
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/signInButton"
+            android:layout_width="125dp"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/signOutButton"
+            android:text="Sign Out"
+            android:layout_width="125dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+    
+    </LinearLayout>
     
     <com.sam.hex.view.HexagonLayout
         android:id="@+id/hexagonButtons"

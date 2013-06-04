@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.common.SignInButton;
@@ -16,6 +17,7 @@ public class MainActivity extends BaseGameActivity {
     public static final int REQUEST_ACHIEVEMENTS = 1001;
 
     SignInButton mSignInButton;
+    Button mSignOutButton;
     boolean mIsSignedIn = false;
 
     /** Called when the activity is first created. */
@@ -24,6 +26,7 @@ public class MainActivity extends BaseGameActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         getSupportActionBar().hide();
+        enableDebugLog(true, "HEX_DEBUG");
 
         HexagonLayout hexagonLayout = (HexagonLayout) findViewById(R.id.hexagonButtons);
         HexagonLayout.Button settingsButton = hexagonLayout.getButtons()[0];
@@ -97,11 +100,19 @@ public class MainActivity extends BaseGameActivity {
             }
         });
 
-        mSignInButton = (SignInButton) findViewById(R.id.loginEnter);
+        mSignInButton = (SignInButton) findViewById(R.id.signInButton);
         mSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 beginUserInitiatedSignIn();
+            }
+        });
+
+        mSignOutButton = (Button) findViewById(R.id.signOutButton);
+        mSignOutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signOut();
             }
         });
     }
@@ -129,10 +140,15 @@ public class MainActivity extends BaseGameActivity {
     public void onSignInSucceeded() {
         System.out.println("Signed in");
         mIsSignedIn = true;
+        mSignOutButton.setVisibility(View.VISIBLE);
+        mSignInButton.setVisibility(View.GONE);
     }
 
     @Override
     public void onSignInFailed() {
         System.out.println("Sign in failed");
+        mIsSignedIn = false;
+        mSignOutButton.setVisibility(View.GONE);
+        mSignInButton.setVisibility(View.VISIBLE);
     }
 }

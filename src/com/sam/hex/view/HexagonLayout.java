@@ -15,6 +15,7 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 
 import com.hex.core.Point;
 
@@ -29,7 +30,7 @@ public class HexagonLayout extends View implements OnTouchListener {
     private ShapeDrawable mHexagon;
     private int mBackgroundColor;
 
-    private String mTitle;
+    private String mText;
     private float mTextX;
     private float mTextY;
     private float mTextSize;
@@ -75,7 +76,7 @@ public class HexagonLayout extends View implements OnTouchListener {
         mBorderShadowWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, dm);
         mPressedColor = Color.LTGRAY;
         mTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 44, dm);
-        mTitle = "Hex";
+        mText = "Hex";
         mTextPaint = new Paint();
         mTextPaint.setColor(Color.BLACK);
         mTextPadding = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, dm);
@@ -92,7 +93,7 @@ public class HexagonLayout extends View implements OnTouchListener {
 
         Paint paint = mTextPaint;
         if(mTextSize != 0f) paint.setTextSize(mTextSize);
-        float textWidth = paint.measureText(mTitle);
+        float textWidth = paint.measureText(mText);
         float width = screenWidth;
         float textSize = mTextSize;
         if(textWidth > width) {
@@ -101,9 +102,9 @@ public class HexagonLayout extends View implements OnTouchListener {
             mTextSize = textSize;
         }
         else {
-            mTextX = (screenHeight - textWidth) / 2;
+            mTextX = (screenWidth - textWidth) / 2;
         }
-        mTextY = (screenWidth - paint.ascent() - paint.descent()) / 2;
+        mTextY = (screenHeight - paint.ascent() - paint.descent()) / 2;
 
         mTextBackground = new ShapeDrawable(new OvalShape());
         mTextBackground.getPaint().setColor(mBackgroundColor);
@@ -132,7 +133,7 @@ public class HexagonLayout extends View implements OnTouchListener {
             }
         }
 
-        canvas.drawText(mTitle, mTextX, mTextY, mTextPaint);
+        canvas.drawText(mText, mTextX, mTextY, mTextPaint);
 
         canvas.save();
         for(int i = 0; i < 6; i++) {
@@ -147,25 +148,71 @@ public class HexagonLayout extends View implements OnTouchListener {
     }
 
     @Override
+    public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) getLayoutParams();
+        int desiredHeight = MeasureSpec.getSize(heightMeasureSpec) - lp.topMargin - lp.bottomMargin;
+        int desiredWidth = (int) (desiredHeight * 1.1547);
+
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+
+        int width;
+        int height;
+
+        // Measure Width
+        if(widthMode == MeasureSpec.EXACTLY) {
+            // Must be this size
+            width = widthSize;
+        }
+        else if(widthMode == MeasureSpec.AT_MOST) {
+            // Can't be bigger than...
+            width = Math.min(desiredWidth, widthSize);
+        }
+        else {
+            // Be whatever you want
+            width = desiredWidth;
+        }
+
+        // Measure Height
+        if(heightMode == MeasureSpec.EXACTLY) {
+            // Must be this size
+            height = heightSize;
+        }
+        else if(heightMode == MeasureSpec.AT_MOST) {
+            // Can't be bigger than...
+            height = Math.min(desiredHeight, heightSize);
+        }
+        else {
+            // Be whatever you want
+            height = desiredHeight;
+        }
+
+        // MUST CALL THIS
+        setMeasuredDimension(width, height);
+    }
+
+    @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
+        w = (int) (h * 1.1547);
+
         // Create a box
-        double boxLength = Math.min(w, h);
-        center = new Point((int)boxLength / 2, (int)boxLength / 2);
+
+        center = new Point(w / 2, h / 2);
 
         // Get the length of a side of the hexagon
-        
-        int s = (int) (boxLength/2);
-        double shortRadius =  ((boxLength /4) * Math.sqrt(3));
-        double radiusDiffence = boxLength /2 -shortRadius;
+        int s = w / 2;
 
         // Create an array of the corners
         corners = new Point[6];
-        corners[0] = new Point((int) ((boxLength) / 4), (int) radiusDiffence);
-        corners[1] = new Point((int) ((3*boxLength) / 4), (int)radiusDiffence);
-        corners[2] = new Point((int)boxLength,(int)( boxLength / 2));
-        corners[3] = new Point((int) (3*boxLength  / 4), (int)(boxLength-radiusDiffence));
-        corners[4] = new Point((int) ((boxLength)  / 4),(int) (boxLength-radiusDiffence));
-        corners[5] = new Point(0, (int)(boxLength / 2));
+        corners[0] = new Point(w / 4, 0);
+        corners[1] = new Point(3 * w / 4, 0);
+        corners[2] = new Point(w, h / 2);
+        corners[3] = new Point(3 * w / 4, h);
+        corners[4] = new Point(w / 4, h);
+        corners[5] = new Point(0, h / 2);
+
 
         // Shape of a hexagon
         Path hexagonPath = new Path();
@@ -265,8 +312,20 @@ public class HexagonLayout extends View implements OnTouchListener {
         return mButtons;
     }
 
+    public void setText(String text) {
+        mText = text;
+    }
+
+    public void setText(int resId) {
+        setText(getContext().getString(resId));
+    }
+
+    public String getText() {
+        return mText;
+    }
+
     private class Triangle {
-        private Point a, b, c;
+        private final Point a, b, c;
 
         private Triangle(Point a, Point b, Point c) {
             this.a = a;
@@ -291,7 +350,7 @@ public class HexagonLayout extends View implements OnTouchListener {
     }
 
     public static class Button {
-        private Context context;
+        private final Context context;
         private HexagonLayout.Button.OnClickListener onClickListener;
         private Drawable drawable;
         private String text;

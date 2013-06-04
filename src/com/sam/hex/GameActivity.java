@@ -3,12 +3,16 @@ package com.sam.hex;
 import java.io.File;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -34,8 +38,13 @@ import com.sam.hex.view.BoardView;
 public class GameActivity extends BaseGameActivity {
     private static final String GAME = "game";
 
+    boolean mIsSignedIn = false;
+
     private Game game;
     private boolean replay;
+    private int replayDuration;
+    private long timeGamePaused;
+    private long whenGamePaused;
 
     BoardView board;
     ImageButton player1Icon;
@@ -51,29 +60,43 @@ public class GameActivity extends BaseGameActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        // Must be set up immediately
-        initializeNewGame();
-
-        if(savedInstanceState != null) {
+        if(savedInstanceState != null && savedInstanceState.containsKey(GAME)) {
             // Resume a game if one exists
             game = (Game) savedInstanceState.getSerializable(GAME);
             game.setGameListener(createGameListener());
             replay = true;
+            replayDuration = 0;
+        }
+        else if(getIntent().getData() != null) {
+            // Check to see if we should load a game
+            Load load = new Load(new File(getIntent().getData().getPath()));
+            game = load.run();
+            game.setGameListener(createGameListener());
+            replay = true;
+            replayDuration = 900;
         }
         else {
-            // Check to see if we should load a game
-            Intent intent = getIntent();
-            if(intent.getData() != null) {
-                Load load = new Load(new File(intent.getData().getPath()));
-                game = load.run();
-                game.setGameListener(createGameListener());
-                replay = true;
-            }
+            // Create a new game
+            initializeNewGame();
         }
 
         // Load the UI
         applyBoard();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        whenGamePaused = System.currentTimeMillis();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stopGame(game);
     }
 
     @Override
@@ -85,15 +108,26 @@ public class GameActivity extends BaseGameActivity {
     private void applyBoard() {
         setContentView(R.layout.game);
 
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            timerText = (TextView) findViewById(R.id.timer);
+            winnerText = (TextView) findViewById(R.id.winner);
+        }
+        else {
+            LayoutInflater inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View v = inflator.inflate(R.layout.actionbar_message, null);
+            getSupportActionBar().setCustomView(v);
+            getSupportActionBar().setDisplayShowCustomEnabled(true);
+
+            winnerText = (TextView) v.findViewById(R.id.winner);
+            timerText = (TextView) v.findViewById(R.id.timer);
+        }
         board = (BoardView) findViewById(R.id.board);
         board.setGame(game);
         player1Icon = (ImageButton) findViewById(R.id.p1);
         player2Icon = (ImageButton) findViewById(R.id.p2);
-        timerText = (TextView) findViewById(R.id.timer);
         if(game.gameOptions.timer.type == 0 || game.isGameOver()) {
             timerText.setVisibility(View.GONE);
         }
-        winnerText = (TextView) findViewById(R.id.winner);
         if(game.isGameOver() && game.getGameListener() != null) game.getGameListener().onWin(game.getCurrentPlayer());
 
         replayForward = (ImageButton) findViewById(R.id.replayForward);
@@ -107,6 +141,7 @@ public class GameActivity extends BaseGameActivity {
 
         // Stop the old game
         stopGame(game);
+        timeGamePaused = 0;
 
         // Create a new game object
         GameOptions go = new GameOptions();
@@ -145,23 +180,40 @@ public class GameActivity extends BaseGameActivity {
                         timerText.invalidate();
                         board.invalidate();
 
-                        // Unlock the quick play achievement!
-                        if(game.getGameLength() < 30 * 1000) {
-                            if(mIsSignedIn) {
+                        Stats.incrementTimePlayed(getApplicationContext(), game.getGameLength() - timeGamePaused);
+                        Stats.incrementGamesPlayed(getApplicationContext());
+                        if(player.getTeam() == 1) Stats.incrementGamesWon(getApplicationContext());
+
+                        if(mIsSignedIn) {
+                            // Unlock the quick play achievement!
+                            if(game.getGameLength() < 30 * 1000) {
                                 getGamesClient().unlockAchievement(getString(R.string.achievement_30_seconds));
                             }
-                        }
 
-                        // Unlock the fill the board achievement!
-                        boolean boardFilled = true;
-                        for(int i = 0; i < game.gameOptions.gridSize; i++) {
-                            for(int j = 0; j < game.gameOptions.gridSize; j++) {
-                                if(game.gamePieces[i][j].getTeam() == 0) boardFilled = false;
+                            // Unlock the fill the board achievement!
+                            boolean boardFilled = true;
+                            for(int i = 0; i < game.gameOptions.gridSize; i++) {
+                                for(int j = 0; j < game.gameOptions.gridSize; j++) {
+                                    if(game.gamePieces[i][j].getTeam() == 0) boardFilled = false;
+                                }
                             }
-                        }
-                        if(boardFilled) {
-                            if(mIsSignedIn) {
+                            if(boardFilled) {
                                 getGamesClient().unlockAchievement(getString(R.string.achievement_fill_the_board));
+                            }
+
+                            // Unlock the Novice achievement!
+                            if(Stats.getGamesPlayed(getApplicationContext()) > 10) {
+                                getGamesClient().unlockAchievement(getString(R.string.achievement_novice));
+                            }
+
+                            // Unlock the Intermediate achievement!
+                            if(Stats.getGamesPlayed(getApplicationContext()) > 25) {
+                                getGamesClient().unlockAchievement(getString(R.string.achievement_intermediate));
+                            }
+
+                            // Unlock the Expert achievement!
+                            if(Stats.getGamesWon(getApplicationContext()) > 100) {
+                                getGamesClient().unlockAchievement(getString(R.string.achievement_expert));
                             }
                         }
                     }
@@ -263,6 +315,7 @@ public class GameActivity extends BaseGameActivity {
 
             @Override
             public void displayTime(final int minutes, final int seconds) {
+                System.out.println("running!" + minutes + ", " + seconds);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -277,6 +330,10 @@ public class GameActivity extends BaseGameActivity {
     @Override
     public void onResume() {
         super.onResume();
+        if(whenGamePaused != 0) {
+            timeGamePaused += System.currentTimeMillis() - whenGamePaused;
+            whenGamePaused = 0;
+        }
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Check if settings were changed and we need to run a new game
@@ -285,7 +342,7 @@ public class GameActivity extends BaseGameActivity {
         }
         else if(replay) {
             replay = false;
-            replay(800);
+            replay(replayDuration);
         }
         else if(somethingChanged(prefs, GameAction.LOCAL_GAME, game)) {
             initializeNewGame();
@@ -525,8 +582,6 @@ public class GameActivity extends BaseGameActivity {
         builder.setMessage(getString(R.string.confirmExit)).setPositiveButton(getString(R.string.yes), dialogClickListener)
                 .setNegativeButton(getString(R.string.no), dialogClickListener).show();
     }
-
-    boolean mIsSignedIn = false;
 
     @Override
     public void onSignInSucceeded() {

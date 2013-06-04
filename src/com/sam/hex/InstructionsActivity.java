@@ -16,6 +16,7 @@ public class InstructionsActivity extends SherlockFragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.instructions);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         TextView view = (TextView) findViewById(R.id.rules);
         view.setMovementMethod(LinkMovementMethod.getInstance());

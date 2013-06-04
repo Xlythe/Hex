@@ -55,6 +55,7 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         settings = PreferenceManager.getDefaultSharedPreferences(this);
 
         if(getIntent().getExtras() != null) {
@@ -134,7 +135,7 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
                 return false;
             }
             else {
-                preference.setSummary(String.format(getString(R.string.gameSizeSummary_onChange), newValue));
+                preference.setSummary(String.format(getString(R.string.gameSizeSummary_onChange), newValue, newValue));
                 return true;
             }
         }
@@ -233,10 +234,9 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
         gridPref = findPreference("gameSizePref");
         if(gridPref != null) {
             String defaultBoardSize = getString(R.integer.DEFAULT_BOARD_SIZE);
-            if(Integer.valueOf(settings.getString("gameSizePref", defaultBoardSize)) == 0) gridPref.setSummary(String.format(
-                    getString(R.string.gameSizeSummary_onChange), Integer.valueOf(settings.getString("customGameSizePref", defaultBoardSize))));
-            else gridPref.setSummary(String.format(getString(R.string.gameSizeSummary_onChange),
-                    Integer.valueOf(settings.getString("gameSizePref", defaultBoardSize))));
+            String boardSize = Integer.valueOf(settings.getString("gameSizePref", defaultBoardSize)) == 0 ? settings.getString("customGameSizePref",
+                    defaultBoardSize) : settings.getString("gameSizePref", defaultBoardSize);
+            gridPref.setSummary(String.format(getString(R.string.gameSizeSummary_onChange), boardSize, boardSize));
             gridPref.setOnPreferenceChangeListener(new gridListener());
         }
 
@@ -301,8 +301,8 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
                     }
                     settings.edit().putString("customGameSizePref", String.valueOf(input)).commit();
                     settings.edit().putString("gameSizePref", String.valueOf(0)).commit();
-                    gridPref.setSummary(String.format(getString(R.string.gameSizeSummary_onChange),
-                            Integer.valueOf(settings.getString("customGameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE)))));
+                    String boardSize = settings.getString("customGameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE));
+                    gridPref.setSummary(String.format(getString(R.string.gameSizeSummary_onChange), boardSize, boardSize));
                     generalScreen.removeAll();
                     loadPreferences();
                     setListeners();

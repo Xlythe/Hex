@@ -3,15 +3,21 @@ package com.sam.hex;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.google.android.gms.common.SignInButton;
 import com.sam.hex.view.HexagonLayout;
 
 /**
  * @author Will Harmon
  **/
-public class MainActivity extends SherlockFragmentActivity {
+public class MainActivity extends BaseGameActivity {
+    public static final int REQUEST_ACHIEVEMENTS = 1001;
+
+    SignInButton mSignInButton;
+    boolean mIsSignedIn = false;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -19,10 +25,6 @@ public class MainActivity extends SherlockFragmentActivity {
         setContentView(R.layout.main);
         getSupportActionBar().hide();
 
-        TextView title = (TextView) findViewById(R.id.title);
-        TextView timePlayed = (TextView) findViewById(R.id.timePlayed);
-        TextView gamesPlayed = (TextView) findViewById(R.id.gamesPlayed);
-        TextView gamesWon = (TextView) findViewById(R.id.gamesWon);
         HexagonLayout hexagonLayout = (HexagonLayout) findViewById(R.id.hexagonButtons);
         HexagonLayout.Button settingsButton = hexagonLayout.getButtons()[0];
         HexagonLayout.Button donateButton = hexagonLayout.getButtons()[1];
@@ -31,10 +33,7 @@ public class MainActivity extends SherlockFragmentActivity {
         HexagonLayout.Button achievementsButton = hexagonLayout.getButtons()[4];
         HexagonLayout.Button playButton = hexagonLayout.getButtons()[5];
 
-        title.setText("Will's stats");
-        timePlayed.setText("time played 00:00:00");
-        gamesPlayed.setText("games played 15");
-        gamesWon.setText("games won 10");
+        hexagonLayout.setText(R.string.app_name);
 
         settingsButton.setText(R.string.main_button_settings);
         settingsButton.setColor(0xcc5c57);
@@ -81,7 +80,11 @@ public class MainActivity extends SherlockFragmentActivity {
         achievementsButton.setDrawableResource(R.drawable.icon);
         achievementsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
-            public void onClick() {}
+            public void onClick() {
+                if(mIsSignedIn) {
+                    startActivityForResult(getGamesClient().getAchievementsIntent(), REQUEST_ACHIEVEMENTS);
+                }
+            }
         });
 
         playButton.setText(R.string.main_button_play);
@@ -93,5 +96,43 @@ public class MainActivity extends SherlockFragmentActivity {
                 startActivity(new Intent(getBaseContext(), GameActivity.class));
             }
         });
+
+        mSignInButton = (SignInButton) findViewById(R.id.loginEnter);
+        mSignInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                beginUserInitiatedSignIn();
+            }
+        });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        TextView title = (TextView) findViewById(R.id.title);
+        TextView timePlayed = (TextView) findViewById(R.id.timePlayed);
+        TextView gamesPlayed = (TextView) findViewById(R.id.gamesPlayed);
+        TextView gamesWon = (TextView) findViewById(R.id.gamesWon);
+
+        title.setText(String.format(getString(R.string.main_title), Stats.getPlayer1Name(this)));
+        long timePlayedInMillis = Stats.getTimePlayed(this);
+        long timePlayedInHours = timePlayedInMillis / (1000 * 60 * 60);
+        long timePlayedInMintues = (timePlayedInMillis - timePlayedInHours * (1000 * 60 * 60)) / (1000 * 60);
+        long timePlayedInSeconds = (timePlayedInMillis - timePlayedInHours * (1000 * 60 * 60) - timePlayedInMintues * (1000 * 60)) / (1000);
+        timePlayed.setText(String.format(getString(R.string.main_stats_time_played), timePlayedInHours, timePlayedInMintues, timePlayedInSeconds));
+        gamesPlayed.setText(String.format(getString(R.string.main_stats_games_played), Stats.getGamesPlayed(this)));
+        gamesWon.setText(String.format(getString(R.string.main_stats_games_won), Stats.getGamesWon(this)));
+    }
+
+    @Override
+    public void onSignInSucceeded() {
+        System.out.println("Signed in");
+        mIsSignedIn = true;
+    }
+
+    @Override
+    public void onSignInFailed() {
+        System.out.println("Sign in failed");
     }
 }

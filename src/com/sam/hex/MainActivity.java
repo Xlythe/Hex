@@ -150,6 +150,12 @@ public class MainActivity extends BaseGameActivity {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        mIsSignedIn = false;
+    }
+
+    @Override
     public void onSignInSucceeded() {
         System.out.println("Signed in");
         mIsSignedIn = true;

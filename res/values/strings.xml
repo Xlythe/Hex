@@ -4,21 +4,24 @@
     
     <!-- Application name and constants -->
     <string name="app_name">Hex</string>
-    <string name="app_id">387298223585</string>
-    <string name="achievement_30_seconds">CgkI4cuX5qILEAIQAg</string>
-    <string name="achievement_fill_the_board">CgkI4cuX5qILEAIQAw</string>
-    <string name="achievement_novice">CgkI4cuX5qILEAIQBA</string>
-    <string name="achievement_intermediate">CgkI4cuX5qILEAIQBQ</string>
-    <string name="achievement_expert">CgkI4cuX5qILEAIQBg</string>
-    <string name="leaderboard_score">CgkI4cuX5qILEAIQAQ</string>
+
+    <string name="app_id">307536683764</string>
+    <string name="achievement_30_seconds">CgkI9MX11PkIEAIQCg</string>
+    <string name="achievement_fill_the_board">CgkI9MX11PkIEAIQCw</string>
+    <string name="achievement_novice">CgkI9MX11PkIEAIQDA</string>
+    <string name="achievement_intermediate">CgkI9MX11PkIEAIQDQ</string>
+    <string name="achievement_expert">CgkI9MX11PkIEAIQDg</string>
+<!--     <string name="leaderboard_score">CgkI4cuX5qILEAIQAQ</string> -->
     <string name="activity_title_instructions">How to Play</string>
     
     <!-- Main page -->
-    <string name="main_label_login">Login</string>
+    <string name="main_title" formatted="false">%s\'s stats</string>
+    <string name="main_stats_time_played" formatted="false">time played %02d:%02d:%02d</string>
+    <string name="main_stats_games_played" formatted="false">games played %s</string>
+    <string name="main_stats_games_won" formatted="false">games won %s</string>
     
     <!-- Preferences -->
     <string name="preferences_title_options">Options</string>
-    <string name="preferences_title_reset">Reset</string>
     
     <string name="preferences">Settings</string>
     <string name="gameSizeTitle">Board Size</string>

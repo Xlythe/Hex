@@ -55,7 +55,7 @@ public class BoardView extends View {
                 int c = Color.TRANSPARENT;
                 if(game.gamePieces[x][y].getTeam() == game.getPlayer1().getTeam()) c = game.getPlayer1().getColor();
                 else if(game.gamePieces[x][y].getTeam() == game.getPlayer2().getTeam()) c = game.getPlayer2().getColor();
-                if(game.gamePieces[x][y].isWinningPath()) c = Color.GREEN;
+                if(game.gamePieces[x][y].isWinningPath()) c = getDarkerColor(c);
                 mCellShadow[x][y].draw(canvas);
                 mCell[x][y].draw(canvas);
                 if(c != Color.TRANSPARENT) {
@@ -128,6 +128,13 @@ public class BoardView extends View {
         return Color.HSVToColor(hsv);
     }
 
+    private int getDarkerColor(int color) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        hsv[2] *= 0.8f;
+        return Color.HSVToColor(hsv);
+    }
+
     private class TouchListener implements OnTouchListener {
         Game game;
 
@@ -157,9 +164,9 @@ public class BoardView extends View {
 
     public class Hexagon {
         // Polygon coodinates.
-        private int[] polyY, polyX;
+        private final int[] polyY, polyX;
         // Number of sides in the polygon.
-        private int polySides = 6;
+        private final int polySides = 6;
 
         public Hexagon(double x, double y, double r) {
             polyX = getXCoordinates(x, y, r, 6, Math.PI / 2);

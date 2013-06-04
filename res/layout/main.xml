@@ -47,11 +47,31 @@
         
     </LinearLayout>
     
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_alignParentBottom="true" >
+
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/signInButton"
+            android:layout_width="125dp"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/signOutButton"
+            android:text="Sign Out"
+            android:layout_width="125dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+    
+    </LinearLayout>
+    
     <com.sam.hex.view.HexagonLayout
         android:id="@+id/hexagonButtons"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="25dp"
         android:layout_alignParentRight="true"
-        android:layout_width="350dp"
-        android:layout_height="350dp" />
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent" />
     
 </RelativeLayout>

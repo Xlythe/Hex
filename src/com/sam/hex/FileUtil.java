@@ -3,11 +3,9 @@ package com.sam.hex;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.StreamCorruptedException;
 import java.util.Locale;
 
 import android.os.Environment;
@@ -29,7 +27,7 @@ public class FileUtil {
         return Game.load(text.toString());
     }
 
-    public static void saveGame(String fileName, String gameState) throws StreamCorruptedException, FileNotFoundException, IOException {
+    public static void saveGame(String fileName, String gameState) throws IOException {
         if(!fileName.toLowerCase(Locale.getDefault()).endsWith(".rhex")) {
             fileName = fileName + ".rhex";
         }

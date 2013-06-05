@@ -1,8 +1,6 @@
 package com.sam.hex;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.StreamCorruptedException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -44,6 +42,7 @@ import com.sam.hex.view.BoardView;
 
 public class GameActivity extends BaseGameActivity {
     private static final String GAME = "game";
+    private static final SimpleDateFormat SAVE_FORMAT = new SimpleDateFormat("MMM dd, yyyy (HH:mm a)", Locale.getDefault());
 
     boolean mIsSignedIn = false;
 
@@ -193,6 +192,14 @@ public class GameActivity extends BaseGameActivity {
                         timerText.invalidate();
                         board.invalidate();
 
+                        // Auto save completed game
+                        try {
+                            FileUtil.saveGame(getString(R.string.auto_save_preamble) + SAVE_FORMAT.format(new Date()), game.save());
+                        }
+                        catch(IOException e) {
+                            e.printStackTrace();
+                        }
+
                         Stats.incrementTimePlayed(getApplicationContext(), game.getGameLength() - timeGamePaused);
                         Stats.incrementGamesPlayed(getApplicationContext());
                         if(player.getTeam() == 1) Stats.incrementGamesWon(getApplicationContext());
@@ -221,7 +228,7 @@ public class GameActivity extends BaseGameActivity {
                             getGamesClient().incrementAchievement(getString(R.string.achievement_intermediate), 1);
 
                             // Unlock the Expert achievement!
-                            getGamesClient().incrementAchievement(getString(R.string.achievement_expert), player.getTeam() % 2);
+                            if(player.getTeam() == 1) getGamesClient().incrementAchievement(getString(R.string.achievement_expert), 1);
                         }
                     }
                 });
@@ -410,9 +417,7 @@ public class GameActivity extends BaseGameActivity {
     private void showSavingDialog() {
         final EditText editText = new EditText(this);
         editText.setInputType(InputType.TYPE_CLASS_TEXT);
-        Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy (HH:mm a)", Locale.getDefault());
-        editText.setText(dateFormat.format(date));
+        editText.setText(SAVE_FORMAT.format(new Date()));
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.enterFilename).setView(editText).setPositiveButton(android.R.string.ok, new OnClickListener() {
             @Override
@@ -420,14 +425,6 @@ public class GameActivity extends BaseGameActivity {
                 try {
                     FileUtil.saveGame(editText.getText().toString(), game.save());
                     Toast.makeText(getApplicationContext(), R.string.saved, Toast.LENGTH_SHORT).show();
-                }
-                catch(StreamCorruptedException e) {
-                    e.printStackTrace();
-                    Toast.makeText(getApplicationContext(), R.string.failed, Toast.LENGTH_SHORT).show();
-                }
-                catch(FileNotFoundException e) {
-                    e.printStackTrace();
-                    Toast.makeText(getApplicationContext(), R.string.failed, Toast.LENGTH_SHORT).show();
                 }
                 catch(IOException e) {
                     e.printStackTrace();

@@ -131,7 +131,7 @@ public class BoardView extends View {
     private int getDarkerColor(int color) {
         float[] hsv = new float[3];
         Color.colorToHSV(color, hsv);
-        hsv[2] *= 0.8f;
+        hsv[2] *= 0.6f;
         return Color.HSVToColor(hsv);
     }
 

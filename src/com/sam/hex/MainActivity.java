@@ -111,7 +111,7 @@ public class MainActivity extends BaseGameActivity {
         playButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                startActivity(new Intent(getBaseContext(), GameActivity.class));
+                startActivity(new Intent(getBaseContext(), GameSelectionActivity.class));
             }
         });
 

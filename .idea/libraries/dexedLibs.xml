@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="dexedLibs">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/bin/dexedLibs/hex-ai-46290a96958ef1fd989306844c9dd941.jar!/" />
+      <root url="jar://$PROJECT_DIR$/bin/dexedLibs/hex-core-03d0e78e90f428859273f4a864b421b7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/bin/dexedLibs/android-support-v4-40c789c4b2eabaf280ecc7f705e1258e.jar!/" />
+      <root url="jar://$PROJECT_DIR$/bin/dexedLibs/gson-2.2.4-57f825bfd135d84b9cf808aac8e33cad.jar!/" />
+      <root url="jar://$PROJECT_DIR$/bin/dexedLibs/google-play-services-45bd07b6526bc75a84d9acd9539ecfe1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/bin/dexedLibs/actionbarsherlock-74c6f6bd7cff492f733113e8dfdb2dc7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/bin/dexedLibs/annotations-23e72ab5d88dba53cae7d527b4c5aef2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

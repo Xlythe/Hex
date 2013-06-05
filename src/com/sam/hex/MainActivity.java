@@ -16,6 +16,9 @@ import com.sam.hex.view.HexagonLayout;
 public class MainActivity extends BaseGameActivity {
     public static final int REQUEST_ACHIEVEMENTS = 1001;
 
+    // Hexagon variables
+    HexagonLayout.Button mAchievementsButton;
+
     // Stat variables
     TextView mTitleTextView;
     TextView mTimePlayedTextView;
@@ -40,7 +43,7 @@ public class MainActivity extends BaseGameActivity {
         HexagonLayout.Button donateButton = hexagonLayout.getButtons()[1];
         HexagonLayout.Button historyButton = hexagonLayout.getButtons()[2];
         HexagonLayout.Button instructionsButton = hexagonLayout.getButtons()[3];
-        HexagonLayout.Button achievementsButton = hexagonLayout.getButtons()[4];
+        mAchievementsButton = hexagonLayout.getButtons()[4];
         HexagonLayout.Button playButton = hexagonLayout.getButtons()[5];
 
         mTitleTextView = (TextView) findViewById(R.id.title);
@@ -93,17 +96,16 @@ public class MainActivity extends BaseGameActivity {
             }
         });
 
-        achievementsButton.setText(R.string.main_button_achievements);
-        achievementsButton.setColor(0xf48935);
-        achievementsButton.setDrawableResource(R.drawable.icon);
-        achievementsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
+        mAchievementsButton.setText(R.string.main_button_achievements);
+        mAchievementsButton.setColor(0xf48935);
+        mAchievementsButton.setDrawableResource(R.drawable.icon);
+        mAchievementsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                if(mIsSignedIn) {
-                    startActivityForResult(getGamesClient().getAchievementsIntent(), REQUEST_ACHIEVEMENTS);
-                }
+                startActivityForResult(getGamesClient().getAchievementsIntent(), REQUEST_ACHIEVEMENTS);
             }
         });
+        mAchievementsButton.setEnabled(mIsSignedIn);
 
         playButton.setText(R.string.main_button_play);
         playButton.setColor(0x4ba5e2);
@@ -130,6 +132,7 @@ public class MainActivity extends BaseGameActivity {
                 mSignInButton.setVisibility(View.VISIBLE);
                 mTitleTextView.setText(String.format(getString(R.string.main_title),
                         mIsSignedIn ? getGamesClient().getCurrentPlayer().getDisplayName() : Stats.getPlayer1Name(getApplicationContext())));
+                mAchievementsButton.setEnabled(mIsSignedIn);
             }
         });
     }
@@ -147,12 +150,14 @@ public class MainActivity extends BaseGameActivity {
         mTimePlayedTextView.setText(String.format(getString(R.string.main_stats_time_played), timePlayedInHours, timePlayedInMintues, timePlayedInSeconds));
         mGamesPlayedTextView.setText(String.format(getString(R.string.main_stats_games_played), Stats.getGamesPlayed(this)));
         mGamesWonTextView.setText(String.format(getString(R.string.main_stats_games_won), Stats.getGamesWon(this)));
+        mAchievementsButton.setEnabled(mIsSignedIn);
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mIsSignedIn = false;
+        mAchievementsButton.setEnabled(mIsSignedIn);
     }
 
     @Override
@@ -163,6 +168,7 @@ public class MainActivity extends BaseGameActivity {
         mSignInButton.setVisibility(View.GONE);
         mTitleTextView.setText(String.format(getString(R.string.main_title),
                 mIsSignedIn ? getGamesClient().getCurrentPlayer().getDisplayName() : Stats.getPlayer1Name(this)));
+        mAchievementsButton.setEnabled(mIsSignedIn);
     }
 
     @Override

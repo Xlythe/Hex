@@ -279,7 +279,7 @@ public class HexagonLayout extends View implements OnTouchListener {
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
             for(Button b : mButtons) {
                 if(b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
-                    b.setPressed(true);
+                    b.setPressed(b.isEnabled());
                 }
                 else {
                     b.setPressed(false);
@@ -364,6 +364,7 @@ public class HexagonLayout extends View implements OnTouchListener {
         private int color;
         private Triangle triangle;
         private boolean pressed;
+        private boolean enabled = true;
 
         public Button(Context context) {
             this.context = context;
@@ -425,12 +426,20 @@ public class HexagonLayout extends View implements OnTouchListener {
             if(onClickListener != null) onClickListener.onClick();
         }
 
-        public boolean isPressed() {
+        protected boolean isPressed() {
             return pressed;
         }
 
-        public void setPressed(boolean pressed) {
+        protected void setPressed(boolean pressed) {
             this.pressed = pressed;
+        }
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
         }
     }
 }

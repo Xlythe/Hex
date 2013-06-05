@@ -260,7 +260,8 @@ public class HexagonLayout extends View implements OnTouchListener {
 
             mButtons[i].setTriangle(t);
 
-            mButtons[i].getDrawable().setBounds((center.x - s / 6), (int) (s * 0.866 / 2 - s / 6), (center.x + s / 6), (int) (s * 0.866 / 2 + s / 6));
+            mButtons[i].getDrawable().setBounds((center.x - s / 6), (int) (s * 0.866 / 2 - s / 3 + mBorderWidth + mBorderShadowWidth), (center.x + s / 6),
+                    (int) (s * 0.866 / 2 + mBorderWidth + mBorderShadowWidth));
 
             mBorder[i] = new ShapeDrawable(new PathShape(edgePath, w, h));
             mBorder[i].getPaint().setColor(mButtons[i].getColor());

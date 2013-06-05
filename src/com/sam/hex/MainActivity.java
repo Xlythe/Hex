@@ -58,7 +58,7 @@ public class MainActivity extends BaseGameActivity {
 
         settingsButton.setText(R.string.main_button_settings);
         settingsButton.setColor(0xcc5c57);
-        settingsButton.setDrawableResource(R.drawable.icon);
+        settingsButton.setDrawableResource(R.drawable.settings);
         settingsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
@@ -68,7 +68,7 @@ public class MainActivity extends BaseGameActivity {
 
         donateButton.setText(R.string.main_button_donate);
         donateButton.setColor(0x5f6ec2);
-        donateButton.setDrawableResource(R.drawable.icon);
+        donateButton.setDrawableResource(R.drawable.store);
         donateButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
@@ -77,8 +77,8 @@ public class MainActivity extends BaseGameActivity {
         });
 
         historyButton.setText(R.string.main_button_history);
-        historyButton.setColor(0xcfca47);
-        historyButton.setDrawableResource(R.drawable.icon);
+        historyButton.setColor(0xf9db00);
+        historyButton.setDrawableResource(R.drawable.about);
         historyButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
@@ -88,7 +88,7 @@ public class MainActivity extends BaseGameActivity {
 
         instructionsButton.setText(R.string.main_button_instructions);
         instructionsButton.setColor(0xb7cf47);
-        instructionsButton.setDrawableResource(R.drawable.icon);
+        instructionsButton.setDrawableResource(R.drawable.howtoplay);
         instructionsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
@@ -98,7 +98,7 @@ public class MainActivity extends BaseGameActivity {
 
         mAchievementsButton.setText(R.string.main_button_achievements);
         mAchievementsButton.setColor(0xf48935);
-        mAchievementsButton.setDrawableResource(R.drawable.icon);
+        mAchievementsButton.setDrawableResource(R.drawable.achievements);
         mAchievementsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
@@ -109,7 +109,7 @@ public class MainActivity extends BaseGameActivity {
 
         playButton.setText(R.string.main_button_play);
         playButton.setColor(0x4ba5e2);
-        playButton.setDrawableResource(R.drawable.icon);
+        playButton.setDrawableResource(R.drawable.play);
         playButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {

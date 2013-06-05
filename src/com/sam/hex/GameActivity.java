@@ -1,21 +1,30 @@
 package com.sam.hex;
 
-import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.StreamCorruptedException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -31,8 +40,6 @@ import com.hex.core.Player;
 import com.hex.core.PlayerObject;
 import com.hex.core.PlayingEntity;
 import com.hex.core.Timer;
-import com.sam.hex.replay.Load;
-import com.sam.hex.replay.Save;
 import com.sam.hex.view.BoardView;
 
 public class GameActivity extends BaseGameActivity {
@@ -72,11 +79,17 @@ public class GameActivity extends BaseGameActivity {
         }
         else if(getIntent().getData() != null) {
             // Check to see if we should load a game
-            Load load = new Load(new File(getIntent().getData().getPath()));
-            game = load.run();
-            game.setGameListener(createGameListener());
-            replay = true;
-            replayDuration = 900;
+            try {
+                game = FileUtil.loadGame(getIntent().getData().getPath());
+                game.setGameListener(createGameListener());
+                replay = true;
+                replayDuration = 900;
+            }
+            catch(IOException e) {
+                e.printStackTrace();
+                Toast.makeText(this, R.string.failed, Toast.LENGTH_SHORT).show();
+                initializeNewGame();
+            }
         }
         else {
             // Create a new game
@@ -383,9 +396,8 @@ public class GameActivity extends BaseGameActivity {
         case R.id.replay:
             replay(900);
             return true;
-        case R.id.saveReplay:
-            Save save = new Save(game);
-            save.showSavingDialog(this);
+        case R.id.save:
+            showSavingDialog();
             return true;
         case R.id.quit:
             quit();
@@ -393,6 +405,36 @@ public class GameActivity extends BaseGameActivity {
         default:
             return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void showSavingDialog() {
+        final EditText editText = new EditText(this);
+        editText.setInputType(InputType.TYPE_CLASS_TEXT);
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy (HH:mm a)", Locale.getDefault());
+        editText.setText(dateFormat.format(date));
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.enterFilename).setView(editText).setPositiveButton(android.R.string.ok, new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                try {
+                    FileUtil.saveGame(editText.getText().toString(), game.save());
+                    Toast.makeText(getApplicationContext(), R.string.saved, Toast.LENGTH_SHORT).show();
+                }
+                catch(StreamCorruptedException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), R.string.failed, Toast.LENGTH_SHORT).show();
+                }
+                catch(FileNotFoundException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), R.string.failed, Toast.LENGTH_SHORT).show();
+                }
+                catch(IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), R.string.failed, Toast.LENGTH_SHORT).show();
+                }
+            }
+        }).setNegativeButton(R.string.cancel, null).show();
     }
 
     /**
@@ -533,7 +575,7 @@ public class GameActivity extends BaseGameActivity {
                     || Integer.valueOf(prefs.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME))) * 60 * 1000 != game.gameOptions.timer.totalTime;
         }
         else if(gameLocation == GameAction.NET_GAME) {
-            return (game != null && game.isGameOver());
+            return(game != null && game.isGameOver());
         }
         else {
             return true;

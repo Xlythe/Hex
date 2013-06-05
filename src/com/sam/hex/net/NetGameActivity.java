@@ -1,4 +1,4 @@
-package com.sam.hex.playgames;
+package com.sam.hex.net;
 
 import com.sam.hex.BaseGameActivity;
 

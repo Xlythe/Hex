@@ -11,7 +11,6 @@
     <string name="achievement_novice">CgkI9MX11PkIEAIQDA</string>
     <string name="achievement_intermediate">CgkI9MX11PkIEAIQDQ</string>
     <string name="achievement_expert">CgkI9MX11PkIEAIQDg</string>
-<!--     <string name="leaderboard_score">CgkI4cuX5qILEAIQAQ</string> -->
     <string name="activity_title_instructions">How to Play</string>
     
     <!-- Main page -->
@@ -80,6 +79,7 @@
     <string name="winner">%s wins!</string>
     <string name="timer">Time Left: %s</string>
     <string name="saved">Saved!</string>
+    <string name="failed">Failed</string>
     <string name="claimVictory">Claim Victory</string>
     
     <!-- Game instructions -->
@@ -99,6 +99,7 @@
     <string name="submit">Submit</string>
     <string name="rename">Rename</string>
     <string name="delete">Delete</string>
+    <string name="enterFilename">Enter a filename</string>
     
     <!-- Color Picker -->
     <string name="dialog_color_picker">Color Picker</string>

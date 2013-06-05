@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.sam.hex"
-    android:versionCode="14"
-    android:versionName="2.3"
+    android:versionCode="15"
+    android:versionName="3.0"
     android:installLocation="auto" >
 
     <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="17"/>
@@ -40,7 +40,7 @@
         </activity>
         <activity android:label="@string/preferences" android:name=".PreferencesActivity" android:screenOrientation="landscape" />
         <activity android:label="@string/activity_title_instructions" android:name="com.sam.hex.InstructionsActivity" android:screenOrientation="landscape" />
-        <activity android:label="@string/app_name" android:name=".playgames.NetGameActivity" android:screenOrientation="landscape" />
+        <activity android:label="@string/app_name" android:name=".net.NetGameActivity" android:screenOrientation="landscape" />
         <activity android:label="@string/app_name" android:name=".HistoryActivity" android:screenOrientation="landscape" />
          <activity android:label="@string/app_name" android:name="com.sam.hex.GameSelectionActivity" android:screenOrientation="landscape" />
     </application>

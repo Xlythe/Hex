@@ -7,6 +7,8 @@ import android.graphics.Path;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.PathShape;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -14,7 +16,6 @@ import com.hex.core.Game;
 import com.hex.core.GameAction;
 import com.hex.core.Point;
 import com.sam.hex.BoardTools;
-import com.sam.hex.R;
 
 /**
  * @author Will Harmon
@@ -25,18 +26,35 @@ public class BoardView extends View {
     private ShapeDrawable[][] mCell;
     private ShapeDrawable[][] mCellShadow;
     private Hexagon[][] mHexagon;
+
     public Game game;
+
+    private float mPieceMargin;
+    private float mPieceWhiteBorder;
+    private float mPieceLightBorder;
+    private float mPieceShadowOffset;
 
     public BoardView(Context context) {
         super(context);
+        setUp();
     }
 
     public BoardView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        setUp();
     }
 
     public BoardView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        setUp();
+    }
+
+    private void setUp() {
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        mPieceMargin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, dm);
+        mPieceWhiteBorder = mPieceMargin + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, dm);
+        mPieceLightBorder = mPieceWhiteBorder + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, dm);
+        mPieceShadowOffset = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3, dm);
     }
 
     public void setGame(Game game) {
@@ -79,12 +97,6 @@ public class BoardView extends View {
         int windowHeight = getHeight();
         int windowWidth = getWidth();
 
-        // Size of border
-        float margin = getContext().getResources().getDimension(R.dimen.hex_margin);
-        float border = margin + getContext().getResources().getDimension(R.dimen.hex_border);
-        float drawableBorder = border + getContext().getResources().getDimension(R.dimen.hex_drawable_border);
-        float shadowOffset = getContext().getResources().getDimension(R.dimen.hex_shadow_offset);
-
         double radius = BoardTools.radiusCalculator(windowWidth, windowHeight, game.gameOptions.gridSize);
         double hrad = radius * Math.sqrt(3) / 2;
         int yOffset = (int) ((windowHeight - ((3 * radius / 2) * (game.gamePieces[0].length - 1) + 2 * radius)) / 2);
@@ -105,15 +117,18 @@ public class BoardView extends View {
                 double x = ((hrad + yc * hrad + 2 * hrad * xc) + hrad + xOffset);
                 double y = (1.5 * radius * yc + radius) + yOffset;
                 mDrawable[xc][yc] = new ShapeDrawable(new PathShape(path, (int) hrad * 2, (int) radius * 2));
-                mDrawable[xc][yc].setBounds((int) (x - hrad), (int) (y), (int) (x + hrad - drawableBorder), (int) (y + radius * 2 - drawableBorder));
+                mDrawable[xc][yc].setBounds((int) (x - hrad), (int) (y), (int) (x + hrad - mPieceLightBorder),
+                        (int) (y + radius * 2 - (mPieceLightBorder * 1.1547)));
                 mDrawableOutline[xc][yc] = new ShapeDrawable(new PathShape(path, (int) hrad * 2, (int) radius * 2));
-                mDrawableOutline[xc][yc].setBounds((int) (x - hrad), (int) (y), (int) (x + hrad - border), (int) (y + radius * 2 - border));
+                mDrawableOutline[xc][yc].setBounds((int) (x - hrad), (int) (y), (int) (x + hrad - mPieceWhiteBorder),
+                        (int) (y + radius * 2 - (mPieceWhiteBorder * 1.1547)));
                 mDrawableOutline[xc][yc].getPaint().setAlpha(200);
                 mCell[xc][yc] = new ShapeDrawable(new PathShape(path, (int) hrad * 2, (int) radius * 2));
-                mCell[xc][yc].setBounds((int) (x - hrad), (int) (y), (int) (x + hrad - margin), (int) (y + radius * 2 - margin));
+                mCell[xc][yc].setBounds((int) (x - hrad), (int) (y), (int) (x + hrad - mPieceMargin), (int) (y + radius * 2 - (mPieceMargin * 1.1547)));
                 mCell[xc][yc].getPaint().setColor(Color.WHITE);
                 mCellShadow[xc][yc] = new ShapeDrawable(new PathShape(path, (int) hrad * 2, (int) radius * 2));
-                mCellShadow[xc][yc].setBounds((int) (x - hrad), (int) (y + shadowOffset), (int) (x + hrad - margin), (int) (y + radius * 2 - margin));
+                mCellShadow[xc][yc].setBounds((int) (x - hrad), (int) (y + mPieceShadowOffset), (int) (x + hrad - mPieceMargin),
+                        (int) (y + radius * 2 - (mPieceMargin * 1.1547)));
                 mCellShadow[xc][yc].getPaint().setColor(Color.BLACK);
                 mCellShadow[xc][yc].getPaint().setAlpha(15);
                 mHexagon[xc][yc] = new Hexagon(x - hrad, y, radius);

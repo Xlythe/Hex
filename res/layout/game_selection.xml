@@ -9,18 +9,18 @@
         android:id="@+id/button1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="AI Game" />
+        android:text="@string/game_selection_button_computer" />
 
     <Button
         android:id="@+id/button2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hotseat Game" />
+        android:text="@string/game_selection_button_pass" />
 
     <Button
         android:id="@+id/button3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Net Game" />
+        android:text="@string/game_selection_button_net" />
 
 </LinearLayout>

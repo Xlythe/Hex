@@ -4,10 +4,12 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.sam.hex.view.HexagonLayout;
 
 /**
@@ -128,11 +130,7 @@ public class MainActivity extends BaseGameActivity {
             @Override
             public void onClick(View v) {
                 signOut();
-                mSignOutButton.setVisibility(View.GONE);
-                mSignInButton.setVisibility(View.VISIBLE);
-                mTitleTextView.setText(String.format(getString(R.string.main_title),
-                        mIsSignedIn ? getGamesClient().getCurrentPlayer().getDisplayName() : Stats.getPlayer1Name(getApplicationContext())));
-                mAchievementsButton.setEnabled(mIsSignedIn);
+                refreshPlayerInformation();
             }
         });
     }
@@ -141,8 +139,6 @@ public class MainActivity extends BaseGameActivity {
     public void onResume() {
         super.onResume();
 
-        mTitleTextView.setText(String.format(getString(R.string.main_title),
-                mIsSignedIn ? getGamesClient().getCurrentPlayer().getDisplayName() : Stats.getPlayer1Name(this)));
         long timePlayedInMillis = Stats.getTimePlayed(this);
         long timePlayedInHours = timePlayedInMillis / (1000 * 60 * 60);
         long timePlayedInMintues = (timePlayedInMillis - timePlayedInHours * (1000 * 60 * 60)) / (1000 * 60);
@@ -150,29 +146,49 @@ public class MainActivity extends BaseGameActivity {
         mTimePlayedTextView.setText(String.format(getString(R.string.main_stats_time_played), timePlayedInHours, timePlayedInMintues, timePlayedInSeconds));
         mGamesPlayedTextView.setText(String.format(getString(R.string.main_stats_games_played), Stats.getGamesPlayed(this)));
         mGamesWonTextView.setText(String.format(getString(R.string.main_stats_games_won), Stats.getGamesWon(this)));
-        mAchievementsButton.setEnabled(mIsSignedIn);
+        refreshPlayerInformation();
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mIsSignedIn = false;
-        mAchievementsButton.setEnabled(mIsSignedIn);
     }
 
     @Override
     public void onSignInSucceeded() {
         System.out.println("Signed in");
         mIsSignedIn = true;
-        mSignOutButton.setVisibility(View.VISIBLE);
-        mSignInButton.setVisibility(View.GONE);
-        mTitleTextView.setText(String.format(getString(R.string.main_title),
-                mIsSignedIn ? getGamesClient().getCurrentPlayer().getDisplayName() : Stats.getPlayer1Name(this)));
-        mAchievementsButton.setEnabled(mIsSignedIn);
+        refreshPlayerInformation();
+
+        if(getInvitationId() != null) {
+            RoomConfig.Builder roomConfigBuilder = makeBasicRoomConfigBuilder();
+            roomConfigBuilder.setInvitationIdToAccept(getInvitationId());
+            getGamesClient().joinRoom(roomConfigBuilder.build());
+
+            // prevent screen from sleeping during handshake
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+            // go to game screen
+        }
     }
 
     @Override
     public void onSignInFailed() {
         System.out.println("Sign in failed");
+        mIsSignedIn = false;
+        refreshPlayerInformation();
+    }
+
+    private RoomConfig.Builder makeBasicRoomConfigBuilder() {
+        return null;// RoomConfig.builder(this).setMessageReceivedListener(this).setRoomStatusUpdateListener(this);
+    }
+
+    private void refreshPlayerInformation() {
+        mSignOutButton.setVisibility(mIsSignedIn ? View.VISIBLE : View.GONE);
+        mSignInButton.setVisibility(mIsSignedIn ? View.GONE : View.VISIBLE);
+        mTitleTextView.setText(String.format(getString(R.string.main_title),
+                mIsSignedIn ? getGamesClient().getCurrentPlayer().getDisplayName() : Stats.getPlayer1Name(this)));
+        mAchievementsButton.setEnabled(mIsSignedIn);
     }
 }

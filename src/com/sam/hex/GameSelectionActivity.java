@@ -8,21 +8,24 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.MenuItem;
 
-public class GameSelectionActivity extends SherlockFragmentActivity {
+public class GameSelectionActivity extends BaseGameActivity {
+    Button mNetButton;
 
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.game_type);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setContentView(R.layout.game_selection);
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         Button AI = (Button) findViewById(R.id.button1);
         AI.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                startActivity(new Intent(getBaseContext(), GameActivity.class));
                 prefs.edit().putString("player2Type", "4").apply();
+                startActivity(new Intent(getBaseContext(), GameActivity.class));
                 finish();
             }
         });
@@ -31,20 +34,41 @@ public class GameSelectionActivity extends SherlockFragmentActivity {
         hotseat.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                startActivity(new Intent(getBaseContext(), GameActivity.class));
                 prefs.edit().putString("player2Type", "0").apply();
+                startActivity(new Intent(getBaseContext(), GameActivity.class));
                 finish();
             }
         });
 
-        Button net = (Button) findViewById(R.id.button3);
-        net.setOnClickListener(new OnClickListener() {
+        mNetButton = (Button) findViewById(R.id.button3);
+        mNetButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View arg0) {
+                startActivity(new Intent(getBaseContext(), OnlineSelectionActivity.class));
                 finish();
             }
         });
-        net.setEnabled(false);
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch(item.getItemId()) {
+        case android.R.id.home:
+            finish();
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onSignInSucceeded() {
+        mNetButton.setEnabled(true);
+    }
+
+    @Override
+    public void onSignInFailed() {
+        mNetButton.setEnabled(false);
     }
 }

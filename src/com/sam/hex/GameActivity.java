@@ -69,7 +69,7 @@ public class GameActivity extends BaseGameActivity {
 
         if(savedInstanceState != null && savedInstanceState.containsKey(GAME)) {
             // Resume a game if one exists
-            game = (Game) savedInstanceState.getSerializable(GAME);
+            game = Game.load(savedInstanceState.getString(GAME));
             game.setGameListener(createGameListener());
             replay = true;
             replayDuration = 0;
@@ -112,7 +112,7 @@ public class GameActivity extends BaseGameActivity {
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putSerializable(GAME, game);
+        savedInstanceState.putString(GAME, game.save());
     }
 
     private void applyBoard() {

@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Please note, %s represents a variable. For example, %s wins will write out Alex wins (or whatever their name is) -->
-    
+
     <!-- Application name and constants -->
     <string name="app_name">Hex</string>
-
     <string name="app_id">307536683764</string>
     <string name="achievement_30_seconds">CgkI9MX11PkIEAIQCg</string>
     <string name="achievement_fill_the_board">CgkI9MX11PkIEAIQCw</string>
@@ -12,16 +11,33 @@
     <string name="achievement_intermediate">CgkI9MX11PkIEAIQDQ</string>
     <string name="achievement_expert">CgkI9MX11PkIEAIQDg</string>
     <string name="activity_title_instructions">How to Play</string>
-    
+
     <!-- Main page -->
     <string name="main_title" formatted="false">%s\'s stats</string>
     <string name="main_stats_time_played" formatted="false">time played %02d:%02d:%02d</string>
     <string name="main_stats_games_played" formatted="false">games played %s</string>
     <string name="main_stats_games_won" formatted="false">games won %s</string>
-    
+
+    <string name="main_button_play">play</string>
+    <string name="main_button_settings">settings</string>
+    <string name="main_button_donate">donate</string>
+    <string name="main_button_history">history</string>
+    <string name="main_button_instructions">how to play</string>
+    <string name="main_button_achievements">achievements</string>
+
+    <!-- Game selection page -->
+    <string name="game_selection_button_computer">Computer</string>
+    <string name="game_selection_button_pass">Pass to Play</string>
+    <string name="game_selection_button_net">Play Online</string>
+
+    <!-- Online selection page -->
+    <string name="online_selection_button_quick">Quick Game</string>
+    <string name="online_selection_button_invite">Invite Friends</string>
+    <string name="online_selection_button_pending">Pending Invites</string>
+
     <!-- Preferences -->
     <string name="preferences_title_options">Options</string>
-    
+
     <string name="preferences">Settings</string>
     <string name="gameSizeTitle">Board Size</string>
     <string name="gameSizeSummary">Pick a size for the gameboard (Current: 7x7)</string>
@@ -31,11 +47,11 @@
     <string name="swapSummary">Allow the second player to swap places during their first move</string>
     <string name="timerTitle">Timer</string>
     <string name="timerSummary">Limit the amount of time a player has (in minutes)</string>
-    
+
     <string name="playerTypeHuman">Human</string>
     <string name="playerTypeWill">Computer (Will)</string>
     <string name="playerTypeBee">Computer (Bee)</string>
-    
+
     <string name="player1NameTitle">Player1\'s Name</string>
     <string name="player1NameSummary">Name: Player1</string>
     <string name="player1NameSummary_onChange">Name: %s</string>
@@ -44,7 +60,7 @@
     <string name="player1TypeSummary_onChange">Type: %s</string>
     <string name="player1ColorTitle">Player1\'s Color</string>
     <string name="player1ColorSummary">Pick a color for Player1</string>
-    
+
     <string name="player2NameTitle">Player2\'s Name</string>
     <string name="player2NameSummary">Name: Player2</string>
     <string name="player2NameSummary_onChange">Name: %s</string>
@@ -53,19 +69,11 @@
     <string name="player2TypeSummary_onChange">Type: %s</string>
     <string name="player2ColorTitle">Player2\'s Color</string>
     <string name="player2ColorSummary">Pick a color for Player2</string>
-    
+
     <string name="abstractGeneralTitle">Game Options</string>
     <string name="abstractP1Title">Player 1</string>
     <string name="abstractP2Title">Player 2</string>
-    
-    <!-- Buttons from top to bottom -->
-    <string name="main_button_play">play</string>
-    <string name="main_button_settings">settings</string>
-    <string name="main_button_donate">donate</string>
-    <string name="main_button_history">history</string>
-    <string name="main_button_instructions">how to play</string>
-    <string name="main_button_achievements">achievements</string>
-    
+
     <!-- Menu choices -->
     <string name="undo">Undo</string>
     <string name="newgame">New Game</string>
@@ -74,7 +82,7 @@
     <string name="saveReplay">Save</string>
     <string name="settings">Settings</string>
     <string name="quit">Quit</string>
-    
+
     <!-- In game notifications -->
     <string name="winner">%s wins!</string>
     <string name="timer">Time Left: %s</string>
@@ -82,15 +90,15 @@
     <string name="failed">Failed</string>
     <string name="claimVictory">Claim Victory</string>
     <string name="auto_save_preamble">AutoSave:</string>
-    
+
     <!-- Game instructions -->
     <string name="instructions">Hex is played by two players, who take turns placing pieces on the board. The players have different colours, say red and blue. (The players themselves are sometimes referred to as Red and Blue) The four edges of the board are coloured with the same colours, in such a way that parallel edges have the same colour. Red wins if he can build a continuous chain between the two red edges, and blue wins if he can build such a chain between the blue edges.\n\n
         (Taken from <a href="http://www.hexwiki.org/index.php?title=Rules">hexwiki.org</a>)</string>
-    
+
     <!-- Confirmation -->
     <string name="confirmExit">Are you sure you want to exit?</string>
     <string name="confirmNewgame">Do you want to start a new game?</string>
-    
+
     <!-- Dialog Options -->
     <string name="yes">Yes</string>
     <string name="no">No</string>
@@ -101,11 +109,11 @@
     <string name="rename">Rename</string>
     <string name="delete">Delete</string>
     <string name="enterFilename">Enter a filename</string>
-    
+
     <!-- Color Picker -->
     <string name="dialog_color_picker">Color Picker</string>
     <string name="press_color_to_apply">Press on Color to apply</string>    
-    
+
     <!-- Preferences -->
     <string name="pref_category">Category</string>
     <string name="color1_title">Color 1</string>

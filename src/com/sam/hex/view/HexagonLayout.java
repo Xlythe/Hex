@@ -73,12 +73,9 @@ public class HexagonLayout extends View implements OnTouchListener {
         for(int i = 0; i < 6; i++) {
             mButtons[i] = new Button(getContext());
         }
-        mBorderWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, dm);
-        mBorderShadowWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, dm);
         mPressedColor = Color.LTGRAY;
         mDisabledColor = getDarkerColor(mPressedColor);
         mTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 44, dm);
-        mText = "Hex";
         mTextPaint = new Paint();
         mTextPaint.setColor(Color.BLACK);
         mTextPadding = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, dm);
@@ -147,8 +144,8 @@ public class HexagonLayout extends View implements OnTouchListener {
             mBorderShadow[i].draw(canvas);
             mBorder[i].draw(canvas);
             mButtons[i].getDrawable().draw(canvas);
-            canvas.drawText(mButtons[i].getText(), center.x - mButtonTextPaint.measureText(mButtons[i].getText()) / 2, mButtonTextPaint.getTextSize(),
-                    mButtonTextPaint);
+            canvas.drawText(mButtons[i].getText(), center.x - mButtonTextPaint.measureText(mButtons[i].getText()) / 2,
+                    (mBorderWidth + mButtonTextPaint.getTextSize()) / 2, mButtonTextPaint);
         }
         canvas.restore();
     }
@@ -202,6 +199,9 @@ public class HexagonLayout extends View implements OnTouchListener {
     @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
         w = (int) (h * 1.1547);
+        mBorderShadowWidth = h / 2 * 0.1828f;
+        mBorderWidth = mBorderShadowWidth * 0.882f;
+        mBorderShadowWidth -= mBorderWidth;
 
         // Create a box
 

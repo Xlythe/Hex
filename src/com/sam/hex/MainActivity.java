@@ -1,194 +1,168 @@
 package com.sam.hex;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.TextView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.view.KeyEvent;
 
-import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
-import com.sam.hex.view.HexagonLayout;
+import com.actionbarsherlock.view.MenuItem;
+import com.sam.hex.fragment.GameFragment;
+import com.sam.hex.fragment.GameSelectionFragment;
+import com.sam.hex.fragment.HistoryFragment;
+import com.sam.hex.fragment.InstructionsFragment;
+import com.sam.hex.fragment.MainFragment;
+import com.sam.hex.fragment.OnlineSelectionFragment;
 
 /**
  * @author Will Harmon
  **/
 public class MainActivity extends BaseGameActivity {
     public static final int REQUEST_ACHIEVEMENTS = 1001;
-
-    // Hexagon variables
-    HexagonLayout.Button mAchievementsButton;
-
-    // Stat variables
-    TextView mTitleTextView;
-    TextView mTimePlayedTextView;
-    TextView mGamesPlayedTextView;
-    TextView mGamesWonTextView;
+    public final static int RC_SELECT_PLAYERS = 1002;
+    public final static int RC_WAITING_ROOM = 1003;
 
     // Play variables
-    SignInButton mSignInButton;
-    Button mSignOutButton;
-    boolean mIsSignedIn = false;
+    private boolean mIsSignedIn = false;
+    private HexRealTimeMessageReceivedListener mHexRealTimeMessageReceivedListener;
+    private HexRoomStatusUpdateListener mHexRoomStatusUpdateListener;
+    private HexRoomUpdateListener mHexRoomUpdateListener;
+
+    // Fragments
+    private MainFragment mMainFragment;
+    private GameFragment mGameFragment;
+    private GameSelectionFragment mGameSelectionFragment;
+    private HistoryFragment mHistoryFragment;
+    private InstructionsFragment mInstructionsFragment;
+    private OnlineSelectionFragment mOnlineSelectionFragment;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        getSupportActionBar().hide();
-        enableDebugLog(true, "HEX_DEBUG");
 
-        HexagonLayout hexagonLayout = (HexagonLayout) findViewById(R.id.hexagonButtons);
-        HexagonLayout.Button settingsButton = hexagonLayout.getButtons()[0];
-        HexagonLayout.Button donateButton = hexagonLayout.getButtons()[1];
-        HexagonLayout.Button historyButton = hexagonLayout.getButtons()[2];
-        HexagonLayout.Button instructionsButton = hexagonLayout.getButtons()[3];
-        mAchievementsButton = hexagonLayout.getButtons()[4];
-        HexagonLayout.Button playButton = hexagonLayout.getButtons()[5];
+        mHexRealTimeMessageReceivedListener = new HexRealTimeMessageReceivedListener();
+        mHexRoomStatusUpdateListener = new HexRoomStatusUpdateListener();
+        mHexRoomUpdateListener = new HexRoomUpdateListener(this);
 
-        mTitleTextView = (TextView) findViewById(R.id.title);
-        mTimePlayedTextView = (TextView) findViewById(R.id.timePlayed);
-        mGamesPlayedTextView = (TextView) findViewById(R.id.gamesPlayed);
-        mGamesWonTextView = (TextView) findViewById(R.id.gamesWon);
-
-        mSignInButton = (SignInButton) findViewById(R.id.signInButton);
-        mSignOutButton = (Button) findViewById(R.id.signOutButton);
-
-        hexagonLayout.setText(R.string.app_name);
-
-        settingsButton.setText(R.string.main_button_settings);
-        settingsButton.setColor(0xcc5c57);
-        settingsButton.setDrawableResource(R.drawable.settings);
-        settingsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
-            @Override
-            public void onClick() {
-                startActivity(new Intent(getBaseContext(), PreferencesActivity.class));
-            }
-        });
-
-        donateButton.setText(R.string.main_button_donate);
-        donateButton.setColor(0x5f6ec2);
-        donateButton.setDrawableResource(R.drawable.store);
-        donateButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
-            @Override
-            public void onClick() {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.donate.hex")));
-            }
-        });
-
-        historyButton.setText(R.string.main_button_history);
-        historyButton.setColor(0xf9db00);
-        historyButton.setDrawableResource(R.drawable.about);
-        historyButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
-            @Override
-            public void onClick() {
-                startActivity(new Intent(getBaseContext(), HistoryActivity.class));
-            }
-        });
-
-        instructionsButton.setText(R.string.main_button_instructions);
-        instructionsButton.setColor(0xb7cf47);
-        instructionsButton.setDrawableResource(R.drawable.howtoplay);
-        instructionsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
-            @Override
-            public void onClick() {
-                startActivity(new Intent(getBaseContext(), InstructionsActivity.class));
-            }
-        });
-
-        mAchievementsButton.setText(R.string.main_button_achievements);
-        mAchievementsButton.setColor(0xf48935);
-        mAchievementsButton.setDrawableResource(R.drawable.achievements);
-        mAchievementsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
-            @Override
-            public void onClick() {
-                startActivityForResult(getGamesClient().getAchievementsIntent(), REQUEST_ACHIEVEMENTS);
-            }
-        });
-        mAchievementsButton.setEnabled(mIsSignedIn);
-
-        playButton.setText(R.string.main_button_play);
-        playButton.setColor(0x4ba5e2);
-        playButton.setDrawableResource(R.drawable.play);
-        playButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
-            @Override
-            public void onClick() {
-                startActivity(new Intent(getBaseContext(), GameSelectionActivity.class));
-            }
-        });
-
-        mSignInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                beginUserInitiatedSignIn();
-            }
-        });
-
-        mSignOutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signOut();
-                refreshPlayerInformation();
-            }
-        });
+        mMainFragment = new MainFragment();
+        swapFragment(mMainFragment);
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
-        long timePlayedInMillis = Stats.getTimePlayed(this);
-        long timePlayedInHours = timePlayedInMillis / (1000 * 60 * 60);
-        long timePlayedInMintues = (timePlayedInMillis - timePlayedInHours * (1000 * 60 * 60)) / (1000 * 60);
-        long timePlayedInSeconds = (timePlayedInMillis - timePlayedInHours * (1000 * 60 * 60) - timePlayedInMintues * (1000 * 60)) / (1000);
-        mTimePlayedTextView.setText(String.format(getString(R.string.main_stats_time_played), timePlayedInHours, timePlayedInMintues, timePlayedInSeconds));
-        mGamesPlayedTextView.setText(String.format(getString(R.string.main_stats_games_played), Stats.getGamesPlayed(this)));
-        mGamesWonTextView.setText(String.format(getString(R.string.main_stats_games_won), Stats.getGamesWon(this)));
-        refreshPlayerInformation();
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch(item.getItemId()) {
+        case android.R.id.home:
+            getSupportFragmentManager().popBackStack(mMainFragment.toString(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            swapFragment(mMainFragment);
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        mIsSignedIn = false;
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK) {
+            getSupportFragmentManager().popBackStack(mMainFragment.toString(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            swapFragment(mMainFragment);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override
     public void onSignInSucceeded() {
         System.out.println("Signed in");
         mIsSignedIn = true;
-        refreshPlayerInformation();
-
-        if(getInvitationId() != null) {
-            RoomConfig.Builder roomConfigBuilder = makeBasicRoomConfigBuilder();
-            roomConfigBuilder.setInvitationIdToAccept(getInvitationId());
-            getGamesClient().joinRoom(roomConfigBuilder.build());
-
-            // prevent screen from sleeping during handshake
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-            // go to game screen
-        }
+        mMainFragment.setSignedIn(mIsSignedIn);
     }
 
     @Override
     public void onSignInFailed() {
         System.out.println("Sign in failed");
         mIsSignedIn = false;
-        refreshPlayerInformation();
+        mMainFragment.setSignedIn(mIsSignedIn);
     }
 
-    private RoomConfig.Builder makeBasicRoomConfigBuilder() {
-        return null;// RoomConfig.builder(this).setMessageReceivedListener(this).setRoomStatusUpdateListener(this);
+    public void swapFragment(Fragment newFragment) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.content, newFragment).addToBackStack(newFragment.toString()).commit();
     }
 
-    private void refreshPlayerInformation() {
-        mSignOutButton.setVisibility(mIsSignedIn ? View.VISIBLE : View.GONE);
-        mSignInButton.setVisibility(mIsSignedIn ? View.GONE : View.VISIBLE);
-        mTitleTextView.setText(String.format(getString(R.string.main_title),
-                mIsSignedIn ? getGamesClient().getCurrentPlayer().getDisplayName() : Stats.getPlayer1Name(this)));
-        mAchievementsButton.setEnabled(mIsSignedIn);
+    public void swapFragmentWithoutBackStack(Fragment newFragment) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.content, newFragment).commit();
+    }
+
+    public MainFragment getMainFragment() {
+        return mMainFragment;
+    }
+
+    public void setMainFragment(MainFragment mainFragment) {
+        this.mMainFragment = mainFragment;
+    }
+
+    public GameFragment getGameFragment() {
+        return mGameFragment;
+    }
+
+    public void setGameFragment(GameFragment gameFragment) {
+        this.mGameFragment = gameFragment;
+    }
+
+    public GameSelectionFragment getGameSelectionFragment() {
+        return mGameSelectionFragment;
+    }
+
+    public void setGameSelectionFragment(GameSelectionFragment gameSelectionFragment) {
+        this.mGameSelectionFragment = gameSelectionFragment;
+    }
+
+    public HistoryFragment getHistoryFragment() {
+        return mHistoryFragment;
+    }
+
+    public void setHistoryFragment(HistoryFragment historyFragment) {
+        this.mHistoryFragment = historyFragment;
+    }
+
+    public InstructionsFragment getInstructionsFragment() {
+        return mInstructionsFragment;
+    }
+
+    public void setInstructionsFragment(InstructionsFragment instructionsFragment) {
+        this.mInstructionsFragment = instructionsFragment;
+    }
+
+    public OnlineSelectionFragment getOnlineSelectionFragment() {
+        return mOnlineSelectionFragment;
+    }
+
+    public void setOnlineSelectionFragment(OnlineSelectionFragment onlineSelectionFragment) {
+        this.mOnlineSelectionFragment = onlineSelectionFragment;
+    }
+
+    public HexRealTimeMessageReceivedListener getHexRealTimeMessageReceivedListener() {
+        return mHexRealTimeMessageReceivedListener;
+    }
+
+    public void setHexRealTimeMessageReceivedListener(HexRealTimeMessageReceivedListener mHexRealTimeMessageReceivedListener) {
+        this.mHexRealTimeMessageReceivedListener = mHexRealTimeMessageReceivedListener;
+    }
+
+    public HexRoomStatusUpdateListener getHexRoomStatusUpdateListener() {
+        return mHexRoomStatusUpdateListener;
+    }
+
+    public void setHexRoomStatusUpdateListener(HexRoomStatusUpdateListener mHexRoomStatusUpdateListener) {
+        this.mHexRoomStatusUpdateListener = mHexRoomStatusUpdateListener;
+    }
+
+    public HexRoomUpdateListener getHexRoomUpdateListener() {
+        return mHexRoomUpdateListener;
+    }
+
+    public void setHexRoomUpdateListener(HexRoomUpdateListener mHexRoomUpdateListener) {
+        this.mHexRoomUpdateListener = mHexRoomUpdateListener;
     }
 }

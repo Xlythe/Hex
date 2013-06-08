@@ -37,6 +37,8 @@
 
     <!-- Preferences -->
     <string name="preferences_title_options">Options</string>
+    <string name="preferences_title_p1">Player 1</string>
+    <string name="preferences_title_p2">Player 2</string>
 
     <string name="preferences">Settings</string>
     <string name="gameSizeTitle">Board Size</string>

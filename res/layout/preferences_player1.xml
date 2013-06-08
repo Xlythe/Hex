@@ -2,7 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="preferences">
     <PreferenceCategory
-        android:title="@string/preferences_title_options" >
+        android:title="@string/preferences_title_p1" >
 	    <EditTextPreference
 	        android:title="@string/player1NameTitle"
 	        android:summary="@string/player1NameSummary"

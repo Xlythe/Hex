@@ -1,28 +1,31 @@
-package com.sam.hex;
+package com.sam.hex.fragment;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.app.SherlockListFragment;
+import com.sam.hex.FileUtil;
+import com.sam.hex.MainActivity;
+import com.sam.hex.R;
 
-public class HistoryActivity extends SherlockActivity {
+public class HistoryFragment extends SherlockListFragment {
 
     // Stores names of traversed directories
     ArrayList<String> str = new ArrayList<String>();
@@ -41,21 +44,20 @@ public class HistoryActivity extends SherlockActivity {
     Handler handle;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = super.onCreateView(inflater, container, savedInstanceState);
+        rootView.setBackgroundResource(R.color.background);
         handle = new Handler();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSherlockActivity().getSupportActionBar().show();
+        getSherlockActivity().getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         try {
             loadFileList();
-            view = new ListView(this);
             refreshView();
-
-            setContentView(view);
         }
         catch(NullPointerException e) {
             e.printStackTrace();
         }
-
+        return rootView;
     }
 
     private void loadFileList() {
@@ -91,6 +93,10 @@ public class HistoryActivity extends SherlockActivity {
                     fileList[i].icon = R.drawable.directory_icon;
                     Log.d("DIRECTORY", fileList[i].file);
                 }
+                else if(fList[i].endsWith(".rhex")) {
+                    fileList[i].icon = R.drawable.file_hex_icon;
+                    Log.d("HEX FILE", fileList[i].file);
+                }
                 else {
                     Log.d("FILE", fileList[i].file);
                 }
@@ -109,7 +115,18 @@ public class HistoryActivity extends SherlockActivity {
             Log.e(TAG, "path does not exist");
         }
 
-        adapter = new ArrayAdapter<Item>(this, android.R.layout.select_dialog_item, android.R.id.text1, fileList) {
+        Arrays.sort(fileList, new Comparator<Item>() {
+            public int compare(Item f1, Item f2) {
+                File file1 = new File(path, f1.file);
+                File file2 = new File(path, f2.file);
+
+                if(file1.isDirectory() != file2.isDirectory()) {
+                    return file1.isDirectory() ? -1 : 1;
+                }
+                return f1.file.compareTo(f2.file);
+            }
+        });
+        adapter = new ArrayAdapter<Item>(getSherlockActivity(), android.R.layout.select_dialog_item, android.R.id.text1, fileList) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 // creates view
@@ -146,63 +163,64 @@ public class HistoryActivity extends SherlockActivity {
     }
 
     private void refreshView() {
-        view.setAdapter(adapter);
-        view.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                chosenFile = fileList[position].file;
-                File sel = new File(path + "/" + chosenFile);
-                if(sel.isDirectory()) {
-                    firstLvl = false;
-
-                    // Adds chosen directory to list
-                    str.add(chosenFile);
-                    fileList = null;
-                    path = new File(sel + "");
-
-                    loadFileList();
-
-                    refreshView();
-                }
-
-                // Checks if 'up' was clicked
-                else if(chosenFile.equalsIgnoreCase("up") && !sel.exists()) {
-
-                    // present directory removed from list
-                    String s = str.remove(str.size() - 1);
-
-                    // path modified to exclude present directory
-                    path = new File(path.toString().substring(0, path.toString().lastIndexOf(s)));
-                    fileList = null;
-
-                    // if there are no more directories in the list, then
-                    // its the first level
-                    if(str.isEmpty()) {
-                        firstLvl = true;
-                    }
-                    loadFileList();
-                    refreshView();
-                }
-                // File picked
-                else {
-                    Intent intent = new Intent(HistoryActivity.this, GameActivity.class);
-                    intent.setData(Uri.fromFile(new File(HistoryActivity.path + File.separator + HistoryActivity.chosenFile)));
-                    startActivity(intent);
-                    finish();
-                }
-            }
-        });
+        setListAdapter(adapter);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch(item.getItemId()) {
-        case android.R.id.home:
-            finish();
-            return true;
-        default:
-            return super.onOptionsItemSelected(item);
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+        chosenFile = fileList[position].file;
+        File sel = new File(path + "/" + chosenFile);
+        if(sel.isDirectory()) {
+            firstLvl = false;
+
+            // Adds chosen directory to list
+            str.add(chosenFile);
+            fileList = null;
+            path = new File(sel + "");
+
+            loadFileList();
+
+            refreshView();
         }
+
+        // Checks if 'up' was clicked
+        else if(chosenFile.equalsIgnoreCase("up") && !sel.exists()) {
+
+            // present directory removed from list
+            String s = str.remove(str.size() - 1);
+
+            // path modified to exclude present directory
+            path = new File(path.toString().substring(0, path.toString().lastIndexOf(s)));
+            fileList = null;
+
+            // if there are no more directories in the list, then
+            // its the first level
+            if(str.isEmpty()) {
+                firstLvl = true;
+            }
+            loadFileList();
+            refreshView();
+        }
+        // File picked
+        else {
+            try {
+                Bundle b = new Bundle();
+                b.putString(GameFragment.GAME, FileUtil.loadGameAsString(path + File.separator + chosenFile));
+                b.putBoolean(GameFragment.REPLAY, true);
+
+                getMainActivity().setGameFragment(new GameFragment());
+                getMainActivity().getGameFragment().setArguments(b);
+                getMainActivity().swapFragmentWithoutBackStack(getMainActivity().getGameFragment());
+            }
+            catch(IOException e) {
+                e.printStackTrace();
+                Toast.makeText(getMainActivity(), R.string.failed, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private MainActivity getMainActivity() {
+        return (MainActivity) getSherlockActivity();
     }
 }

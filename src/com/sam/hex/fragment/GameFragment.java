@@ -1,4 +1,4 @@
-package com.sam.hex;
+package com.sam.hex.fragment;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.Locale;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -17,6 +16,7 @@ import android.preference.PreferenceManager;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -24,6 +24,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -36,11 +38,17 @@ import com.hex.core.GameAction;
 import com.hex.core.PlayerObject;
 import com.hex.core.PlayingEntity;
 import com.hex.core.Timer;
+import com.sam.hex.FileUtil;
+import com.sam.hex.MainActivity;
+import com.sam.hex.PreferencesActivity;
+import com.sam.hex.R;
+import com.sam.hex.Stats;
 import com.sam.hex.view.BoardView;
 
-public class GameActivity extends BaseGameActivity {
-    private static final String GAME = "game";
-    private static final SimpleDateFormat SAVE_FORMAT = new SimpleDateFormat("MMM dd, yyyy (HH:mm a)", Locale.getDefault());
+public class GameFragment extends SherlockFragment {
+    public static final String GAME = "game";
+    public static final String REPLAY = "replay";
+    private static final SimpleDateFormat SAVE_FORMAT = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
 
     boolean mIsSignedIn = false;
 
@@ -62,10 +70,12 @@ public class GameActivity extends BaseGameActivity {
 
     /** Called when the activity is first created. */
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
+        getSherlockActivity().getSupportActionBar().show();
+        ((SherlockFragmentActivity) getSherlockActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setHasOptionsMenu(true);
+        getSherlockActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         if(savedInstanceState != null && savedInstanceState.containsKey(GAME)) {
             // Resume a game if one exists
@@ -73,28 +83,29 @@ public class GameActivity extends BaseGameActivity {
             game.setGameListener(createGameListener());
             replay = true;
             replayDuration = 0;
-        }
-        else if(getIntent().getData() != null) {
-            // Check to see if we should load a game
-            try {
-                game = FileUtil.loadGame(getIntent().getData().getPath());
-                game.setGameListener(createGameListener());
-                replay = true;
+
+            if(savedInstanceState.containsKey(REPLAY) && savedInstanceState.getBoolean(REPLAY)) {
                 replayDuration = 900;
             }
-            catch(IOException e) {
-                e.printStackTrace();
-                Toast.makeText(this, R.string.failed, Toast.LENGTH_SHORT).show();
-                initializeNewGame();
+        }
+        else if(getArguments() != null && getArguments().containsKey(GAME)) {
+            // Resume a game if one exists
+            game = Game.load(getArguments().getString(GAME));
+            game.setGameListener(createGameListener());
+            replay = true;
+            replayDuration = 0;
+
+            if(getArguments().containsKey(REPLAY) && getArguments().getBoolean(REPLAY)) {
+                replayDuration = 900;
             }
         }
         else {
             // Create a new game
-            initializeNewGame();
+            initializeNewGame(inflater);
         }
 
         // Load the UI
-        applyBoard();
+        return applyBoard(inflater);
     }
 
     @Override
@@ -110,44 +121,51 @@ public class GameActivity extends BaseGameActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle savedInstanceState) {
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        game.start();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putString(GAME, game.save());
     }
 
-    private void applyBoard() {
-        setContentView(R.layout.game);
+    private View applyBoard(LayoutInflater inflater) {
+        View v = inflater.inflate(R.layout.game, null);
 
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            timerText = (TextView) findViewById(R.id.timer);
-            winnerText = (TextView) findViewById(R.id.winner);
+            timerText = (TextView) v.findViewById(R.id.timer);
+            winnerText = (TextView) v.findViewById(R.id.winner);
         }
         else {
-            LayoutInflater inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View v = inflator.inflate(R.layout.actionbar_message, null);
-            getSupportActionBar().setCustomView(v);
-            getSupportActionBar().setDisplayShowCustomEnabled(true);
+            View message = inflater.inflate(R.layout.actionbar_message, null);
+            getSherlockActivity().getSupportActionBar().setCustomView(message);
+            getSherlockActivity().getSupportActionBar().setDisplayShowCustomEnabled(true);
 
-            winnerText = (TextView) v.findViewById(R.id.winner);
-            timerText = (TextView) v.findViewById(R.id.timer);
+            winnerText = (TextView) message.findViewById(R.id.winner);
+            timerText = (TextView) message.findViewById(R.id.timer);
         }
-        board = (BoardView) findViewById(R.id.board);
+        board = (BoardView) v.findViewById(R.id.board);
         board.setGame(game);
-        player1Icon = (ImageButton) findViewById(R.id.p1);
-        player2Icon = (ImageButton) findViewById(R.id.p2);
+        player1Icon = (ImageButton) v.findViewById(R.id.p1);
+        player2Icon = (ImageButton) v.findViewById(R.id.p2);
         if(game.gameOptions.timer.type == 0 || game.isGameOver()) {
             timerText.setVisibility(View.GONE);
         }
         if(game.isGameOver() && game.getGameListener() != null) game.getGameListener().onWin(game.getCurrentPlayer());
 
-        replayForward = (ImageButton) findViewById(R.id.replayForward);
-        replayPlayPause = (ImageButton) findViewById(R.id.replayPlayPause);
-        replayBack = (ImageButton) findViewById(R.id.replayBack);
-        replayButtons = (RelativeLayout) findViewById(R.id.replayButtons);
+        replayForward = (ImageButton) v.findViewById(R.id.replayForward);
+        replayPlayPause = (ImageButton) v.findViewById(R.id.replayPlayPause);
+        replayBack = (ImageButton) v.findViewById(R.id.replayBack);
+        replayButtons = (RelativeLayout) v.findViewById(R.id.replayButtons);
+
+        return v;
     }
 
-    private void initializeNewGame() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    private void initializeNewGame(LayoutInflater inflater) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getSherlockActivity());
 
         // Stop the old game
         stopGame(game);
@@ -170,16 +188,15 @@ public class GameActivity extends BaseGameActivity {
         setNames(prefs, GameAction.LOCAL_GAME, game);
         setColors(prefs, GameAction.LOCAL_GAME, game);
 
-        applyBoard();
+        applyBoard(inflater);
         game.gameOptions.timer.start(game);
-        game.start();
     }
 
     private GameListener createGameListener() {
         return new GameListener() {
             @Override
             public void onWin(final PlayingEntity player) {
-                runOnUiThread(new Runnable() {
+                getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         String winnerMsg = String.format(getString(R.string.winner), player.getName());
@@ -190,22 +207,25 @@ public class GameActivity extends BaseGameActivity {
                         timerText.invalidate();
                         board.invalidate();
 
+                        if(replay) return;
+
                         // Auto save completed game
                         try {
-                            FileUtil.saveGame(getString(R.string.auto_save_preamble) + SAVE_FORMAT.format(new Date()), game.save());
+                            FileUtil.autoSaveGame(game.getPlayer1().getName() + " vs " + game.getPlayer2().getName() + " " + SAVE_FORMAT.format(new Date())
+                                    + " (Victor: " + player.getName() + ")", game.save());
                         }
                         catch(IOException e) {
                             e.printStackTrace();
                         }
 
-                        Stats.incrementTimePlayed(getApplicationContext(), game.getGameLength() - timeGamePaused);
-                        Stats.incrementGamesPlayed(getApplicationContext());
-                        if(player.getTeam() == 1) Stats.incrementGamesWon(getApplicationContext());
+                        Stats.incrementTimePlayed(getSherlockActivity(), game.getGameLength() - timeGamePaused);
+                        Stats.incrementGamesPlayed(getSherlockActivity());
+                        if(player.getTeam() == 1) Stats.incrementGamesWon(getSherlockActivity());
 
-                        if(mIsSignedIn) {
+                        if(getMainActivity().isSignedIn()) {
                             // Unlock the quick play achievement!
                             if(game.getGameLength() < 30 * 1000) {
-                                getGamesClient().unlockAchievement(getString(R.string.achievement_30_seconds));
+                                getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_30_seconds));
                             }
 
                             // Unlock the fill the board achievement!
@@ -216,17 +236,17 @@ public class GameActivity extends BaseGameActivity {
                                 }
                             }
                             if(boardFilled) {
-                                getGamesClient().unlockAchievement(getString(R.string.achievement_fill_the_board));
+                                getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_fill_the_board));
                             }
 
                             // Unlock the Novice achievement!
-                            getGamesClient().incrementAchievement(getString(R.string.achievement_novice), 1);
+                            getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_novice), 1);
 
                             // Unlock the Intermediate achievement!
-                            getGamesClient().incrementAchievement(getString(R.string.achievement_intermediate), 1);
+                            getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_intermediate), 1);
 
                             // Unlock the Expert achievement!
-                            if(player.getTeam() == 1) getGamesClient().incrementAchievement(getString(R.string.achievement_expert), 1);
+                            if(player.getTeam() == 1) getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_expert), 1);
                         }
                     }
                 });
@@ -234,7 +254,7 @@ public class GameActivity extends BaseGameActivity {
 
             @Override
             public void onClear() {
-                runOnUiThread(new Runnable() {
+                getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.postInvalidate();
@@ -244,7 +264,7 @@ public class GameActivity extends BaseGameActivity {
 
             @Override
             public void onStart() {
-                runOnUiThread(new Runnable() {
+                getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         if(game.isGameOver()) winnerText.setVisibility(View.GONE);
@@ -259,7 +279,7 @@ public class GameActivity extends BaseGameActivity {
 
             @Override
             public void onTurn(PlayingEntity player) {
-                runOnUiThread(new Runnable() {
+                getSherlockActivity().runOnUiThread(new Runnable() {
                     @SuppressWarnings("deprecation")
                     @Override
                     public void run() {
@@ -284,7 +304,7 @@ public class GameActivity extends BaseGameActivity {
 
             @Override
             public void onReplayStart() {
-                runOnUiThread(new Runnable() {
+                getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.postInvalidate();
@@ -296,7 +316,7 @@ public class GameActivity extends BaseGameActivity {
 
             @Override
             public void onReplayEnd() {
-                runOnUiThread(new Runnable() {
+                getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.postInvalidate();
@@ -307,7 +327,7 @@ public class GameActivity extends BaseGameActivity {
 
             @Override
             public void onUndo() {
-                runOnUiThread(new Runnable() {
+                getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.postInvalidate();
@@ -317,7 +337,7 @@ public class GameActivity extends BaseGameActivity {
 
             @Override
             public void startTimer() {
-                runOnUiThread(new Runnable() {
+                getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         timerText.setVisibility(View.VISIBLE);
@@ -327,8 +347,7 @@ public class GameActivity extends BaseGameActivity {
 
             @Override
             public void displayTime(final int minutes, final int seconds) {
-                System.out.println("running!" + minutes + ", " + seconds);
-                runOnUiThread(new Runnable() {
+                getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         timerText.setText(String.format(getString(R.string.timer), String.format("%d:%02d", minutes, seconds)));
@@ -346,7 +365,7 @@ public class GameActivity extends BaseGameActivity {
             timeGamePaused += System.currentTimeMillis() - whenGamePaused;
             whenGamePaused = 0;
         }
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getSherlockActivity());
 
         // Check if settings were changed and we need to run a new game
         if(game != null && game.replayRunning) {
@@ -357,8 +376,9 @@ public class GameActivity extends BaseGameActivity {
             replay(replayDuration);
         }
         else if(somethingChanged(prefs, GameAction.LOCAL_GAME, game)) {
-            initializeNewGame();
-            applyBoard();
+            LayoutInflater inflater = getLayoutInflater(null);
+            initializeNewGame(inflater);
+            applyBoard(inflater);
         }
         else {// Apply minor changes without stopping the current game
             setColors(prefs, GameAction.LOCAL_GAME, game);
@@ -375,10 +395,8 @@ public class GameActivity extends BaseGameActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getSupportMenuInflater();
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_game_local, menu);
-        return true;
     }
 
     @Override
@@ -386,11 +404,11 @@ public class GameActivity extends BaseGameActivity {
         // Handle item selection
         switch(item.getItemId()) {
         case android.R.id.home:
-            finish();
+            getFragmentManager().popBackStackImmediate();
             return true;
         case R.id.settings:
             game.replayRunning = false;
-            startActivity(new Intent(getBaseContext(), PreferencesActivity.class));
+            startActivity(new Intent(getSherlockActivity(), PreferencesActivity.class));
             return true;
         case R.id.undo:
             undo();
@@ -413,20 +431,20 @@ public class GameActivity extends BaseGameActivity {
     }
 
     private void showSavingDialog() {
-        final EditText editText = new EditText(this);
+        final EditText editText = new EditText(getSherlockActivity());
         editText.setInputType(InputType.TYPE_CLASS_TEXT);
         editText.setText(SAVE_FORMAT.format(new Date()));
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getSherlockActivity());
         builder.setTitle(R.string.enterFilename).setView(editText).setPositiveButton(android.R.string.ok, new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 try {
                     FileUtil.saveGame(editText.getText().toString(), game.save());
-                    Toast.makeText(getApplicationContext(), R.string.saved, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getSherlockActivity(), R.string.saved, Toast.LENGTH_SHORT).show();
                 }
                 catch(IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(getApplicationContext(), R.string.failed, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getSherlockActivity(), R.string.failed, Toast.LENGTH_SHORT).show();
                 }
             }
         }).setNegativeButton(R.string.cancel, null).show();
@@ -447,8 +465,10 @@ public class GameActivity extends BaseGameActivity {
     public void setNames(SharedPreferences prefs, int gameLocation, Game game) {
         if(gameLocation == GameAction.LOCAL_GAME) {
             // Playing on the same phone
-            game.getPlayer1().setName(prefs.getString("player1Name", "Player1"));
-            game.getPlayer2().setName(prefs.getString("player2Name", "Player2"));
+            String p1 = prefs.getString("player1Name", getString(R.string.DEFAULT_P1_NAME));
+            if(getMainActivity().isSignedIn()) p1 = getMainActivity().getGamesClient().getCurrentPlayer().getDisplayName();
+            game.getPlayer1().setName(p1);
+            game.getPlayer2().setName(prefs.getString("player2Name", getString(R.string.DEFAULT_P2_NAME)));
         }
         else if(gameLocation == GameAction.NET_GAME) {
             // // Playing over the net
@@ -536,8 +556,9 @@ public class GameActivity extends BaseGameActivity {
                     // Yes button clicked
                     if(game.getPlayer1().supportsNewgame() && game.getPlayer2().supportsNewgame()) {
                         game.replayRunning = false;
-                        initializeNewGame();
-                        applyBoard();
+                        LayoutInflater inflater = getLayoutInflater(null);
+                        initializeNewGame(inflater);
+                        applyBoard(inflater);
                     }
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:
@@ -548,7 +569,7 @@ public class GameActivity extends BaseGameActivity {
             }
         };
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getSherlockActivity());
         builder.setMessage(getString(R.string.confirmNewgame)).setPositiveButton(getString(R.string.yes), dialogClickListener)
                 .setNegativeButton(getString(R.string.no), dialogClickListener).show();
     }
@@ -587,7 +608,7 @@ public class GameActivity extends BaseGameActivity {
                 case DialogInterface.BUTTON_POSITIVE:
                     // Yes button clicked
                     stopGame(game);
-                    finish();
+                    getFragmentManager().popBackStackImmediate();
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:
                     // No button clicked
@@ -597,19 +618,12 @@ public class GameActivity extends BaseGameActivity {
             }
         };
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getSherlockActivity());
         builder.setMessage(getString(R.string.confirmExit)).setPositiveButton(getString(R.string.yes), dialogClickListener)
                 .setNegativeButton(getString(R.string.no), dialogClickListener).show();
     }
 
-    @Override
-    public void onSignInSucceeded() {
-        System.out.println("Signed in");
-        mIsSignedIn = true;
-    }
-
-    @Override
-    public void onSignInFailed() {
-        System.out.println("Sign in failed");
+    public MainActivity getMainActivity() {
+        return (MainActivity) getSherlockActivity();
     }
 }

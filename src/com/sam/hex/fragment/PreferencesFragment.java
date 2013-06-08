@@ -1,19 +1,18 @@
-package com.sam.hex;
+package com.sam.hex.fragment;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
+import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,23 +21,14 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.actionbarsherlock.app.SherlockPreferenceActivity;
-import com.actionbarsherlock.view.MenuItem;
-import com.sam.hex.fragment.PreferencesFragment;
+import com.sam.hex.R;
 
 /**
  * @author Will Harmon
  **/
-@SuppressWarnings("deprecation")
 @SuppressLint("NewApi")
-public class PreferencesActivity extends SherlockPreferenceActivity {
-    private static final int GENERAL = 0;
-    private static final int PLAYER1 = 1;
-    private static final int PLAYER2 = 2;
-
+public class PreferencesFragment extends PreferenceFragment {
     SharedPreferences settings;
-    PreferenceScreen screen;
-    PreferenceScreen generalScreen;
     Preference p1NamePref;
     Preference p2NamePref;
     ListPreference p1TypePref;
@@ -51,42 +41,15 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
     Preference p1;
     Preference p2;
 
-    private boolean in_submenu = false;
-    private boolean in_general = false;
-    private boolean in_p1 = false;
-    private boolean in_p2 = false;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(android.os.Build.VERSION.SDK_INT < 11) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            settings = PreferenceManager.getDefaultSharedPreferences(this);
+        getActivity().getActionBar().show();
+        getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActivity().getActionBar().setTitle(R.string.preferences);
+        settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-            if(getIntent().getExtras() != null) {
-                in_submenu = true;
-                Bundle extras = getIntent().getExtras();
-                int type = extras.getInt("type");
-
-                if(type == GENERAL) {
-                    in_general = true;
-                }
-                else if(type == PLAYER1) {
-                    in_p1 = true;
-                }
-                else if(type == PLAYER2) {
-                    in_p2 = true;
-                }
-            }
-
-            loadPreferences();
-        }
-        else {
-            if(savedInstanceState == null) {
-                PreferencesFragment preferences = new PreferencesFragment();
-                getFragmentManager().beginTransaction().add(android.R.id.content, preferences).commit();
-            }
-        }
+        loadPreferences();
     }
 
     @Override
@@ -96,19 +59,7 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
         setListeners();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch(item.getItemId()) {
-        case android.R.id.home:
-            finish();
-            return true;
-        default:
-            return super.onOptionsItemSelected(item);
-        }
-    }
-
-    class nameListener implements OnPreferenceChangeListener {
+    public class NameListener implements OnPreferenceChangeListener {
         @Override
         public boolean onPreferenceChange(Preference pref, Object newValue) {
             pref.setSummary(String.format(getString(R.string.player2NameSummary_onChange), newValue.toString()));
@@ -116,7 +67,7 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
         }
     }
 
-    class p1typeListener implements OnPreferenceChangeListener {
+    public class P1TypeListener implements OnPreferenceChangeListener {
         @Override
         public boolean onPreferenceChange(Preference pref, Object newValue) {
             String[] texts = getResources().getStringArray(R.array.player1Array);
@@ -127,7 +78,7 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
         }
     }
 
-    class p2typeListener implements OnPreferenceChangeListener {
+    public class P2TypeListener implements OnPreferenceChangeListener {
         @Override
         public boolean onPreferenceChange(Preference pref, Object newValue) {
             String[] texts = getResources().getStringArray(R.array.player2Array);
@@ -138,7 +89,7 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
         }
     }
 
-    class gridListener implements OnPreferenceChangeListener {
+    public class GridListener implements OnPreferenceChangeListener {
         @Override
         public boolean onPreferenceChange(Preference preference, Object newValue) {
             if(newValue.toString().equals("0")) {
@@ -153,10 +104,10 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
         }
     }
 
-    class timerListener implements OnPreferenceClickListener {
+    public class TimerListener implements OnPreferenceClickListener {
         @Override
         public boolean onPreferenceClick(Preference pref) {
-            LayoutInflater inflater = (LayoutInflater) PreferencesActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View dialoglayout = inflater.inflate(R.layout.preferences_timer, null);
             final Spinner timerType = (Spinner) dialoglayout.findViewById(R.id.timerType);
             final EditText timer = (EditText) dialoglayout.findViewById(R.id.timer);
@@ -178,7 +129,7 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
                     timer.setVisibility(View.GONE);
                 }
             });
-            AlertDialog.Builder builder = new AlertDialog.Builder(PreferencesActivity.this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setView(dialoglayout).setPositiveButton(getString(R.string.okay), new OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -191,35 +142,19 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
         }
     }
 
-    class menuListener implements OnPreferenceClickListener {
-        int type;
-
-        menuListener(int type) {
-            this.type = type;
-        }
-
-        @Override
-        public boolean onPreferenceClick(Preference preference) {
-            final Intent intent = new Intent(getBaseContext(), PreferencesActivity.class);
-            intent.putExtra("type", type);
-            startActivity(intent);
-            return false;
-        }
-    }
-
     private void setListeners() {
         // Change the summary to show the player's name
         p1NamePref = findPreference("player1Name");
         if(p1NamePref != null) {
             p1NamePref.setSummary(String.format(getString(R.string.player1NameSummary_onChange),
                     settings.getString("player1Name", getString(R.string.DEFAULT_P1_NAME))));
-            p1NamePref.setOnPreferenceChangeListener(new nameListener());
+            p1NamePref.setOnPreferenceChangeListener(new NameListener());
         }
         p2NamePref = findPreference("player2Name");
         if(p2NamePref != null) {
             p2NamePref.setSummary(String.format(getString(R.string.player2NameSummary_onChange),
                     settings.getString("player2Name", getString(R.string.DEFAULT_P2_NAME))));
-            p2NamePref.setOnPreferenceChangeListener(new nameListener());
+            p2NamePref.setOnPreferenceChangeListener(new NameListener());
         }
 
         // Change the summary to show the player's type
@@ -230,7 +165,7 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
             String newValue = settings.getString("player1Type", getString(R.string.DEFAULT_P1_NAME));
             String value = getTextValue(texts, values, newValue);
             p1TypePref.setSummary(String.format(getString(R.string.player1TypeSummary_onChange), value));
-            p1TypePref.setOnPreferenceChangeListener(new p1typeListener());
+            p1TypePref.setOnPreferenceChangeListener(new P1TypeListener());
         }
         p2TypePref = (ListPreference) findPreference("player2Type");
         if(p2TypePref != null) {
@@ -239,7 +174,7 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
             String newValue = settings.getString("player2Type", getString(R.string.DEFAULT_P2_NAME));
             String value = getTextValue(texts, values, newValue);
             p2TypePref.setSummary(String.format(getString(R.string.player2TypeSummary_onChange), value));
-            p2TypePref.setOnPreferenceChangeListener(new p2typeListener());
+            p2TypePref.setOnPreferenceChangeListener(new P2TypeListener());
         }
 
         // Allow for custom grid sizes
@@ -249,57 +184,29 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
             String boardSize = Integer.valueOf(settings.getString("gameSizePref", defaultBoardSize)) == 0 ? settings.getString("customGameSizePref",
                     defaultBoardSize) : settings.getString("gameSizePref", defaultBoardSize);
             gridPref.setSummary(String.format(getString(R.string.gameSizeSummary_onChange), boardSize, boardSize));
-            gridPref.setOnPreferenceChangeListener(new gridListener());
+            gridPref.setOnPreferenceChangeListener(new GridListener());
         }
 
         // Give that custom popup for timers
         timerPref = findPreference("timerOptionsPref");
         if(timerPref != null) {
-            timerPref.setOnPreferenceClickListener(new timerListener());
-        }
-
-        // Set up the abstract menu
-        options = findPreference("general");
-        if(options != null) {
-            options.setOnPreferenceClickListener(new menuListener(GENERAL));
-        }
-        p1 = findPreference("p1");
-        if(p1 != null) {
-            p1.setOnPreferenceClickListener(new menuListener(PLAYER1));
-        }
-        p2 = findPreference("p2");
-        if(p2 != null) {
-            p2.setOnPreferenceClickListener(new menuListener(PLAYER2));
+            timerPref.setOnPreferenceClickListener(new TimerListener());
         }
     }
 
     private void loadPreferences() {
-        setContentView(R.layout.preferences);
-        getSupportActionBar().setTitle(R.string.preferences);
-        if(!in_submenu) {
-            addPreferencesFromResource(R.layout.preferences_abstract);
-        }
-        else if(in_general) {
-            addPreferencesFromResource(R.layout.preferences_general);
-
-            generalScreen = (PreferenceScreen) findPreference("generalScreen");
-        }
-        else if(in_p1) {
-            addPreferencesFromResource(R.layout.preferences_player1);
-        }
-        else if(in_p2) {
-            addPreferencesFromResource(R.layout.preferences_player2);
-        }
-        screen = (PreferenceScreen) findPreference("preferences");
+        addPreferencesFromResource(R.layout.preferences_general);
+        addPreferencesFromResource(R.layout.preferences_player1);
+        addPreferencesFromResource(R.layout.preferences_player2);
     }
 
     /**
      * Popup for custom grid sizes
      * */
     private void showInputDialog(String message) {
-        final EditText editText = new EditText(this);
+        final EditText editText = new EditText(getActivity());
         editText.setInputType(InputType.TYPE_CLASS_NUMBER);
-        AlertDialog.Builder builder = new AlertDialog.Builder(PreferencesActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(message).setView(editText).setPositiveButton(getString(R.string.okay), new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -315,9 +222,6 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
                     settings.edit().putString("gameSizePref", String.valueOf(0)).commit();
                     String boardSize = settings.getString("customGameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE));
                     gridPref.setSummary(String.format(getString(R.string.gameSizeSummary_onChange), boardSize, boardSize));
-                    generalScreen.removeAll();
-                    loadPreferences();
-                    setListeners();
                 }
             }
         }).setNegativeButton(getString(R.string.cancel), null).show();

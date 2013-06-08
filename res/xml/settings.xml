@@ -5,20 +5,20 @@
             android:key="color1"
             android:title="@string/color1_title" 
             android:summary="@string/color1_summary"
-            android:defaultValue="@integer/COLOR_BLACK" 
+            android:defaultValue="0xff000000" 
         />
         <net.margaritov.preference.colorpicker.ColorPickerPreference 
             android:key="color2"
             android:persistent="false"
             android:title="@string/color2_title" 
             android:summary="@string/color2_summary"
-            android:defaultValue="@integer/COLOR_GREEN" 
+            android:defaultValue="0xff00ff00" 
         />
         <net.margaritov.preference.colorpicker.ColorPickerPreference 
             android:key="color3"
             android:title="@string/color3_title" 
             android:summary="@string/color3_summary"
-            android:defaultValue="@integer/COLOR_GREEN"
+            android:defaultValue="0xff00ff00"
             alphaSlider="true" 
         />
         <net.margaritov.preference.colorpicker.ColorPickerPreference 

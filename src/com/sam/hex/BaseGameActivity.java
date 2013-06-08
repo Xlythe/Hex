@@ -84,7 +84,7 @@ public abstract class BaseGameActivity extends SherlockFragmentActivity implemen
         mHelper.onActivityResult(request, response, data);
     }
 
-    protected GamesClient getGamesClient() {
+    public GamesClient getGamesClient() {
         return mHelper.getGamesClient();
     }
 
@@ -96,15 +96,15 @@ public abstract class BaseGameActivity extends SherlockFragmentActivity implemen
         return mHelper.getPlusClient();
     }
 
-    protected boolean isSignedIn() {
+    public boolean isSignedIn() {
         return mHelper.isSignedIn();
     }
 
-    protected void beginUserInitiatedSignIn() {
+    public void beginUserInitiatedSignIn() {
         mHelper.beginUserInitiatedSignIn();
     }
 
-    protected void signOut() {
+    public void signOut() {
         mHelper.signOut();
     }
 

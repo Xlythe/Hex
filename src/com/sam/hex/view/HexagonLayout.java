@@ -47,6 +47,7 @@ public class HexagonLayout extends View implements OnTouchListener {
     private Paint mLinePaint;
     private Paint mButtonTextPaint;
     private int mPressedColor;
+    private int mDisabledColor;
 
     public HexagonLayout(Context context) {
         super(context);
@@ -75,6 +76,7 @@ public class HexagonLayout extends View implements OnTouchListener {
         mBorderWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, dm);
         mBorderShadowWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, dm);
         mPressedColor = Color.LTGRAY;
+        mDisabledColor = getDarkerColor(mPressedColor);
         mTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 44, dm);
         mText = "Hex";
         mTextPaint = new Paint();
@@ -128,6 +130,11 @@ public class HexagonLayout extends View implements OnTouchListener {
 
         for(int i = 0; i < 6; i++) {
             if(mButtons[i].isPressed()) {
+                mPressedState[i].getPaint().setColor(mPressedColor);
+                mPressedState[i].draw(canvas);
+            }
+            if(!mButtons[i].isEnabled()) {
+                mPressedState[i].getPaint().setColor(mDisabledColor);
                 mPressedState[i].draw(canvas);
             }
         }
@@ -255,13 +262,13 @@ public class HexagonLayout extends View implements OnTouchListener {
             pressedStatePath.close();
 
             mPressedState[i] = new ShapeDrawable(new PathShape(pressedStatePath, w, h));
-            mPressedState[i].getPaint().setColor(mPressedColor);
             mPressedState[i].setBounds(0, 0, w, h);
 
             mButtons[i].setTriangle(t);
 
-            mButtons[i].getDrawable().setBounds((center.x - s / 6), (int) (s * 0.866 / 2 - s / 3 + mBorderWidth + mBorderShadowWidth), (center.x + s / 6),
-                    (int) (s * 0.866 / 2 + mBorderWidth + mBorderShadowWidth));
+            int drawableWidth = s / 4;
+            mButtons[i].getDrawable().setBounds(center.x - drawableWidth / 2, center.y / 2 - drawableWidth / 2, center.x + drawableWidth / 2,
+                    center.y / 2 + drawableWidth / 2);
 
             mBorder[i] = new ShapeDrawable(new PathShape(edgePath, w, h));
             mBorder[i].getPaint().setColor(mButtons[i].getColor());

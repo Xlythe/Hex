@@ -2,13 +2,12 @@
 <resources>
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
-    <color name="red">#FF0000</color>
+    <color name="red">#cc5c57</color>
     <color name="transparent">#00000000</color>
     <color name="grey">#FFCCCCCC</color>
     <drawable name="transparent">#00000000</drawable>
     <drawable name="white">#FFFFFFFF</drawable>
     <drawable name="black">#00000000</drawable>
-    <color name="cream">#F0F0F0</color>
     <color name="background">#D2D2D2</color>
     <color name="bar_background">#333333</color>
 </resources>

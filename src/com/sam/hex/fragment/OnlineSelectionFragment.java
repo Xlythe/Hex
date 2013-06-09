@@ -7,10 +7,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.Button;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.google.android.gms.games.GamesActivityResultCodes;
@@ -18,6 +16,7 @@ import com.google.android.gms.games.GamesClient;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.sam.hex.MainActivity;
 import com.sam.hex.R;
+import com.sam.hex.view.SelectorLayout;
 
 public class OnlineSelectionFragment extends SherlockFragment {
     private String mRoomId;
@@ -25,30 +24,37 @@ public class OnlineSelectionFragment extends SherlockFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        getSherlockActivity().getSupportActionBar().show();
-        getSherlockActivity().getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSherlockActivity().getSupportActionBar().hide();
         View v = inflater.inflate(R.layout.online_selection, null);
 
-        Button quickGameButton = (Button) v.findViewById(R.id.button1);
-        quickGameButton.setOnClickListener(new OnClickListener() {
+        SelectorLayout selectorLayout = (SelectorLayout) v.findViewById(R.id.buttons);
+
+        SelectorLayout.Button quickGameButton = selectorLayout.getButtons()[0];
+        quickGameButton.setColor(0xfff9db00);
+        quickGameButton.setText(R.string.online_selection_button_quick);
+        quickGameButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
             @Override
-            public void onClick(View arg0) {
+            public void onClick() {
                 startQuickGame();
             }
         });
 
-        Button inviteButton = (Button) v.findViewById(R.id.button2);
-        inviteButton.setOnClickListener(new OnClickListener() {
+        SelectorLayout.Button inviteButton = selectorLayout.getButtons()[1];
+        inviteButton.setColor(0xff5f6ec2);
+        inviteButton.setText(R.string.online_selection_button_invite);
+        inviteButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
             @Override
-            public void onClick(View arg0) {
+            public void onClick() {
                 startActivityForResult(getMainActivity().getGamesClient().getSelectPlayersIntent(1, 1), MainActivity.RC_SELECT_PLAYERS);
             }
         });
 
-        Button pendingButton = (Button) v.findViewById(R.id.button3);
-        pendingButton.setOnClickListener(new OnClickListener() {
+        SelectorLayout.Button pendingButton = selectorLayout.getButtons()[2];
+        pendingButton.setColor(0xfff48935);
+        pendingButton.setText(R.string.online_selection_button_pending);
+        pendingButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
             @Override
-            public void onClick(View arg0) {
+            public void onClick() {
                 startActivityForResult(getMainActivity().getGamesClient().getInvitationInboxIntent(), MainActivity.RC_SELECT_PLAYERS);
             }
         });

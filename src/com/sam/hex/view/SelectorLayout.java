@@ -69,7 +69,7 @@ public class SelectorLayout extends View implements OnTouchListener {
         mIndentHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, dm);
         mMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, dm);
         mRotation = 45f;
-        mAnimationTick = 40;
+        mAnimationTick = 30;
         mAnimationDelta = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 22, dm);
     }
 
@@ -125,8 +125,8 @@ public class SelectorLayout extends View implements OnTouchListener {
         mOldTextPos = new Point[3];
 
         for(int i = 0; i < 3; i++) {
-            Hexagon hex = new Hexagon(new Point(offset, mIndentHeight - offset), new Point(mWidth / 2 + offset, 0 - offset), new Point(mWidth + offset,
-                    mIndentHeight - offset), new Point(mWidth + offset, h - offset), new Point(mWidth / 2 + offset, h - mIndentHeight - offset), new Point(
+            Hexagon hex = new Hexagon(new Point(offset, mIndentHeight - 3 * offset), new Point(mWidth / 2 + offset, -3 * offset), new Point(mWidth + offset,
+                    mIndentHeight - 3 * offset), new Point(mWidth + offset, h - offset), new Point(mWidth / 2 + offset, h - mIndentHeight - offset), new Point(
                     offset, h - offset));
 
             // Shape of a pressed state
@@ -139,16 +139,31 @@ public class SelectorLayout extends View implements OnTouchListener {
             buttonPath.lineTo(hex.f.x, hex.f.y);
             buttonPath.close();
 
+            Hexagon mirrorHex = new Hexagon(new Point(offset, mIndentHeight - offset), new Point(mWidth / 2 + offset, 0 - offset), new Point(mWidth + offset,
+                    mIndentHeight - offset), new Point(mWidth + offset, h - offset), new Point(mWidth / 2 + offset, h - mIndentHeight - offset), new Point(
+                    offset, h - offset));
+
+            // Shape of a pressed state
+            Path mirrorButtonPath = new Path();
+            mirrorButtonPath.moveTo(mirrorHex.a.x, mirrorHex.a.y);
+            mirrorButtonPath.lineTo(mirrorHex.b.x, mirrorHex.b.y);
+            mirrorButtonPath.lineTo(mirrorHex.c.x, mirrorHex.c.y);
+            mirrorButtonPath.lineTo(mirrorHex.d.x, mirrorHex.d.y);
+            mirrorButtonPath.lineTo(mirrorHex.e.x, mirrorHex.e.y);
+            mirrorButtonPath.lineTo(mirrorHex.f.x, mirrorHex.f.y);
+            mirrorButtonPath.close();
+
             int heightOffset = 3 * mIndentHeight;
             mButtonDrawable[i] = new ShapeDrawable(new PathShape(buttonPath, w, h));
-            mButtonDrawable[i].setBounds(0, -heightOffset, w, h - heightOffset);
-            mMirrorButtonDrawable[i] = new ShapeDrawable(new PathShape(buttonPath, w, h));
-            mMirrorButtonDrawable[i].setBounds(0, (h - mIndentHeight) + mMargin - heightOffset, w, (2 * h - mIndentHeight) + mMargin - heightOffset);
+            mButtonDrawable[i].setBounds(0, -heightOffset + h / 2, w, h - heightOffset + h / 2);
+            mMirrorButtonDrawable[i] = new ShapeDrawable(new PathShape(mirrorButtonPath, w, h));
+            mMirrorButtonDrawable[i].setBounds(0, (h - mIndentHeight) + mMargin - heightOffset + h / 2, w, (2 * h - mIndentHeight) + mMargin - heightOffset + h
+                    / 2);
 
             mButtons[i].setHexagon(hex);
 
-            mButtons[i].textX = mButtons[i].getHexagon().b.x - mButtonTextPaint.measureText(mButtons[i].getText()) / 2;
-            mButtons[i].textY = mButtons[i].getHexagon().d.y / 2 + mButtonTextPaint.getTextSize() / 2;
+            mButtons[i].textX = mButtons[i].getHexagon().b.x * 2 - mButtonTextPaint.measureText(mButtons[i].getText()) / 2 - 2 * i * margin;
+            mButtons[i].textY = mButtons[i].getHexagon().d.y / 2 + mButtonTextPaint.getTextSize() / 4;
 
             mOldRect[i] = mButtonDrawable[i].copyBounds();
             mOldMirrorRect[i] = mMirrorButtonDrawable[i].copyBounds();

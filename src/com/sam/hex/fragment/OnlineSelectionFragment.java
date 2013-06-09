@@ -19,6 +19,7 @@ import com.sam.hex.R;
 import com.sam.hex.view.SelectorLayout;
 
 public class OnlineSelectionFragment extends SherlockFragment {
+    private SelectorLayout mSelectorLayout;
     private String mRoomId;
 
     @Override
@@ -27,9 +28,9 @@ public class OnlineSelectionFragment extends SherlockFragment {
         getSherlockActivity().getSupportActionBar().hide();
         View v = inflater.inflate(R.layout.online_selection, null);
 
-        SelectorLayout selectorLayout = (SelectorLayout) v.findViewById(R.id.buttons);
+        mSelectorLayout = (SelectorLayout) v.findViewById(R.id.buttons);
 
-        SelectorLayout.Button quickGameButton = selectorLayout.getButtons()[0];
+        SelectorLayout.Button quickGameButton = mSelectorLayout.getButtons()[0];
         quickGameButton.setColor(0xfff9db00);
         quickGameButton.setText(R.string.online_selection_button_quick);
         quickGameButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
@@ -39,7 +40,7 @@ public class OnlineSelectionFragment extends SherlockFragment {
             }
         });
 
-        SelectorLayout.Button inviteButton = selectorLayout.getButtons()[1];
+        SelectorLayout.Button inviteButton = mSelectorLayout.getButtons()[1];
         inviteButton.setColor(0xff5f6ec2);
         inviteButton.setText(R.string.online_selection_button_invite);
         inviteButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
@@ -49,7 +50,7 @@ public class OnlineSelectionFragment extends SherlockFragment {
             }
         });
 
-        SelectorLayout.Button pendingButton = selectorLayout.getButtons()[2];
+        SelectorLayout.Button pendingButton = mSelectorLayout.getButtons()[2];
         pendingButton.setColor(0xfff48935);
         pendingButton.setText(R.string.online_selection_button_pending);
         pendingButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
@@ -60,6 +61,12 @@ public class OnlineSelectionFragment extends SherlockFragment {
         });
 
         return v;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mSelectorLayout.reset();
     }
 
     @Override

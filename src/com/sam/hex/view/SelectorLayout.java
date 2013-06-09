@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Rect;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.PathShape;
 import android.util.AttributeSet;
@@ -33,6 +34,9 @@ public class SelectorLayout extends View implements OnTouchListener {
     private float mRotation;
     private int mAnimationTick;
     private int mAnimationDelta;
+    private Rect[] mOldRect;
+    private Rect[] mOldMirrorRect;
+    private Point[] mOldTextPos;
 
     public SelectorLayout(Context context) {
         super(context);
@@ -92,6 +96,7 @@ public class SelectorLayout extends View implements OnTouchListener {
                             mButtonDrawable[i].getBounds().right, mButtonDrawable[i].getBounds().bottom - mAnimationDelta);
                     mMirrorButtonDrawable[i].setBounds(mMirrorButtonDrawable[i].getBounds().left, mMirrorButtonDrawable[i].getBounds().top + mAnimationDelta,
                             mMirrorButtonDrawable[i].getBounds().right, mMirrorButtonDrawable[i].getBounds().bottom + mAnimationDelta);
+                    mButtons[i].textX += mAnimationDelta;
                     postInvalidateDelayed(mAnimationTick);
                 }
                 else {
@@ -103,8 +108,7 @@ public class SelectorLayout extends View implements OnTouchListener {
             mMirrorButtonDrawable[i].draw(canvas);
             canvas.save();
             canvas.rotate(-90f, mButtons[i].getHexagon().b.x, mButtons[i].getHexagon().d.y / 2);
-            canvas.drawText(mButtons[i].getText(), mButtons[i].getHexagon().b.x - mButtonTextPaint.measureText(mButtons[i].getText()) / 2,
-                    mButtons[i].getHexagon().d.y / 2 + mButtonTextPaint.getTextSize() / 2, mButtonTextPaint);
+            canvas.drawText(mButtons[i].getText(), mButtons[i].textX, mButtons[i].textY, mButtonTextPaint);
             canvas.restore();
         }
     }
@@ -116,6 +120,9 @@ public class SelectorLayout extends View implements OnTouchListener {
         // Create the buttons
         mButtonDrawable = new ShapeDrawable[3];
         mMirrorButtonDrawable = new ShapeDrawable[3];
+        mOldRect = new Rect[3];
+        mOldMirrorRect = new Rect[3];
+        mOldTextPos = new Point[3];
 
         for(int i = 0; i < 3; i++) {
             Hexagon hex = new Hexagon(new Point(offset, mIndentHeight - offset), new Point(mWidth / 2 + offset, 0 - offset), new Point(mWidth + offset,
@@ -139,6 +146,13 @@ public class SelectorLayout extends View implements OnTouchListener {
             mMirrorButtonDrawable[i].setBounds(0, (h - mIndentHeight) + mMargin - heightOffset, w, (2 * h - mIndentHeight) + mMargin - heightOffset);
 
             mButtons[i].setHexagon(hex);
+
+            mButtons[i].textX = mButtons[i].getHexagon().b.x - mButtonTextPaint.measureText(mButtons[i].getText()) / 2;
+            mButtons[i].textY = mButtons[i].getHexagon().d.y / 2 + mButtonTextPaint.getTextSize() / 2;
+
+            mOldRect[i] = mButtonDrawable[i].copyBounds();
+            mOldMirrorRect[i] = mMirrorButtonDrawable[i].copyBounds();
+            mOldTextPos[i] = new Point((int) mButtons[i].textX, (int) mButtons[i].textY);
 
             offset += margin + mWidth;
         }
@@ -189,6 +203,18 @@ public class SelectorLayout extends View implements OnTouchListener {
         return mButtons;
     }
 
+    public void reset() {
+        if(mOldRect != null) {
+            for(int i = 0; i < 3; i++) {
+                mButtonDrawable[i].setBounds(mOldRect[i]);
+                mMirrorButtonDrawable[i].setBounds(mOldMirrorRect[i]);
+                mButtons[i].textX = mOldTextPos[i].x;
+                mButtons[i].textY = mOldTextPos[i].y;
+            }
+            invalidate();
+        }
+    }
+
     private class Hexagon {
         private final Point a, b, c, d, e, f;
         private final Matrix m;
@@ -226,6 +252,8 @@ public class SelectorLayout extends View implements OnTouchListener {
         private boolean pressed = false;
         private boolean enabled = true;
         private boolean animate = false;
+        private float textX;
+        private float textY;
 
         public Button(Context context) {
             this.context = context;

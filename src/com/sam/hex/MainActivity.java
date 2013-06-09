@@ -34,6 +34,7 @@ public class MainActivity extends BaseGameActivity {
     private HistoryFragment mHistoryFragment;
     private InstructionsFragment mInstructionsFragment;
     private OnlineSelectionFragment mOnlineSelectionFragment;
+    private Fragment mActiveFragment;
 
     /** Called when the activity is first created. */
     @Override
@@ -65,8 +66,13 @@ public class MainActivity extends BaseGameActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == KeyEvent.KEYCODE_BACK) {
-            getSupportFragmentManager().popBackStack(mMainFragment.toString(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
-            swapFragment(mMainFragment);
+            if(mActiveFragment != mMainFragment) {
+                getSupportFragmentManager().popBackStack(mMainFragment.toString(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                swapFragment(mMainFragment);
+            }
+            else {
+                finish();
+            }
             return true;
         }
         return super.onKeyDown(keyCode, event);
@@ -88,10 +94,12 @@ public class MainActivity extends BaseGameActivity {
 
     public void swapFragment(Fragment newFragment) {
         getSupportFragmentManager().beginTransaction().replace(R.id.content, newFragment).addToBackStack(newFragment.toString()).commit();
+        mActiveFragment = newFragment;
     }
 
     public void swapFragmentWithoutBackStack(Fragment newFragment) {
         getSupportFragmentManager().beginTransaction().replace(R.id.content, newFragment).commit();
+        mActiveFragment = newFragment;
     }
 
     public MainFragment getMainFragment() {

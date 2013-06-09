@@ -60,7 +60,7 @@ public class MainFragment extends SherlockFragment {
         hexagonLayout.setText(R.string.app_name);
 
         settingsButton.setText(R.string.main_button_settings);
-        settingsButton.setColor(0xcc5c57);
+        settingsButton.setColor(0xffcc5c57);
         settingsButton.setDrawableResource(R.drawable.settings);
         settingsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
@@ -70,7 +70,7 @@ public class MainFragment extends SherlockFragment {
         });
 
         donateButton.setText(R.string.main_button_donate);
-        donateButton.setColor(0x5f6ec2);
+        donateButton.setColor(0xff5f6ec2);
         donateButton.setDrawableResource(R.drawable.store);
         donateButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
@@ -80,7 +80,7 @@ public class MainFragment extends SherlockFragment {
         });
 
         historyButton.setText(R.string.main_button_history);
-        historyButton.setColor(0xf9db00);
+        historyButton.setColor(0xfff9db00);
         historyButton.setDrawableResource(R.drawable.history);
         historyButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
@@ -90,7 +90,7 @@ public class MainFragment extends SherlockFragment {
         });
 
         instructionsButton.setText(R.string.main_button_instructions);
-        instructionsButton.setColor(0xb7cf47);
+        instructionsButton.setColor(0xffb7cf47);
         instructionsButton.setDrawableResource(R.drawable.howtoplay);
         instructionsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
@@ -100,7 +100,7 @@ public class MainFragment extends SherlockFragment {
         });
 
         mAchievementsButton.setText(R.string.main_button_achievements);
-        mAchievementsButton.setColor(0xf48935);
+        mAchievementsButton.setColor(0xfff48935);
         mAchievementsButton.setDrawableResource(R.drawable.achievements);
         mAchievementsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
@@ -110,7 +110,7 @@ public class MainFragment extends SherlockFragment {
         });
 
         playButton.setText(R.string.main_button_play);
-        playButton.setColor(0x4ba5e2);
+        playButton.setColor(0xff4ba5e2);
         playButton.setDrawableResource(R.drawable.play);
         playButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override

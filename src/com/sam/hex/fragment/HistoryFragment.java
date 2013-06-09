@@ -117,9 +117,11 @@ public class HistoryFragment extends SherlockListFragment {
 
         Arrays.sort(fileList, new Comparator<Item>() {
             public int compare(Item f1, Item f2) {
+                if(f1.file.equals("Up")) return -1;
+                if(f2.file.equals("Up")) return 1;
+
                 File file1 = new File(path, f1.file);
                 File file2 = new File(path, f2.file);
-
                 if(file1.isDirectory() != file2.isDirectory()) {
                     return file1.isDirectory() ? -1 : 1;
                 }

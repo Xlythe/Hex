@@ -26,9 +26,9 @@
     <string name="main_button_achievements">achievements</string>
 
     <!-- Game selection page -->
-    <string name="game_selection_button_computer">Computer</string>
-    <string name="game_selection_button_pass">Pass to Play</string>
-    <string name="game_selection_button_net">Play Online</string>
+    <string name="game_selection_button_computer">computer</string>
+    <string name="game_selection_button_pass">pass to play</string>
+    <string name="game_selection_button_net">online</string>
 
     <!-- Online selection page -->
     <string name="online_selection_button_quick">Quick Game</string>

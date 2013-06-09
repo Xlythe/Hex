@@ -6,10 +6,16 @@
     <string name="app_name">Hex</string>
     <string name="app_id">307536683764</string>
     <string name="achievement_30_seconds">CgkI9MX11PkIEAIQCg</string>
+    <string name="achievement_10_seconds">CgkI9MX11PkIEAIQEw</string>
     <string name="achievement_fill_the_board">CgkI9MX11PkIEAIQCw</string>
+    <string name="achievement_monitor_smasher">CgkI9MX11PkIEAIQFQ</string>
+    <string name="achievement_speed_demon">CgkI9MX11PkIEAIQFg</string>
     <string name="achievement_novice">CgkI9MX11PkIEAIQDA</string>
     <string name="achievement_intermediate">CgkI9MX11PkIEAIQDQ</string>
     <string name="achievement_expert">CgkI9MX11PkIEAIQDg</string>
+    <string name="achievement_insane">CgkI9MX11PkIEAIQFA</string>
+    
+    <!-- Page titles -->
     <string name="activity_title_instructions">How to Play</string>
 
     <!-- Main page -->

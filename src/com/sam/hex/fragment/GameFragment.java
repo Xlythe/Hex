@@ -35,6 +35,7 @@ import com.hex.core.Game;
 import com.hex.core.Game.GameListener;
 import com.hex.core.Game.GameOptions;
 import com.hex.core.GameAction;
+import com.hex.core.Player;
 import com.hex.core.PlayerObject;
 import com.hex.core.PlayingEntity;
 import com.hex.core.Timer;
@@ -223,9 +224,12 @@ public class GameFragment extends SherlockFragment {
                         if(player.getTeam() == 1) Stats.incrementGamesWon(getSherlockActivity());
 
                         if(getMainActivity().isSignedIn()) {
-                            // Unlock the quick play achievement!
+                            // Unlock the quick play achievements!
                             if(game.getGameLength() < 30 * 1000) {
                                 getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_30_seconds));
+                            }
+                            if(game.getGameLength() < 10 * 1000) {
+                                getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_10_seconds));
                             }
 
                             // Unlock the fill the board achievement!
@@ -239,6 +243,16 @@ public class GameFragment extends SherlockFragment {
                                 getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_fill_the_board));
                             }
 
+                            // Unlock the montior smasher achievement!
+                            if(player.getTeam() == 1 && game.getPlayer2().getType().equals(Player.AI)) {
+                                getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_monitor_smasher));
+                            }
+
+                            // Unlock the speed demon achievement!
+                            if(game.gameOptions.timer.type != 0) {
+                                getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_monitor_smasher));
+                            }
+
                             // Unlock the Novice achievement!
                             getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_novice), 1);
 
@@ -247,6 +261,9 @@ public class GameFragment extends SherlockFragment {
 
                             // Unlock the Expert achievement!
                             if(player.getTeam() == 1) getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_expert), 1);
+
+                            // Unlock the Expert achievement!
+                            if(player.getTeam() == 1) getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_insane), 1);
                         }
                     }
                 });

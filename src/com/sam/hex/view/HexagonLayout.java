@@ -3,6 +3,7 @@ package com.sam.hex.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.drawable.Drawable;
@@ -341,14 +342,25 @@ public class HexagonLayout extends View implements OnTouchListener {
 
     private class Triangle {
         private final Point a, b, c;
+        private final Matrix m;
+        private final float[] points;
 
         private Triangle(Point a, Point b, Point c) {
             this.a = a;
             this.b = b;
             this.c = c;
+            points = new float[2];
+            m = new Matrix();
+            m.postRotate(-mRotation);
         }
 
         public boolean contains(Point p) {
+            points[0] = p.x;
+            points[1] = p.y;
+            m.mapPoints(points);
+            p.x = (int) points[0];
+            p.y = (int) points[1];
+
             Point AB = new Point(b.x - a.x, b.y - a.y);
             Point BC = new Point(c.x - b.x, c.y - b.y);
             Point CA = new Point(a.x - c.x, a.y - c.y);

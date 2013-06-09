@@ -196,7 +196,7 @@ public class GameFragment extends SherlockFragment {
         return new GameListener() {
             @Override
             public void onWin(final PlayingEntity player) {
-                getSherlockActivity().runOnUiThread(new Runnable() {
+                if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         String winnerMsg = String.format(getString(R.string.winner), player.getName());
@@ -254,7 +254,7 @@ public class GameFragment extends SherlockFragment {
 
             @Override
             public void onClear() {
-                getSherlockActivity().runOnUiThread(new Runnable() {
+                if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.postInvalidate();
@@ -264,7 +264,7 @@ public class GameFragment extends SherlockFragment {
 
             @Override
             public void onStart() {
-                getSherlockActivity().runOnUiThread(new Runnable() {
+                if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         if(game.isGameOver()) winnerText.setVisibility(View.GONE);
@@ -279,7 +279,7 @@ public class GameFragment extends SherlockFragment {
 
             @Override
             public void onTurn(PlayingEntity player) {
-                getSherlockActivity().runOnUiThread(new Runnable() {
+                if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
                     @SuppressWarnings("deprecation")
                     @Override
                     public void run() {
@@ -304,7 +304,7 @@ public class GameFragment extends SherlockFragment {
 
             @Override
             public void onReplayStart() {
-                getSherlockActivity().runOnUiThread(new Runnable() {
+                if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.postInvalidate();
@@ -316,7 +316,7 @@ public class GameFragment extends SherlockFragment {
 
             @Override
             public void onReplayEnd() {
-                getSherlockActivity().runOnUiThread(new Runnable() {
+                if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.postInvalidate();
@@ -327,7 +327,7 @@ public class GameFragment extends SherlockFragment {
 
             @Override
             public void onUndo() {
-                getSherlockActivity().runOnUiThread(new Runnable() {
+                if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.postInvalidate();
@@ -337,7 +337,7 @@ public class GameFragment extends SherlockFragment {
 
             @Override
             public void startTimer() {
-                getSherlockActivity().runOnUiThread(new Runnable() {
+                if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         timerText.setVisibility(View.VISIBLE);
@@ -347,7 +347,7 @@ public class GameFragment extends SherlockFragment {
 
             @Override
             public void displayTime(final int minutes, final int seconds) {
-                getSherlockActivity().runOnUiThread(new Runnable() {
+                if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         timerText.setText(String.format(getString(R.string.timer), String.format("%d:%02d", minutes, seconds)));

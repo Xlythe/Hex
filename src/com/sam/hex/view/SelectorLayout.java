@@ -31,6 +31,8 @@ public class SelectorLayout extends View implements OnTouchListener {
     private int mIndentHeight;
     private int mMargin;
     private float mRotation;
+    private int mAnimationTick;
+    private int mAnimationDelta;
 
     public SelectorLayout(Context context) {
         super(context);
@@ -63,6 +65,8 @@ public class SelectorLayout extends View implements OnTouchListener {
         mIndentHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, dm);
         mMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, dm);
         mRotation = 45f;
+        mAnimationTick = 40;
+        mAnimationDelta = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 22, dm);
     }
 
     @Override
@@ -80,6 +84,20 @@ public class SelectorLayout extends View implements OnTouchListener {
             else {
                 mButtonDrawable[i].getPaint().setColor(mButtons[i].getColor());
                 mMirrorButtonDrawable[i].getPaint().setColor(mButtons[i].getColor());
+            }
+
+            if(mButtons[i].isAnimate()) {
+                if(mButtonDrawable[i].getBounds().bottom + 3 * mIndentHeight > 0) {
+                    mButtonDrawable[i].setBounds(mButtonDrawable[i].getBounds().left, mButtonDrawable[i].getBounds().top - mAnimationDelta,
+                            mButtonDrawable[i].getBounds().right, mButtonDrawable[i].getBounds().bottom - mAnimationDelta);
+                    mMirrorButtonDrawable[i].setBounds(mMirrorButtonDrawable[i].getBounds().left, mMirrorButtonDrawable[i].getBounds().top + mAnimationDelta,
+                            mMirrorButtonDrawable[i].getBounds().right, mMirrorButtonDrawable[i].getBounds().bottom + mAnimationDelta);
+                    postInvalidateDelayed(mAnimationTick);
+                }
+                else {
+                    mButtons[i].setAnimate(false);
+                    mButtons[i].preformClick();
+                }
             }
             mButtonDrawable[i].draw(canvas);
             mMirrorButtonDrawable[i].draw(canvas);
@@ -141,7 +159,7 @@ public class SelectorLayout extends View implements OnTouchListener {
         else if(event.getAction() == MotionEvent.ACTION_UP) {
             for(Button b : mButtons) {
                 if(b.isPressed()) {
-                    b.preformClick();
+                    b.setAnimate(true);
                 }
                 b.setPressed(false);
             }
@@ -173,6 +191,8 @@ public class SelectorLayout extends View implements OnTouchListener {
 
     private class Hexagon {
         private final Point a, b, c, d, e, f;
+        private final Matrix m;
+        private final float[] points;
 
         private Hexagon(Point a, Point b, Point c, Point d, Point e, Point f) {
             this.a = a;
@@ -181,18 +201,19 @@ public class SelectorLayout extends View implements OnTouchListener {
             this.d = d;
             this.e = e;
             this.f = f;
+            points = new float[2];
+            m = new Matrix();
+            m.postRotate(-mRotation);
         }
 
         public boolean contains(Point p) {
-            float[] points = new float[2];
             points[0] = p.x;
             points[1] = p.y;
-            Matrix m = new Matrix();
-            m.postRotate(-mRotation);
             m.mapPoints(points);
-            Point rotatedP = new Point((int) points[0], (int) points[1]);
+            p.x = (int) points[0];
+            p.y = (int) points[1];
 
-            return rotatedP.x > a.x && rotatedP.x < c.x;
+            return p.x > a.x && p.x < c.x;
         }
     }
 
@@ -202,8 +223,9 @@ public class SelectorLayout extends View implements OnTouchListener {
         private String text;
         private int color;
         private Hexagon hexagon;
-        private boolean pressed;
+        private boolean pressed = false;
         private boolean enabled = true;
+        private boolean animate = false;
 
         public Button(Context context) {
             this.context = context;
@@ -267,6 +289,14 @@ public class SelectorLayout extends View implements OnTouchListener {
 
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
+        }
+
+        public boolean isAnimate() {
+            return animate;
+        }
+
+        public void setAnimate(boolean animate) {
+            this.animate = animate;
         }
     }
 }

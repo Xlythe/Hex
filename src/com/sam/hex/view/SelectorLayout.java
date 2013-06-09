@@ -24,7 +24,6 @@ public class SelectorLayout extends View implements OnTouchListener {
     private SelectorLayout.Button[] mButtons;
     private ShapeDrawable[] mButtonDrawable;
     private ShapeDrawable[] mMirrorButtonDrawable;
-    private Point[] mButtonLabelPos;
     private Paint mButtonTextPaint;
     private int mDisabledColor;
 
@@ -62,7 +61,7 @@ public class SelectorLayout extends View implements OnTouchListener {
 
         mWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 80, dm);
         mIndentHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, dm);
-        mMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, dm);
+        mMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, dm);
         mRotation = 45f;
     }
 
@@ -85,8 +84,9 @@ public class SelectorLayout extends View implements OnTouchListener {
             mButtonDrawable[i].draw(canvas);
             mMirrorButtonDrawable[i].draw(canvas);
             canvas.save();
-            canvas.rotate(-90f, mButtonLabelPos[i].x, mButtonLabelPos[i].y);
-            canvas.drawText(mButtons[i].getText(), mButtonLabelPos[i].x, mButtonLabelPos[i].y, mButtonTextPaint);
+            canvas.rotate(-90f, mButtons[i].getHexagon().b.x, mButtons[i].getHexagon().d.y / 2);
+            canvas.drawText(mButtons[i].getText(), mButtons[i].getHexagon().b.x - mButtonTextPaint.measureText(mButtons[i].getText()) / 2,
+                    mButtons[i].getHexagon().d.y / 2 + mButtonTextPaint.getTextSize() / 2, mButtonTextPaint);
             canvas.restore();
         }
     }
@@ -98,31 +98,30 @@ public class SelectorLayout extends View implements OnTouchListener {
         // Create the buttons
         mButtonDrawable = new ShapeDrawable[3];
         mMirrorButtonDrawable = new ShapeDrawable[3];
-        mButtonLabelPos = new Point[3];
-
-        Hexagon hex = new Hexagon(new Point(0, mIndentHeight), new Point(mWidth / 2, 0), new Point(mWidth, mIndentHeight), new Point(mWidth, h), new Point(
-                mWidth / 2, h - mIndentHeight), new Point(0, h));
-
-        // Shape of a pressed state
-        Path buttonPath = new Path();
-        buttonPath.moveTo(hex.a.x, hex.a.y);
-        buttonPath.lineTo(hex.b.x, hex.b.y);
-        buttonPath.lineTo(hex.c.x, hex.c.y);
-        buttonPath.lineTo(hex.d.x, hex.d.y);
-        buttonPath.lineTo(hex.e.x, hex.e.y);
-        buttonPath.lineTo(hex.f.x, hex.f.y);
-        buttonPath.close();
 
         for(int i = 0; i < 3; i++) {
-            int heightOffset = offset + mIndentHeight * 3;
+            Hexagon hex = new Hexagon(new Point(offset, mIndentHeight - offset), new Point(mWidth / 2 + offset, 0 - offset), new Point(mWidth + offset,
+                    mIndentHeight - offset), new Point(mWidth + offset, h - offset), new Point(mWidth / 2 + offset, h - mIndentHeight - offset), new Point(
+                    offset, h - offset));
+
+            // Shape of a pressed state
+            Path buttonPath = new Path();
+            buttonPath.moveTo(hex.a.x, hex.a.y);
+            buttonPath.lineTo(hex.b.x, hex.b.y);
+            buttonPath.lineTo(hex.c.x, hex.c.y);
+            buttonPath.lineTo(hex.d.x, hex.d.y);
+            buttonPath.lineTo(hex.e.x, hex.e.y);
+            buttonPath.lineTo(hex.f.x, hex.f.y);
+            buttonPath.close();
+
+            int heightOffset = 3 * mIndentHeight;
             mButtonDrawable[i] = new ShapeDrawable(new PathShape(buttonPath, w, h));
-            mButtonDrawable[i].setBounds(offset, -heightOffset, w + offset, h - heightOffset);
+            mButtonDrawable[i].setBounds(0, -heightOffset, w, h - heightOffset);
             mMirrorButtonDrawable[i] = new ShapeDrawable(new PathShape(buttonPath, w, h));
-            mMirrorButtonDrawable[i].setBounds(offset, (h - mIndentHeight) + mMargin - heightOffset, w + offset, (2 * h - mIndentHeight) + mMargin
-                    - heightOffset);
-            mButtonLabelPos[i] = new Point((int) (offset + mWidth / 2 + mButtonTextPaint.getTextSize() / 2),
-                    (int) (h / 2 + mButtonTextPaint.measureText(mButtons[i].getText()) / 2));
+            mMirrorButtonDrawable[i].setBounds(0, (h - mIndentHeight) + mMargin - heightOffset, w, (2 * h - mIndentHeight) + mMargin - heightOffset);
+
             mButtons[i].setHexagon(hex);
+
             offset += margin + mWidth;
         }
     }

@@ -133,7 +133,7 @@ public class GameFragment extends SherlockFragment {
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putString(GAME, game.save());
+        if(game != null) savedInstanceState.putString(GAME, game.save());
     }
 
     private View applyBoard(LayoutInflater inflater) {
@@ -215,8 +215,9 @@ public class GameFragment extends SherlockFragment {
 
                         // Auto save completed game
                         try {
-                            FileUtil.autoSaveGame(game.getPlayer1().getName() + " vs " + game.getPlayer2().getName() + " " + SAVE_FORMAT.format(new Date())
-                                    + " (Victor: " + player.getName() + ")", game.save());
+                            String fileName = String.format(getString(R.string.auto_saved_game_name), game.getPlayer1().getName(), game.getPlayer2().getName(),
+                                    SAVE_FORMAT.format(new Date()), player.getName());
+                            FileUtil.autoSaveGame(fileName, game.save());
                         }
                         catch(IOException e) {
                             e.printStackTrace();

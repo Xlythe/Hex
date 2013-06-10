@@ -85,6 +85,10 @@ public class HexagonLayout extends View implements OnTouchListener {
         mButtonTextPaint = new Paint();
         mButtonTextPaint.setColor(Color.WHITE);
         mButtonTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, dm));
+        setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {}
+        });
     }
 
     private void layoutText() {
@@ -298,6 +302,7 @@ public class HexagonLayout extends View implements OnTouchListener {
         else if(event.getAction() == MotionEvent.ACTION_UP) {
             for(Button b : mButtons) {
                 if(b.isPressed()) {
+                    performClick();
                     b.preformClick();
                 }
                 b.setPressed(false);

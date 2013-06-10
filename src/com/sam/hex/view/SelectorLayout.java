@@ -71,6 +71,10 @@ public class SelectorLayout extends View implements OnTouchListener {
         mRotation = 45f;
         mAnimationTick = 30;
         mAnimationDelta = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 35, dm);
+        setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {}
+        });
     }
 
     @Override
@@ -188,6 +192,7 @@ public class SelectorLayout extends View implements OnTouchListener {
         else if(event.getAction() == MotionEvent.ACTION_UP) {
             for(Button b : mButtons) {
                 if(b.isPressed()) {
+                    performClick();
                     b.setAnimate(true);
                 }
                 b.setPressed(false);

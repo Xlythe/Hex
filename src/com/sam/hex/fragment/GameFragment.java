@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -13,12 +14,14 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentManager;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -565,17 +568,26 @@ public class GameFragment extends SherlockFragment {
     }
 
     private void newGame() {
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+ 
+    	
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {        	
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch(which) {
                 case DialogInterface.BUTTON_POSITIVE:
                     // Yes button clicked
                     if(game.getPlayer1().supportsNewgame() && game.getPlayer2().supportsNewgame()) {
+                    	final View insertPoint =getView();
                         game.replayRunning = false;
                         LayoutInflater inflater = getLayoutInflater(null);
                         initializeNewGame(inflater);
-                        applyBoard(inflater);
+                        View v = applyBoard(inflater);  
+                        ((FrameLayout)insertPoint).removeAllViews();
+                        ((FrameLayout)insertPoint).addView(v);
+                        GameListener gl = createGameListener();
+                        game.setGameListener(gl);
+
+                       
                     }
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:
@@ -625,7 +637,7 @@ public class GameFragment extends SherlockFragment {
                 case DialogInterface.BUTTON_POSITIVE:
                     // Yes button clicked
                     stopGame(game);
-                    getFragmentManager().popBackStackImmediate();
+                    getMainActivity().swapFragmentWithoutBackStack(getMainActivity().getMainFragment());
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:
                     // No button clicked

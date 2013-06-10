@@ -70,7 +70,7 @@ public class SelectorLayout extends View implements OnTouchListener {
         mMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, dm);
         mRotation = 45f;
         mAnimationTick = 30;
-        mAnimationDelta = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 22, dm);
+        mAnimationDelta = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 35, dm);
     }
 
     @Override

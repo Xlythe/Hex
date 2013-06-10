@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.Locale;
 
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -14,14 +13,12 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentManager;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -105,7 +102,7 @@ public class GameFragment extends SherlockFragment {
         }
         else {
             // Create a new game
-            initializeNewGame(inflater);
+            initializeNewGame();
         }
 
         // Load the UI
@@ -168,7 +165,7 @@ public class GameFragment extends SherlockFragment {
         return v;
     }
 
-    private void initializeNewGame(LayoutInflater inflater) {
+    private void initializeNewGame() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getSherlockActivity());
 
         // Stop the old game
@@ -192,7 +189,6 @@ public class GameFragment extends SherlockFragment {
         setNames(prefs, GameAction.LOCAL_GAME, game);
         setColors(prefs, GameAction.LOCAL_GAME, game);
 
-        applyBoard(inflater);
         game.gameOptions.timer.start(game);
     }
 
@@ -397,9 +393,7 @@ public class GameFragment extends SherlockFragment {
             replay(replayDuration);
         }
         else if(somethingChanged(prefs, GameAction.LOCAL_GAME, game)) {
-            LayoutInflater inflater = getLayoutInflater(null);
-            initializeNewGame(inflater);
-            applyBoard(inflater);
+            initializeNewGame();
         }
         else {// Apply minor changes without stopping the current game
             setColors(prefs, GameAction.LOCAL_GAME, game);
@@ -569,26 +563,17 @@ public class GameFragment extends SherlockFragment {
     }
 
     private void newGame() {
- 
-    	
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {        	
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch(which) {
                 case DialogInterface.BUTTON_POSITIVE:
                     // Yes button clicked
                     if(game.getPlayer1().supportsNewgame() && game.getPlayer2().supportsNewgame()) {
-                    	final View insertPoint =getView();
                         game.replayRunning = false;
-                        LayoutInflater inflater = getLayoutInflater(null);
-                        initializeNewGame(inflater);
-                        View v = applyBoard(inflater);  
-                        ((FrameLayout)insertPoint).removeAllViews();
-                        ((FrameLayout)insertPoint).addView(v);
-                        GameListener gl = createGameListener();
-                        game.setGameListener(gl);
-
-                       
+                        stopGame(game);
+                        game.clearBoard();
+                        game.start();
                     }
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:

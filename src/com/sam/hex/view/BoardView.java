@@ -25,7 +25,7 @@ public class BoardView extends View {
     private ShapeDrawable[][] mDrawableOutline;
     private ShapeDrawable[][] mCell;
     private ShapeDrawable[][] mCellShadow;
-    private Hexagon[][] mHexagon;
+    private Button[][] mButtons;
 
     public Game game;
 
@@ -55,6 +55,10 @@ public class BoardView extends View {
         mPieceWhiteBorder = mPieceMargin + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, dm);
         mPieceLightBorder = mPieceWhiteBorder + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, dm);
         mPieceShadowOffset = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3, dm);
+        setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {}
+        });
     }
 
     public void setGame(Game game) {
@@ -71,6 +75,9 @@ public class BoardView extends View {
         for(int x = 0; x < n; x++)
             for(int y = 0; y < n; y++) {
                 int c = Color.TRANSPARENT;
+                if(mButtons[x][y].isPressed()) {
+                    c = Color.LTGRAY;
+                }
                 if(game.gamePieces[x][y].getTeam() == game.getPlayer1().getTeam()) c = game.getPlayer1().getColor();
                 else if(game.gamePieces[x][y].getTeam() == game.getPlayer2().getTeam()) c = game.getPlayer2().getColor();
                 if(game.gamePieces[x][y].isWinningPath()) c = getDarkerColor(c);
@@ -93,7 +100,7 @@ public class BoardView extends View {
         mDrawableOutline = new ShapeDrawable[n][n];
         mCell = new ShapeDrawable[n][n];
         mCellShadow = new ShapeDrawable[n][n];
-        mHexagon = new Hexagon[n][n];
+        mButtons = new Button[n][n];
         int windowHeight = getHeight();
         int windowWidth = getWidth();
 
@@ -131,7 +138,8 @@ public class BoardView extends View {
                         (int) (y + radius * 2 - (mPieceMargin * 1.1547)));
                 mCellShadow[xc][yc].getPaint().setColor(Color.BLACK);
                 mCellShadow[xc][yc].getPaint().setAlpha(15);
-                mHexagon[xc][yc] = new Hexagon(x - hrad, y, radius);
+                mButtons[xc][yc] = new Button();
+                mButtons[xc][yc].hexagon = new Hexagon(x - hrad, y, radius);
             }
         }
     }
@@ -159,25 +167,53 @@ public class BoardView extends View {
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            int eventaction = event.getAction();
-            if(eventaction == MotionEvent.ACTION_UP) {
-                int x = (int) event.getX();
-                int y = (int) event.getY();
-                for(int xc = 0; xc < game.gamePieces.length; xc++) {
-                    for(int yc = 0; yc < game.gamePieces[0].length; yc++) {
-                        if(mHexagon[xc][yc].contains(x, y)) {
-                            if(game != null && !game.replayRunning) GameAction.setPiece(new Point(xc, yc), game);
-                            return false;
+            if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                for(int x = 0; x < game.gamePieces.length; x++) {
+                    for(int y = 0; y < game.gamePieces[0].length; y++) {
+                        if(mButtons[x][y].hexagon.contains(new Point((int) event.getX(), (int) event.getY()))) {
+                            mButtons[x][y].setPressed(mButtons[x][y].isEnabled());
+                        }
+                        else {
+                            mButtons[x][y].setPressed(false);
+                        }
+                    }
+                }
+            }
+            else if(event.getAction() == MotionEvent.ACTION_UP) {
+                for(int x = 0; x < game.gamePieces.length; x++) {
+                    for(int y = 0; y < game.gamePieces[0].length; y++) {
+                        if(mButtons[x][y].isPressed()) {
+                            if(game.gamePieces[x][y].getTeam() == 0 || (game.gameOptions.swap && game.getMoveNumber() == 2)) {
+                                performClick();
+                                GameAction.setPiece(new Point(x, y), game);
+                            }
+                        }
+                        mButtons[x][y].setPressed(false);
+                    }
+                }
+            }
+            else {
+                boolean selectedPiece = false;
+                for(int x = 0; x < game.gamePieces.length; x++) {
+                    for(int y = 0; y < game.gamePieces[0].length; y++) {
+                        if(!selectedPiece && mButtons[x][y].hexagon.contains(new Point((int) event.getX(), (int) event.getY()))) {
+                            mButtons[x][y].setPressed(true);
+                            selectedPiece = true;
+                        }
+                        else {
+                            mButtons[x][y].setPressed(false);
                         }
                     }
                 }
             }
 
+            invalidate();
+
             return true;
         }
     }
 
-    public class Hexagon {
+    private class Hexagon {
         // Polygon coodinates.
         private final int[] polyY, polyX;
         // Number of sides in the polygon.
@@ -188,11 +224,11 @@ public class BoardView extends View {
             polyY = getYCoordinates(x, y, r, 6, Math.PI / 2);
         }
 
-        public boolean contains(int x, int y) {
+        public boolean contains(Point p) {
             boolean oddTransitions = false;
             for(int i = 0, j = polySides - 1; i < polySides; j = i++) {
-                if((polyY[i] < y && polyY[j] >= y) || (polyY[j] < y && polyY[i] >= y)) {
-                    if(polyX[i] + (y - polyY[i]) / (polyY[j] - polyY[i]) * (polyX[j] - polyX[i]) < x) {
+                if((polyY[i] < p.y && polyY[j] >= p.y) || (polyY[j] < p.y && polyY[i] >= p.y)) {
+                    if(polyX[i] + (p.y - polyY[i]) / (polyY[j] - polyY[i]) * (polyX[j] - polyX[i]) < p.x) {
                         oddTransitions = !oddTransitions;
                     }
                 }
@@ -220,6 +256,32 @@ public class BoardView extends View {
                 angle += addAngle;
             }
             return res;
+        }
+    }
+
+    public static class Button {
+        private Hexagon hexagon;
+        private boolean pressed;
+        private boolean enabled = true;
+
+        public static interface OnClickListener {
+            public void onClick();
+        }
+
+        protected boolean isPressed() {
+            return pressed;
+        }
+
+        protected void setPressed(boolean pressed) {
+            this.pressed = pressed;
+        }
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
         }
     }
 }

@@ -31,12 +31,4 @@ public class Stats {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         sp.edit().putLong("games_won", getGamesWon(context) + 1).commit();
     }
-
-    public static String getPlayer1Name(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString("player1Name", context.getString(R.string.DEFAULT_P1_NAME));
-    }
-
-    public static String getPlayer2Name(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString("player2Name", context.getString(R.string.DEFAULT_P2_NAME));
-    }
 }

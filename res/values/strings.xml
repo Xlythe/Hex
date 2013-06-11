@@ -17,6 +17,7 @@
     
     <!-- Page titles -->
     <string name="activity_title_instructions">How to Play</string>
+    <string name="activity_title_preferences">Settings</string>
 
     <!-- Main page -->
     <string name="main_title" formatted="false">%s\'s stats</string>
@@ -42,11 +43,6 @@
     <string name="online_selection_button_pending">Pending Invites</string>
 
     <!-- Preferences -->
-    <string name="preferences_title_options">Options</string>
-    <string name="preferences_title_p1">Player 1</string>
-    <string name="preferences_title_p2">Player 2</string>
-
-    <string name="preferences">Settings</string>
     <string name="gameSizeTitle">Board Size</string>
     <string name="gameSizeSummary">Pick a size for the gameboard (Current: 7x7)</string>
     <string name="gameSizeSummary_onChange" formatted="false">Pick a size for the gameboard (Current: %sx%s)</string>
@@ -55,32 +51,8 @@
     <string name="swapSummary">Allow the second player to swap places during their first move</string>
     <string name="timerTitle">Timer</string>
     <string name="timerSummary">Limit the amount of time a player has (in minutes)</string>
-
-    <string name="playerTypeHuman">Human</string>
-    <string name="playerTypeWill">Computer (Will)</string>
-    <string name="playerTypeBee">Computer (Bee)</string>
-
-    <string name="player1NameTitle">Player1\'s Name</string>
-    <string name="player1NameSummary">Name: Player1</string>
-    <string name="player1NameSummary_onChange">Name: %s</string>
-    <string name="player1TypeTitle">Player1\'s Type</string>
-    <string name="player1TypeSummary">Type: Computer (Will)</string>
-    <string name="player1TypeSummary_onChange">Type: %s</string>
-    <string name="player1ColorTitle">Player1\'s Color</string>
-    <string name="player1ColorSummary">Pick a color for Player1</string>
-
-    <string name="player2NameTitle">Player2\'s Name</string>
-    <string name="player2NameSummary">Name: Player2</string>
-    <string name="player2NameSummary_onChange">Name: %s</string>
-    <string name="player2TypeTitle">Player2\'s Type</string>
-    <string name="player2TypeSummary">Type: Human</string>
-    <string name="player2TypeSummary_onChange">Type: %s</string>
-    <string name="player2ColorTitle">Player2\'s Color</string>
-    <string name="player2ColorSummary">Pick a color for Player2</string>
-
-    <string name="abstractGeneralTitle">Game Options</string>
-    <string name="abstractP1Title">Player 1</string>
-    <string name="abstractP2Title">Player 2</string>
+    <string name="autosaveTitle">Autosave</string>
+    <string name="autosaveSummary">Save a replay at the end of each game to the sd card</string>
 
     <!-- Menu choices -->
     <string name="undo">Undo</string>
@@ -124,19 +96,4 @@
     <string name="review_popup_message">Rate Hex on the Play Store</string>
     <string name="review_popup_never">No thanks</string>
     <string name="review_popup_ok">Okay</string>
-
-    <!-- Color Picker -->
-    <string name="dialog_color_picker">Color Picker</string>
-    <string name="press_color_to_apply">Press on Color to apply</string>    
-
-    <!-- Preferences -->
-    <string name="pref_category">Category</string>
-    <string name="color1_title">Color 1</string>
-    <string name="color1_summary">black color by default, set by reference</string>
-    <string name="color2_title">Color 2</string>
-    <string name="color2_summary">not persistent color\nalpha slider added via code</string>
-    <string name="color3_title">Color 3</string>
-    <string name="color3_summary">picker with alpha slider</string>
-    <string name="color4_title">Color 4</string>
-    <string name="color4_summary">color set with HEX code in xml</string>
 </resources>

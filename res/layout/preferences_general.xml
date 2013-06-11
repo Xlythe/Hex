@@ -2,7 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="generalScreen">
     <PreferenceCategory
-        android:title="@string/preferences_title_options" >
+        android:title="@string/activity_title_preferences" >
 	    <ListPreference
 	        android:title="@string/gameSizeTitle"
 	        android:summary="@string/gameSizeSummary"
@@ -19,5 +19,10 @@
 	        android:title="@string/timerTitle"
 	        android:summary="@string/timerSummary"
 	        android:key="timerOptionsPref" />
+	    <CheckBoxPreference
+	        android:title="@string/autosaveTitle"
+	        android:summary="@string/autosaveSummary"
+	        android:defaultValue="@bool/DEFAULT_AUTOSAVE_ENABLED"
+	        android:key="autosavePref" />
 	</PreferenceCategory>
 </PreferenceScreen>

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -14,6 +15,7 @@ import com.google.android.gms.common.SignInButton;
 import com.sam.hex.MainActivity;
 import com.sam.hex.PreferencesActivity;
 import com.sam.hex.R;
+import com.sam.hex.Settings;
 import com.sam.hex.Stats;
 import com.sam.hex.view.HexagonLayout;
 
@@ -38,8 +40,8 @@ public class MainFragment extends SherlockFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        getMainActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         View v = inflater.inflate(R.layout.home, null);
-        getSherlockActivity().getSupportActionBar().hide();
 
         HexagonLayout hexagonLayout = (HexagonLayout) v.findViewById(R.id.hexagonButtons);
         HexagonLayout.Button settingsButton = hexagonLayout.getButtons()[0];
@@ -155,8 +157,8 @@ public class MainFragment extends SherlockFragment {
     private void refreshPlayerInformation() {
         if(mSignOutButton != null) mSignOutButton.setVisibility(getMainActivity().isSignedIn() ? View.VISIBLE : View.GONE);
         if(mSignInButton != null) mSignInButton.setVisibility(getMainActivity().isSignedIn() ? View.GONE : View.VISIBLE);
-        if(mTitleTextView != null) mTitleTextView.setText(String.format(getString(R.string.main_title), getMainActivity().isSignedIn() ? getMainActivity()
-                .getGamesClient().getCurrentPlayer().getDisplayName() : Stats.getPlayer1Name(getSherlockActivity())));
+        if(mTitleTextView != null) mTitleTextView.setText(String.format(getString(R.string.main_title),
+                Settings.getPlayer1Name(getSherlockActivity(), getMainActivity().getGamesClient())));
         if(mAchievementsButton != null) mAchievementsButton.setEnabled(getMainActivity().isSignedIn());
     }
 

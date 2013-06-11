@@ -36,7 +36,7 @@
                 <data android:pathPattern=".*\\.rhex" />
             </intent-filter>
         </activity>
-        <activity android:label="@string/preferences" android:name=".PreferencesActivity" android:screenOrientation="landscape" />
+        <activity android:label="@string/activity_title_preferences" android:name=".PreferencesActivity" android:screenOrientation="landscape" />
     </application>
 
 </manifest>

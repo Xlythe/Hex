@@ -48,8 +48,6 @@ public class HistoryFragment extends SherlockListFragment {
         View rootView = super.onCreateView(inflater, container, savedInstanceState);
         rootView.setBackgroundResource(R.color.background);
         handle = new Handler();
-        getSherlockActivity().getSupportActionBar().show();
-        getSherlockActivity().getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         try {
             loadFileList();
             refreshView();

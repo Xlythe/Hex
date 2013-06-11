@@ -17,12 +17,13 @@ public class InstructionsFragment extends SherlockFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        getSherlockActivity().getSupportActionBar().show();
-        getSherlockActivity().getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         View v = inflater.inflate(R.layout.instructions, null);
 
-        TextView view = (TextView) v.findViewById(R.id.rules);
-        view.setMovementMethod(LinkMovementMethod.getInstance());
+        TextView title = (TextView) v.findViewById(R.id.title);
+        title.setText(R.string.activity_title_instructions);
+
+        TextView rules = (TextView) v.findViewById(R.id.rules);
+        rules.setMovementMethod(LinkMovementMethod.getInstance());
 
         return v;
     }

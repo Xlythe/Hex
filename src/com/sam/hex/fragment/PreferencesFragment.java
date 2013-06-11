@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
@@ -29,67 +28,23 @@ import com.sam.hex.R;
 @SuppressLint("NewApi")
 public class PreferencesFragment extends PreferenceFragment {
     SharedPreferences settings;
-    Preference p1NamePref;
-    Preference p2NamePref;
-    ListPreference p1TypePref;
-    ListPreference p2TypePref;
-    Preference resetPref;
     Preference gridPref;
     Preference timerPref;
-    Preference passwordPref;
-    Preference options;
-    Preference p1;
-    Preference p2;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActivity().getActionBar().show();
-        getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActivity().getActionBar().setTitle(R.string.preferences);
         settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
         loadPreferences();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
         setListeners();
     }
 
-    public class NameListener implements OnPreferenceChangeListener {
-        @Override
-        public boolean onPreferenceChange(Preference pref, Object newValue) {
-            pref.setSummary(String.format(getString(R.string.player2NameSummary_onChange), newValue.toString()));
-            return true;
-        }
-    }
-
-    public class P1TypeListener implements OnPreferenceChangeListener {
-        @Override
-        public boolean onPreferenceChange(Preference pref, Object newValue) {
-            String[] texts = getResources().getStringArray(R.array.player1Array);
-            String[] values = getResources().getStringArray(R.array.player1Values);
-            String value = getTextValue(texts, values, newValue);
-            pref.setSummary(String.format(getString(R.string.player2TypeSummary_onChange), value));
-            return true;
-        }
-    }
-
-    public class P2TypeListener implements OnPreferenceChangeListener {
-        @Override
-        public boolean onPreferenceChange(Preference pref, Object newValue) {
-            String[] texts = getResources().getStringArray(R.array.player2Array);
-            String[] values = getResources().getStringArray(R.array.player2Values);
-            String value = getTextValue(texts, values, newValue);
-            pref.setSummary(String.format(getString(R.string.player2TypeSummary_onChange), value));
-            return true;
-        }
-    }
-
-    public class GridListener implements OnPreferenceChangeListener {
+    private class GridListener implements OnPreferenceChangeListener {
         @Override
         public boolean onPreferenceChange(Preference preference, Object newValue) {
             if(newValue.toString().equals("0")) {
@@ -104,7 +59,7 @@ public class PreferencesFragment extends PreferenceFragment {
         }
     }
 
-    public class TimerListener implements OnPreferenceClickListener {
+    private class TimerListener implements OnPreferenceClickListener {
         @Override
         public boolean onPreferenceClick(Preference pref) {
             LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -143,40 +98,6 @@ public class PreferencesFragment extends PreferenceFragment {
     }
 
     private void setListeners() {
-        // Change the summary to show the player's name
-        p1NamePref = findPreference("player1Name");
-        if(p1NamePref != null) {
-            p1NamePref.setSummary(String.format(getString(R.string.player1NameSummary_onChange),
-                    settings.getString("player1Name", getString(R.string.DEFAULT_P1_NAME))));
-            p1NamePref.setOnPreferenceChangeListener(new NameListener());
-        }
-        p2NamePref = findPreference("player2Name");
-        if(p2NamePref != null) {
-            p2NamePref.setSummary(String.format(getString(R.string.player2NameSummary_onChange),
-                    settings.getString("player2Name", getString(R.string.DEFAULT_P2_NAME))));
-            p2NamePref.setOnPreferenceChangeListener(new NameListener());
-        }
-
-        // Change the summary to show the player's type
-        p1TypePref = (ListPreference) findPreference("player1Type");
-        if(p1TypePref != null) {
-            String[] texts = getResources().getStringArray(R.array.player1Array);
-            String[] values = getResources().getStringArray(R.array.player1Values);
-            String newValue = settings.getString("player1Type", getString(R.string.DEFAULT_P1_NAME));
-            String value = getTextValue(texts, values, newValue);
-            p1TypePref.setSummary(String.format(getString(R.string.player1TypeSummary_onChange), value));
-            p1TypePref.setOnPreferenceChangeListener(new P1TypeListener());
-        }
-        p2TypePref = (ListPreference) findPreference("player2Type");
-        if(p2TypePref != null) {
-            String[] texts = getResources().getStringArray(R.array.player2Array);
-            String[] values = getResources().getStringArray(R.array.player2Values);
-            String newValue = settings.getString("player2Type", getString(R.string.DEFAULT_P2_NAME));
-            String value = getTextValue(texts, values, newValue);
-            p2TypePref.setSummary(String.format(getString(R.string.player2TypeSummary_onChange), value));
-            p2TypePref.setOnPreferenceChangeListener(new P2TypeListener());
-        }
-
         // Allow for custom grid sizes
         gridPref = findPreference("gameSizePref");
         if(gridPref != null) {
@@ -187,7 +108,7 @@ public class PreferencesFragment extends PreferenceFragment {
             gridPref.setOnPreferenceChangeListener(new GridListener());
         }
 
-        // Give that custom popup for timers
+        // Give a custom popup for timers
         timerPref = findPreference("timerOptionsPref");
         if(timerPref != null) {
             timerPref.setOnPreferenceClickListener(new TimerListener());
@@ -196,8 +117,6 @@ public class PreferencesFragment extends PreferenceFragment {
 
     private void loadPreferences() {
         addPreferencesFromResource(R.layout.preferences_general);
-        addPreferencesFromResource(R.layout.preferences_player1);
-        addPreferencesFromResource(R.layout.preferences_player2);
     }
 
     /**
@@ -225,15 +144,5 @@ public class PreferencesFragment extends PreferenceFragment {
                 }
             }
         }).setNegativeButton(getString(R.string.cancel), null).show();
-    }
-
-    private String getTextValue(String[] texts, String[] values, Object value) {
-        for(int i = 0; i < values.length; i++) {
-            String s = values[i];
-            if(s.equals(value)) {
-                return texts[i];
-            }
-        }
-        return null;
     }
 }

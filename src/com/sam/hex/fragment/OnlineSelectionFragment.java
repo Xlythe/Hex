@@ -25,7 +25,6 @@ public class OnlineSelectionFragment extends SherlockFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        getSherlockActivity().getSupportActionBar().hide();
         View v = inflater.inflate(R.layout.online_selection, null);
 
         mSelectorLayout = (SelectorLayout) v.findViewById(R.id.buttons);
@@ -102,7 +101,7 @@ public class OnlineSelectionFragment extends SherlockFragment {
             getMainActivity().getGamesClient().createRoom(roomConfig);
 
             // prevent screen from sleeping during handshake
-            getSherlockActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            getMainActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
         else if(request == MainActivity.RC_WAITING_ROOM) {
             if(response == Activity.RESULT_OK) {
@@ -111,7 +110,7 @@ public class OnlineSelectionFragment extends SherlockFragment {
             else if(response == Activity.RESULT_CANCELED || response == GamesActivityResultCodes.RESULT_LEFT_ROOM) {
                 // player wants to leave the room.
                 getMainActivity().getGamesClient().leaveRoom(getMainActivity().getHexRoomUpdateListener(), mRoomId);
-                getSherlockActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                getMainActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             }
         }
     }

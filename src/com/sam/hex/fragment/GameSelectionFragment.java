@@ -1,13 +1,12 @@
 package com.sam.hex.fragment;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.hex.core.Player;
 import com.sam.hex.MainActivity;
 import com.sam.hex.R;
 import com.sam.hex.view.SelectorLayout;
@@ -18,9 +17,7 @@ public class GameSelectionFragment extends SherlockFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        getSherlockActivity().getSupportActionBar().hide();
         View v = inflater.inflate(R.layout.game_selection, null);
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         SelectorLayout selectorLayout = (SelectorLayout) v.findViewById(R.id.buttons);
 
@@ -30,10 +27,9 @@ public class GameSelectionFragment extends SherlockFragment {
         computerButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                prefs.edit().putString("player1Type", "0").apply();
-                prefs.edit().putString("player2Type", "4").apply();
-
                 getMainActivity().setGameFragment(new GameFragment());
+                getMainActivity().getGameFragment().setPlayer1Type(Player.Human);
+                getMainActivity().getGameFragment().setPlayer2Type(Player.AI);
                 getMainActivity().swapFragmentWithoutBackStack(getMainActivity().getGameFragment());
             }
         });
@@ -44,10 +40,9 @@ public class GameSelectionFragment extends SherlockFragment {
         hotseatButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                prefs.edit().putString("player1Type", "0").apply();
-                prefs.edit().putString("player2Type", "0").apply();
-
                 getMainActivity().setGameFragment(new GameFragment());
+                getMainActivity().getGameFragment().setPlayer1Type(Player.Human);
+                getMainActivity().getGameFragment().setPlayer2Type(Player.Human);
                 getMainActivity().swapFragmentWithoutBackStack(getMainActivity().getGameFragment());
             }
         });

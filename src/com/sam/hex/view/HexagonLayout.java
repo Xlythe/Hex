@@ -368,12 +368,13 @@ public class HexagonLayout extends View implements OnTouchListener {
             this.c = c;
             points = new float[2];
             m = new Matrix();
-            m.postRotate(-mRotation);
         }
 
         public boolean contains(Point p) {
             points[0] = p.x;
             points[1] = p.y;
+            m.reset();
+            m.postRotate(-mRotation, center.x, center.y);
             m.mapPoints(points);
             p.x = (int) points[0];
             p.y = (int) points[1];

@@ -288,15 +288,13 @@ public class HexagonLayout extends View implements OnTouchListener {
         layoutText();
     }
 
-    private float pressedDownX;
-    private float pressedDownY;
+    private float rotationOffset;
     private float oldRotation;
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
-            pressedDownX = event.getX();
-            pressedDownY = event.getY();
+            rotationOffset = cosineInverse(center, new Point(center.x, 0), new Point((int) event.getX(), (int) event.getY()));
             oldRotation = mRotation;
             for(Button b : mButtons) {
                 if(b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
@@ -317,12 +315,7 @@ public class HexagonLayout extends View implements OnTouchListener {
             }
         }
         else {
-            // TODO rewrite this to map pressed down to be as close as possible
-            // to the finger.
-            float deltaX = event.getX() - pressedDownX;
-            float deltaY = event.getY() - pressedDownY;
-            float distance = (float) Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-            mRotation = oldRotation - distance / 4;
+            mRotation = oldRotation + rotationOffset - cosineInverse(center, new Point(center.x, 0), new Point((int) event.getX(), (int) event.getY()));
             for(Button b : mButtons) {
                 if(b.isPressed()) {
                     if((mRotation - oldRotation) % 360 < 5f) {
@@ -339,6 +332,16 @@ public class HexagonLayout extends View implements OnTouchListener {
 
         invalidate();
         return true;
+    }
+
+    private float cosineInverse(Point a, Point b, Point c) {
+        double top = distanceSqr(a, b) + distanceSqr(a, c) - distanceSqr(b, c);
+        double bottom = 2 * Math.sqrt(distanceSqr(a, b)) * Math.sqrt(distanceSqr(a, c));
+        return (float) (Math.acos(top / bottom) * 180 / Math.PI);
+    }
+
+    private double distanceSqr(Point a, Point b) {
+        return ((a.x - b.x) * (a.x - b.x)) + ((a.y - b.y) * (a.y - b.y));
     }
 
     private int getDarkerColor(int color) {

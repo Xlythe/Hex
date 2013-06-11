@@ -85,7 +85,11 @@ public class BoardView extends View {
         if(game == null) return;
         int n = game.gameOptions.gridSize;
 
-        for(int x = 0; x < n; x++)
+        ShapeDrawable background = (game.getCurrentPlayer().getTeam() == 1) ? mPlayer1Background : mPlayer2Background;
+        background.getPaint().setColor(game.getCurrentPlayer().getColor());
+        if(!game.isGameOver()) background.draw(canvas);
+
+        for(int x = 0; x < n; x++) {
             for(int y = 0; y < n; y++) {
                 int c = Color.TRANSPARENT;
                 if(mButtons[x][y].isPressed()) {
@@ -103,6 +107,7 @@ public class BoardView extends View {
                 mDrawable[x][y].getPaint().setColor(c);
                 mDrawable[x][y].draw(canvas);
             }
+        }
     }
 
     @Override
@@ -115,7 +120,7 @@ public class BoardView extends View {
         mCellShadow = new ShapeDrawable[n][n];
         mButtons = new Button[n][n];
         int windowHeight = (int) (h - 2 * mMargin);
-        int windowWidth = (int) (w);
+        int windowWidth = (w);
 
         double radius = BoardTools.radiusCalculator(windowWidth, windowHeight, game.gameOptions.gridSize);
         double hrad = radius * Math.sqrt(3) / 2;
@@ -156,6 +161,28 @@ public class BoardView extends View {
                 mButtons[xc][yc].hexagon = new Hexagon(x - hrad, y + mMargin, radius);
             }
         }
+
+        // Shape of a rectangle
+        Path p1Path = new Path();
+        p1Path.moveTo(0, h / 3);
+        p1Path.lineTo(w, h / 3);
+        p1Path.lineTo(w, 2 * h / 3);
+        p1Path.lineTo(0, 2 * h / 3);
+        path.close();
+        mPlayer1Background = new ShapeDrawable(new PathShape(p1Path, w, h));
+        mPlayer1Background.setBounds(0, 0, w, h);
+
+        // Shape of a rectangle
+        float centerTop = (float) (hrad * (n + 2) + xOffset);
+        float centerBottom = (float) ((2 * n + 2) * hrad + xOffset);
+        Path p2Path = new Path();
+        p2Path.moveTo(centerTop - h / 3, 0);
+        p2Path.lineTo(centerTop, 0);
+        p2Path.lineTo(centerBottom, h);
+        p2Path.lineTo(centerBottom - h / 3, h);
+        path.close();
+        mPlayer2Background = new ShapeDrawable(new PathShape(p2Path, w, h));
+        mPlayer2Background.setBounds(0, 0, w, h);
     }
 
     private int getLighterColor(int color) {

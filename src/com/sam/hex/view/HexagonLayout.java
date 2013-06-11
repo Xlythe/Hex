@@ -289,12 +289,14 @@ public class HexagonLayout extends View implements OnTouchListener {
     }
 
     private float pressedDownX;
+    private float pressedDownY;
     private float oldRotation;
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
             pressedDownX = event.getX();
+            pressedDownY = event.getY();
             oldRotation = mRotation;
             for(Button b : mButtons) {
                 if(b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
@@ -315,7 +317,12 @@ public class HexagonLayout extends View implements OnTouchListener {
             }
         }
         else {
-            mRotation = oldRotation + (event.getX() - pressedDownX) / 4;
+            // TODO rewrite this to map pressed down to be as close as possible
+            // to the finger.
+            float deltaX = event.getX() - pressedDownX;
+            float deltaY = event.getY() - pressedDownY;
+            float distance = (float) Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            mRotation = oldRotation - distance / 4;
             for(Button b : mButtons) {
                 if(b.isPressed()) {
                     if((mRotation - oldRotation) % 360 < 5f) {

@@ -24,7 +24,7 @@ import com.hex.core.Point;
  * @author Will Harmon
  **/
 public class HexagonLayout extends View implements OnTouchListener {
-    private int mRotation;
+    private float mRotation;
     private Point[] corners;
     private Point center;
 
@@ -203,6 +203,7 @@ public class HexagonLayout extends View implements OnTouchListener {
 
     @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
+        h = (int) (h * 1.4);
         w = (int) (h * 1.1547);
         mBorderShadowWidth = h / 2 * 0.1828f;
         mBorderWidth = mBorderShadowWidth * 0.882f;
@@ -287,9 +288,14 @@ public class HexagonLayout extends View implements OnTouchListener {
         layoutText();
     }
 
+    private float pressedDownX;
+    private float oldRotation;
+
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
+            pressedDownX = event.getX();
+            oldRotation = mRotation;
             for(Button b : mButtons) {
                 if(b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
                     b.setPressed(b.isEnabled());
@@ -309,9 +315,15 @@ public class HexagonLayout extends View implements OnTouchListener {
             }
         }
         else {
+            mRotation = oldRotation + (event.getX() - pressedDownX) / 4;
             for(Button b : mButtons) {
                 if(b.isPressed()) {
-                    if(!b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
+                    if((mRotation - oldRotation) % 360 < 5f) {
+                        if(!b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
+                            b.setPressed(false);
+                        }
+                    }
+                    else {
                         b.setPressed(false);
                     }
                 }

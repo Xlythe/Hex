@@ -1,6 +1,11 @@
 package com.sam.hex;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.KeyEvent;
@@ -48,6 +53,8 @@ public class MainActivity extends BaseGameActivity {
 
         mMainFragment = new MainFragment();
         swapFragment(mMainFragment);
+
+        popupRatingDialog();
     }
 
     @Override
@@ -172,5 +179,35 @@ public class MainActivity extends BaseGameActivity {
 
     public void setHexRoomUpdateListener(HexRoomUpdateListener mHexRoomUpdateListener) {
         this.mHexRoomUpdateListener = mHexRoomUpdateListener;
+    }
+
+    private void popupRatingDialog() {
+        // Popup asking to rate app after countdown
+        int numTimesAppOpened = PreferenceManager.getDefaultSharedPreferences(this).getInt("num_times_app_opened_review", 0);
+        if(numTimesAppOpened != -1) {
+            numTimesAppOpened++;
+            PreferenceManager.getDefaultSharedPreferences(this).edit().putInt("num_times_app_opened_review", numTimesAppOpened).commit();
+            if(numTimesAppOpened > 2) {
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch(which) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putInt("num_times_app_opened_review", -1).commit();
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.sam.hex")));
+                            break;
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putInt("num_times_app_opened_review", -1).commit();
+                            break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(R.string.review_popup_title).setMessage(R.string.review_popup_message)
+                        .setPositiveButton(R.string.review_popup_ok, dialogClickListener).setNegativeButton(R.string.review_popup_never, dialogClickListener)
+                        .show();
+            }
+        }
     }
 }

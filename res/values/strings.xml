@@ -98,7 +98,7 @@
     <string name="failed">Failed</string>
     <string name="claimVictory">Claim Victory</string>
     <string name="auto_save_preamble">AutoSave:</string>
-    <string name="auto_saved_game_name" formatted="false">%s vs %s %s (Winner: %s)</string>
+    <string name="auto_saved_game_name" formatted="false">%s %s vs %s</string>
 
     <!-- Game instructions -->
     <string name="instructions">Hex is played by two players, who take turns placing pieces on the board. The players have different colours, say red and blue. (The players themselves are sometimes referred to as Red and Blue) The four edges of the board are coloured with the same colours, in such a way that parallel edges have the same colour. Red wins if he can build a continuous chain between the two red edges, and blue wins if he can build such a chain between the blue edges.\n\n
@@ -118,6 +118,12 @@
     <string name="rename">Rename</string>
     <string name="delete">Delete</string>
     <string name="enterFilename">Enter a filename</string>
+
+    <!-- Review -->
+    <string name="review_popup_title">Like the app?</string>
+    <string name="review_popup_message">Rate Hex on the Play Store</string>
+    <string name="review_popup_never">No thanks</string>
+    <string name="review_popup_ok">Okay</string>
 
     <!-- Color Picker -->
     <string name="dialog_color_picker">Color Picker</string>

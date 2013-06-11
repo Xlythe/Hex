@@ -8,7 +8,6 @@ import java.util.Locale;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -17,16 +16,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.hex.ai.BeeGameAI;
 import com.hex.core.Game;
 import com.hex.core.Game.GameListener;
@@ -38,7 +32,6 @@ import com.hex.core.PlayingEntity;
 import com.hex.core.Timer;
 import com.sam.hex.FileUtil;
 import com.sam.hex.MainActivity;
-import com.sam.hex.PreferencesActivity;
 import com.sam.hex.R;
 import com.sam.hex.Settings;
 import com.sam.hex.Stats;
@@ -59,22 +52,16 @@ public class GameFragment extends SherlockFragment {
     private long timeGamePaused;
     private long whenGamePaused;
 
-    BoardView board;
-    ImageButton player1Icon;
-    ImageButton player2Icon;
-    TextView timerText;
-    TextView winnerText;
-    ImageButton replayForward;
-    ImageButton replayPlayPause;
-    ImageButton replayBack;
-    RelativeLayout replayButtons;
+    private BoardView board;
+    private Button exit;
+    private Button newGame;
+    private Button undo;
 
     /** Called when the activity is first created. */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        setHasOptionsMenu(true);
-        getSherlockActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getMainActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         if(savedInstanceState != null && savedInstanceState.containsKey(GAME)) {
             // Resume a game if one exists
@@ -134,21 +121,34 @@ public class GameFragment extends SherlockFragment {
     private View applyBoard(LayoutInflater inflater) {
         View v = inflater.inflate(R.layout.game, null);
 
-        timerText = (TextView) v.findViewById(R.id.timer);
-        winnerText = (TextView) v.findViewById(R.id.winner);
         board = (BoardView) v.findViewById(R.id.board);
         board.setGame(game);
-        player1Icon = (ImageButton) v.findViewById(R.id.p1);
-        player2Icon = (ImageButton) v.findViewById(R.id.p2);
         if(game.gameOptions.timer.type == 0 || game.isGameOver()) {
-            timerText.setVisibility(View.GONE);
+            board.setShowTimerText(false);
         }
         if(game.isGameOver() && game.getGameListener() != null) game.getGameListener().onWin(game.getCurrentPlayer());
 
-        replayForward = (ImageButton) v.findViewById(R.id.replayForward);
-        replayPlayPause = (ImageButton) v.findViewById(R.id.replayPlayPause);
-        replayBack = (ImageButton) v.findViewById(R.id.replayBack);
-        replayButtons = (RelativeLayout) v.findViewById(R.id.replayButtons);
+        exit = (Button) v.findViewById(R.id.exit);
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                quit();
+            }
+        });
+        newGame = (Button) v.findViewById(R.id.reload);
+        newGame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                newGame();
+            }
+        });
+        undo = (Button) v.findViewById(R.id.undo);
+        undo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                undo();
+            }
+        });
 
         return v;
     }
@@ -184,12 +184,9 @@ public class GameFragment extends SherlockFragment {
                 if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        String winnerMsg = String.format(getString(R.string.winner), player.getName());
-                        winnerText.setText(winnerMsg);
-                        winnerText.setVisibility(View.VISIBLE);
-                        winnerText.invalidate();
-                        timerText.setVisibility(View.GONE);
-                        timerText.invalidate();
+                        board.setWinText(String.format(getString(R.string.winner), player.getName()));
+                        board.setShowWinText(true);
+                        board.setShowTimerText(false);
                         board.invalidate();
 
                         if(replay) return;
@@ -271,7 +268,8 @@ public class GameFragment extends SherlockFragment {
                 if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if(game.isGameOver()) winnerText.setVisibility(View.GONE);
+                        if(game.isGameOver()) board.setShowWinText(false);
+                        board.postInvalidate();
                     }
                 });
             }
@@ -284,24 +282,9 @@ public class GameFragment extends SherlockFragment {
             @Override
             public void onTurn(PlayingEntity player) {
                 if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
-                    @SuppressWarnings("deprecation")
                     @Override
                     public void run() {
                         board.postInvalidate();
-                        player1Icon.setColorFilter(game.getPlayer1().getColor());
-                        player2Icon.setColorFilter(game.getPlayer2().getColor());
-                        if(game.getCurrentPlayer().getTeam() == 1 && !game.isGameOver()) {
-                            player1Icon.setAlpha(255);
-                            player2Icon.setAlpha(80);
-                        }
-                        else if(game.getCurrentPlayer().getTeam() == 2 && !game.isGameOver()) {
-                            player1Icon.setAlpha(80);
-                            player2Icon.setAlpha(255);
-                        }
-                        else {
-                            player1Icon.setAlpha(80);
-                            player2Icon.setAlpha(80);
-                        }
                     }
                 });
             }
@@ -311,9 +294,9 @@ public class GameFragment extends SherlockFragment {
                 if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        board.setShowTimerText(false);
+                        board.setShowWinText(false);
                         board.postInvalidate();
-                        timerText.setVisibility(View.GONE);
-                        winnerText.setVisibility(View.GONE);
                     }
                 });
             }
@@ -323,8 +306,8 @@ public class GameFragment extends SherlockFragment {
                 if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        if(game.gameOptions.timer.type != 0) board.setShowTimerText(true);
                         board.postInvalidate();
-                        if(game.gameOptions.timer.type != 0) timerText.setVisibility(View.VISIBLE);
                     }
                 });
             }
@@ -344,7 +327,8 @@ public class GameFragment extends SherlockFragment {
                 if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        timerText.setVisibility(View.VISIBLE);
+                        board.setShowTimerText(true);
+                        board.postInvalidate();
                     }
                 });
             }
@@ -354,8 +338,8 @@ public class GameFragment extends SherlockFragment {
                 if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        timerText.setText(String.format(getString(R.string.timer), String.format("%d:%02d", minutes, seconds)));
-                        timerText.invalidate();
+                        board.setTimerText(String.format(getString(R.string.timer), String.format("%d:%02d", minutes, seconds)));
+                        board.postInvalidate();
                     }
                 });
             }
@@ -396,43 +380,7 @@ public class GameFragment extends SherlockFragment {
         }
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_game_local, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch(item.getItemId()) {
-        case android.R.id.home:
-            getFragmentManager().popBackStackImmediate();
-            return true;
-        case R.id.settings:
-            game.replayRunning = false;
-            startActivity(new Intent(getSherlockActivity(), PreferencesActivity.class));
-            return true;
-        case R.id.undo:
-            undo();
-            return true;
-        case R.id.newgame:
-            newGame();
-            return true;
-        case R.id.replay:
-            replay(900);
-            return true;
-        case R.id.save:
-            showSavingDialog();
-            return true;
-        case R.id.quit:
-            quit();
-            return true;
-        default:
-            return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void showSavingDialog() {
+    protected void showSavingDialog() {
         final EditText editText = new EditText(getSherlockActivity());
         editText.setInputType(InputType.TYPE_CLASS_TEXT);
         editText.setText(SAVE_FORMAT.format(new Date()));

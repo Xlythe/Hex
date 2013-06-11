@@ -27,12 +27,24 @@ public class BoardView extends View {
     private ShapeDrawable[][] mCellShadow;
     private Button[][] mButtons;
 
+    private ShapeDrawable mPlayer1Background;
+    private ShapeDrawable mPlayer2Background;
+
     public Game game;
+
+    private float mMargin;
 
     private float mPieceMargin;
     private float mPieceWhiteBorder;
     private float mPieceLightBorder;
     private float mPieceShadowOffset;
+
+    private String mWinText;
+    private String mTurnText;
+    private String mTimerText;
+    private boolean mShowWinText;
+    private boolean mShowTurnText;
+    private boolean mShowTimerText;
 
     public BoardView(Context context) {
         super(context);
@@ -51,8 +63,9 @@ public class BoardView extends View {
 
     private void setUp() {
         DisplayMetrics dm = getResources().getDisplayMetrics();
+        mMargin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, dm);
         mPieceMargin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, dm);
-        mPieceWhiteBorder = mPieceMargin + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, dm);
+        mPieceWhiteBorder = mPieceMargin + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, dm);
         mPieceLightBorder = mPieceWhiteBorder + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, dm);
         mPieceShadowOffset = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3, dm);
         setOnClickListener(new OnClickListener() {
@@ -101,8 +114,8 @@ public class BoardView extends View {
         mCell = new ShapeDrawable[n][n];
         mCellShadow = new ShapeDrawable[n][n];
         mButtons = new Button[n][n];
-        int windowHeight = getHeight();
-        int windowWidth = getWidth();
+        int windowHeight = (int) (h - 2 * mMargin);
+        int windowWidth = (int) (w);
 
         double radius = BoardTools.radiusCalculator(windowWidth, windowHeight, game.gameOptions.gridSize);
         double hrad = radius * Math.sqrt(3) / 2;
@@ -124,22 +137,23 @@ public class BoardView extends View {
                 double x = ((hrad + yc * hrad + 2 * hrad * xc) + hrad + xOffset);
                 double y = (1.5 * radius * yc + radius) + yOffset;
                 mDrawable[xc][yc] = new ShapeDrawable(new PathShape(path, (int) hrad * 2, (int) radius * 2));
-                mDrawable[xc][yc].setBounds((int) (x - hrad), (int) (y), (int) (x + hrad - mPieceLightBorder),
-                        (int) (y + radius * 2 - (mPieceLightBorder * 1.1547)));
+                mDrawable[xc][yc].setBounds((int) (x - hrad), (int) (y + mMargin), (int) (x + hrad - mPieceLightBorder),
+                        (int) (y + mMargin + radius * 2 - (mPieceLightBorder * 1.1547)));
                 mDrawableOutline[xc][yc] = new ShapeDrawable(new PathShape(path, (int) hrad * 2, (int) radius * 2));
-                mDrawableOutline[xc][yc].setBounds((int) (x - hrad), (int) (y), (int) (x + hrad - mPieceWhiteBorder),
-                        (int) (y + radius * 2 - (mPieceWhiteBorder * 1.1547)));
+                mDrawableOutline[xc][yc].setBounds((int) (x - hrad), (int) (y + mMargin), (int) (x + hrad - mPieceWhiteBorder),
+                        (int) (y + mMargin + radius * 2 - (mPieceWhiteBorder * 1.1547)));
                 mDrawableOutline[xc][yc].getPaint().setAlpha(200);
                 mCell[xc][yc] = new ShapeDrawable(new PathShape(path, (int) hrad * 2, (int) radius * 2));
-                mCell[xc][yc].setBounds((int) (x - hrad), (int) (y), (int) (x + hrad - mPieceMargin), (int) (y + radius * 2 - (mPieceMargin * 1.1547)));
+                mCell[xc][yc].setBounds((int) (x - hrad), (int) (y + mMargin), (int) (x + hrad - mPieceMargin),
+                        (int) (y + mMargin + radius * 2 - (mPieceMargin * 1.1547)));
                 mCell[xc][yc].getPaint().setColor(Color.WHITE);
                 mCellShadow[xc][yc] = new ShapeDrawable(new PathShape(path, (int) hrad * 2, (int) radius * 2));
-                mCellShadow[xc][yc].setBounds((int) (x - hrad), (int) (y + mPieceShadowOffset), (int) (x + hrad - mPieceMargin),
-                        (int) (y + radius * 2 - (mPieceMargin * 1.1547)));
+                mCellShadow[xc][yc].setBounds((int) (x - hrad), (int) (y + mMargin + mPieceShadowOffset), (int) (x + hrad - mPieceMargin), (int) (y + mMargin
+                        + radius * 2 - (mPieceMargin * 1.1547)));
                 mCellShadow[xc][yc].getPaint().setColor(Color.BLACK);
                 mCellShadow[xc][yc].getPaint().setAlpha(15);
                 mButtons[xc][yc] = new Button();
-                mButtons[xc][yc].hexagon = new Hexagon(x - hrad, y, radius);
+                mButtons[xc][yc].hexagon = new Hexagon(x - hrad, y + mMargin, radius);
             }
         }
     }
@@ -156,6 +170,54 @@ public class BoardView extends View {
         Color.colorToHSV(color, hsv);
         hsv[2] *= 0.6f;
         return Color.HSVToColor(hsv);
+    }
+
+    public String getWinText() {
+        return mWinText;
+    }
+
+    public void setWinText(String winText) {
+        this.mWinText = winText;
+    }
+
+    public String getTurnText() {
+        return mTurnText;
+    }
+
+    public void setTurnText(String turnText) {
+        this.mTurnText = turnText;
+    }
+
+    public String getTimerText() {
+        return mTimerText;
+    }
+
+    public void setTimerText(String timerText) {
+        this.mTimerText = timerText;
+    }
+
+    public boolean isShowWinText() {
+        return mShowWinText;
+    }
+
+    public void setShowWinText(boolean showWinText) {
+        this.mShowWinText = showWinText;
+    }
+
+    public boolean isShowTurnText() {
+        return mShowTurnText;
+    }
+
+    public void setShowTurnText(boolean showTurnText) {
+        this.mShowTurnText = showTurnText;
+    }
+
+    public boolean isShowTimerText() {
+        return mShowTimerText;
+    }
+
+    public void setShowTimerText(boolean showTimerText) {
+        this.mShowTimerText = showTimerText;
     }
 
     private class TouchListener implements OnTouchListener {

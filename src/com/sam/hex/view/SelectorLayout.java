@@ -119,6 +119,7 @@ public class SelectorLayout extends View implements OnTouchListener {
 
     @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
+        int diagonal = (int) Math.sqrt(w * w + h * h);
         int margin = (w - mWidth * 3) / 4;
         int offset = margin;
         // Create the buttons
@@ -135,9 +136,9 @@ public class SelectorLayout extends View implements OnTouchListener {
 
             // Shape of a pressed state
             Path buttonPath = new Path();
-            buttonPath.moveTo(hex.a.x, hex.a.y);
-            buttonPath.lineTo(hex.b.x, hex.b.y);
-            buttonPath.lineTo(hex.c.x, hex.c.y);
+            buttonPath.moveTo(hex.a.x, Math.max(hex.a.y, -diagonal));
+            buttonPath.lineTo(hex.b.x, Math.max(hex.b.y, -diagonal));
+            buttonPath.lineTo(hex.c.x, Math.max(hex.c.y, -diagonal));
             buttonPath.lineTo(hex.d.x, hex.d.y);
             buttonPath.lineTo(hex.e.x, hex.e.y);
             buttonPath.lineTo(hex.f.x, hex.f.y);
@@ -166,7 +167,7 @@ public class SelectorLayout extends View implements OnTouchListener {
 
             mButtons[i].setHexagon(hex);
 
-            mButtons[i].textX = mButtons[i].getHexagon().b.x * 2 - mButtonTextPaint.measureText(mButtons[i].getText()) / 2 - 2 * i * margin;
+            mButtons[i].textX = mButtons[i].getHexagon().b.x * 2 - mButtonTextPaint.measureText(mButtons[i].getText()) / 2 - (int) (1.7 * i * margin);
             mButtons[i].textY = mButtons[i].getHexagon().d.y / 2 + mButtonTextPaint.getTextSize() / 4;
 
             mOldRect[i] = mButtonDrawable[i].copyBounds();

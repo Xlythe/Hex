@@ -26,8 +26,9 @@ import com.hex.core.Point;
  * @author Will Harmon
  **/
 public class HexagonLayout extends View implements OnTouchListener {
+    private boolean mAllowRotation;
+
     // Cached ViewConfiguration and system-wide constant values
-    private int mSlop;
     private int mMinFlingVelocity;
     private int mMaxFlingVelocity;
     private VelocityTracker mVelocityTracker;
@@ -75,7 +76,6 @@ public class HexagonLayout extends View implements OnTouchListener {
 
     public void setUp() {
         ViewConfiguration vc = ViewConfiguration.get(getContext());
-        mSlop = vc.getScaledTouchSlop();
         mMinFlingVelocity = vc.getScaledMinimumFlingVelocity();
         mMaxFlingVelocity = vc.getScaledMaximumFlingVelocity();
 
@@ -98,6 +98,7 @@ public class HexagonLayout extends View implements OnTouchListener {
         mButtonTextPaint = new Paint();
         mButtonTextPaint.setColor(Color.WHITE);
         mButtonTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, dm));
+        mAllowRotation = false;
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {}
@@ -131,14 +132,16 @@ public class HexagonLayout extends View implements OnTouchListener {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        System.out.println(spinVelocity);
-        if(spinSign * spinVelocity > 0) {
-            spinVelocity /= 2;
-            spinVelocity -= spinSign * 5;
-            mRotation += spinSign * 5f;
-            postInvalidateDelayed(30);
+        if(mAllowRotation) {
+            if(spinSign * spinVelocity > 0) {
+                spinVelocity /= 2;
+                spinVelocity -= spinSign * 5;
+                mRotation += spinSign * 5f;
+                postInvalidateDelayed(30);
+            }
+            canvas.rotate(mRotation, center.x, center.y);
         }
-        canvas.rotate(mRotation, center.x, center.y);
+
         mHexagon.draw(canvas);
 
         canvas.drawLine(corners[0].x, corners[0].y, center.x, center.y, mLinePaint);
@@ -223,7 +226,9 @@ public class HexagonLayout extends View implements OnTouchListener {
 
     @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
-        h = (int) (h * 1.4);
+        if(mAllowRotation) {
+            h = (int) (h * 1.4);
+        }
         w = (int) (h * 1.1547);
         mBorderShadowWidth = h / 2 * 0.1828f;
         mBorderWidth = mBorderShadowWidth * 0.882f;
@@ -427,13 +432,15 @@ public class HexagonLayout extends View implements OnTouchListener {
         }
 
         public boolean contains(Point p) {
-            points[0] = p.x;
-            points[1] = p.y;
-            m.reset();
-            m.postRotate(-mRotation, center.x, center.y);
-            m.mapPoints(points);
-            p.x = (int) points[0];
-            p.y = (int) points[1];
+            if(mAllowRotation) {
+                points[0] = p.x;
+                points[1] = p.y;
+                m.reset();
+                m.postRotate(-mRotation, center.x, center.y);
+                m.mapPoints(points);
+                p.x = (int) points[0];
+                p.y = (int) points[1];
+            }
 
             Point AB = new Point(b.x - a.x, b.y - a.y);
             Point BC = new Point(c.x - b.x, c.y - b.y);

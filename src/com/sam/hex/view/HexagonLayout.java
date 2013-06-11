@@ -293,8 +293,9 @@ public class HexagonLayout extends View implements OnTouchListener {
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
+        int sign = (event.getX() > center.x) ? -1 : 1;
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
-            rotationOffset = cosineInverse(center, new Point(center.x, 0), new Point((int) event.getX(), (int) event.getY()));
+            rotationOffset = sign * cosineInverse(center, new Point(center.x, 0), new Point((int) event.getX(), (int) event.getY()));
             oldRotation = mRotation;
             for(Button b : mButtons) {
                 if(b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
@@ -315,7 +316,6 @@ public class HexagonLayout extends View implements OnTouchListener {
             }
         }
         else {
-            int sign = (event.getX() > center.x) ? -1 : 1;
             mRotation = oldRotation + rotationOffset - sign * cosineInverse(center, new Point(center.x, 0), new Point((int) event.getX(), (int) event.getY()));
             for(Button b : mButtons) {
                 if(b.isPressed()) {

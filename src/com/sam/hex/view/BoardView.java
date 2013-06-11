@@ -14,6 +14,7 @@ import android.view.View;
 
 import com.hex.core.Game;
 import com.hex.core.GameAction;
+import com.hex.core.Player;
 import com.hex.core.Point;
 import com.sam.hex.BoardTools;
 
@@ -92,7 +93,7 @@ public class BoardView extends View {
         for(int x = 0; x < n; x++) {
             for(int y = 0; y < n; y++) {
                 int c = Color.TRANSPARENT;
-                if(mButtons[x][y].isPressed()) {
+                if(mButtons[x][y].isPressed() && game.getCurrentPlayer().getType().equals(Player.Human)) {
                     c = Color.LTGRAY;
                 }
                 if(game.gamePieces[x][y].getTeam() == game.getPlayer1().getTeam()) c = game.getPlayer1().getColor();

@@ -10,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -353,7 +352,6 @@ public class GameFragment extends SherlockFragment {
             timeGamePaused += System.currentTimeMillis() - whenGamePaused;
             whenGamePaused = 0;
         }
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getSherlockActivity());
 
         // Check if settings were changed and we need to run a new game
         if(game != null && game.replayRunning) {
@@ -362,21 +360,6 @@ public class GameFragment extends SherlockFragment {
         else if(replay) {
             replay = false;
             replay(replayDuration);
-        }
-        else if(somethingChanged(prefs, GameAction.LOCAL_GAME, game)) {
-            initializeNewGame();
-        }
-        else {// Apply minor changes without stopping the current game
-            setColors();
-            setNames();
-            game.getMoveList().replay(0, game);
-            GameAction.checkedFlagReset(game);
-            GameAction.checkWinPlayer(1, game);
-            GameAction.checkWinPlayer(2, game);
-            GameAction.checkedFlagReset(game);
-
-            // Apply everything
-            board.invalidate();
         }
     }
 
@@ -451,9 +434,8 @@ public class GameFragment extends SherlockFragment {
                 case DialogInterface.BUTTON_POSITIVE:
                     // Yes button clicked
                     if(game.getPlayer1().supportsNewgame() && game.getPlayer2().supportsNewgame()) {
-                        game.replayRunning = false;
-                        stopGame(game);
-                        game.clearBoard();
+                        initializeNewGame();
+                        board.setGame(game);
                         game.start();
                     }
                     break;
@@ -485,7 +467,7 @@ public class GameFragment extends SherlockFragment {
                     || Integer.valueOf(prefs.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME))) * 60 * 1000 != game.gameOptions.timer.totalTime;
         }
         else if(gameLocation == GameAction.NET_GAME) {
-            return(game != null && game.isGameOver());
+            return (game != null && game.isGameOver());
         }
         else {
             return true;

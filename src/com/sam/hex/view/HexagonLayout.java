@@ -319,12 +319,10 @@ public class HexagonLayout extends View implements OnTouchListener {
             mRotation = oldRotation + rotationOffset - sign * cosineInverse(center, new Point(center.x, 0), new Point((int) event.getX(), (int) event.getY()));
             for(Button b : mButtons) {
                 if(b.isPressed()) {
-                    if((mRotation - oldRotation) % 360 < 5f) {
-                        if(!b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
-                            b.setPressed(false);
-                        }
+                    if(!b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
+                        b.setPressed(false);
                     }
-                    else {
+                    else if(Math.abs(Math.abs(mRotation) - Math.abs(oldRotation) % 360) > 10f) {
                         b.setPressed(false);
                     }
                 }

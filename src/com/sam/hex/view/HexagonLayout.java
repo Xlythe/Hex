@@ -14,8 +14,10 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 
 import com.hex.core.Point;
@@ -24,6 +26,12 @@ import com.hex.core.Point;
  * @author Will Harmon
  **/
 public class HexagonLayout extends View implements OnTouchListener {
+    // Cached ViewConfiguration and system-wide constant values
+    private int mSlop;
+    private int mMinFlingVelocity;
+    private int mMaxFlingVelocity;
+    private VelocityTracker mVelocityTracker;
+
     private float mRotation;
     private Point[] corners;
     private Point center;
@@ -66,6 +74,11 @@ public class HexagonLayout extends View implements OnTouchListener {
     }
 
     public void setUp() {
+        ViewConfiguration vc = ViewConfiguration.get(getContext());
+        mSlop = vc.getScaledTouchSlop();
+        mMinFlingVelocity = vc.getScaledMinimumFlingVelocity();
+        mMaxFlingVelocity = vc.getScaledMaximumFlingVelocity();
+
         DisplayMetrics dm = getResources().getDisplayMetrics();
         setOnTouchListener(this);
         mRotation = 0;
@@ -118,6 +131,13 @@ public class HexagonLayout extends View implements OnTouchListener {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        System.out.println(spinVelocity);
+        if(spinSign * spinVelocity > 0) {
+            spinVelocity /= 2;
+            spinVelocity -= spinSign * 5;
+            mRotation += spinSign * 5f;
+            postInvalidateDelayed(30);
+        }
         canvas.rotate(mRotation, center.x, center.y);
         mHexagon.draw(canvas);
 
@@ -290,6 +310,8 @@ public class HexagonLayout extends View implements OnTouchListener {
 
     private float rotationOffset;
     private float oldRotation;
+    private float spinVelocity;
+    private int spinSign;
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -305,6 +327,8 @@ public class HexagonLayout extends View implements OnTouchListener {
                     b.setPressed(false);
                 }
             }
+            mVelocityTracker = VelocityTracker.obtain();
+            mVelocityTracker.addMovement(event);
         }
         else if(event.getAction() == MotionEvent.ACTION_UP) {
             for(Button b : mButtons) {
@@ -313,6 +337,25 @@ public class HexagonLayout extends View implements OnTouchListener {
                     b.preformClick();
                 }
                 b.setPressed(false);
+            }
+
+            if(mVelocityTracker != null) {
+                mVelocityTracker.addMovement(event);
+                mVelocityTracker.computeCurrentVelocity(1000);
+                float distance = (float) Math.sqrt(distanceSqr(new Point((int) mVelocityTracker.getXVelocity(), (int) mVelocityTracker.getYVelocity()),
+                        new Point(0, 0)));
+                if(mMinFlingVelocity <= distance && distance <= mMaxFlingVelocity) {
+                    if(Math.abs(mVelocityTracker.getXVelocity()) > Math.abs(mVelocityTracker.getYVelocity())) {
+                        spinSign = mVelocityTracker.getXVelocity() > 0 ? 1 : -1;
+                    }
+                    else {
+                        spinSign = mVelocityTracker.getYVelocity() > 0 ? 1 : -1;
+                        spinSign *= sign;
+                    }
+                    spinVelocity = spinSign * distance;
+                }
+                mVelocityTracker.recycle();
+                mVelocityTracker = null;
             }
         }
         else {
@@ -326,6 +369,10 @@ public class HexagonLayout extends View implements OnTouchListener {
                         b.setPressed(false);
                     }
                 }
+            }
+
+            if(mVelocityTracker != null) {
+                mVelocityTracker.addMovement(event);
             }
         }
 

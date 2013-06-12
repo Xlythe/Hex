@@ -183,7 +183,8 @@ public class GameFragment extends SherlockFragment {
                 if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        board.setWinText(String.format(getString(R.string.winner), player.getName()));
+                        board.setTitleText(String.format(getString(R.string.game_winner_title), player.getName()));
+                        board.setActionText(getString(R.string.game_winner_msg));
                         board.setShowWinText(true);
                         board.setShowTimerText(false);
                         board.invalidate();
@@ -279,10 +280,12 @@ public class GameFragment extends SherlockFragment {
             }
 
             @Override
-            public void onTurn(PlayingEntity player) {
+            public void onTurn(final PlayingEntity player) {
                 if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        board.setTitleText(String.format(getString(R.string.game_turn_title), game.getCurrentPlayer().getName()));
+                        board.setActionText(getString(R.string.game_turn_msg));
                         board.postInvalidate();
                     }
                 });
@@ -337,7 +340,7 @@ public class GameFragment extends SherlockFragment {
                 if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        board.setTimerText(String.format(getString(R.string.timer), String.format("%d:%02d", minutes, seconds)));
+                        board.setTimerText(String.format(getString(R.string.game_timer_msg), String.format("%d:%02d", minutes, seconds)));
                         board.postInvalidate();
                     }
                 });
@@ -373,11 +376,11 @@ public class GameFragment extends SherlockFragment {
             public void onClick(DialogInterface dialog, int which) {
                 try {
                     FileUtil.saveGame(editText.getText().toString(), game.save());
-                    Toast.makeText(getSherlockActivity(), R.string.saved, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getSherlockActivity(), R.string.game_toast_saved, Toast.LENGTH_SHORT).show();
                 }
                 catch(IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(getSherlockActivity(), R.string.failed, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getSherlockActivity(), R.string.game_toast_failed, Toast.LENGTH_SHORT).show();
                 }
             }
         }).setNegativeButton(R.string.cancel, null).show();
@@ -467,7 +470,7 @@ public class GameFragment extends SherlockFragment {
                     || Integer.valueOf(prefs.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME))) * 60 * 1000 != game.gameOptions.timer.totalTime;
         }
         else if(gameLocation == GameAction.NET_GAME) {
-            return (game != null && game.isGameOver());
+            return(game != null && game.isGameOver());
         }
         else {
             return true;

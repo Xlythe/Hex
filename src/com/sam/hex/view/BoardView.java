@@ -3,7 +3,9 @@ package com.sam.hex.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Typeface;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.PathShape;
 import android.util.AttributeSet;
@@ -30,6 +32,8 @@ public class BoardView extends View {
 
     private ShapeDrawable mPlayer1Background;
     private ShapeDrawable mPlayer2Background;
+    private ShapeDrawable mBorderBackground;
+    private int mBackgroundColor;
 
     public Game game;
 
@@ -40,12 +44,15 @@ public class BoardView extends View {
     private float mPieceLightBorder;
     private float mPieceShadowOffset;
 
-    private String mWinText;
-    private String mTurnText;
+    private float mTextMargin;
+    private String mTitleText;
+    private String mActionText;
     private String mTimerText;
     private boolean mShowWinText;
     private boolean mShowTurnText;
     private boolean mShowTimerText;
+    private Paint mTextPaint;
+    private Paint mLargeTextPaint;
 
     public BoardView(Context context) {
         super(context);
@@ -69,6 +76,14 @@ public class BoardView extends View {
         mPieceWhiteBorder = mPieceMargin + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, dm);
         mPieceLightBorder = mPieceWhiteBorder + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, dm);
         mPieceShadowOffset = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3, dm);
+        mBackgroundColor = 0xFFD2D2D2;
+        mTextPaint = new Paint();
+        mTextPaint.setColor(Color.WHITE);
+        mTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, dm));
+        mLargeTextPaint = new Paint(mTextPaint);
+        mLargeTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 32, dm));
+        mLargeTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        mTextMargin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, dm);
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {}
@@ -89,6 +104,15 @@ public class BoardView extends View {
         ShapeDrawable background = (game.getCurrentPlayer().getTeam() == 1) ? mPlayer1Background : mPlayer2Background;
         background.getPaint().setColor(game.getCurrentPlayer().getColor());
         if(!game.isGameOver()) background.draw(canvas);
+        mBorderBackground.draw(canvas);
+
+        if(mTitleText != null) {
+            int textLength = (int) Math.max(mTextPaint.measureText(mTitleText), mLargeTextPaint.measureText(mActionText));
+            float posX = game.getCurrentPlayer().getTeam() == 1 ? mTextMargin + textLength : getWidth() - mTextMargin;
+            float posY = game.getCurrentPlayer().getTeam() == 1 ? getHeight() / 2 : mTextMargin + mTextPaint.getTextSize();
+            canvas.drawText(mTitleText, posX - mTextPaint.measureText(mTitleText), posY, mTextPaint);
+            canvas.drawText(mActionText, posX - mLargeTextPaint.measureText(mActionText), posY + mLargeTextPaint.getTextSize(), mLargeTextPaint);
+        }
 
         for(int x = 0; x < n; x++) {
             for(int y = 0; y < n; y++) {
@@ -169,21 +193,32 @@ public class BoardView extends View {
         p1Path.lineTo(w, h / 3);
         p1Path.lineTo(w, 2 * h / 3);
         p1Path.lineTo(0, 2 * h / 3);
-        path.close();
+        p1Path.close();
         mPlayer1Background = new ShapeDrawable(new PathShape(p1Path, w, h));
         mPlayer1Background.setBounds(0, 0, w, h);
 
         // Shape of a rectangle
-        float centerTop = (float) (hrad * (n + 2) + xOffset);
-        float centerBottom = (float) ((2 * n + 2) * hrad + xOffset);
+        float centerTop = (float) (xOffset + h / 3);
+        float centerBottom = windowWidth - centerTop;
         Path p2Path = new Path();
-        p2Path.moveTo(centerTop - h / 3, 0);
-        p2Path.lineTo(centerTop, 0);
-        p2Path.lineTo(centerBottom, h);
-        p2Path.lineTo(centerBottom - h / 3, h);
-        path.close();
+        p2Path.moveTo(centerTop - h / 6, 0);
+        p2Path.lineTo(centerTop + h / 6, 0);
+        p2Path.lineTo(centerBottom + h / 6, h);
+        p2Path.lineTo(centerBottom - h / 6, h);
+        p2Path.close();
         mPlayer2Background = new ShapeDrawable(new PathShape(p2Path, w, h));
         mPlayer2Background.setBounds(0, 0, w, h);
+
+        // Shape of a rectangle
+        Path borderPath = new Path();
+        borderPath.moveTo((float) (xOffset + hrad), (float) (mMargin + radius));
+        borderPath.lineTo((float) (xOffset + hrad * 2 * n - hrad), (float) (mMargin + radius));
+        borderPath.lineTo(w - (float) (xOffset + hrad), h - (float) (mMargin + radius));
+        borderPath.lineTo(w - (float) (xOffset + hrad * 2 * n - hrad), h - (float) (mMargin + radius));
+        borderPath.close();
+        mBorderBackground = new ShapeDrawable(new PathShape(borderPath, w, h));
+        mBorderBackground.setBounds(0, 0, w, h);
+        mBorderBackground.getPaint().setColor(mBackgroundColor);
     }
 
     private int getLighterColor(int color) {
@@ -200,20 +235,12 @@ public class BoardView extends View {
         return Color.HSVToColor(hsv);
     }
 
-    public String getWinText() {
-        return mWinText;
+    public String getTitleText() {
+        return mTitleText;
     }
 
-    public void setWinText(String winText) {
-        this.mWinText = winText;
-    }
-
-    public String getTurnText() {
-        return mTurnText;
-    }
-
-    public void setTurnText(String turnText) {
-        this.mTurnText = turnText;
+    public void setTitleText(String titleText) {
+        this.mTitleText = titleText;
     }
 
     public String getTimerText() {
@@ -246,6 +273,14 @@ public class BoardView extends View {
 
     public void setShowTimerText(boolean showTimerText) {
         this.mShowTimerText = showTimerText;
+    }
+
+    public String getActionText() {
+        return mActionText;
+    }
+
+    public void setActionText(String mActionText) {
+        this.mActionText = mActionText;
     }
 
     private class TouchListener implements OnTouchListener {

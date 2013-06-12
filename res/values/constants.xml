@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
-    <integer name="DEFAULT_P1_COLOR">@integer/COLOR_BLUE</integer>
-    <integer name="DEFAULT_P2_COLOR">@integer/COLOR_RED</integer>
+    <integer name="DEFAULT_P1_COLOR">@integer/COLOR_RED</integer>
+    <integer name="DEFAULT_P2_COLOR">@integer/COLOR_BLUE</integer>
     <string name="DEFAULT_P1_NAME">Player1</string>
     <string name="DEFAULT_P2_NAME">Guest</string>
     <integer name="DEFAULT_BOARD_SIZE">7</integer>

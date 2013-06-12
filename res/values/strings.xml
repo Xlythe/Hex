@@ -63,11 +63,14 @@
     <string name="game_quit">Exit</string>
 
     <!-- In game notifications -->
-    <string name="winner">%s wins!</string>
-    <string name="timer">Time Left: %s</string>
-    <string name="saved">Saved!</string>
-    <string name="failed">Failed</string>
-    <string name="claimVictory">Claim Victory</string>
+    <string name="game_winner_title">%s</string>
+    <string name="game_turn_title">%s\'s</string>
+    <string name="game_winner_msg">WINS</string>
+    <string name="game_turn_msg">TURN</string>
+    <string name="game_timer_msg">Time Left: %s</string>
+    <string name="game_toast_saved">Saved!</string>
+    <string name="game_toast_failed">Failed</string>
+    <string name="game_button_claim_victory">Claim Victory</string>
     <string name="auto_save_preamble">AutoSave:</string>
     <string name="auto_saved_game_name" formatted="false">%s %s vs %s</string>
 

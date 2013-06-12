@@ -39,7 +39,7 @@ import com.sam.hex.view.BoardView;
 public class GameFragment extends SherlockFragment {
     public static final String GAME = "game";
     public static final String REPLAY = "replay";
-    private static final SimpleDateFormat SAVE_FORMAT = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+    private static final SimpleDateFormat SAVE_FORMAT = new SimpleDateFormat("MMM dd, yyyy hh:mm", Locale.getDefault());
 
     boolean mIsSignedIn = false;
 
@@ -50,6 +50,12 @@ public class GameFragment extends SherlockFragment {
     private int replayDuration;
     private long timeGamePaused;
     private long whenGamePaused;
+
+    /**
+     * Set at the end of onWin, or when a game is loaded. Use this to avoid
+     * auto-saving replayed games or unlocking achievements that weren't earned.
+     * */
+    private boolean gameHasEnded = false;
 
     private BoardView board;
     private Button exit;
@@ -75,10 +81,12 @@ public class GameFragment extends SherlockFragment {
         }
         else if(getArguments() != null && getArguments().containsKey(GAME)) {
             // Resume a game if one exists
+            System.out.println(getArguments().getString(GAME));
             game = Game.load(getArguments().getString(GAME));
             game.setGameListener(createGameListener());
             replay = true;
             replayDuration = 0;
+            gameHasEnded = true;
 
             if(getArguments().containsKey(REPLAY) && getArguments().getBoolean(REPLAY)) {
                 replayDuration = 900;
@@ -154,6 +162,7 @@ public class GameFragment extends SherlockFragment {
         // Stop the old game
         stopGame(game);
         timeGamePaused = 0;
+        gameHasEnded = false;
 
         // Create a new game object
         GameOptions go = new GameOptions();
@@ -185,7 +194,7 @@ public class GameFragment extends SherlockFragment {
                         board.setActionText(getString(R.string.game_winner_msg));
                         board.invalidate();
 
-                        if(replay) return;
+                        if(gameHasEnded) return;
 
                         // Auto save completed game
                         if(Settings.getAutosave(getMainActivity())) {
@@ -237,8 +246,8 @@ public class GameFragment extends SherlockFragment {
                             }
 
                             // Unlock the speed demon achievement!
-                            if(game.gameOptions.timer.type != 0) {
-                                getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_monitor_smasher));
+                            if(game.gameOptions.timer.type != Timer.NO_TIMER) {
+                                getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_speed_demon));
                             }
 
                             // Unlock the Novice achievement!
@@ -253,6 +262,8 @@ public class GameFragment extends SherlockFragment {
                             // Unlock the Expert achievement!
                             if(player.getTeam() == 1) getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_insane), 1);
                         }
+
+                        gameHasEnded = true;
                     }
                 });
             }

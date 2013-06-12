@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.google.android.gms.games.GamesClient;
+import com.hex.core.Timer;
 
 public class Settings {
     public static int getGridSize(Context context) {
@@ -28,7 +29,7 @@ public class Settings {
     }
 
     public static int getTimerType(Context context) {
-        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("timerTypePref", "0"));
+        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("timerTypePref", String.valueOf(Timer.NO_TIMER)));
     }
 
     public static int getTimeAmount(Context context) {

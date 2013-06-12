@@ -88,7 +88,7 @@ public abstract class BaseGameActivity extends SherlockFragmentActivity implemen
         return mHelper.getGamesClient();
     }
 
-    protected AppStateClient getAppStateClient() {
+    public AppStateClient getAppStateClient() {
         return mHelper.getAppStateClient();
     }
 

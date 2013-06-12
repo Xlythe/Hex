@@ -1,5 +1,7 @@
 package com.sam.hex;
 
+import java.io.UnsupportedEncodingException;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,6 +13,8 @@ import android.support.v4.app.FragmentManager;
 import android.view.KeyEvent;
 
 import com.actionbarsherlock.view.MenuItem;
+import com.google.android.gms.appstate.AppStateClient;
+import com.google.android.gms.appstate.OnStateLoadedListener;
 import com.sam.hex.fragment.GameFragment;
 import com.sam.hex.fragment.GameSelectionFragment;
 import com.sam.hex.fragment.HistoryFragment;
@@ -21,7 +25,10 @@ import com.sam.hex.fragment.OnlineSelectionFragment;
 /**
  * @author Will Harmon
  **/
-public class MainActivity extends BaseGameActivity {
+public class MainActivity extends BaseGameActivity implements OnStateLoadedListener {
+    public static int PLAY_TIME_STATE = 0;
+    public static int GAMES_PLAYED_STATE = 1;
+    public static int GAMES_WON_STATE = 2;
     public static final int REQUEST_ACHIEVEMENTS = 1001;
     public final static int RC_SELECT_PLAYERS = 1002;
     public final static int RC_WAITING_ROOM = 1003;
@@ -40,6 +47,55 @@ public class MainActivity extends BaseGameActivity {
     private InstructionsFragment mInstructionsFragment;
     private OnlineSelectionFragment mOnlineSelectionFragment;
     private Fragment mActiveFragment;
+
+    public MainActivity() {
+        super(CLIENT_GAMES | CLIENT_APPSTATE);
+    }
+
+    @Override
+    public void onStateConflict(int stateKey, String ver, byte[] localData, byte[] serverData) {
+        byte[] resolvedData = serverData;
+        try {
+            if(stateKey == PLAY_TIME_STATE) {
+                resolvedData = String.valueOf(Math.max(Long.parseLong(new String(localData, "UTF-8")), Long.parseLong(new String(serverData, "UTF-8"))))
+                        .getBytes();
+            }
+            else if(stateKey == GAMES_PLAYED_STATE) {
+                resolvedData = String.valueOf(Math.max(Long.parseLong(new String(localData, "UTF-8")), Long.parseLong(new String(serverData, "UTF-8"))))
+                        .getBytes();
+            }
+            else if(stateKey == GAMES_WON_STATE) {
+                resolvedData = String.valueOf(Math.max(Long.parseLong(new String(localData, "UTF-8")), Long.parseLong(new String(serverData, "UTF-8"))))
+                        .getBytes();
+            }
+        }
+        catch(UnsupportedEncodingException e) {}
+
+        getAppStateClient().resolveState(this, stateKey, ver, resolvedData);
+    }
+
+    @Override
+    public void onStateLoaded(int statusCode, int stateKey, byte[] buffer) {
+        if(statusCode == AppStateClient.STATUS_OK) {
+            try {
+                if(stateKey == PLAY_TIME_STATE) {
+                    String s = new String(buffer, "UTF-8");
+                    Stats.setTimePlayed(this, Long.parseLong(s));
+                }
+                else if(stateKey == GAMES_PLAYED_STATE) {
+                    String s = new String(buffer, "UTF-8");
+                    Stats.setGamesPlayed(this, Long.parseLong(s));
+                }
+                else if(stateKey == GAMES_WON_STATE) {
+                    String s = new String(buffer, "UTF-8");
+                    Stats.setGamesWon(this, Long.parseLong(s));
+                }
+            }
+            catch(Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     /** Called when the activity is first created. */
     @Override
@@ -89,6 +145,9 @@ public class MainActivity extends BaseGameActivity {
     public void onSignInSucceeded() {
         System.out.println("Signed in");
         mIsSignedIn = true;
+        getAppStateClient().loadState(this, PLAY_TIME_STATE);
+        getAppStateClient().loadState(this, GAMES_PLAYED_STATE);
+        getAppStateClient().loadState(this, GAMES_WON_STATE);
         mMainFragment.setSignedIn(mIsSignedIn);
     }
 

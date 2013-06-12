@@ -204,6 +204,14 @@ public class GameFragment extends SherlockFragment {
                         if(player.getTeam() == 1) Stats.incrementGamesWon(getSherlockActivity());
 
                         if(getMainActivity().isSignedIn()) {
+                            // Backup stats
+                            getMainActivity().getAppStateClient().updateState(MainActivity.PLAY_TIME_STATE,
+                                    String.valueOf(Stats.getTimePlayed(getMainActivity())).getBytes());
+                            getMainActivity().getAppStateClient().updateState(MainActivity.GAMES_PLAYED_STATE,
+                                    String.valueOf(Stats.getGamesPlayed(getMainActivity())).getBytes());
+                            getMainActivity().getAppStateClient().updateState(MainActivity.GAMES_WON_STATE,
+                                    String.valueOf(Stats.getGamesWon(getMainActivity())).getBytes());
+
                             // Unlock the quick play achievements!
                             if(game.getGameLength() < 30 * 1000) {
                                 getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_30_seconds));
@@ -461,7 +469,7 @@ public class GameFragment extends SherlockFragment {
                     || Integer.valueOf(prefs.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME))) * 60 * 1000 != game.gameOptions.timer.totalTime;
         }
         else if(gameLocation == GameAction.NET_GAME) {
-            return(game != null && game.isGameOver());
+            return (game != null && game.isGameOver());
         }
         else {
             return true;

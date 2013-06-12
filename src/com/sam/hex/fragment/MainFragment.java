@@ -152,6 +152,7 @@ public class MainFragment extends SherlockFragment {
         mTimePlayedTextView.setText(String.format(getString(R.string.main_stats_time_played), timePlayedInHours, timePlayedInMintues, timePlayedInSeconds));
         mGamesPlayedTextView.setText(String.format(getString(R.string.main_stats_games_played), Stats.getGamesPlayed(getSherlockActivity())));
         mGamesWonTextView.setText(String.format(getString(R.string.main_stats_games_won), Stats.getGamesWon(getSherlockActivity())));
+        showDonationStar();
     }
 
     private void refreshPlayerInformation() {
@@ -168,5 +169,22 @@ public class MainFragment extends SherlockFragment {
 
     public void setSignedIn(boolean isSignedIn) {
         refreshPlayerInformation();
+    }
+
+    private void showDonationStar() {
+        int donationAmount = Stats.getDonationAmount(getMainActivity());
+        int resource = R.drawable.directory_up;
+
+        if(donationAmount >= 5) {
+            resource = R.drawable.directory_icon;
+        }
+        else if(donationAmount >= 3) {
+            resource = R.drawable.store;
+        }
+        else if(donationAmount >= 1) {
+            resource = R.drawable.icon;
+        }
+
+        mTitleTextView.setCompoundDrawablesWithIntrinsicBounds(resource, 0, 0, 0);
     }
 }

@@ -1,5 +1,7 @@
 package com.sam.hex.view;
 
+import java.util.Locale;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -48,9 +50,6 @@ public class BoardView extends View {
     private String mTitleText;
     private String mActionText;
     private String mTimerText;
-    private boolean mShowWinText;
-    private boolean mShowTurnText;
-    private boolean mShowTimerText;
     private Paint mTextPaint;
     private Paint mLargeTextPaint;
 
@@ -106,12 +105,22 @@ public class BoardView extends View {
         if(!game.isGameOver()) background.draw(canvas);
         mBorderBackground.draw(canvas);
 
-        if(mTitleText != null) {
+        if(mTitleText != null && mActionText != null) {
             int textLength = (int) Math.max(mTextPaint.measureText(mTitleText), mLargeTextPaint.measureText(mActionText));
             float posX = game.getCurrentPlayer().getTeam() == 1 ? mTextMargin + textLength : getWidth() - mTextMargin;
             float posY = game.getCurrentPlayer().getTeam() == 1 ? getHeight() / 2 : mTextMargin + mTextPaint.getTextSize();
             canvas.drawText(mTitleText, posX - mTextPaint.measureText(mTitleText), posY, mTextPaint);
             canvas.drawText(mActionText, posX - mLargeTextPaint.measureText(mActionText), posY + mLargeTextPaint.getTextSize(), mLargeTextPaint);
+        }
+
+        if(mTimerText != null) {
+            float posX = getWidth() - mTextMargin;
+            float posY = getHeight() / 2;
+            long minutesLeft = game.getCurrentPlayer().getTime() / (60 * 1000);
+            long secondsLeft = (long) (Math.ceil(((double) game.getCurrentPlayer().getTime()) / 1000) - minutesLeft * 60);
+            String time = String.format(Locale.getDefault(), "%d:%02d", minutesLeft, secondsLeft);
+            canvas.drawText(mTimerText, posX - mTextPaint.measureText(mTimerText), posY, mTextPaint);
+            canvas.drawText(time, posX - mLargeTextPaint.measureText(time), posY + mLargeTextPaint.getTextSize(), mLargeTextPaint);
         }
 
         for(int x = 0; x < n; x++) {
@@ -249,30 +258,6 @@ public class BoardView extends View {
 
     public void setTimerText(String timerText) {
         this.mTimerText = timerText;
-    }
-
-    public boolean isShowWinText() {
-        return mShowWinText;
-    }
-
-    public void setShowWinText(boolean showWinText) {
-        this.mShowWinText = showWinText;
-    }
-
-    public boolean isShowTurnText() {
-        return mShowTurnText;
-    }
-
-    public void setShowTurnText(boolean showTurnText) {
-        this.mShowTurnText = showTurnText;
-    }
-
-    public boolean isShowTimerText() {
-        return mShowTimerText;
-    }
-
-    public void setShowTimerText(boolean showTimerText) {
-        this.mShowTimerText = showTimerText;
     }
 
     public String getActionText() {

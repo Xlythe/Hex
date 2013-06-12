@@ -67,7 +67,7 @@
     <string name="game_turn_title">%s\'s</string>
     <string name="game_winner_msg">WINS</string>
     <string name="game_turn_msg">TURN</string>
-    <string name="game_timer_msg">Time Left: %s</string>
+    <string name="game_timer_msg">Time Left</string>
     <string name="game_toast_saved">Saved!</string>
     <string name="game_toast_failed">Failed</string>
     <string name="game_button_claim_victory">Claim Victory</string>

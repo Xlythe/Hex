@@ -36,7 +36,7 @@ public class Settings {
     }
 
     public static String getPlayer1Name(Context context, GamesClient gamesClient) {
-        if(gamesClient.isConnected()) return gamesClient.getCurrentPlayer().getDisplayName();
+        if(gamesClient.isConnected()) return gamesClient.getCurrentPlayer().getDisplayName().split(" ")[0];
         return context.getString(R.string.DEFAULT_P1_NAME);
     }
 

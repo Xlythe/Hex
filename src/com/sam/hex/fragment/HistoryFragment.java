@@ -215,7 +215,7 @@ public class HistoryFragment extends SherlockListFragment {
             }
             catch(IOException e) {
                 e.printStackTrace();
-                Toast.makeText(getMainActivity(), R.string.failed, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getMainActivity(), R.string.game_toast_failed, Toast.LENGTH_SHORT).show();
             }
         }
     }

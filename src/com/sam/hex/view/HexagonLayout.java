@@ -335,7 +335,7 @@ public class HexagonLayout extends View implements OnTouchListener {
             for(Button b : mButtons) {
                 if(b.isPressed()) {
                     performClick();
-                    b.preformClick();
+                    b.performClick();
                 }
                 b.setPressed(false);
             }
@@ -500,7 +500,7 @@ public class HexagonLayout extends View implements OnTouchListener {
             return triangle;
         }
 
-        public void preformClick() {
+        public void performClick() {
             if(onClickListener != null) onClickListener.onClick();
         }
 

@@ -148,7 +148,7 @@ public class HexDialogView extends View implements OnTouchListener {
             wasPressed = false;
             for(Button b : mButtons) {
                 if(b.getHexagon().contains(new Point((int) event.getX(), (int) event.getY()))) {
-                    b.setPressed(b.isEnabled());
+                    b.setPressed(b.isEnabled() && b.getOnClickListener() != null);
                     wasPressed = true;
                 }
                 else {

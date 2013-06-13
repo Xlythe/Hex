@@ -32,6 +32,7 @@ public class SelectorLayout extends View implements OnTouchListener {
     private int mIndentHeight;
     private int mMargin;
     private float mRotation;
+    private int mAnimationLength;
     private int mAnimationTick;
     private int mAnimationDelta;
     private Rect[] mOldRect;
@@ -70,7 +71,7 @@ public class SelectorLayout extends View implements OnTouchListener {
         mMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, dm);
         mRotation = 45f;
         mAnimationTick = 30;
-        mAnimationDelta = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 45, dm);
+        mAnimationLength = 300;
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {}
@@ -176,6 +177,8 @@ public class SelectorLayout extends View implements OnTouchListener {
 
             offset += margin + mWidth;
         }
+
+        mAnimationDelta = h / mAnimationLength * mAnimationTick;
     }
 
     @Override

@@ -92,6 +92,7 @@ public class DonateDialog extends HexDialog {
             amount = 5;
         }
         Stats.incrementDonationAmount(this, amount);
+        dismiss();
     }
 
     @Override

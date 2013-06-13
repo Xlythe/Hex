@@ -26,6 +26,7 @@ public class HexDialogView extends View implements OnTouchListener {
     private int mPressedColor;
     private int mDisabledColor;
     private int mBackgroundColor;
+    private int mBorderColor;
 
     private HexDialog mDialog;
 
@@ -53,16 +54,18 @@ public class HexDialogView extends View implements OnTouchListener {
     public void setUp() {
         DisplayMetrics dm = getResources().getDisplayMetrics();
         setOnTouchListener(this);
-        mBackgroundColor = Color.WHITE;
-        mPressedColor = Color.LTGRAY;
-        mDisabledColor = Color.LTGRAY;// getDarkerColor(mPressedColor);
-        mButtonTextPaint = new Paint();
-        mButtonTextPaint.setColor(Color.WHITE);
-        mButtonTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, dm));
         mButtons = new Button[3];
         for(int i = 0; i < 3; i++) {
             mButtons[i] = new Button(getContext());
+            mButtons[i].setSideLength(100f);
         }
+        mBackgroundColor = Color.WHITE;
+        mPressedColor = Color.LTGRAY;
+        mDisabledColor = Color.LTGRAY;
+        mButtonTextPaint = new Paint();
+        mButtonTextPaint.setColor(Color.WHITE);
+        mButtonTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, dm));
+        mBorderColor = Color.LTGRAY;
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {}
@@ -84,6 +87,7 @@ public class HexDialogView extends View implements OnTouchListener {
             else {
                 b.getBackgroundDrawable().getPaint().setColor(mBackgroundColor);
             }
+            b.getBackgroundBorderDrawable().draw(canvas);
             b.getBackgroundDrawable().draw(canvas);
             canvas.restore();
 
@@ -106,38 +110,50 @@ public class HexDialogView extends View implements OnTouchListener {
         for(int i = 0; i < 3; i++) {
             Button b = mButtons[i];
 
-            b.setSideLength(100f);
             b.setCenter(new Point((i + 1) * w / 4, (2 - i % 2) * h / 4));
 
-            Point[] corners = new Point[6];
-            corners[0] = new Point(b.getCenter().x - b.getSideLength() / 2, (int) (b.getCenter().y + b.getSideLength() * 0.866));
-            corners[1] = new Point(b.getCenter().x + b.getSideLength() / 2, (int) (b.getCenter().y + b.getSideLength() * 0.866));
-            corners[2] = new Point(b.getCenter().x + b.getSideLength(), b.getCenter().y);
-            corners[3] = new Point(b.getCenter().x + b.getSideLength() / 2, (int) (b.getCenter().y - b.getSideLength() * 0.866));
-            corners[4] = new Point(b.getCenter().x - b.getSideLength() / 2, (int) (b.getCenter().y - b.getSideLength() * 0.866));
-            corners[5] = new Point(b.getCenter().x - b.getSideLength(), b.getCenter().y);
-
+            Point[] corners = getHexagon(b.getCenter(), b.getSideLength());
             b.setHexagon(new Hexagon(b, corners[0], corners[1], corners[2], corners[3], corners[4], corners[5]));
 
-            // Shape of a hexagon
-            Path hexagonPath = new Path();
-            hexagonPath.moveTo(corners[0].x, corners[0].y);
-            hexagonPath.lineTo(corners[1].x, corners[1].y);
-            hexagonPath.lineTo(corners[2].x, corners[2].y);
-            hexagonPath.lineTo(corners[3].x, corners[3].y);
-            hexagonPath.lineTo(corners[4].x, corners[4].y);
-            hexagonPath.lineTo(corners[5].x, corners[5].y);
-            hexagonPath.close();
-
-            ShapeDrawable hexagon = new ShapeDrawable(new PathShape(hexagonPath, w, h));
+            ShapeDrawable hexagon = getHexagonDrawable(corners, w, h);
             hexagon.getPaint().setColor(mBackgroundColor);
-            hexagon.setBounds(0, 0, w, h);
             b.setBackgroundDrawable(hexagon);
+
+            ShapeDrawable hexagonBorder = getHexagonDrawable(getHexagon(b.getCenter(), (int) (b.getSideLength() * 1.2)), w, h);
+            hexagonBorder.getPaint().setColor(mBorderColor);
+            b.setBackgroundBorderDrawable(hexagonBorder);
 
             int width = b.getSideLength();
             if(b.getView() != null) b.getView().layout(b.getCenter().x - width / 2, b.getCenter().y - width / 2, b.getCenter().x + width / 2,
                     b.getCenter().y + width / 2);
         }
+    }
+
+    private Point[] getHexagon(Point center, int sideLength) {
+        Point[] corners = new Point[6];
+        corners[0] = new Point(center.x - sideLength / 2, (int) (center.y + sideLength * 0.866));
+        corners[1] = new Point(center.x + sideLength / 2, (int) (center.y + sideLength * 0.866));
+        corners[2] = new Point(center.x + sideLength, center.y);
+        corners[3] = new Point(center.x + sideLength / 2, (int) (center.y - sideLength * 0.866));
+        corners[4] = new Point(center.x - sideLength / 2, (int) (center.y - sideLength * 0.866));
+        corners[5] = new Point(center.x - sideLength, center.y);
+        return corners;
+    }
+
+    private ShapeDrawable getHexagonDrawable(Point[] corners, int w, int h) {
+        // Shape of a hexagon
+        Path hexagonPath = new Path();
+        hexagonPath.moveTo(corners[0].x, corners[0].y);
+        hexagonPath.lineTo(corners[1].x, corners[1].y);
+        hexagonPath.lineTo(corners[2].x, corners[2].y);
+        hexagonPath.lineTo(corners[3].x, corners[3].y);
+        hexagonPath.lineTo(corners[4].x, corners[4].y);
+        hexagonPath.lineTo(corners[5].x, corners[5].y);
+        hexagonPath.close();
+
+        ShapeDrawable sd = new ShapeDrawable(new PathShape(hexagonPath, w, h));
+        sd.setBounds(0, 0, w, h);
+        return sd;
     }
 
     private boolean wasPressed;
@@ -252,6 +268,7 @@ public class HexDialogView extends View implements OnTouchListener {
         private Point center;
         private float rotation;
         private ShapeDrawable backgroundDrawable;
+        private ShapeDrawable backgroundBorderDrawable;
         private View view;
         private float sideLength;
 
@@ -325,6 +342,14 @@ public class HexDialogView extends View implements OnTouchListener {
 
         private void setBackgroundDrawable(ShapeDrawable drawable) {
             this.backgroundDrawable = drawable;
+        }
+
+        private ShapeDrawable getBackgroundBorderDrawable() {
+            return backgroundBorderDrawable;
+        }
+
+        private void setBackgroundBorderDrawable(ShapeDrawable drawable) {
+            this.backgroundBorderDrawable = drawable;
         }
 
         private int getSideLength() {

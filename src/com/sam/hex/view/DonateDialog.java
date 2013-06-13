@@ -1,12 +1,12 @@
 package com.sam.hex.view;
 
 import android.content.Context;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.ImageView;
 
 import com.android.vending.billing.util.IabResult;
 import com.sam.hex.MainActivity;
+import com.sam.hex.R;
 import com.sam.hex.Stats;
 import com.sam.hex.view.HexDialogView.Button.OnClickListener;
 
@@ -24,26 +24,23 @@ public class DonateDialog extends HexDialog {
 
     @Override
     public View getPositiveView() {
-        TextView tv = new TextView(this);
-        tv.setGravity(Gravity.CENTER);
-        tv.setText("$5");
-        return tv;
+        ImageView iv = (ImageView) View.inflate(this, R.layout.donate_dialog_textview, null);
+        iv.setImageResource(R.drawable.donate_gold);
+        return iv;
     }
 
     @Override
     public View getNegativeView() {
-        TextView tv = new TextView(this);
-        tv.setGravity(Gravity.CENTER);
-        tv.setText("$1");
-        return tv;
+        ImageView iv = (ImageView) View.inflate(this, R.layout.donate_dialog_textview, null);
+        iv.setImageResource(R.drawable.donate_bronze);
+        return iv;
     }
 
     @Override
     public View getNeutralView() {
-        TextView tv = new TextView(this);
-        tv.setGravity(Gravity.CENTER);
-        tv.setText("$3");
-        return tv;
+        ImageView iv = (ImageView) View.inflate(this, R.layout.donate_dialog_textview, null);
+        iv.setImageResource(R.drawable.donate_silver);
+        return iv;
     }
 
     @Override

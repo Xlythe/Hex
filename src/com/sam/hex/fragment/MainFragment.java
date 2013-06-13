@@ -1,7 +1,6 @@
 package com.sam.hex.fragment;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +24,7 @@ import com.sam.hex.view.HexagonLayout;
 public class MainFragment extends SherlockFragment {
     // Hexagon variables
     HexagonLayout.Button mAchievementsButton;
+    HexagonLayout.Button mDonateButton;
 
     // Stat variables
     TextView mTitleTextView;
@@ -45,7 +45,7 @@ public class MainFragment extends SherlockFragment {
 
         HexagonLayout hexagonLayout = (HexagonLayout) v.findViewById(R.id.hexagonButtons);
         HexagonLayout.Button settingsButton = hexagonLayout.getButtons()[0];
-        HexagonLayout.Button donateButton = hexagonLayout.getButtons()[1];
+        mDonateButton = hexagonLayout.getButtons()[1];
         HexagonLayout.Button historyButton = hexagonLayout.getButtons()[2];
         HexagonLayout.Button instructionsButton = hexagonLayout.getButtons()[3];
         mAchievementsButton = hexagonLayout.getButtons()[4];
@@ -71,13 +71,13 @@ public class MainFragment extends SherlockFragment {
             }
         });
 
-        donateButton.setText(R.string.main_button_donate);
-        donateButton.setColor(0xff5f6ec2);
-        donateButton.setDrawableResource(R.drawable.store);
-        donateButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
+        mDonateButton.setText(R.string.main_button_donate);
+        mDonateButton.setColor(0xff5f6ec2);
+        mDonateButton.setDrawableResource(R.drawable.store);
+        mDonateButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.donate.hex")));
+                getMainActivity().purchaseItem(MainActivity.ITEM_SKU_INTERMEDIATE);
             }
         });
 
@@ -161,6 +161,7 @@ public class MainFragment extends SherlockFragment {
         if(mTitleTextView != null) mTitleTextView.setText(String.format(getString(R.string.main_title),
                 Settings.getPlayer1Name(getSherlockActivity(), getMainActivity().getGamesClient())));
         if(mAchievementsButton != null) mAchievementsButton.setEnabled(getMainActivity().isSignedIn());
+        if(mDonateButton != null) mDonateButton.setEnabled(getMainActivity().isIabSetup());
     }
 
     private MainActivity getMainActivity() {
@@ -168,6 +169,10 @@ public class MainFragment extends SherlockFragment {
     }
 
     public void setSignedIn(boolean isSignedIn) {
+        refreshPlayerInformation();
+    }
+
+    public void setIabSetup(boolean isIabSetup) {
         refreshPlayerInformation();
     }
 

@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentManager;
 import android.view.KeyEvent;
 
 import com.actionbarsherlock.view.MenuItem;
+import com.android.vending.billing.util.IabResult;
 import com.google.android.gms.appstate.AppStateClient;
 import com.google.android.gms.appstate.OnStateLoadedListener;
 import com.sam.hex.fragment.GameFragment;
@@ -38,6 +39,9 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
     private HexRealTimeMessageReceivedListener mHexRealTimeMessageReceivedListener;
     private HexRoomStatusUpdateListener mHexRoomStatusUpdateListener;
     private HexRoomUpdateListener mHexRoomUpdateListener;
+
+    // Donate variables
+    private boolean iabSetup;
 
     // Fragments
     private MainFragment mMainFragment;
@@ -90,6 +94,7 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
                     String s = new String(buffer, "UTF-8");
                     Stats.setGamesWon(this, Long.parseLong(s));
                 }
+                mMainFragment.setSignedIn(mIsSignedIn);
             }
             catch(Exception e) {
                 e.printStackTrace();
@@ -157,6 +162,34 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
         mIsSignedIn = false;
         mMainFragment.setSignedIn(mIsSignedIn);
     }
+
+    @Override
+    protected void dealWithIabSetupSuccess() {
+        setIabSetup(true);
+    }
+
+    @Override
+    protected void dealWithIabSetupFailure() {
+        setIabSetup(false);
+    }
+
+    @Override
+    protected void dealWithPurchaseSuccess(IabResult result, String sku) {
+        int amount = 0;
+        if(sku.equals(ITEM_SKU_BASIC)) {
+            amount = 1;
+        }
+        else if(sku.equals(ITEM_SKU_INTERMEDIATE)) {
+            amount = 3;
+        }
+        else if(sku.equals(ITEM_SKU_ADVANCED)) {
+            amount = 5;
+        }
+        Stats.incrementDonationAmount(this, amount);
+    }
+
+    @Override
+    protected void dealWithPurchaseFailed(IabResult result) {}
 
     public void swapFragment(Fragment newFragment) {
         getSupportFragmentManager().beginTransaction().replace(R.id.content, newFragment).addToBackStack(newFragment.toString()).commit();
@@ -268,5 +301,13 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
                         .show();
             }
         }
+    }
+
+    public boolean isIabSetup() {
+        return iabSetup;
+    }
+
+    public void setIabSetup(boolean iabSetup) {
+        this.iabSetup = iabSetup;
     }
 }

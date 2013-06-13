@@ -19,7 +19,6 @@ package com.sam.hex;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.google.android.gms.appstate.AppStateClient;
 import com.google.android.gms.games.GamesClient;
 import com.google.android.gms.plus.PlusClient;
@@ -35,7 +34,7 @@ import com.google.android.gms.plus.PlusClient;
  * @author Bruno Oliveira (Google)
  * 
  */
-public abstract class BaseGameActivity extends SherlockFragmentActivity implements GameHelper.GameHelperListener {
+public abstract class BaseGameActivity extends PurchaseActivity implements GameHelper.GameHelperListener {
 
     protected GameHelper mHelper;
 

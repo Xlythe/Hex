@@ -1,12 +1,15 @@
 package com.sam.hex.view;
 
-import android.app.Dialog;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Window;
 
-public class HexDialog extends Dialog {
+public class HexDialog extends Activity {
     private HexDialogView view;
+
+    private Context context;
 
     private HexDialogView.Button.OnClickListener positiveOnClickListener;
     private String positiveText;
@@ -16,16 +19,20 @@ public class HexDialog extends Dialog {
     private String neutralText;
 
     public HexDialog(Context context) {
-        super(context);
+        this.context = context;
+    }
+
+    public HexDialog() {
+        super();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setCancelable(true);
 
-        view = new HexDialogView(getContext());
+        view = new HexDialogView(this);
+        view.setBackgroundResource(android.R.color.transparent);
 
         setContentView(view);
 
@@ -75,5 +82,13 @@ public class HexDialog extends Dialog {
             };
         }
         this.neutralOnClickListener = neutralOnClickListener;
+    }
+
+    public void dismiss() {
+        finish();
+    }
+
+    public void show() {
+        context.startActivity(new Intent(context, this.getClass()));
     }
 }

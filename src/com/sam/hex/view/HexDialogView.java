@@ -8,7 +8,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
 import android.graphics.drawable.shapes.PathShape;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -105,31 +104,6 @@ public class HexDialogView extends View implements OnTouchListener {
         });
     }
 
-    private void layoutText() {
-        final int screenWidth = center.x * 2;
-        final int screenHeight = center.y * 2;
-
-        Paint paint = mTextPaint;
-        if(mTextSize != 0f) paint.setTextSize(mTextSize);
-        float textWidth = paint.measureText(mText);
-        float width = screenWidth;
-        float textSize = mTextSize;
-        if(textWidth > width) {
-            paint.setTextSize(textSize * width / textWidth);
-            mTextX = getPaddingLeft();
-            mTextSize = textSize;
-        }
-        else {
-            mTextX = (screenWidth - textWidth) / 2;
-        }
-        mTextY = (screenHeight - paint.ascent() - paint.descent()) / 2;
-
-        mTextBackground = new ShapeDrawable(new OvalShape());
-        mTextBackground.getPaint().setColor(mBackgroundColor);
-        mTextBackground.setBounds((int) (center.x - textWidth / 2 - mTextPadding), (int) (center.y - textSize / 2 - mTextPadding), (int) (center.x + textWidth
-                / 2 + mTextPadding), (int) (center.y + textSize / 2 + mTextPadding));
-    }
-
     @Override
     protected void onDraw(Canvas canvas) {
         if(mAllowRotation) {
@@ -151,7 +125,7 @@ public class HexDialogView extends View implements OnTouchListener {
         canvas.drawLine(corners[4].x, corners[4].y, center.x, center.y, mLinePaint);
         canvas.drawLine(corners[5].x, corners[5].y, center.x, center.y, mLinePaint);
 
-        mTextBackground.draw(canvas);
+        // mTextBackground.draw(canvas);
 
         for(int i = 0; i < 6; i++) {
             if(mButtons[i].isPressed()) {
@@ -164,16 +138,18 @@ public class HexDialogView extends View implements OnTouchListener {
             }
         }
 
-        canvas.drawText(mText, mTextX, mTextY, mTextPaint);
+        // canvas.drawText(mText, mTextX, mTextY, mTextPaint);
 
         canvas.save();
         for(int i = 0; i < 6; i++) {
             canvas.rotate(60, center.x, center.y);
             mBorderShadow[i].draw(canvas);
             mBorder[i].draw(canvas);
-            mButtons[i].getDrawable().draw(canvas);
-            canvas.drawText(mButtons[i].getText(), center.x - mButtonTextPaint.measureText(mButtons[i].getText()) / 2,
-                    (mBorderWidth + mButtonTextPaint.getTextSize()) / 2, mButtonTextPaint);
+            // mButtons[i].getDrawable().draw(canvas);
+            // canvas.drawText(mButtons[i].getText(), center.x -
+            // mButtonTextPaint.measureText(mButtons[i].getText()) / 2,
+            // (mBorderWidth + mButtonTextPaint.getTextSize()) / 2,
+            // mButtonTextPaint);
         }
         canvas.restore();
     }
@@ -297,10 +273,6 @@ public class HexDialogView extends View implements OnTouchListener {
 
             mButtons[i].setTriangle(t);
 
-            int drawableWidth = s / 4;
-            mButtons[i].getDrawable().setBounds(center.x - drawableWidth / 2, center.y / 2 - drawableWidth / 2, center.x + drawableWidth / 2,
-                    center.y / 2 + drawableWidth / 2);
-
             mBorder[i] = new ShapeDrawable(new PathShape(edgePath, w, h));
             mBorder[i].getPaint().setColor(mButtons[i].getColor());
             mBorder[i].setBounds(0, 0, w, h);
@@ -309,8 +281,6 @@ public class HexDialogView extends View implements OnTouchListener {
             mBorderShadow[i].getPaint().setColor(getDarkerColor(mButtons[i].getColor()));
             mBorderShadow[i].setBounds(0, 0, w, h);
         }
-
-        layoutText();
     }
 
     private float rotationOffset;

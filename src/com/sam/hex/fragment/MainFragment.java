@@ -82,6 +82,7 @@ public class MainFragment extends Fragment {
                 hd.setPositiveButton("lol", null);
                 hd.setNegativeButton("lol", null);
                 hd.setNeutralButton("lol", null);
+                hd.show();
                 // getMainActivity().purchaseItem(MainActivity.ITEM_SKU_INTERMEDIATE);
             }
         });

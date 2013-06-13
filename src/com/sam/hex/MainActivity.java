@@ -297,8 +297,15 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(R.string.review_popup_title).setMessage(R.string.review_popup_message)
-                        .setPositiveButton(R.string.review_popup_ok, dialogClickListener).setNegativeButton(R.string.review_popup_never, dialogClickListener)
-                        .show();
+                        .setPositiveButton(R.string.review_popup_ok, dialogClickListener).setNegativeButton(R.string.review_popup_never, dialogClickListener);
+
+                // Wrap in try/catch because this can sometimes leak window
+                try {
+                    builder.show();
+                }
+                catch(Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

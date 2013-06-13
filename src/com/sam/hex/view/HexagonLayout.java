@@ -347,7 +347,7 @@ public class HexagonLayout extends View implements OnTouchListener {
                     if(!b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
                         b.setPressed(false);
                     }
-                    else if(Math.abs(Math.abs(mRotation) - Math.abs(oldRotation) % 360) > 10f) {
+                    else if(Math.abs(Math.abs(mRotation) - Math.abs(oldRotation)) > 10f) {
                         b.setPressed(false);
                     }
                 }

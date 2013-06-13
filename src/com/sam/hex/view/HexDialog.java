@@ -3,26 +3,14 @@ package com.sam.hex.view;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.View;
 import android.view.Window;
 
-import com.sam.hex.R;
-
-public class HexDialog extends Activity {
+public abstract class HexDialog extends Activity {
     private HexDialogView view;
 
     private Context context;
-
-    private HexDialogView.Button.OnClickListener positiveOnClickListener;
-    private String positiveText;
-    private Drawable positiveDrawable;
-    private HexDialogView.Button.OnClickListener negativeOnClickListener;
-    private String negativeText;
-    private Drawable negativeDrawable;
-    private HexDialogView.Button.OnClickListener neutralOnClickListener;
-    private String neutralText;
-    private Drawable neutralDrawable;
 
     public HexDialog(Context context) {
         this.context = context;
@@ -46,55 +34,16 @@ public class HexDialog extends Activity {
         HexDialogView.Button negative = view.getButtons()[0];
         HexDialogView.Button neutral = view.getButtons()[1];
 
-        positive.setText(positiveText);
-        positive.setDrawable(getResources().getDrawable(R.drawable.play_again));
-        negative.setText(negativeText);
-        negative.setDrawable(getResources().getDrawable(R.drawable.home));
-        neutral.setText(neutralText);
-        neutral.setDrawable(neutralDrawable);
+        positive.setView(getPositiveView());
+        negative.setView(getNegativeView());
+        neutral.setView(getNeutralView());
     }
 
-    public void setPositiveButton(String text, Drawable drawable, HexDialogView.Button.OnClickListener positiveOnClickListener) {
-        positiveText = text;
-        positiveDrawable = drawable;
-        if(positiveOnClickListener == null) {
-            positiveOnClickListener = new HexDialogView.Button.OnClickListener() {
-                @Override
-                public void onClick() {
-                    dismiss();
-                }
-            };
-        }
-        this.positiveOnClickListener = positiveOnClickListener;
-    }
+    public abstract View getPositiveView();
 
-    public void setNegativeButton(String text, Drawable drawable, HexDialogView.Button.OnClickListener negativeOnClickListener) {
-        this.negativeText = text;
-        this.negativeDrawable = drawable;
-        if(negativeOnClickListener == null) {
-            negativeOnClickListener = new HexDialogView.Button.OnClickListener() {
-                @Override
-                public void onClick() {
-                    dismiss();
-                }
-            };
-        }
-        this.negativeOnClickListener = negativeOnClickListener;
-    }
+    public abstract View getNegativeView();
 
-    public void setNeutralButton(String text, Drawable drawable, HexDialogView.Button.OnClickListener neutralOnClickListener) {
-        this.neutralText = text;
-        this.neutralDrawable = drawable;
-        if(neutralOnClickListener == null) {
-            neutralOnClickListener = new HexDialogView.Button.OnClickListener() {
-                @Override
-                public void onClick() {
-                    dismiss();
-                }
-            };
-        }
-        this.neutralOnClickListener = neutralOnClickListener;
-    }
+    public abstract View getNeutralView();
 
     public void dismiss() {
         finish();

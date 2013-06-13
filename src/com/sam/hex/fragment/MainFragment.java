@@ -17,6 +17,7 @@ import com.sam.hex.PreferencesActivity;
 import com.sam.hex.R;
 import com.sam.hex.Settings;
 import com.sam.hex.Stats;
+import com.sam.hex.view.DonateDialog;
 import com.sam.hex.view.HexDialog;
 import com.sam.hex.view.HexagonLayout;
 
@@ -81,10 +82,7 @@ public class MainFragment extends Fragment {
         mDonateButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                HexDialog hd = new HexDialog(getMainActivity());
-                hd.setPositiveButton("yay", getResources().getDrawable(R.drawable.play_again), null);
-                hd.setNegativeButton(null, getResources().getDrawable(R.drawable.home), null);
-                hd.setNeutralButton("lol", null, null);
+                HexDialog hd = new DonateDialog(getMainActivity());
                 hd.show();
                 // getMainActivity().purchaseItem(MainActivity.ITEM_SKU_INTERMEDIATE);
             }

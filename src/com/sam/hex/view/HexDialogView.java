@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.PathShape;
 import android.util.AttributeSet;
@@ -88,10 +87,18 @@ public class HexDialogView extends View implements OnTouchListener {
             b.getBackgroundDrawable().draw(canvas);
             canvas.restore();
 
-            if(b.getDrawable() != null) {
-                b.getDrawable().draw(canvas);
+            if(b.getView() != null) {
+                canvas.save();
+                canvas.translate(b.getCenter().x - b.getSideLength() / 2, b.getCenter().y - b.getSideLength() / 2);
+                b.getView().draw(canvas);
+                canvas.restore();
             }
         }
+
+        mButtons[0].incrementRotation(-3f);
+        mButtons[1].incrementRotation(2f);
+        mButtons[2].incrementRotation(-3f);
+        postInvalidateDelayed(50);
     }
 
     @Override
@@ -110,7 +117,7 @@ public class HexDialogView extends View implements OnTouchListener {
             corners[4] = new Point(b.getCenter().x - b.getSideLength() / 2, (int) (b.getCenter().y - b.getSideLength() * 0.866));
             corners[5] = new Point(b.getCenter().x - b.getSideLength(), b.getCenter().y);
 
-            b.hexagon = new Hexagon(b, corners[0], corners[1], corners[2], corners[3], corners[4], corners[5]);
+            b.setHexagon(new Hexagon(b, corners[0], corners[1], corners[2], corners[3], corners[4], corners[5]));
 
             // Shape of a hexagon
             Path hexagonPath = new Path();
@@ -127,9 +134,9 @@ public class HexDialogView extends View implements OnTouchListener {
             hexagon.setBounds(0, 0, w, h);
             b.setBackgroundDrawable(hexagon);
 
-            int drawableWidth = b.getSideLength();
-            if(b.getDrawable() != null) b.getDrawable().setBounds(b.getCenter().x - drawableWidth / 2, b.getCenter().y - drawableWidth / 2,
-                    b.getCenter().x + drawableWidth / 2, b.getCenter().y + drawableWidth / 2);
+            int width = b.getSideLength();
+            if(b.getView() != null) b.getView().layout(b.getCenter().x - width / 2, b.getCenter().y - width / 2, b.getCenter().x + width / 2,
+                    b.getCenter().y + width / 2);
         }
     }
 
@@ -239,14 +246,13 @@ public class HexDialogView extends View implements OnTouchListener {
     public static class Button {
         private final Context context;
         private HexDialogView.Button.OnClickListener onClickListener;
-        private String text;
         private Hexagon hexagon;
         private boolean pressed;
         private boolean enabled = true;
         private Point center;
         private float rotation;
         private ShapeDrawable backgroundDrawable;
-        private Drawable drawable;
+        private View view;
         private float sideLength;
 
         public Button(Context context) {
@@ -263,18 +269,6 @@ public class HexDialogView extends View implements OnTouchListener {
 
         public OnClickListener getOnClickListener() {
             return onClickListener;
-        }
-
-        public void setText(String text) {
-            this.text = text;
-        }
-
-        public void setText(int resId) {
-            setText(context.getString(resId));
-        }
-
-        public String getText() {
-            return text;
         }
 
         private void setHexagon(Hexagon hexagon) {
@@ -321,6 +315,10 @@ public class HexDialogView extends View implements OnTouchListener {
             this.rotation = rotation;
         }
 
+        private void incrementRotation(float rotation) {
+            setRotation(this.rotation + rotation);
+        }
+
         private ShapeDrawable getBackgroundDrawable() {
             return backgroundDrawable;
         }
@@ -337,15 +335,20 @@ public class HexDialogView extends View implements OnTouchListener {
             this.sideLength = sideLength;
         }
 
-        public Drawable getDrawable() {
-            return drawable;
+        public View getView() {
+            return view;
         }
 
-        public void setDrawable(Drawable drawable) {
-            this.drawable = drawable;
-            int drawableWidth = getSideLength();
-            if(getCenter() != null) getDrawable().setBounds(getCenter().x - drawableWidth / 2, getCenter().y - drawableWidth / 2,
-                    getCenter().x + drawableWidth / 2, getCenter().y + drawableWidth / 2);
+        public void setView(View view) {
+            this.view = view;
+
+            if(getCenter() == null) return;
+            int width = getSideLength();
+            this.view.layout(getCenter().x - width / 2, getCenter().y - width / 2, getCenter().x + width / 2, getCenter().y + width / 2);
+        }
+
+        public void setView(int resId) {
+            setView(View.inflate(context, resId, null));
         }
     }
 }

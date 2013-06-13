@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.PathShape;
 import android.util.AttributeSet;
@@ -53,16 +54,16 @@ public class HexDialogView extends View implements OnTouchListener {
     public void setUp() {
         DisplayMetrics dm = getResources().getDisplayMetrics();
         setOnTouchListener(this);
-        mButtons = new Button[6];
-        for(int i = 0; i < 6; i++) {
-            mButtons[i] = new Button(getContext());
-        }
         mBackgroundColor = Color.WHITE;
         mPressedColor = Color.LTGRAY;
         mDisabledColor = Color.LTGRAY;// getDarkerColor(mPressedColor);
         mButtonTextPaint = new Paint();
         mButtonTextPaint.setColor(Color.WHITE);
         mButtonTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, dm));
+        mButtons = new Button[3];
+        for(int i = 0; i < 3; i++) {
+            mButtons[i] = new Button(getContext());
+        }
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {}
@@ -75,16 +76,27 @@ public class HexDialogView extends View implements OnTouchListener {
             canvas.save();
             Button b = mButtons[i];
             canvas.rotate(b.getRoation(), b.getCenter().x, b.getCenter().y);
-            b.getDrawable().draw(canvas);
+            if(!b.isEnabled()) {
+                b.getBackgroundDrawable().getPaint().setColor(mDisabledColor);
+            }
+            else if(b.isPressed()) {
+                b.getBackgroundDrawable().getPaint().setColor(mPressedColor);
+            }
+            else {
+                b.getBackgroundDrawable().getPaint().setColor(mBackgroundColor);
+            }
+            b.getBackgroundDrawable().draw(canvas);
             canvas.restore();
+
+            if(b.getDrawable() != null) {
+                b.getDrawable().draw(canvas);
+            }
         }
     }
 
     @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
-        mButtons = new Button[3];
         for(int i = 0; i < 3; i++) {
-            mButtons[i] = new Button(getContext());
             Button b = mButtons[i];
 
             b.setSideLength(100f);
@@ -113,23 +125,24 @@ public class HexDialogView extends View implements OnTouchListener {
             ShapeDrawable hexagon = new ShapeDrawable(new PathShape(hexagonPath, w, h));
             hexagon.getPaint().setColor(mBackgroundColor);
             hexagon.setBounds(0, 0, w, h);
-            b.setDrawable(hexagon);
+            b.setBackgroundDrawable(hexagon);
 
-            System.out.println(corners[0]);
-            System.out.println(corners[1]);
-            System.out.println(corners[2]);
-            System.out.println(corners[3]);
-            System.out.println(corners[4]);
-            System.out.println(corners[5]);
+            int drawableWidth = b.getSideLength();
+            if(b.getDrawable() != null) b.getDrawable().setBounds(b.getCenter().x - drawableWidth / 2, b.getCenter().y - drawableWidth / 2,
+                    b.getCenter().x + drawableWidth / 2, b.getCenter().y + drawableWidth / 2);
         }
     }
+
+    private boolean wasPressed;
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
+            wasPressed = false;
             for(Button b : mButtons) {
                 if(b.getHexagon().contains(new Point((int) event.getX(), (int) event.getY()))) {
                     b.setPressed(b.isEnabled());
+                    wasPressed = true;
                 }
                 else {
                     b.setPressed(false);
@@ -137,14 +150,12 @@ public class HexDialogView extends View implements OnTouchListener {
             }
         }
         else if(event.getAction() == MotionEvent.ACTION_UP) {
-            boolean dismiss = true;
+            boolean dismiss = !wasPressed;
             for(Button b : mButtons) {
-                if(b.getHexagon().contains(new Point((int) event.getX(), (int) event.getY()))) {
-                    dismiss = false;
-                    if(b.isEnabled()) {
-                        performClick();
-                        b.performClick();
-                    }
+                if(b.isPressed()) {
+                    performClick();
+                    b.performClick();
+                    b.setPressed(false);
                 }
             }
             if(dismiss) {
@@ -217,6 +228,9 @@ public class HexDialogView extends View implements OnTouchListener {
             int EFxEP = EF.x * EP.y - EP.x * EF.y;
             int FAxFP = FA.x * FP.y - FP.x * FA.y;
 
+            // temp fix
+            DExDP *= -1;
+
             return (ABxAP >= 0 && BCxBP >= 0 && CDxCP >= 0 && DExDP >= 0 && EFxEP >= 0 && FAxFP >= 0)
                     || (ABxAP <= 0 && BCxBP <= 0 && CDxCP <= 0 && DExDP <= 0 && EFxEP <= 0 && FAxFP <= 0);
         }
@@ -231,7 +245,8 @@ public class HexDialogView extends View implements OnTouchListener {
         private boolean enabled = true;
         private Point center;
         private float rotation;
-        private ShapeDrawable drawable;
+        private ShapeDrawable backgroundDrawable;
+        private Drawable drawable;
         private float sideLength;
 
         public Button(Context context) {
@@ -306,12 +321,12 @@ public class HexDialogView extends View implements OnTouchListener {
             this.rotation = rotation;
         }
 
-        private ShapeDrawable getDrawable() {
-            return drawable;
+        private ShapeDrawable getBackgroundDrawable() {
+            return backgroundDrawable;
         }
 
-        private void setDrawable(ShapeDrawable drawable) {
-            this.drawable = drawable;
+        private void setBackgroundDrawable(ShapeDrawable drawable) {
+            this.backgroundDrawable = drawable;
         }
 
         private int getSideLength() {
@@ -320,6 +335,17 @@ public class HexDialogView extends View implements OnTouchListener {
 
         private void setSideLength(float sideLength) {
             this.sideLength = sideLength;
+        }
+
+        public Drawable getDrawable() {
+            return drawable;
+        }
+
+        public void setDrawable(Drawable drawable) {
+            this.drawable = drawable;
+            int drawableWidth = getSideLength();
+            if(getCenter() != null) getDrawable().setBounds(getCenter().x - drawableWidth / 2, getCenter().y - drawableWidth / 2,
+                    getCenter().x + drawableWidth / 2, getCenter().y + drawableWidth / 2);
         }
     }
 }

@@ -82,9 +82,9 @@ public class MainFragment extends Fragment {
             @Override
             public void onClick() {
                 HexDialog hd = new HexDialog(getMainActivity());
-                hd.setPositiveButton("lol", null);
-                hd.setNegativeButton("lol", null);
-                hd.setNeutralButton("lol", null);
+                hd.setPositiveButton("yay", getResources().getDrawable(R.drawable.play_again), null);
+                hd.setNegativeButton(null, getResources().getDrawable(R.drawable.home), null);
+                hd.setNeutralButton("lol", null, null);
                 hd.show();
                 // getMainActivity().purchaseItem(MainActivity.ITEM_SKU_INTERMEDIATE);
             }

@@ -3,8 +3,11 @@ package com.sam.hex.view;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Window;
+
+import com.sam.hex.R;
 
 public class HexDialog extends Activity {
     private HexDialogView view;
@@ -13,10 +16,13 @@ public class HexDialog extends Activity {
 
     private HexDialogView.Button.OnClickListener positiveOnClickListener;
     private String positiveText;
+    private Drawable positiveDrawable;
     private HexDialogView.Button.OnClickListener negativeOnClickListener;
     private String negativeText;
+    private Drawable negativeDrawable;
     private HexDialogView.Button.OnClickListener neutralOnClickListener;
     private String neutralText;
+    private Drawable neutralDrawable;
 
     public HexDialog(Context context) {
         this.context = context;
@@ -36,17 +42,21 @@ public class HexDialog extends Activity {
 
         setContentView(view);
 
-        HexDialogView.Button positive = view.getButtons()[0];
-        HexDialogView.Button negative = view.getButtons()[1];
-        HexDialogView.Button neutral = view.getButtons()[2];
+        HexDialogView.Button positive = view.getButtons()[2];
+        HexDialogView.Button negative = view.getButtons()[0];
+        HexDialogView.Button neutral = view.getButtons()[1];
 
         positive.setText(positiveText);
+        positive.setDrawable(getResources().getDrawable(R.drawable.play_again));
         negative.setText(negativeText);
+        negative.setDrawable(getResources().getDrawable(R.drawable.home));
         neutral.setText(neutralText);
+        neutral.setDrawable(neutralDrawable);
     }
 
-    public void setPositiveButton(String text, HexDialogView.Button.OnClickListener positiveOnClickListener) {
-        this.positiveText = text;
+    public void setPositiveButton(String text, Drawable drawable, HexDialogView.Button.OnClickListener positiveOnClickListener) {
+        positiveText = text;
+        positiveDrawable = drawable;
         if(positiveOnClickListener == null) {
             positiveOnClickListener = new HexDialogView.Button.OnClickListener() {
                 @Override
@@ -58,8 +68,9 @@ public class HexDialog extends Activity {
         this.positiveOnClickListener = positiveOnClickListener;
     }
 
-    public void setNegativeButton(String text, HexDialogView.Button.OnClickListener negativeOnClickListener) {
+    public void setNegativeButton(String text, Drawable drawable, HexDialogView.Button.OnClickListener negativeOnClickListener) {
         this.negativeText = text;
+        this.negativeDrawable = drawable;
         if(negativeOnClickListener == null) {
             negativeOnClickListener = new HexDialogView.Button.OnClickListener() {
                 @Override
@@ -71,8 +82,9 @@ public class HexDialog extends Activity {
         this.negativeOnClickListener = negativeOnClickListener;
     }
 
-    public void setNeutralButton(String text, HexDialogView.Button.OnClickListener neutralOnClickListener) {
+    public void setNeutralButton(String text, Drawable drawable, HexDialogView.Button.OnClickListener neutralOnClickListener) {
         this.neutralText = text;
+        this.neutralDrawable = drawable;
         if(neutralOnClickListener == null) {
             neutralOnClickListener = new HexDialogView.Button.OnClickListener() {
                 @Override

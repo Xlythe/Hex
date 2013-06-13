@@ -51,11 +51,12 @@ public class FileUtil {
         File saveFile = new File(fileName);
         if(!saveFile.exists()) {
             saveFile.createNewFile();
+
+            // BufferedWriter for performance, true to set append to file flag
+            BufferedWriter buf = new BufferedWriter(new FileWriter(saveFile, true));
+            buf.append(gameState);
+            buf.close();
         }
-        // BufferedWriter for performance, true to set append to file flag
-        BufferedWriter buf = new BufferedWriter(new FileWriter(saveFile, true));
-        buf.append(gameState);
-        buf.close();
     }
 
     public static void autoSaveGame(String fileName, String gameState) throws IOException {

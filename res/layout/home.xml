@@ -6,7 +6,6 @@
 
     <TextView
         android:id="@+id/title"
-        android:drawableLeft="@drawable/icon"
         android:drawablePadding="5dp"
         android:textColor="@color/white"
         android:textSize="22sp"

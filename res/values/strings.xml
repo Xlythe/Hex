@@ -97,5 +97,5 @@
     <string name="review_popup_title">Like the app?</string>
     <string name="review_popup_message">Rate Hex on the Play Store</string>
     <string name="review_popup_never">No thanks</string>
-    <string name="review_popup_ok">Okay</string>
+    <string name="review_popup_ok">Sure</string>
 </resources>

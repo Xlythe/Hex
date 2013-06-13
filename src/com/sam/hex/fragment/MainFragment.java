@@ -173,16 +173,16 @@ public class MainFragment extends SherlockFragment {
 
     private void showDonationStar() {
         int donationAmount = Stats.getDonationAmount(getMainActivity());
-        int resource = R.drawable.directory_up;
+        int resource = R.drawable.donate_hollow;
 
         if(donationAmount >= 5) {
-            resource = R.drawable.directory_icon;
+            resource = R.drawable.donate_gold;
         }
         else if(donationAmount >= 3) {
-            resource = R.drawable.store;
+            resource = R.drawable.donate_silver;
         }
         else if(donationAmount >= 1) {
-            resource = R.drawable.icon;
+            resource = R.drawable.donate_bronze;
         }
 
         mTitleTextView.setCompoundDrawablesWithIntrinsicBounds(resource, 0, 0, 0);

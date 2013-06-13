@@ -187,7 +187,7 @@ public class GameFragment extends Fragment {
         return new GameListener() {
             @Override
             public void onWin(final PlayingEntity player) {
-                if(getMainActivity() != null) getMainActivity().runOnUiThread(new Runnable() {
+                if(getMainActivity() != null && !isDetached()) getMainActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.setTitleText(String.format(getString(R.string.game_winner_title), player.getName()));
@@ -270,7 +270,7 @@ public class GameFragment extends Fragment {
 
             @Override
             public void onClear() {
-                if(getMainActivity() != null) getMainActivity().runOnUiThread(new Runnable() {
+                if(getMainActivity() != null && !isDetached()) getMainActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.postInvalidate();
@@ -280,7 +280,7 @@ public class GameFragment extends Fragment {
 
             @Override
             public void onStart() {
-                if(getMainActivity() != null) getMainActivity().runOnUiThread(new Runnable() {
+                if(getMainActivity() != null && !isDetached()) getMainActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.postInvalidate();
@@ -295,19 +295,24 @@ public class GameFragment extends Fragment {
 
             @Override
             public void onTurn(final PlayingEntity player) {
-                if(getMainActivity() != null) getMainActivity().runOnUiThread(new Runnable() {
+                if(getMainActivity() != null && !isDetached()) getMainActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        board.setTitleText(String.format(getString(R.string.game_turn_title), game.getCurrentPlayer().getName()));
-                        board.setActionText(getString(R.string.game_turn_msg));
-                        board.postInvalidate();
+                        try {
+                            board.setTitleText(String.format(getString(R.string.game_turn_title), game.getCurrentPlayer().getName()));
+                            board.setActionText(getString(R.string.game_turn_msg));
+                            board.postInvalidate();
+                        }
+                        catch(IllegalStateException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
             }
 
             @Override
             public void onReplayStart() {
-                if(getMainActivity() != null) getMainActivity().runOnUiThread(new Runnable() {
+                if(getMainActivity() != null && !isDetached()) getMainActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.setTitleText("");
@@ -320,7 +325,7 @@ public class GameFragment extends Fragment {
 
             @Override
             public void onReplayEnd() {
-                if(getMainActivity() != null) getMainActivity().runOnUiThread(new Runnable() {
+                if(getMainActivity() != null && !isDetached()) getMainActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.postInvalidate();
@@ -330,7 +335,7 @@ public class GameFragment extends Fragment {
 
             @Override
             public void onUndo() {
-                if(getMainActivity() != null) getMainActivity().runOnUiThread(new Runnable() {
+                if(getMainActivity() != null && !isDetached()) getMainActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.postInvalidate();
@@ -340,7 +345,7 @@ public class GameFragment extends Fragment {
 
             @Override
             public void startTimer() {
-                if(getMainActivity() != null) getMainActivity().runOnUiThread(new Runnable() {
+                if(getMainActivity() != null && !isDetached()) getMainActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {}
                 });
@@ -348,7 +353,7 @@ public class GameFragment extends Fragment {
 
             @Override
             public void displayTime(final int minutes, final int seconds) {
-                if(getMainActivity() != null) getMainActivity().runOnUiThread(new Runnable() {
+                if(getMainActivity() != null && !isDetached()) getMainActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.postInvalidate();

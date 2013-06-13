@@ -13,10 +13,8 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.MotionEvent;
-import android.view.VelocityTracker;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 
 import com.hex.core.Point;
@@ -27,25 +25,12 @@ import com.hex.core.Point;
 public class HexDialogView extends View implements OnTouchListener {
     private boolean mAllowRotation;
 
-    // Cached ViewConfiguration and system-wide constant values
-    private int mMinFlingVelocity;
-    private int mMaxFlingVelocity;
-    private VelocityTracker mVelocityTracker;
-
     private float mRotation;
     private Point[] corners;
     private Point center;
 
     private ShapeDrawable mHexagon;
     private int mBackgroundColor;
-
-    private String mText;
-    private float mTextX;
-    private float mTextY;
-    private float mTextSize;
-    private float mTextPadding;
-    private Paint mTextPaint;
-    private ShapeDrawable mTextBackground;
 
     private HexDialogView.Button[] mButtons;
     private ShapeDrawable[] mBorder;
@@ -57,6 +42,8 @@ public class HexDialogView extends View implements OnTouchListener {
     private Paint mButtonTextPaint;
     private int mPressedColor;
     private int mDisabledColor;
+
+    private HexDialog mDialog;
 
     public HexDialogView(Context context) {
         super(context);
@@ -73,11 +60,13 @@ public class HexDialogView extends View implements OnTouchListener {
         setUp();
     }
 
-    public void setUp() {
-        ViewConfiguration vc = ViewConfiguration.get(getContext());
-        mMinFlingVelocity = vc.getScaledMinimumFlingVelocity();
-        mMaxFlingVelocity = vc.getScaledMaximumFlingVelocity();
+    protected HexDialogView(Context context, HexDialog dialog) {
+        super(context);
+        mDialog = dialog;
+        setUp();
+    }
 
+    public void setUp() {
         DisplayMetrics dm = getResources().getDisplayMetrics();
         setOnTouchListener(this);
         mRotation = 0;
@@ -88,10 +77,6 @@ public class HexDialogView extends View implements OnTouchListener {
         }
         mPressedColor = Color.LTGRAY;
         mDisabledColor = getDarkerColor(mPressedColor);
-        mTextSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 44, dm);
-        mTextPaint = new Paint();
-        mTextPaint.setColor(Color.BLACK);
-        mTextPadding = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, dm);
         mLinePaint = new Paint();
         mLinePaint.setColor(Color.LTGRAY);
         mButtonTextPaint = new Paint();
@@ -302,35 +287,16 @@ public class HexDialogView extends View implements OnTouchListener {
                     b.setPressed(false);
                 }
             }
-            mVelocityTracker = VelocityTracker.obtain();
-            mVelocityTracker.addMovement(event);
         }
         else if(event.getAction() == MotionEvent.ACTION_UP) {
+            boolean dismiss = true;
             for(Button b : mButtons) {
-                if(b.isPressed()) {
-                    performClick();
-                    b.preformClick();
+                if(b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
+                    dismiss = false;
                 }
-                b.setPressed(false);
             }
-
-            if(mVelocityTracker != null) {
-                mVelocityTracker.addMovement(event);
-                mVelocityTracker.computeCurrentVelocity(1000);
-                float distance = (float) Math.sqrt(distanceSqr(new Point((int) mVelocityTracker.getXVelocity(), (int) mVelocityTracker.getYVelocity()),
-                        new Point(0, 0)));
-                if(mMinFlingVelocity <= distance && distance <= mMaxFlingVelocity) {
-                    if(Math.abs(mVelocityTracker.getXVelocity()) > Math.abs(mVelocityTracker.getYVelocity())) {
-                        spinSign = mVelocityTracker.getXVelocity() > 0 ? 1 : -1;
-                    }
-                    else {
-                        spinSign = mVelocityTracker.getYVelocity() > 0 ? 1 : -1;
-                        spinSign *= sign;
-                    }
-                    spinVelocity = spinSign * distance;
-                }
-                mVelocityTracker.recycle();
-                mVelocityTracker = null;
+            if(dismiss) {
+                mDialog.dismiss();
             }
         }
         else {
@@ -344,10 +310,6 @@ public class HexDialogView extends View implements OnTouchListener {
                         b.setPressed(false);
                     }
                 }
-            }
-
-            if(mVelocityTracker != null) {
-                mVelocityTracker.addMovement(event);
             }
         }
 
@@ -374,18 +336,6 @@ public class HexDialogView extends View implements OnTouchListener {
 
     public Button[] getButtons() {
         return mButtons;
-    }
-
-    public void setText(String text) {
-        mText = text;
-    }
-
-    public void setText(int resId) {
-        setText(getContext().getString(resId));
-    }
-
-    public String getText() {
-        return mText;
     }
 
     private class Triangle {

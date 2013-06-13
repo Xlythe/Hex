@@ -3,6 +3,7 @@ package com.sam.hex.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +52,8 @@ public class MainFragment extends Fragment {
         HexagonLayout.Button instructionsButton = hexagonLayout.getButtons()[3];
         mAchievementsButton = hexagonLayout.getButtons()[4];
         HexagonLayout.Button playButton = hexagonLayout.getButtons()[5];
+
+        hexagonLayout.setTopMargin(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 25, getResources().getDisplayMetrics()));
 
         mTitleTextView = (TextView) v.findViewById(R.id.title);
         mTimePlayedTextView = (TextView) v.findViewById(R.id.timePlayed);

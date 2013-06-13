@@ -31,7 +31,7 @@ public class HexDialog extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        view = new HexDialogView(this);
+        view = new HexDialogView(this, this);
         view.setBackgroundResource(android.R.color.transparent);
 
         setContentView(view);

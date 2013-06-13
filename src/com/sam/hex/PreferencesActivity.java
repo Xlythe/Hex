@@ -10,17 +10,17 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
+import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.text.InputType;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.actionbarsherlock.app.SherlockPreferenceActivity;
-import com.actionbarsherlock.view.MenuItem;
 import com.sam.hex.fragment.PreferencesFragment;
 
 /**
@@ -28,7 +28,7 @@ import com.sam.hex.fragment.PreferencesFragment;
  **/
 @SuppressWarnings("deprecation")
 @SuppressLint("NewApi")
-public class PreferencesActivity extends SherlockPreferenceActivity {
+public class PreferencesActivity extends PreferenceActivity {
     SharedPreferences settings;
     Preference gridPref;
     Preference timerPref;
@@ -37,7 +37,6 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(android.os.Build.VERSION.SDK_INT < 11) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             settings = PreferenceManager.getDefaultSharedPreferences(this);
             loadPreferences();
         }

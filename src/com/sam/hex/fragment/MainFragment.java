@@ -2,6 +2,7 @@ package com.sam.hex.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,19 +10,19 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.google.android.gms.common.SignInButton;
 import com.sam.hex.MainActivity;
 import com.sam.hex.PreferencesActivity;
 import com.sam.hex.R;
 import com.sam.hex.Settings;
 import com.sam.hex.Stats;
+import com.sam.hex.view.HexDialog;
 import com.sam.hex.view.HexagonLayout;
 
 /**
  * @author Will Harmon
  **/
-public class MainFragment extends SherlockFragment {
+public class MainFragment extends Fragment {
     // Hexagon variables
     HexagonLayout.Button mAchievementsButton;
     HexagonLayout.Button mDonateButton;
@@ -67,7 +68,7 @@ public class MainFragment extends SherlockFragment {
         settingsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                startActivity(new Intent(getSherlockActivity(), PreferencesActivity.class));
+                startActivity(new Intent(getMainActivity(), PreferencesActivity.class));
             }
         });
 
@@ -77,7 +78,11 @@ public class MainFragment extends SherlockFragment {
         mDonateButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                getMainActivity().purchaseItem(MainActivity.ITEM_SKU_INTERMEDIATE);
+                HexDialog hd = new HexDialog(getMainActivity());
+                hd.setPositiveButton("lol", null);
+                hd.setNegativeButton("lol", null);
+                hd.setNeutralButton("lol", null);
+                // getMainActivity().purchaseItem(MainActivity.ITEM_SKU_INTERMEDIATE);
             }
         });
 
@@ -145,13 +150,13 @@ public class MainFragment extends SherlockFragment {
     public void onResume() {
         super.onResume();
 
-        long timePlayedInMillis = Stats.getTimePlayed(getSherlockActivity());
+        long timePlayedInMillis = Stats.getTimePlayed(getMainActivity());
         long timePlayedInHours = timePlayedInMillis / (1000 * 60 * 60);
         long timePlayedInMintues = (timePlayedInMillis - timePlayedInHours * (1000 * 60 * 60)) / (1000 * 60);
         long timePlayedInSeconds = (timePlayedInMillis - timePlayedInHours * (1000 * 60 * 60) - timePlayedInMintues * (1000 * 60)) / (1000);
         mTimePlayedTextView.setText(String.format(getString(R.string.main_stats_time_played), timePlayedInHours, timePlayedInMintues, timePlayedInSeconds));
-        mGamesPlayedTextView.setText(String.format(getString(R.string.main_stats_games_played), Stats.getGamesPlayed(getSherlockActivity())));
-        mGamesWonTextView.setText(String.format(getString(R.string.main_stats_games_won), Stats.getGamesWon(getSherlockActivity())));
+        mGamesPlayedTextView.setText(String.format(getString(R.string.main_stats_games_played), Stats.getGamesPlayed(getMainActivity())));
+        mGamesWonTextView.setText(String.format(getString(R.string.main_stats_games_won), Stats.getGamesWon(getMainActivity())));
         showDonationStar();
     }
 
@@ -159,13 +164,13 @@ public class MainFragment extends SherlockFragment {
         if(mSignOutButton != null) mSignOutButton.setVisibility(getMainActivity().isSignedIn() ? View.VISIBLE : View.GONE);
         if(mSignInButton != null) mSignInButton.setVisibility(getMainActivity().isSignedIn() ? View.GONE : View.VISIBLE);
         if(mTitleTextView != null) mTitleTextView.setText(String.format(getString(R.string.main_title),
-                Settings.getPlayer1Name(getSherlockActivity(), getMainActivity().getGamesClient())));
+                Settings.getPlayer1Name(getMainActivity(), getMainActivity().getGamesClient())));
         if(mAchievementsButton != null) mAchievementsButton.setEnabled(getMainActivity().isSignedIn());
         if(mDonateButton != null) mDonateButton.setEnabled(getMainActivity().isIabSetup());
     }
 
     private MainActivity getMainActivity() {
-        return (MainActivity) getSherlockActivity();
+        return (MainActivity) getActivity();
     }
 
     public void setSignedIn(boolean isSignedIn) {

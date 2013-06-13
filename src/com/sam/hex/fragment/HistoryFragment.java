@@ -10,6 +10,7 @@ import java.util.Comparator;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,12 +21,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockListFragment;
 import com.sam.hex.FileUtil;
 import com.sam.hex.MainActivity;
 import com.sam.hex.R;
 
-public class HistoryFragment extends SherlockListFragment {
+public class HistoryFragment extends ListFragment {
 
     // Stores names of traversed directories
     ArrayList<String> str = new ArrayList<String>();
@@ -126,7 +126,7 @@ public class HistoryFragment extends SherlockListFragment {
                 return f1.file.compareTo(f2.file);
             }
         });
-        adapter = new ArrayAdapter<Item>(getSherlockActivity(), android.R.layout.select_dialog_item, android.R.id.text1, fileList) {
+        adapter = new ArrayAdapter<Item>(getMainActivity(), android.R.layout.select_dialog_item, android.R.id.text1, fileList) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 // creates view
@@ -221,6 +221,6 @@ public class HistoryFragment extends SherlockListFragment {
     }
 
     private MainActivity getMainActivity() {
-        return (MainActivity) getSherlockActivity();
+        return (MainActivity) getActivity();
     }
 }

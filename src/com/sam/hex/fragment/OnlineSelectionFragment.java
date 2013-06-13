@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.google.android.gms.games.GamesActivityResultCodes;
 import com.google.android.gms.games.GamesClient;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
@@ -18,7 +18,7 @@ import com.sam.hex.MainActivity;
 import com.sam.hex.R;
 import com.sam.hex.view.SelectorLayout;
 
-public class OnlineSelectionFragment extends SherlockFragment {
+public class OnlineSelectionFragment extends Fragment {
     private SelectorLayout mSelectorLayout;
     private String mRoomId;
 
@@ -129,7 +129,7 @@ public class OnlineSelectionFragment extends SherlockFragment {
         getMainActivity().getGamesClient().createRoom(roomConfig);
 
         // prevent screen from sleeping during handshake
-        getSherlockActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getMainActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // go to game screen
     }
@@ -141,6 +141,6 @@ public class OnlineSelectionFragment extends SherlockFragment {
     }
 
     private MainActivity getMainActivity() {
-        return (MainActivity) getSherlockActivity();
+        return (MainActivity) getActivity();
     }
 }

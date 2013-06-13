@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +20,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.hex.ai.BeeGameAI;
 import com.hex.core.Game;
 import com.hex.core.Game.GameListener;
@@ -36,7 +36,7 @@ import com.sam.hex.Settings;
 import com.sam.hex.Stats;
 import com.sam.hex.view.BoardView;
 
-public class GameFragment extends SherlockFragment {
+public class GameFragment extends Fragment {
     public static final String GAME = "game";
     public static final String REPLAY = "replay";
     private static final SimpleDateFormat SAVE_FORMAT = new SimpleDateFormat("MMM dd, yyyy hh:mm", Locale.getDefault());
@@ -187,7 +187,7 @@ public class GameFragment extends SherlockFragment {
         return new GameListener() {
             @Override
             public void onWin(final PlayingEntity player) {
-                if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
+                if(getMainActivity() != null) getMainActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.setTitleText(String.format(getString(R.string.game_winner_title), player.getName()));
@@ -208,9 +208,9 @@ public class GameFragment extends SherlockFragment {
                             }
                         }
 
-                        Stats.incrementTimePlayed(getSherlockActivity(), game.getGameLength() - timeGamePaused);
-                        Stats.incrementGamesPlayed(getSherlockActivity());
-                        if(player.getTeam() == 1) Stats.incrementGamesWon(getSherlockActivity());
+                        Stats.incrementTimePlayed(getMainActivity(), game.getGameLength() - timeGamePaused);
+                        Stats.incrementGamesPlayed(getMainActivity());
+                        if(player.getTeam() == 1) Stats.incrementGamesWon(getMainActivity());
 
                         if(getMainActivity().isSignedIn()) {
                             // Backup stats
@@ -270,7 +270,7 @@ public class GameFragment extends SherlockFragment {
 
             @Override
             public void onClear() {
-                if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
+                if(getMainActivity() != null) getMainActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.postInvalidate();
@@ -280,7 +280,7 @@ public class GameFragment extends SherlockFragment {
 
             @Override
             public void onStart() {
-                if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
+                if(getMainActivity() != null) getMainActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.postInvalidate();
@@ -295,7 +295,7 @@ public class GameFragment extends SherlockFragment {
 
             @Override
             public void onTurn(final PlayingEntity player) {
-                if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
+                if(getMainActivity() != null) getMainActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.setTitleText(String.format(getString(R.string.game_turn_title), game.getCurrentPlayer().getName()));
@@ -307,7 +307,7 @@ public class GameFragment extends SherlockFragment {
 
             @Override
             public void onReplayStart() {
-                if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
+                if(getMainActivity() != null) getMainActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.setTitleText("");
@@ -320,7 +320,7 @@ public class GameFragment extends SherlockFragment {
 
             @Override
             public void onReplayEnd() {
-                if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
+                if(getMainActivity() != null) getMainActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.postInvalidate();
@@ -330,7 +330,7 @@ public class GameFragment extends SherlockFragment {
 
             @Override
             public void onUndo() {
-                if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
+                if(getMainActivity() != null) getMainActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.postInvalidate();
@@ -340,7 +340,7 @@ public class GameFragment extends SherlockFragment {
 
             @Override
             public void startTimer() {
-                if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
+                if(getMainActivity() != null) getMainActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {}
                 });
@@ -348,7 +348,7 @@ public class GameFragment extends SherlockFragment {
 
             @Override
             public void displayTime(final int minutes, final int seconds) {
-                if(getSherlockActivity() != null) getSherlockActivity().runOnUiThread(new Runnable() {
+                if(getMainActivity() != null) getMainActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         board.postInvalidate();
@@ -377,20 +377,20 @@ public class GameFragment extends SherlockFragment {
     }
 
     protected void showSavingDialog() {
-        final EditText editText = new EditText(getSherlockActivity());
+        final EditText editText = new EditText(getMainActivity());
         editText.setInputType(InputType.TYPE_CLASS_TEXT);
         editText.setText(SAVE_FORMAT.format(new Date()));
-        AlertDialog.Builder builder = new AlertDialog.Builder(getSherlockActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getMainActivity());
         builder.setTitle(R.string.enterFilename).setView(editText).setPositiveButton(android.R.string.ok, new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 try {
                     FileUtil.saveGame(editText.getText().toString(), game.save());
-                    Toast.makeText(getSherlockActivity(), R.string.game_toast_saved, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getMainActivity(), R.string.game_toast_saved, Toast.LENGTH_SHORT).show();
                 }
                 catch(IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(getSherlockActivity(), R.string.game_toast_failed, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getMainActivity(), R.string.game_toast_failed, Toast.LENGTH_SHORT).show();
                 }
             }
         }).setNegativeButton(R.string.cancel, null).show();
@@ -460,7 +460,7 @@ public class GameFragment extends SherlockFragment {
             }
         };
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getSherlockActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getMainActivity());
         builder.setMessage(getString(R.string.confirmNewgame)).setPositiveButton(getString(R.string.yes), dialogClickListener)
                 .setNegativeButton(getString(R.string.no), dialogClickListener).show();
     }
@@ -480,7 +480,7 @@ public class GameFragment extends SherlockFragment {
                     || Integer.valueOf(prefs.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME))) * 60 * 1000 != game.gameOptions.timer.totalTime;
         }
         else if(gameLocation == GameAction.NET_GAME) {
-            return (game != null && game.isGameOver());
+            return(game != null && game.isGameOver());
         }
         else {
             return true;
@@ -509,13 +509,13 @@ public class GameFragment extends SherlockFragment {
             }
         };
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getSherlockActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getMainActivity());
         builder.setMessage(getString(R.string.confirmExit)).setPositiveButton(getString(R.string.yes), dialogClickListener)
                 .setNegativeButton(getString(R.string.no), dialogClickListener).show();
     }
 
     public MainActivity getMainActivity() {
-        return (MainActivity) getSherlockActivity();
+        return (MainActivity) getActivity();
     }
 
     public void setPlayer1Type(Player player1Type) {

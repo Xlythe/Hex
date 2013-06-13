@@ -1,17 +1,17 @@
 package com.sam.hex.fragment;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.hex.core.Player;
 import com.sam.hex.MainActivity;
 import com.sam.hex.R;
 import com.sam.hex.view.SelectorLayout;
 
-public class GameSelectionFragment extends SherlockFragment {
+public class GameSelectionFragment extends Fragment {
     SelectorLayout.Button mNetButton;
 
     @Override
@@ -63,6 +63,6 @@ public class GameSelectionFragment extends SherlockFragment {
     }
 
     private MainActivity getMainActivity() {
-        return (MainActivity) getSherlockActivity();
+        return (MainActivity) getActivity();
     }
 }

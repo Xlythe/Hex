@@ -11,8 +11,8 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 
-import com.actionbarsherlock.view.MenuItem;
 import com.android.vending.billing.util.IabResult;
 import com.google.android.gms.appstate.AppStateClient;
 import com.google.android.gms.appstate.OnStateLoadedListener;

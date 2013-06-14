@@ -53,6 +53,12 @@ public class PreferencesActivity extends PreferenceActivity {
     }
 
     @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         setListeners();

@@ -73,6 +73,7 @@ public class MainFragment extends Fragment {
             @Override
             public void onClick() {
                 startActivity(new Intent(getMainActivity(), PreferencesActivity.class));
+                getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
 
@@ -84,7 +85,6 @@ public class MainFragment extends Fragment {
             public void onClick() {
                 HexDialog hd = new DonateDialog(getMainActivity());
                 hd.show();
-                // getMainActivity().purchaseItem(MainActivity.ITEM_SKU_INTERMEDIATE);
             }
         });
 
@@ -117,6 +117,7 @@ public class MainFragment extends Fragment {
             @Override
             public void onClick() {
                 startActivityForResult(getMainActivity().getGamesClient().getAchievementsIntent(), MainActivity.REQUEST_ACHIEVEMENTS);
+                getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
 

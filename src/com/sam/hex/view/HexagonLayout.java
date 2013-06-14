@@ -55,6 +55,8 @@ public class HexagonLayout extends View implements OnTouchListener {
     private int mPressedColor;
     private int mDisabledColor;
 
+    private boolean mSnapToSide;
+
     public HexagonLayout(Context context) {
         super(context);
         setUp();
@@ -130,6 +132,22 @@ public class HexagonLayout extends View implements OnTouchListener {
         canvas.save();
         if(mAllowRotation) {
             canvas.rotate(mRotation, center.x, center.y);
+
+            if(mSnapToSide) {
+                float offset = Math.abs(mRotation % 60);
+                int sign = (int) (mRotation / Math.abs(mRotation));
+                if(offset < 5f) {
+                    mSnapToSide = false;
+                    mRotation -= mRotation % 60;
+                }
+                else if(offset < 30f) {
+                    mRotation -= 2f * sign;
+                }
+                else {
+                    mRotation += 2f * sign;
+                }
+                postInvalidateDelayed(30);
+            }
         }
 
         mHexagon.draw(canvas);
@@ -339,6 +357,7 @@ public class HexagonLayout extends View implements OnTouchListener {
                 }
                 b.setPressed(false);
             }
+            mSnapToSide = true;
         }
         else {
             mRotation = oldRotation + rotationOffset - sign * cosineInverse(center, new Point(center.x, 0), new Point((int) event.getX(), (int) event.getY()));

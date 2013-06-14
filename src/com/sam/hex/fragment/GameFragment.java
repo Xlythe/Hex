@@ -37,6 +37,9 @@ import com.sam.hex.Stats;
 import com.sam.hex.view.BoardView;
 import com.sam.hex.view.GameOverDialog;
 
+/**
+ * @author Will Harmon
+ **/
 public class GameFragment extends Fragment {
     public static final String GAME = "game";
     public static final String REPLAY = "replay";

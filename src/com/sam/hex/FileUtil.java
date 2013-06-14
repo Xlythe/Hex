@@ -12,6 +12,9 @@ import android.os.Environment;
 
 import com.hex.core.Game;
 
+/**
+ * @author Will Harmon
+ **/
 public class FileUtil {
     public static Game loadGame(String fileName) throws IOException {
         File file = new File(fileName);

@@ -11,6 +11,9 @@ import com.sam.hex.MainActivity;
 import com.sam.hex.R;
 import com.sam.hex.view.SelectorLayout;
 
+/**
+ * @author Will Harmon
+ **/
 public class GameSelectionFragment extends Fragment {
     SelectorLayout.Button mNetButton;
 

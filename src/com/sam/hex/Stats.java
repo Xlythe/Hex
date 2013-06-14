@@ -3,6 +3,9 @@ package com.sam.hex;
 import android.content.Context;
 import android.preference.PreferenceManager;
 
+/**
+ * @author Will Harmon
+ **/
 public class Stats {
     public static long getTimePlayed(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getLong("time_played", 0);

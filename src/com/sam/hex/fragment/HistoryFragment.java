@@ -25,6 +25,9 @@ import com.sam.hex.FileUtil;
 import com.sam.hex.MainActivity;
 import com.sam.hex.R;
 
+/**
+ * @author Will Harmon
+ **/
 public class HistoryFragment extends ListFragment {
 
     // Stores names of traversed directories

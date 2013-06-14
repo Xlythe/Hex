@@ -7,6 +7,9 @@ import android.preference.PreferenceManager;
 import com.google.android.gms.games.GamesClient;
 import com.hex.core.Timer;
 
+/**
+ * @author Will Harmon
+ **/
 public class Settings {
     public static int getGridSize(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);

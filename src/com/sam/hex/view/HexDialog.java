@@ -8,6 +8,9 @@ import android.view.Window;
 
 import com.sam.hex.PurchaseActivity;
 
+/**
+ * @author Will Harmon
+ **/
 public abstract class HexDialog extends PurchaseActivity {
     private HexDialogView view;
 

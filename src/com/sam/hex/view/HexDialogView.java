@@ -14,6 +14,7 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 
 import com.hex.core.Point;
 
@@ -110,7 +111,8 @@ public class HexDialogView extends View implements OnTouchListener {
         for(int i = 0; i < 3; i++) {
             Button b = mButtons[i];
 
-            b.setCenter(new Point((i + 1) * w / 4, (2 - i % 2) * h / 4));
+            b.setCenter(new Point((int) (b.getCenterXPercent() * w), (int) (b.getCenterYPercent() * h)));
+            b.setSideLength(b.getSideLengthPercent() * w);
 
             Point[] corners = getHexagon(b.getCenter(), b.getSideLength());
             b.setHexagon(new Hexagon(b, corners[0], corners[1], corners[2], corners[3], corners[4], corners[5]));
@@ -124,8 +126,21 @@ public class HexDialogView extends View implements OnTouchListener {
             b.setBackgroundBorderDrawable(hexagonBorder);
 
             int width = b.getSideLength();
-            if(b.getView() != null) b.getView().layout(b.getCenter().x - width / 2, b.getCenter().y - width / 2, b.getCenter().x + width / 2,
-                    b.getCenter().y + width / 2);
+            if(b.getView() != null) {
+                b.getView().measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY));
+                layoutAllViews(b.getView(), 0, 0, width, width);
+            }
+        }
+    }
+
+    private void layoutAllViews(View v, int l, int t, int r, int b) {
+        v.layout(l, t, r, b);
+        if(ViewGroup.class.isAssignableFrom(v.getClass())) {
+            ViewGroup fl = (ViewGroup) v;
+            for(int i = 0; i < fl.getChildCount(); i++) {
+                View child = fl.getChildAt(i);
+                layoutAllViews(child, child.getLeft(), child.getTop(), child.getRight(), child.getBottom());
+            }
         }
     }
 
@@ -271,6 +286,9 @@ public class HexDialogView extends View implements OnTouchListener {
         private ShapeDrawable backgroundBorderDrawable;
         private View view;
         private float sideLength;
+        private float sideLengthPercent;
+        private float centerXPercent;
+        private float centerYPercent;
 
         public Button(Context context) {
             this.context = context;
@@ -374,6 +392,30 @@ public class HexDialogView extends View implements OnTouchListener {
 
         public void setView(int resId) {
             setView(View.inflate(context, resId, null));
+        }
+
+        public float getSideLengthPercent() {
+            return sideLengthPercent;
+        }
+
+        public void setSideLengthPercent(float sideLengthPercent) {
+            this.sideLengthPercent = sideLengthPercent;
+        }
+
+        public float getCenterXPercent() {
+            return centerXPercent;
+        }
+
+        public void setCenterXPercent(float centerXPercent) {
+            this.centerXPercent = centerXPercent;
+        }
+
+        public float getCenterYPercent() {
+            return centerYPercent;
+        }
+
+        public void setCenterYPercent(float centerYPercent) {
+            this.centerYPercent = centerYPercent;
         }
     }
 }

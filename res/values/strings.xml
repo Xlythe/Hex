@@ -63,16 +63,19 @@
     <string name="game_quit">Exit</string>
 
     <!-- In game notifications -->
-    <string name="game_winner_title">%s</string>
     <string name="game_turn_title">%s\'s</string>
-    <string name="game_winner_msg">WINS</string>
     <string name="game_turn_msg">TURN</string>
     <string name="game_timer_msg">Time Left</string>
     <string name="game_toast_saved">Saved!</string>
     <string name="game_toast_failed">Failed</string>
     <string name="game_button_claim_victory">Claim Victory</string>
-    <string name="auto_save_preamble">AutoSave:</string>
-    <string name="auto_saved_game_name" formatted="false">%s %s vs %s</string>
+    <string name="auto_saved_file_name" formatted="false">%s %s vs %s</string>
+    <string name="game_over_you">You</string>
+    <string name="game_over_action">%s!</string>
+    <string name="game_over_won">Won</string>
+    <string name="game_over_lose">Lost</string>
+    <string name="game_over_time">Time</string>
+    <string name="game_over_length" formatted="false">%02d:%02d:%02d</string>
 
     <!-- Game instructions -->
     <string name="instructions">Hex is played by two players, who take turns placing pieces on the board. The players have different colours, say red and blue. (The players themselves are sometimes referred to as Red and Blue) The four edges of the board are coloured with the same colours, in such a way that parallel edges have the same colour. Red wins if he can build a continuous chain between the two red edges, and blue wins if he can build such a chain between the blue edges.\n\n

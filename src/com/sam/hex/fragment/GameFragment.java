@@ -35,6 +35,7 @@ import com.sam.hex.R;
 import com.sam.hex.Settings;
 import com.sam.hex.Stats;
 import com.sam.hex.view.BoardView;
+import com.sam.hex.view.GameOverDialog;
 
 public class GameFragment extends Fragment {
     public static final String GAME = "game";
@@ -50,6 +51,8 @@ public class GameFragment extends Fragment {
     private int replayDuration;
     private long timeGamePaused;
     private long whenGamePaused;
+
+    private boolean goHome = false;
 
     /**
      * Set at the end of onWin, or when a game is loaded. Use this to avoid
@@ -190,16 +193,17 @@ public class GameFragment extends Fragment {
                 if(getMainActivity() != null && !isDetached()) getMainActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        board.setTitleText(String.format(getString(R.string.game_winner_title), player.getName()));
-                        board.setActionText(getString(R.string.game_winner_msg));
                         board.invalidate();
+
+                        GameOverDialog dialog = new GameOverDialog(getMainActivity(), GameFragment.this, player);
+                        dialog.show();
 
                         if(gameHasEnded) return;
 
                         // Auto save completed game
                         if(Settings.getAutosave(getMainActivity())) {
                             try {
-                                String fileName = String.format(getString(R.string.auto_saved_game_name), SAVE_FORMAT.format(new Date()), game.getPlayer1()
+                                String fileName = String.format(getString(R.string.auto_saved_file_name), SAVE_FORMAT.format(new Date()), game.getPlayer1()
                                         .getName(), game.getPlayer2().getName());
                                 FileUtil.autoSaveGame(fileName, game.save());
                             }
@@ -210,7 +214,7 @@ public class GameFragment extends Fragment {
 
                         Stats.incrementTimePlayed(getMainActivity(), game.getGameLength() - timeGamePaused);
                         Stats.incrementGamesPlayed(getMainActivity());
-                        if(player.getTeam() == 1) Stats.incrementGamesWon(getMainActivity());
+                        if(player.getType().equals(Player.Human)) Stats.incrementGamesWon(getMainActivity());
 
                         if(getMainActivity().isSignedIn()) {
                             // Backup stats
@@ -241,7 +245,7 @@ public class GameFragment extends Fragment {
                             }
 
                             // Unlock the montior smasher achievement!
-                            if(player.getTeam() == 1 && game.getPlayer2().getType().equals(Player.AI)) {
+                            if(player.getType().equals(Player.Human) && game.getPlayer2().getType().equals(Player.AI)) {
                                 getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_monitor_smasher));
                             }
 
@@ -257,10 +261,12 @@ public class GameFragment extends Fragment {
                             getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_intermediate), 1);
 
                             // Unlock the Expert achievement!
-                            if(player.getTeam() == 1) getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_expert), 1);
+                            if(player.getType().equals(Player.Human)) getMainActivity().getGamesClient().incrementAchievement(
+                                    getString(R.string.achievement_expert), 1);
 
                             // Unlock the Expert achievement!
-                            if(player.getTeam() == 1) getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_insane), 1);
+                            if(player.getType().equals(Player.Human)) getMainActivity().getGamesClient().incrementAchievement(
+                                    getString(R.string.achievement_insane), 1);
                         }
 
                         gameHasEnded = true;
@@ -299,9 +305,11 @@ public class GameFragment extends Fragment {
                     @Override
                     public void run() {
                         try {
-                            board.setTitleText(String.format(getString(R.string.game_turn_title), game.getCurrentPlayer().getName()));
-                            board.setActionText(getString(R.string.game_turn_msg));
-                            board.postInvalidate();
+                            if(!game.isGameOver()) {
+                                board.setTitleText(String.format(getString(R.string.game_turn_title), game.getCurrentPlayer().getName()));
+                                board.setActionText(getString(R.string.game_turn_msg));
+                                board.postInvalidate();
+                            }
                         }
                         catch(IllegalStateException e) {
                             e.printStackTrace();
@@ -371,9 +379,15 @@ public class GameFragment extends Fragment {
             whenGamePaused = 0;
         }
 
+        if(goHome) {
+            getMainActivity().returnHome();
+            return;
+        }
+
         // Check if settings were changed and we need to run a new game
         if(game != null && game.replayRunning) {
             // Do nothing
+            return;
         }
         else if(replay) {
             replay = false;
@@ -451,11 +465,7 @@ public class GameFragment extends Fragment {
                 switch(which) {
                 case DialogInterface.BUTTON_POSITIVE:
                     // Yes button clicked
-                    if(game.getPlayer1().supportsNewgame() && game.getPlayer2().supportsNewgame()) {
-                        initializeNewGame();
-                        board.setGame(game);
-                        game.start();
-                    }
+                    startNewGame();
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:
                     // No button clicked
@@ -468,6 +478,14 @@ public class GameFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getMainActivity());
         builder.setMessage(getString(R.string.confirmNewgame)).setPositiveButton(getString(R.string.yes), dialogClickListener)
                 .setNegativeButton(getString(R.string.no), dialogClickListener).show();
+    }
+
+    public void startNewGame() {
+        if(game.getPlayer1().supportsNewgame() && game.getPlayer2().supportsNewgame()) {
+            initializeNewGame();
+            board.setGame(game);
+            game.start();
+        }
     }
 
     /**
@@ -529,5 +547,13 @@ public class GameFragment extends Fragment {
 
     public void setPlayer2Type(Player player2Type) {
         this.player2Type = player2Type;
+    }
+
+    public void setGoHome(boolean goHome) {
+        this.goHome = goHome;
+    }
+
+    public Game getGame() {
+        return game;
     }
 }

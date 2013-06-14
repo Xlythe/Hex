@@ -123,8 +123,7 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
         // Handle item selection
         switch(item.getItemId()) {
         case android.R.id.home:
-            getSupportFragmentManager().popBackStack(mMainFragment.toString(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
-            swapFragment(mMainFragment);
+            returnHome();
             return true;
         default:
             return super.onOptionsItemSelected(item);
@@ -135,8 +134,7 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == KeyEvent.KEYCODE_BACK) {
             if(mActiveFragment != mMainFragment) {
-                getSupportFragmentManager().popBackStack(mMainFragment.toString(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                swapFragment(mMainFragment);
+                returnHome();
             }
             else {
                 finish();
@@ -144,6 +142,11 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    public void returnHome() {
+        getSupportFragmentManager().popBackStack(mMainFragment.toString(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        swapFragment(mMainFragment);
     }
 
     @Override

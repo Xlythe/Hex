@@ -163,6 +163,7 @@ public class MainFragment extends Fragment {
     }
 
     private void refreshPlayerInformation() {
+        if(getMainActivity() == null) return;
         if(mSignOutButton != null) mSignOutButton.setVisibility(getMainActivity().isSignedIn() ? View.VISIBLE : View.GONE);
         if(mSignInButton != null) mSignInButton.setVisibility(getMainActivity().isSignedIn() ? View.GONE : View.VISIBLE);
         if(mTitleTextView != null) mTitleTextView.setText(String.format(getString(R.string.main_title),

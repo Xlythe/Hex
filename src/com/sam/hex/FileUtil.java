@@ -63,9 +63,8 @@ public class FileUtil {
         if(!fileName.toLowerCase(Locale.getDefault()).endsWith(".rhex")) {
             fileName = fileName + ".rhex";
         }
-        fileName = Environment.getExternalStorageDirectory() + File.separator + "Hex" + File.separator + "Autosave" + File.separator + fileName;
+        fileName = Environment.getExternalStorageDirectory() + File.separator + "Hex" + File.separator + fileName;
         FileUtil.createDirIfNoneExists(File.separator + "Hex" + File.separator);
-        FileUtil.createDirIfNoneExists(File.separator + "Hex" + File.separator + "Autosave" + File.separator);
 
         File saveFile = new File(fileName);
         if(!saveFile.exists()) {

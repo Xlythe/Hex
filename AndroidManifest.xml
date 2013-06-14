@@ -39,6 +39,7 @@
         </activity>
         <activity android:label="@string/activity_title_preferences" android:name=".PreferencesActivity" android:screenOrientation="landscape" />
         <activity android:name=".view.DonateDialog" android:screenOrientation="landscape" android:theme="@style/HexDialog" />
+        <activity android:name=".view.GameOverDialog" android:screenOrientation="landscape" android:theme="@style/HexDialog" />
     </application>
 
 </manifest>

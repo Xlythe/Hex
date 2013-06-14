@@ -103,7 +103,7 @@ public class BoardView extends View {
         if(!game.replayRunning) {
             ShapeDrawable background = (game.getCurrentPlayer().getTeam() == 1) ? mPlayer1Background : mPlayer2Background;
             background.getPaint().setColor(game.getCurrentPlayer().getColor());
-            if(!game.isGameOver()) background.draw(canvas);
+            background.draw(canvas);
             mBorderBackground.draw(canvas);
 
             if(mTitleText != null && mActionText != null) {

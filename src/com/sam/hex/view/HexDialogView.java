@@ -31,8 +31,10 @@ public class HexDialogView extends View implements OnTouchListener {
 
     private HexDialog mDialog;
 
-    private int mOpeningAnimationTick;
+    private int mAnimationTick;
     private float mOpeningAnimationScaleSize;
+    private float mClosingAnimationScaleSize;
+    private int mClosingButton;
 
     public HexDialogView(Context context) {
         super(context);
@@ -59,7 +61,7 @@ public class HexDialogView extends View implements OnTouchListener {
         DisplayMetrics dm = getResources().getDisplayMetrics();
         setOnTouchListener(this);
         mButtons = new Button[3];
-        for(int i = 0; i < 3; i++) {
+        for(int i = 0; i < mButtons.length; i++) {
             mButtons[i] = new Button(getContext());
             mButtons[i].setSideLength(100f);
         }
@@ -70,8 +72,10 @@ public class HexDialogView extends View implements OnTouchListener {
         mButtonTextPaint.setColor(Color.WHITE);
         mButtonTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, dm));
         mBorderColor = Color.LTGRAY;
-        mOpeningAnimationTick = 40;
+        mAnimationTick = 40;
         mOpeningAnimationScaleSize = 0.5f;
+        mClosingAnimationScaleSize = 1.0f;
+        mClosingButton = -1;
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {}
@@ -80,14 +84,27 @@ public class HexDialogView extends View implements OnTouchListener {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        for(int i = 0; i < 3; i++) {
+        for(int i = 0; i < mButtons.length; i++) {
             Button b = mButtons[i];
 
             canvas.save();
             if(mOpeningAnimationScaleSize < 1) {
-                mOpeningAnimationScaleSize += 0.01;
+                mOpeningAnimationScaleSize += 0.01f;
                 canvas.scale(mOpeningAnimationScaleSize, mOpeningAnimationScaleSize, b.getCenter().x, b.getCenter().y);
-                postInvalidateDelayed(mOpeningAnimationTick);
+                postInvalidateDelayed(mAnimationTick);
+            }
+            if(mClosingButton == i) {
+                if(mClosingAnimationScaleSize > 0.85f) {
+                    mClosingAnimationScaleSize -= 0.01f;
+                    canvas.scale(mClosingAnimationScaleSize, mClosingAnimationScaleSize, b.getCenter().x, b.getCenter().y);
+                    postInvalidateDelayed(mAnimationTick);
+                }
+                else {
+                    canvas.scale(mClosingAnimationScaleSize, mClosingAnimationScaleSize, b.getCenter().x, b.getCenter().y);
+                    mClosingAnimationScaleSize = 1.0f;
+                    mClosingButton = -1;
+                    b.performClick();
+                }
             }
 
             canvas.save();
@@ -123,7 +140,7 @@ public class HexDialogView extends View implements OnTouchListener {
 
     @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
-        for(int i = 0; i < 3; i++) {
+        for(int i = 0; i < mButtons.length; i++) {
             Button b = mButtons[i];
 
             b.setCenter(new Point((int) (b.getCenterXPercent() * w), (int) (b.getCenterYPercent() * h)));
@@ -211,10 +228,11 @@ public class HexDialogView extends View implements OnTouchListener {
         }
         else if(event.getAction() == MotionEvent.ACTION_UP) {
             boolean dismiss = !wasPressed;
-            for(Button b : mButtons) {
+            for(int i = 0; i < mButtons.length; i++) {
+                Button b = mButtons[i];
                 if(b.isPressed()) {
                     performClick();
-                    b.performClick();
+                    mClosingButton = i;
                     b.setPressed(false);
                 }
             }

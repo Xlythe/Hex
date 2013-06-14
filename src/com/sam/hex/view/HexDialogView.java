@@ -64,7 +64,7 @@ public class HexDialogView extends View implements OnTouchListener {
             mButtons[i].setSideLength(100f);
         }
         mBackgroundColor = Color.WHITE;
-        mPressedColor = Color.LTGRAY;
+        mPressedColor = getLighterColor(Color.LTGRAY);
         mDisabledColor = Color.LTGRAY;
         mButtonTextPaint = new Paint();
         mButtonTextPaint.setColor(Color.WHITE);
@@ -184,6 +184,13 @@ public class HexDialogView extends View implements OnTouchListener {
         ShapeDrawable sd = new ShapeDrawable(new PathShape(hexagonPath, w, h));
         sd.setBounds(0, 0, w, h);
         return sd;
+    }
+
+    private int getLighterColor(int color) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        hsv[2] *= 1.1f;
+        return Color.HSVToColor(hsv);
     }
 
     private boolean wasPressed;

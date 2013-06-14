@@ -49,6 +49,7 @@ public class DonateDialog extends HexDialog {
             @Override
             public void onClick() {
                 purchaseItem(MainActivity.ITEM_SKU_ADVANCED);
+                dismiss();
             }
         };
     }
@@ -59,6 +60,7 @@ public class DonateDialog extends HexDialog {
             @Override
             public void onClick() {
                 purchaseItem(MainActivity.ITEM_SKU_BASIC);
+                dismiss();
             }
         };
     }
@@ -69,6 +71,7 @@ public class DonateDialog extends HexDialog {
             @Override
             public void onClick() {
                 purchaseItem(MainActivity.ITEM_SKU_INTERMEDIATE);
+                dismiss();
             }
         };
     }

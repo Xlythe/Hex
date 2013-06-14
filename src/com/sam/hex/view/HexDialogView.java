@@ -35,6 +35,7 @@ public class HexDialogView extends View implements OnTouchListener {
     private float mOpeningAnimationScaleSize;
     private float mClosingAnimationScaleSize;
     private int mClosingButton;
+    private boolean mClosingButtonClicked;
 
     public HexDialogView(Context context) {
         super(context);
@@ -94,15 +95,13 @@ public class HexDialogView extends View implements OnTouchListener {
                 postInvalidateDelayed(mAnimationTick);
             }
             if(mClosingButton == i) {
+                canvas.scale(mClosingAnimationScaleSize, mClosingAnimationScaleSize, b.getCenter().x, b.getCenter().y);
                 if(mClosingAnimationScaleSize > 0.85f) {
                     mClosingAnimationScaleSize -= 0.01f;
-                    canvas.scale(mClosingAnimationScaleSize, mClosingAnimationScaleSize, b.getCenter().x, b.getCenter().y);
                     postInvalidateDelayed(mAnimationTick);
                 }
-                else {
-                    canvas.scale(mClosingAnimationScaleSize, mClosingAnimationScaleSize, b.getCenter().x, b.getCenter().y);
-                    mClosingAnimationScaleSize = 1.0f;
-                    mClosingButton = -1;
+                else if(!mClosingButtonClicked) {
+                    mClosingButtonClicked = true;
                     b.performClick();
                 }
             }

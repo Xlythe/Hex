@@ -46,6 +46,7 @@ public class OnlineSelectionFragment extends Fragment {
             @Override
             public void onClick() {
                 startActivityForResult(getMainActivity().getGamesClient().getSelectPlayersIntent(1, 1), MainActivity.RC_SELECT_PLAYERS);
+                getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
 
@@ -56,6 +57,7 @@ public class OnlineSelectionFragment extends Fragment {
             @Override
             public void onClick() {
                 startActivityForResult(getMainActivity().getGamesClient().getInvitationInboxIntent(), MainActivity.RC_SELECT_PLAYERS);
+                getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
 

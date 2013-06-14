@@ -306,7 +306,7 @@ public class GameFragment extends Fragment {
                     public void run() {
                         try {
                             if(!game.isGameOver()) {
-                                board.setTitleText(String.format(getString(R.string.game_turn_title), game.getCurrentPlayer().getName()));
+                                board.setTitleText(getString(R.string.game_turn_title));
                                 board.setActionText(getString(R.string.game_turn_msg));
                                 board.postInvalidate();
                             }
@@ -503,7 +503,7 @@ public class GameFragment extends Fragment {
                     || Integer.valueOf(prefs.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME))) * 60 * 1000 != game.gameOptions.timer.totalTime;
         }
         else if(gameLocation == GameAction.NET_GAME) {
-            return(game != null && game.isGameOver());
+            return (game != null && game.isGameOver());
         }
         else {
             return true;

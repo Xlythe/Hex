@@ -107,6 +107,7 @@ public class BoardView extends View {
             mBorderBackground.draw(canvas);
 
             if(mTitleText != null && mActionText != null) {
+                mTitleText = String.format(mTitleText, game.getCurrentPlayer().getName());
                 int textLength = (int) Math.max(mTextPaint.measureText(mTitleText), mLargeTextPaint.measureText(mActionText));
                 float posX = game.getCurrentPlayer().getTeam() == 1 ? mTextMargin + textLength : getWidth() - mTextMargin;
                 float posY = game.getCurrentPlayer().getTeam() == 1 ? getHeight() / 2 : mTextMargin + mTextPaint.getTextSize();

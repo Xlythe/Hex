@@ -31,6 +31,9 @@ public class HexDialogView extends View implements OnTouchListener {
 
     private HexDialog mDialog;
 
+    private int mOpeningAnimationTick;
+    private float mOpeningAnimationScaleSize;
+
     public HexDialogView(Context context) {
         super(context);
         setUp();
@@ -67,6 +70,8 @@ public class HexDialogView extends View implements OnTouchListener {
         mButtonTextPaint.setColor(Color.WHITE);
         mButtonTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, dm));
         mBorderColor = Color.LTGRAY;
+        mOpeningAnimationTick = 40;
+        mOpeningAnimationScaleSize = 0.5f;
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {}
@@ -76,8 +81,16 @@ public class HexDialogView extends View implements OnTouchListener {
     @Override
     protected void onDraw(Canvas canvas) {
         for(int i = 0; i < 3; i++) {
-            canvas.save();
             Button b = mButtons[i];
+
+            canvas.save();
+            if(mOpeningAnimationScaleSize < 1) {
+                mOpeningAnimationScaleSize += 0.01;
+                canvas.scale(mOpeningAnimationScaleSize, mOpeningAnimationScaleSize, b.getCenter().x, b.getCenter().y);
+                postInvalidateDelayed(mOpeningAnimationTick);
+            }
+
+            canvas.save();
             canvas.rotate(b.getRoation(), b.getCenter().x, b.getCenter().y);
             if(!b.isEnabled()) {
                 b.getBackgroundDrawable().getPaint().setColor(mDisabledColor);
@@ -98,6 +111,8 @@ public class HexDialogView extends View implements OnTouchListener {
                 b.getView().draw(canvas);
                 canvas.restore();
             }
+
+            canvas.restore();
         }
 
         mButtons[0].incrementRotation(-3f);

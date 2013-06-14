@@ -9,6 +9,7 @@ public class Stats {
     }
 
     public static void incrementTimePlayed(Context context, long time) {
+        time = Math.max(time, 0);
         PreferenceManager.getDefaultSharedPreferences(context).edit().putLong("time_played", getTimePlayed(context) + time).commit();
     }
 

@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.sam.hex.fragment.PreferencesFragment;
 
@@ -36,6 +37,9 @@ public class PreferencesActivity extends PreferenceActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.preferences);
+        TextView title = (TextView) findViewById(R.id.title);
+        title.setText(R.string.activity_title_preferences);
         if(android.os.Build.VERSION.SDK_INT < 11) {
             settings = PreferenceManager.getDefaultSharedPreferences(this);
             loadPreferences();
@@ -43,7 +47,7 @@ public class PreferencesActivity extends PreferenceActivity {
         else {
             if(savedInstanceState == null) {
                 PreferencesFragment preferences = new PreferencesFragment();
-                getFragmentManager().beginTransaction().add(android.R.id.content, preferences).commit();
+                getFragmentManager().beginTransaction().add(R.id.content, preferences).commit();
             }
         }
     }
@@ -138,7 +142,6 @@ public class PreferencesActivity extends PreferenceActivity {
     }
 
     private void loadPreferences() {
-        setContentView(R.layout.preferences);
         addPreferencesFromResource(R.layout.preferences_general);
     }
 

@@ -94,7 +94,8 @@ public class MainFragment extends Fragment {
         historyButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                getMainActivity().swapFragment(new HistoryFragment());
+                getMainActivity().setHistoryFragment(new HistoryFragment());
+                getMainActivity().swapFragment(getMainActivity().getHistoryFragment());
             }
         });
 
@@ -104,7 +105,8 @@ public class MainFragment extends Fragment {
         instructionsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                getMainActivity().swapFragment(new InstructionsFragment());
+                getMainActivity().setInstructionsFragment(new InstructionsFragment());
+                getMainActivity().swapFragment(getMainActivity().getInstructionsFragment());
             }
         });
 

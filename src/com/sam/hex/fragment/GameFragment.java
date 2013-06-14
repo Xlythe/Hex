@@ -522,7 +522,7 @@ public class GameFragment extends Fragment {
                 case DialogInterface.BUTTON_POSITIVE:
                     // Yes button clicked
                     stopGame(game);
-                    getMainActivity().swapFragmentWithoutBackStack(getMainActivity().getMainFragment());
+                    getMainActivity().returnHome();
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:
                     // No button clicked

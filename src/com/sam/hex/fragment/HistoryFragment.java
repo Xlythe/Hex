@@ -114,6 +114,7 @@ public class HistoryFragment extends ListFragment {
         }
 
         Arrays.sort(fileList, new Comparator<Item>() {
+            @Override
             public int compare(Item f1, Item f2) {
                 if(f1.file.equals("Up")) return -1;
                 if(f2.file.equals("Up")) return 1;
@@ -186,21 +187,7 @@ public class HistoryFragment extends ListFragment {
 
         // Checks if 'up' was clicked
         else if(chosenFile.equalsIgnoreCase("up") && !sel.exists()) {
-
-            // present directory removed from list
-            String s = str.remove(str.size() - 1);
-
-            // path modified to exclude present directory
-            path = new File(path.toString().substring(0, path.toString().lastIndexOf(s)));
-            fileList = null;
-
-            // if there are no more directories in the list, then
-            // its the first level
-            if(str.isEmpty()) {
-                firstLvl = true;
-            }
-            loadFileList();
-            refreshView();
+            goUp();
         }
         // File picked
         else {
@@ -218,6 +205,28 @@ public class HistoryFragment extends ListFragment {
                 Toast.makeText(getMainActivity(), R.string.game_toast_failed, Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    public boolean goUp() {
+        if(!firstLvl) {
+            // present directory removed from list
+            String s = str.remove(str.size() - 1);
+
+            // path modified to exclude present directory
+            path = new File(path.toString().substring(0, path.toString().lastIndexOf(s)));
+            fileList = null;
+
+            // if there are no more directories in the list, then
+            // its the first level
+            if(str.isEmpty()) {
+                firstLvl = true;
+            }
+            loadFileList();
+            refreshView();
+            return true;
+        }
+
+        return false;
     }
 
     private MainActivity getMainActivity() {

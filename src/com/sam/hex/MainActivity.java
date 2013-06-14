@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 
@@ -133,6 +132,10 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == KeyEvent.KEYCODE_BACK) {
+            if(mActiveFragment == mHistoryFragment) {
+                if(mHistoryFragment.goUp()) return true;
+            }
+
             if(mActiveFragment != mMainFragment) {
                 returnHome();
             }
@@ -145,7 +148,6 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
     }
 
     public void returnHome() {
-        getSupportFragmentManager().popBackStack(mMainFragment.toString(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
         swapFragment(mMainFragment);
     }
 
@@ -195,7 +197,7 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
     protected void dealWithPurchaseFailed(IabResult result) {}
 
     public void swapFragment(Fragment newFragment) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.content, newFragment).addToBackStack(newFragment.toString()).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.content, newFragment).commit();
         mActiveFragment = newFragment;
     }
 

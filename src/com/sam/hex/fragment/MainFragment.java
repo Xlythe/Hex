@@ -26,6 +26,7 @@ import com.sam.hex.view.HexagonLayout;
  **/
 public class MainFragment extends Fragment {
     // Hexagon variables
+    HexagonLayout mHexagonLayout;
     HexagonLayout.Button mAchievementsButton;
     HexagonLayout.Button mDonateButton;
 
@@ -46,15 +47,16 @@ public class MainFragment extends Fragment {
         getMainActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         View v = inflater.inflate(R.layout.home, null);
 
-        HexagonLayout hexagonLayout = (HexagonLayout) v.findViewById(R.id.hexagonButtons);
-        HexagonLayout.Button settingsButton = hexagonLayout.getButtons()[0];
-        mDonateButton = hexagonLayout.getButtons()[1];
-        HexagonLayout.Button historyButton = hexagonLayout.getButtons()[2];
-        HexagonLayout.Button instructionsButton = hexagonLayout.getButtons()[3];
-        mAchievementsButton = hexagonLayout.getButtons()[4];
-        HexagonLayout.Button playButton = hexagonLayout.getButtons()[5];
+        mHexagonLayout = (HexagonLayout) v.findViewById(R.id.hexagonButtons);
+        HexagonLayout.Button settingsButton = mHexagonLayout.getButtons()[0];
+        mDonateButton = mHexagonLayout.getButtons()[1];
+        HexagonLayout.Button historyButton = mHexagonLayout.getButtons()[2];
+        HexagonLayout.Button instructionsButton = mHexagonLayout.getButtons()[3];
+        mAchievementsButton = mHexagonLayout.getButtons()[4];
+        HexagonLayout.Button playButton = mHexagonLayout.getButtons()[5];
 
-        hexagonLayout.setTopMargin(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 25, getResources().getDisplayMetrics()));
+        mHexagonLayout.setTopMargin(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 25, getResources().getDisplayMetrics()));
+        mHexagonLayout.setText(R.string.app_name);
 
         mTitleTextView = (TextView) v.findViewById(R.id.title);
         mTimePlayedTextView = (TextView) v.findViewById(R.id.timePlayed);
@@ -63,8 +65,6 @@ public class MainFragment extends Fragment {
 
         mSignInButton = (SignInButton) v.findViewById(R.id.signInButton);
         mSignOutButton = (Button) v.findViewById(R.id.signOutButton);
-
-        hexagonLayout.setText(R.string.app_name);
 
         settingsButton.setText(R.string.main_button_settings);
         settingsButton.setColor(0xffcc5c57);
@@ -172,6 +172,7 @@ public class MainFragment extends Fragment {
                 Settings.getPlayer1Name(getMainActivity(), getMainActivity().getGamesClient())));
         if(mAchievementsButton != null) mAchievementsButton.setEnabled(getMainActivity().isSignedIn());
         if(mDonateButton != null) mDonateButton.setEnabled(getMainActivity().isIabSetup());
+        if(mHexagonLayout != null) mHexagonLayout.invalidate();
     }
 
     private MainActivity getMainActivity() {

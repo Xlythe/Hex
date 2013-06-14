@@ -15,6 +15,8 @@ import android.view.KeyEvent;
 import com.actionbarsherlock.view.MenuItem;
 import com.google.android.gms.appstate.AppStateClient;
 import com.google.android.gms.appstate.OnStateLoadedListener;
+import com.hex.android.net.GameManager;
+import com.hex.android.net.HexRoomUpdateListener;
 import com.sam.hex.fragment.GameFragment;
 import com.sam.hex.fragment.GameSelectionFragment;
 import com.sam.hex.fragment.HistoryFragment;
@@ -35,9 +37,8 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
 
     // Play variables
     private boolean mIsSignedIn = false;
-    private HexRealTimeMessageReceivedListener mHexRealTimeMessageReceivedListener;
-    private HexRoomStatusUpdateListener mHexRoomStatusUpdateListener;
-    private HexRoomUpdateListener mHexRoomUpdateListener;
+    private GameManager gameManager = null;
+    
 
     // Fragments
     private MainFragment mMainFragment;
@@ -103,9 +104,9 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        mHexRealTimeMessageReceivedListener = new HexRealTimeMessageReceivedListener();
-        mHexRoomStatusUpdateListener = new HexRoomStatusUpdateListener();
-        mHexRoomUpdateListener = new HexRoomUpdateListener(this);
+        //mHexRealTimeMessageReceivedListener = new HexRealTimeMessageReceivedListener();
+        //mHexRoomStatusUpdateListener = new HexRoomStatusUpdateListener();
+        //mHexRoomUpdateListener = new HexRoomUpdateListener(this);
 
         mMainFragment = new MainFragment();
         swapFragment(mMainFragment);
@@ -215,7 +216,7 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
     public void setOnlineSelectionFragment(OnlineSelectionFragment onlineSelectionFragment) {
         this.mOnlineSelectionFragment = onlineSelectionFragment;
     }
-
+/*
     public HexRealTimeMessageReceivedListener getHexRealTimeMessageReceivedListener() {
         return mHexRealTimeMessageReceivedListener;
     }
@@ -239,7 +240,7 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
     public void setHexRoomUpdateListener(HexRoomUpdateListener mHexRoomUpdateListener) {
         this.mHexRoomUpdateListener = mHexRoomUpdateListener;
     }
-
+ */
     private void popupRatingDialog() {
         // Popup asking to rate app after countdown
         int numTimesAppOpened = PreferenceManager.getDefaultSharedPreferences(this).getInt("num_times_app_opened_review", 0);
@@ -269,4 +270,16 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
             }
         }
     }
+
+	/**
+	 * @return the gameManager
+	 */
+	public GameManager getGameManager() {
+		return gameManager= new GameManager(this.mHelper,this);
+	}
+
+	/**
+	 * @param gameManager the gameManager to set
+	 */
+	
 }

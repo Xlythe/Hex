@@ -14,16 +14,19 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.google.android.gms.games.GamesActivityResultCodes;
 import com.google.android.gms.games.GamesClient;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
+import com.hex.android.net.GameManager;
+import com.hex.core.Game;
 import com.sam.hex.MainActivity;
 import com.sam.hex.R;
 import com.sam.hex.view.SelectorLayout;
 
 public class OnlineSelectionFragment extends SherlockFragment {
     private SelectorLayout mSelectorLayout;
-    private String mRoomId;
-
+    GameManager gameManager = null;
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    	gameManager = getMainActivity().getGameManager();
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.online_selection, null);
 
@@ -70,6 +73,7 @@ public class OnlineSelectionFragment extends SherlockFragment {
 
     @Override
     public void onActivityResult(int request, int response, Intent intent) {
+    	
         if(request == MainActivity.RC_SELECT_PLAYERS) {
             if(response != Activity.RESULT_OK) {
                 // user canceled
@@ -109,13 +113,14 @@ public class OnlineSelectionFragment extends SherlockFragment {
             }
             else if(response == Activity.RESULT_CANCELED || response == GamesActivityResultCodes.RESULT_LEFT_ROOM) {
                 // player wants to leave the room.
-                getMainActivity().getGamesClient().leaveRoom(getMainActivity().getHexRoomUpdateListener(), mRoomId);
+                getMainActivity().getGamesClient().leaveRoom(gameManager.getHexRoomUpdateListener(), gameManager.mRoomId);
                 getMainActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             }
         }
     }
 
     private void startQuickGame() {
+    
         // automatch criteria to invite 1 random automatch opponent.
         // You can also specify more opponents (up to 3).
         Bundle am = RoomConfig.createAutoMatchCriteria(1, 1, 0);
@@ -132,12 +137,13 @@ public class OnlineSelectionFragment extends SherlockFragment {
         getSherlockActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // go to game screen
+       Game g =this.gameManager.getGame();
     }
 
     private RoomConfig.Builder makeBasicRoomConfigBuilder() {
-        return RoomConfig.builder(getMainActivity().getHexRoomUpdateListener())
-                .setMessageReceivedListener(getMainActivity().getHexRealTimeMessageReceivedListener())
-                .setRoomStatusUpdateListener(getMainActivity().getHexRoomStatusUpdateListener());
+        return RoomConfig.builder(gameManager.getHexRoomUpdateListener())
+                .setMessageReceivedListener(gameManager.getHexRealTimeMessageReceivedListener())
+                .setRoomStatusUpdateListener(gameManager.getHexRoomStatusUpdateListener());
     }
 
     private MainActivity getMainActivity() {

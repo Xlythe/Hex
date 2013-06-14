@@ -23,6 +23,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.google.android.gms.appstate.AppStateClient;
 import com.google.android.gms.games.GamesClient;
 import com.google.android.gms.plus.PlusClient;
+import com.hex.android.net.GameHelper;
 
 /**
  * Example base class for games. This implementation takes care of setting up
@@ -37,7 +38,7 @@ import com.google.android.gms.plus.PlusClient;
  */
 public abstract class BaseGameActivity extends SherlockFragmentActivity implements GameHelper.GameHelperListener {
 
-    protected GameHelper mHelper;
+    public GameHelper mHelper;
 
     // expose these constants here because we don't want users of this class
     // to have to know about GameHelper at all
@@ -53,7 +54,7 @@ public abstract class BaseGameActivity extends SherlockFragmentActivity implemen
         super();
         mHelper = new GameHelper(this);
     }
-
+    
     protected BaseGameActivity(int requestedClients) {
         super();
         mRequestedClients = requestedClients;
@@ -83,7 +84,6 @@ public abstract class BaseGameActivity extends SherlockFragmentActivity implemen
         super.onActivityResult(request, response, data);
         mHelper.onActivityResult(request, response, data);
     }
-
     public GamesClient getGamesClient() {
         return mHelper.getGamesClient();
     }

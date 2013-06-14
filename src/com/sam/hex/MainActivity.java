@@ -38,9 +38,10 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
     private HexRealTimeMessageReceivedListener mHexRealTimeMessageReceivedListener;
     private HexRoomStatusUpdateListener mHexRoomStatusUpdateListener;
     private HexRoomUpdateListener mHexRoomUpdateListener;
+    private boolean mOpenAchievements = false;
 
     // Donate variables
-    private boolean iabSetup;
+    private boolean mIabSetup;
 
     // Fragments
     private MainFragment mMainFragment;
@@ -159,6 +160,12 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
         getAppStateClient().loadState(this, GAMES_PLAYED_STATE);
         getAppStateClient().loadState(this, GAMES_WON_STATE);
         mMainFragment.setSignedIn(mIsSignedIn);
+
+        if(mOpenAchievements) {
+            mOpenAchievements = false;
+            startActivityForResult(getGamesClient().getAchievementsIntent(), MainActivity.REQUEST_ACHIEVEMENTS);
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        }
     }
 
     @Override
@@ -312,10 +319,14 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
     }
 
     public boolean isIabSetup() {
-        return iabSetup;
+        return mIabSetup;
     }
 
     public void setIabSetup(boolean iabSetup) {
-        this.iabSetup = iabSetup;
+        this.mIabSetup = iabSetup;
+    }
+
+    public void setOpenAchievements(boolean open) {
+        this.mOpenAchievements = open;
     }
 }

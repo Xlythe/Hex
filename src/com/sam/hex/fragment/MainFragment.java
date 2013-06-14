@@ -27,7 +27,6 @@ import com.sam.hex.view.HexagonLayout;
 public class MainFragment extends Fragment {
     // Hexagon variables
     HexagonLayout mHexagonLayout;
-    HexagonLayout.Button mAchievementsButton;
     HexagonLayout.Button mDonateButton;
 
     // Stat variables
@@ -52,7 +51,7 @@ public class MainFragment extends Fragment {
         mDonateButton = mHexagonLayout.getButtons()[1];
         HexagonLayout.Button historyButton = mHexagonLayout.getButtons()[2];
         HexagonLayout.Button instructionsButton = mHexagonLayout.getButtons()[3];
-        mAchievementsButton = mHexagonLayout.getButtons()[4];
+        HexagonLayout.Button achievementsButton = mHexagonLayout.getButtons()[4];
         HexagonLayout.Button playButton = mHexagonLayout.getButtons()[5];
 
         mHexagonLayout.setTopMargin(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 25, getResources().getDisplayMetrics()));
@@ -110,14 +109,20 @@ public class MainFragment extends Fragment {
             }
         });
 
-        mAchievementsButton.setText(R.string.main_button_achievements);
-        mAchievementsButton.setColor(0xfff48935);
-        mAchievementsButton.setDrawableResource(R.drawable.achievements);
-        mAchievementsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
+        achievementsButton.setText(R.string.main_button_achievements);
+        achievementsButton.setColor(0xfff48935);
+        achievementsButton.setDrawableResource(R.drawable.achievements);
+        achievementsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                startActivityForResult(getMainActivity().getGamesClient().getAchievementsIntent(), MainActivity.REQUEST_ACHIEVEMENTS);
-                getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                if(getMainActivity().isSignedIn()) {
+                    startActivityForResult(getMainActivity().getGamesClient().getAchievementsIntent(), MainActivity.REQUEST_ACHIEVEMENTS);
+                    getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                }
+                else {
+                    getMainActivity().setOpenAchievements(true);
+                    getMainActivity().beginUserInitiatedSignIn();
+                }
             }
         });
 
@@ -171,7 +176,6 @@ public class MainFragment extends Fragment {
         if(mSignInButton != null) mSignInButton.setVisibility(getMainActivity().isSignedIn() ? View.GONE : View.VISIBLE);
         if(mTitleTextView != null) mTitleTextView.setText(String.format(getString(R.string.main_title),
                 Settings.getPlayer1Name(getMainActivity(), getMainActivity().getGamesClient())));
-        if(mAchievementsButton != null) mAchievementsButton.setEnabled(getMainActivity().isSignedIn());
         if(mDonateButton != null) mDonateButton.setEnabled(getMainActivity().isIabSetup());
         if(mHexagonLayout != null) mHexagonLayout.invalidate();
     }

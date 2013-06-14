@@ -197,12 +197,8 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
     protected void dealWithPurchaseFailed(IabResult result) {}
 
     public void swapFragment(Fragment newFragment) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.content, newFragment).commit();
-        mActiveFragment = newFragment;
-    }
-
-    public void swapFragmentWithoutBackStack(Fragment newFragment) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.content, newFragment).commit();
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out).replace(R.id.content, newFragment)
+                .commit();
         mActiveFragment = newFragment;
     }
 

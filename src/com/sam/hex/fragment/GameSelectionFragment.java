@@ -30,7 +30,7 @@ public class GameSelectionFragment extends Fragment {
                 getMainActivity().setGameFragment(new GameFragment());
                 getMainActivity().getGameFragment().setPlayer1Type(Player.Human);
                 getMainActivity().getGameFragment().setPlayer2Type(Player.AI);
-                getMainActivity().swapFragmentWithoutBackStack(getMainActivity().getGameFragment());
+                getMainActivity().swapFragment(getMainActivity().getGameFragment());
             }
         });
 
@@ -43,7 +43,7 @@ public class GameSelectionFragment extends Fragment {
                 getMainActivity().setGameFragment(new GameFragment());
                 getMainActivity().getGameFragment().setPlayer1Type(Player.Human);
                 getMainActivity().getGameFragment().setPlayer2Type(Player.Human);
-                getMainActivity().swapFragmentWithoutBackStack(getMainActivity().getGameFragment());
+                getMainActivity().swapFragment(getMainActivity().getGameFragment());
             }
         });
 
@@ -55,7 +55,7 @@ public class GameSelectionFragment extends Fragment {
             @Override
             public void onClick() {
                 getMainActivity().setOnlineSelectionFragment(new OnlineSelectionFragment());
-                getMainActivity().swapFragmentWithoutBackStack(getMainActivity().getOnlineSelectionFragment());
+                getMainActivity().swapFragment(getMainActivity().getOnlineSelectionFragment());
             }
         });
 

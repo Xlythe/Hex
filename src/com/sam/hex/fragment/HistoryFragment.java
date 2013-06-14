@@ -198,7 +198,7 @@ public class HistoryFragment extends ListFragment {
 
                 getMainActivity().setGameFragment(new GameFragment());
                 getMainActivity().getGameFragment().setArguments(b);
-                getMainActivity().swapFragmentWithoutBackStack(getMainActivity().getGameFragment());
+                getMainActivity().swapFragment(getMainActivity().getGameFragment());
             }
             catch(IOException e) {
                 e.printStackTrace();

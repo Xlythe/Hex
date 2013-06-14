@@ -199,77 +199,81 @@ public class GameFragment extends Fragment {
                         dialog.show();
 
                         if(gameHasEnded) return;
+                        else gameHasEnded = true;
 
-                        // Auto save completed game
-                        if(Settings.getAutosave(getMainActivity())) {
-                            try {
-                                String fileName = String.format(getString(R.string.auto_saved_file_name), SAVE_FORMAT.format(new Date()), game.getPlayer1()
-                                        .getName(), game.getPlayer2().getName());
-                                FileUtil.autoSaveGame(fileName, game.save());
-                            }
-                            catch(IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Auto save completed game
+                                if(Settings.getAutosave(getMainActivity())) {
+                                    try {
+                                        String fileName = String.format(getString(R.string.auto_saved_file_name), SAVE_FORMAT.format(new Date()), game
+                                                .getPlayer1().getName(), game.getPlayer2().getName());
+                                        FileUtil.autoSaveGame(fileName, game.save());
+                                    }
+                                    catch(IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
 
-                        Stats.incrementTimePlayed(getMainActivity(), game.getGameLength() - timeGamePaused);
-                        Stats.incrementGamesPlayed(getMainActivity());
-                        if(player.getType().equals(Player.Human)) Stats.incrementGamesWon(getMainActivity());
+                                Stats.incrementTimePlayed(getMainActivity(), game.getGameLength() - timeGamePaused);
+                                Stats.incrementGamesPlayed(getMainActivity());
+                                if(player.getType().equals(Player.Human)) Stats.incrementGamesWon(getMainActivity());
 
-                        if(getMainActivity().isSignedIn()) {
-                            // Backup stats
-                            getMainActivity().getAppStateClient().updateState(MainActivity.PLAY_TIME_STATE,
-                                    String.valueOf(Stats.getTimePlayed(getMainActivity())).getBytes());
-                            getMainActivity().getAppStateClient().updateState(MainActivity.GAMES_PLAYED_STATE,
-                                    String.valueOf(Stats.getGamesPlayed(getMainActivity())).getBytes());
-                            getMainActivity().getAppStateClient().updateState(MainActivity.GAMES_WON_STATE,
-                                    String.valueOf(Stats.getGamesWon(getMainActivity())).getBytes());
+                                if(getMainActivity().isSignedIn()) {
+                                    // Backup stats
+                                    getMainActivity().getAppStateClient().updateState(MainActivity.PLAY_TIME_STATE,
+                                            String.valueOf(Stats.getTimePlayed(getMainActivity())).getBytes());
+                                    getMainActivity().getAppStateClient().updateState(MainActivity.GAMES_PLAYED_STATE,
+                                            String.valueOf(Stats.getGamesPlayed(getMainActivity())).getBytes());
+                                    getMainActivity().getAppStateClient().updateState(MainActivity.GAMES_WON_STATE,
+                                            String.valueOf(Stats.getGamesWon(getMainActivity())).getBytes());
 
-                            // Unlock the quick play achievements!
-                            if(game.getGameLength() < 30 * 1000) {
-                                getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_30_seconds));
-                            }
-                            if(game.getGameLength() < 10 * 1000) {
-                                getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_10_seconds));
-                            }
+                                    // Unlock the quick play achievements!
+                                    if(game.getGameLength() < 30 * 1000) {
+                                        getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_30_seconds));
+                                    }
+                                    if(game.getGameLength() < 10 * 1000) {
+                                        getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_10_seconds));
+                                    }
 
-                            // Unlock the fill the board achievement!
-                            boolean boardFilled = true;
-                            for(int i = 0; i < game.gameOptions.gridSize; i++) {
-                                for(int j = 0; j < game.gameOptions.gridSize; j++) {
-                                    if(game.gamePieces[i][j].getTeam() == 0) boardFilled = false;
+                                    // Unlock the fill the board achievement!
+                                    boolean boardFilled = true;
+                                    for(int i = 0; i < game.gameOptions.gridSize; i++) {
+                                        for(int j = 0; j < game.gameOptions.gridSize; j++) {
+                                            if(game.gamePieces[i][j].getTeam() == 0) boardFilled = false;
+                                        }
+                                    }
+                                    if(boardFilled) {
+                                        getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_fill_the_board));
+                                    }
+
+                                    // Unlock the montior smasher achievement!
+                                    if(player.getType().equals(Player.Human) && game.getPlayer2().getType().equals(Player.AI)) {
+                                        getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_monitor_smasher));
+                                    }
+
+                                    // Unlock the speed demon achievement!
+                                    if(game.gameOptions.timer.type != Timer.NO_TIMER) {
+                                        getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_speed_demon));
+                                    }
+
+                                    // Unlock the Novice achievement!
+                                    getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_novice), 1);
+
+                                    // Unlock the Intermediate achievement!
+                                    getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_intermediate), 1);
+
+                                    // Unlock the Expert achievement!
+                                    if(player.getType().equals(Player.Human)) getMainActivity().getGamesClient().incrementAchievement(
+                                            getString(R.string.achievement_expert), 1);
+
+                                    // Unlock the Expert achievement!
+                                    if(player.getType().equals(Player.Human)) getMainActivity().getGamesClient().incrementAchievement(
+                                            getString(R.string.achievement_insane), 1);
                                 }
                             }
-                            if(boardFilled) {
-                                getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_fill_the_board));
-                            }
-
-                            // Unlock the montior smasher achievement!
-                            if(player.getType().equals(Player.Human) && game.getPlayer2().getType().equals(Player.AI)) {
-                                getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_monitor_smasher));
-                            }
-
-                            // Unlock the speed demon achievement!
-                            if(game.gameOptions.timer.type != Timer.NO_TIMER) {
-                                getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_speed_demon));
-                            }
-
-                            // Unlock the Novice achievement!
-                            getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_novice), 1);
-
-                            // Unlock the Intermediate achievement!
-                            getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_intermediate), 1);
-
-                            // Unlock the Expert achievement!
-                            if(player.getType().equals(Player.Human)) getMainActivity().getGamesClient().incrementAchievement(
-                                    getString(R.string.achievement_expert), 1);
-
-                            // Unlock the Expert achievement!
-                            if(player.getType().equals(Player.Human)) getMainActivity().getGamesClient().incrementAchievement(
-                                    getString(R.string.achievement_insane), 1);
-                        }
-
-                        gameHasEnded = true;
+                        }).start();
                     }
                 });
             }

@@ -28,6 +28,7 @@ public class HexDialogView extends View implements OnTouchListener {
     private int mDisabledColor;
     private int mBackgroundColor;
     private int mBorderColor;
+    private Button mFocusedButton = null;
 
     private HexDialog mDialog;
 
@@ -79,8 +80,95 @@ public class HexDialogView extends View implements OnTouchListener {
         mClosingButton = -1;
         setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View v) {}
+            public void onClick(View v) {
+                for(int i = 0; i < mButtons.length; i++) {
+                    Button b = mButtons[i];
+                    if(b.isSelected() || b.isPressed()) {
+                        mClosingButton = i;
+                        invalidate();
+                    }
+                }
+            }
         });
+        setFocusable(true);
+        setOnFocusChangeListener(new OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    mFocusedButton = mButtons[0];
+                    while(mFocusedButton != getToLeftOf(mFocusedButton)) {
+                        mFocusedButton = getToLeftOf(mFocusedButton);
+                    }
+                    mFocusedButton.setSelected(true);
+                    invalidate();
+                }
+                else {
+                    if(mFocusedButton != null) {
+                        mFocusedButton.setSelected(false);
+                        invalidate();
+                    }
+                }
+            }
+        });
+    }
+
+    @Override
+    public View focusSearch(int direction) {
+        Button button;
+        if(mFocusedButton != null) mFocusedButton.setSelected(false);
+        switch(direction) {
+        case View.FOCUS_RIGHT:
+            button = getToRightOf(mFocusedButton);
+            if(button != mFocusedButton) {
+                button.setSelected(true);
+                mFocusedButton = button;
+                invalidate();
+                return this;
+            }
+            else {
+                mFocusedButton = null;
+            }
+
+            if(mFocusedButton == null) {
+                mFocusedButton = mButtons[0];
+                while(mFocusedButton != getToRightOf(mFocusedButton)) {
+                    mFocusedButton = getToRightOf(mFocusedButton);
+                }
+                mFocusedButton.setSelected(true);
+                invalidate();
+            }
+            break;
+        case View.FOCUS_LEFT:
+            button = getToLeftOf(mFocusedButton);
+            if(button != mFocusedButton) {
+                button.setSelected(true);
+                mFocusedButton = button;
+                invalidate();
+                return this;
+            }
+            else {
+                mFocusedButton = null;
+            }
+
+            if(mFocusedButton == null) {
+                mFocusedButton = mButtons[0];
+                while(mFocusedButton != getToLeftOf(mFocusedButton)) {
+                    mFocusedButton = getToLeftOf(mFocusedButton);
+                }
+                mFocusedButton.setSelected(true);
+                invalidate();
+            }
+            break;
+        case View.FOCUS_UP:
+            break;
+        case View.FOCUS_DOWN:
+            break;
+        case View.FOCUS_FORWARD:
+            break;
+        case View.FOCUS_BACKWARD:
+            break;
+        }
+        return super.focusSearch(direction);
     }
 
     @Override
@@ -112,6 +200,9 @@ public class HexDialogView extends View implements OnTouchListener {
                 b.getBackgroundDrawable().getPaint().setColor(mDisabledColor);
             }
             else if(b.isPressed()) {
+                b.getBackgroundDrawable().getPaint().setColor(mPressedColor);
+            }
+            else if(b.isSelected()) {
                 b.getBackgroundDrawable().getPaint().setColor(mPressedColor);
             }
             else {
@@ -231,7 +322,6 @@ public class HexDialogView extends View implements OnTouchListener {
                 Button b = mButtons[i];
                 if(b.isPressed()) {
                     performClick();
-                    mClosingButton = i;
                     b.setPressed(false);
                 }
             }
@@ -255,6 +345,56 @@ public class HexDialogView extends View implements OnTouchListener {
 
     public Button[] getButtons() {
         return mButtons;
+    }
+
+    private Button getToRightOf(Button button) {
+        if(button == null) return null;
+        Button[] sortedButtons = getSortedButtons();
+        Button rightMost = sortedButtons[sortedButtons.length - 1];
+        for(int i = 0; i < sortedButtons.length - 1; i++) {
+            Button b = sortedButtons[i];
+            if(b == button) {
+                rightMost = sortedButtons[i + 1];
+            }
+        }
+        return rightMost;
+    }
+
+    private Button getToLeftOf(Button button) {
+        if(button == null) return null;
+        Button[] sortedButtons = getSortedButtons();
+        Button leftMost = sortedButtons[0];
+        for(int i = 1; i < sortedButtons.length; i++) {
+            Button b = sortedButtons[i];
+            if(b == button) {
+                leftMost = sortedButtons[i - 1];
+            }
+        }
+        return leftMost;
+    }
+
+    private Button[] getSortedButtons() {
+        Button[] unsorted = mButtons.clone();
+        int disabledButtons = 0;
+        for(Button b : unsorted) {
+            if(b.getOnClickListener() == null) disabledButtons++;
+        }
+        Button[] sorted = new Button[mButtons.length - disabledButtons];
+
+        for(int i = 0; i < sorted.length; i++) {
+            int smallestButtonPos = 0;
+            for(int j = 0; j < unsorted.length; j++) {
+                if(unsorted[j] == null || unsorted[j].getOnClickListener() == null) continue;
+
+                if(unsorted[smallestButtonPos] == null) smallestButtonPos = j;
+                else if(unsorted[j].getCenter().x < unsorted[smallestButtonPos].getCenter().x) {
+                    smallestButtonPos = j;
+                }
+            }
+            sorted[i] = unsorted[smallestButtonPos];
+            unsorted[smallestButtonPos] = null;
+        }
+        return sorted;
     }
 
     private class Hexagon {
@@ -318,6 +458,7 @@ public class HexDialogView extends View implements OnTouchListener {
         private HexDialogView.Button.OnClickListener onClickListener;
         private Hexagon hexagon;
         private boolean pressed;
+        private boolean selected;
         private boolean enabled = true;
         private Point center;
         private float rotation;
@@ -363,6 +504,14 @@ public class HexDialogView extends View implements OnTouchListener {
 
         protected void setPressed(boolean pressed) {
             this.pressed = pressed;
+        }
+
+        protected boolean isSelected() {
+            return selected;
+        }
+
+        protected void setSelected(boolean selected) {
+            this.selected = selected;
         }
 
         public boolean isEnabled() {

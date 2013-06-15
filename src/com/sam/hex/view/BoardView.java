@@ -20,6 +20,7 @@ import com.hex.core.Game;
 import com.hex.core.GameAction;
 import com.hex.core.Player;
 import com.hex.core.Point;
+import com.hex.core.Timer;
 import com.sam.hex.BoardTools;
 
 /**
@@ -116,7 +117,7 @@ public class BoardView extends View {
             }
         }
 
-        if(mTimerText != null && !game.replayRunning && !game.isGameOver()) {
+        if(game.gameOptions.timer.type != Timer.NO_TIMER && !game.replayRunning && !game.isGameOver()) {
             float posX = getWidth() - mTextMargin;
             float posY = getHeight() / 2;
             long minutesLeft = game.getCurrentPlayer().getTime() / (60 * 1000);

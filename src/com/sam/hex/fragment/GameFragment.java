@@ -159,6 +159,9 @@ public class GameFragment extends HexFragment {
             }
         });
 
+        undo.setNextFocusRightId(R.id.board);
+        board.setNextFocusLeftId(R.id.undo);
+
         return v;
     }
 

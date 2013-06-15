@@ -124,6 +124,12 @@ public class HexagonLayout extends View implements OnTouchListener {
                     mButtons[3].setSelected(true);
                     invalidate();
                 }
+                else {
+                    if(mFocusedButton != -1) {
+                        mButtons[mFocusedButton].setSelected(false);
+                        invalidate();
+                    }
+                }
             }
         });
     }

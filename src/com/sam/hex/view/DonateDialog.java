@@ -3,6 +3,7 @@ package com.sam.hex.view;
 import android.content.Context;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.android.vending.billing.util.IabResult;
 import com.sam.hex.MainActivity;
@@ -24,23 +25,41 @@ public class DonateDialog extends HexDialog {
 
     @Override
     public View getPositiveView() {
-        ImageView iv = (ImageView) View.inflate(this, R.layout.donate_dialog_textview, null);
+        View v = View.inflate(this, R.layout.donate_dialog_textview, null);
+
+        ImageView iv = (ImageView) v.findViewById(R.id.image);
         iv.setImageResource(R.drawable.donate_gold_d);
-        return iv;
+
+        TextView tv = (TextView) v.findViewById(R.id.text);
+        tv.setText("$4.99");
+
+        return v;
     }
 
     @Override
     public View getNegativeView() {
-        ImageView iv = (ImageView) View.inflate(this, R.layout.donate_dialog_textview, null);
+        View v = View.inflate(this, R.layout.donate_dialog_textview, null);
+
+        ImageView iv = (ImageView) v.findViewById(R.id.image);
         iv.setImageResource(R.drawable.donate_bronze_d);
-        return iv;
+
+        TextView tv = (TextView) v.findViewById(R.id.text);
+        tv.setText("$.99");
+
+        return v;
     }
 
     @Override
     public View getNeutralView() {
-        ImageView iv = (ImageView) View.inflate(this, R.layout.donate_dialog_textview, null);
+        View v = View.inflate(this, R.layout.donate_dialog_textview, null);
+
+        ImageView iv = (ImageView) v.findViewById(R.id.image);
         iv.setImageResource(R.drawable.donate_silver_d);
-        return iv;
+
+        TextView tv = (TextView) v.findViewById(R.id.text);
+        tv.setText("$2.99");
+
+        return v;
     }
 
     @Override
@@ -103,42 +122,42 @@ public class DonateDialog extends HexDialog {
 
     @Override
     public float getPositiveXPercent() {
-        return 0.75f;
+        return 0.45f;
     }
 
     @Override
     public float getPositiveYPercent() {
-        return 0.50f;
+        return 0.25f;
     }
 
     @Override
     public float getPositiveSideLengthPercent() {
-        return 0.10f;
+        return 0.13f;
     }
 
     @Override
     public float getNegativeXPercent() {
-        return 0.25f;
+        return 0.20f;
     }
 
     @Override
     public float getNegativeYPercent() {
-        return 0.50f;
+        return 0.80f;
     }
 
     @Override
     public float getNegativeSideLengthPercent() {
-        return 0.10f;
+        return 0.08f;
     }
 
     @Override
     public float getNeutralXPercent() {
-        return 0.50f;
+        return 0.77f;
     }
 
     @Override
     public float getNeutralYPercent() {
-        return 0.25f;
+        return 0.65f;
     }
 
     @Override

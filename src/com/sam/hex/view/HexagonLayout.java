@@ -105,9 +105,6 @@ public class HexagonLayout extends View implements OnTouchListener {
         mButtonTextPaint.setColor(Color.WHITE);
         mButtonTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, dm));
         mAllowRotation = true;
-        mRotation = 120f;
-        mRotationSpin = 100f;
-        mRotationSpinSign = 1;
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {}
@@ -458,6 +455,21 @@ public class HexagonLayout extends View implements OnTouchListener {
 
     public void setTopMargin(float margin) {
         mTopMargin = margin;
+    }
+
+    public void setInitialSpin(float initialSpin) {
+        if(initialSpin > 0) {
+            mRotationSpin = initialSpin;
+            mRotationSpinSign = 1;
+        }
+        else {
+            mRotationSpin = -1 * initialSpin;
+            mRotationSpinSign = -1;
+        }
+    }
+
+    public void setInitialRotation(float initialRotation) {
+        mRotation = initialRotation;
     }
 
     private class Triangle {

@@ -28,6 +28,8 @@ public class MainFragment extends Fragment {
     // Hexagon variables
     HexagonLayout mHexagonLayout;
     HexagonLayout.Button mDonateButton;
+    private float mInitialSpin;
+    private float mInitialRotation;
 
     // Stat variables
     TextView mTitleTextView;
@@ -56,6 +58,10 @@ public class MainFragment extends Fragment {
 
         mHexagonLayout.setTopMargin(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 25, getResources().getDisplayMetrics()));
         mHexagonLayout.setText(R.string.app_name);
+        mHexagonLayout.setInitialRotation(mInitialRotation);
+        mInitialRotation = 0f;
+        mHexagonLayout.setInitialSpin(mInitialSpin);
+        mInitialSpin = 0f;
 
         mTitleTextView = (TextView) v.findViewById(R.id.title);
         mTimePlayedTextView = (TextView) v.findViewById(R.id.timePlayed);
@@ -190,6 +196,14 @@ public class MainFragment extends Fragment {
 
     public void setIabSetup(boolean isIabSetup) {
         refreshPlayerInformation();
+    }
+
+    public void setInitialSpin(float initialSpin) {
+        mInitialSpin = initialSpin;
+    }
+
+    public void setInitialRotation(float initialRotation) {
+        mInitialRotation = initialRotation;
     }
 
     private void showDonationStar() {

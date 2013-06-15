@@ -113,6 +113,8 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
         mHexRoomUpdateListener = new HexRoomUpdateListener(this);
 
         mMainFragment = new MainFragment();
+        mMainFragment.setInitialRotation(-120f);
+        mMainFragment.setInitialSpin(50f);
         swapFragment(mMainFragment);
 
         popupRatingDialog();

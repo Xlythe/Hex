@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.KeyEvent;
-import android.view.MenuItem;
 
 import com.android.vending.billing.util.IabResult;
 import com.google.android.gms.appstate.AppStateClient;
@@ -118,18 +117,6 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
         swapFragment(mMainFragment);
 
         popupRatingDialog();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch(item.getItemId()) {
-        case android.R.id.home:
-            returnHome();
-            return true;
-        default:
-            return super.onOptionsItemSelected(item);
-        }
     }
 
     @Override

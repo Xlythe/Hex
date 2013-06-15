@@ -65,6 +65,7 @@ public class HexagonLayout extends View implements OnTouchListener {
     private float mLineOffset;
     private int mPressedColor;
     private int mDisabledColor;
+    private int mFocusedButton = -1;
 
     public HexagonLayout(Context context) {
         super(context);
@@ -133,8 +134,6 @@ public class HexagonLayout extends View implements OnTouchListener {
             }
         });
     }
-
-    private int mFocusedButton = -1;
 
     @Override
     public View focusSearch(int direction) {

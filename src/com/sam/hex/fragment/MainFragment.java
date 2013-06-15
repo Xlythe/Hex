@@ -2,7 +2,6 @@ package com.sam.hex.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +23,7 @@ import com.sam.hex.view.HexagonLayout;
 /**
  * @author Will Harmon
  **/
-public class MainFragment extends Fragment {
+public class MainFragment extends HexFragment {
     // Hexagon variables
     HexagonLayout mHexagonLayout;
     HexagonLayout.Button mDonateButton;
@@ -184,10 +183,6 @@ public class MainFragment extends Fragment {
                 Settings.getPlayer1Name(getMainActivity(), getMainActivity().getGamesClient())));
         if(mDonateButton != null) mDonateButton.setEnabled(getMainActivity().isIabSetup());
         if(mHexagonLayout != null) mHexagonLayout.invalidate();
-    }
-
-    private MainActivity getMainActivity() {
-        return (MainActivity) getActivity();
     }
 
     public void setSignedIn(boolean isSignedIn) {

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +20,7 @@ import com.sam.hex.view.SelectorLayout;
 /**
  * @author Will Harmon
  **/
-public class OnlineSelectionFragment extends Fragment {
+public class OnlineSelectionFragment extends HexFragment {
     private SelectorLayout mSelectorLayout;
     private String mRoomId;
 
@@ -143,9 +142,5 @@ public class OnlineSelectionFragment extends Fragment {
         return RoomConfig.builder(getMainActivity().getHexRoomUpdateListener())
                 .setMessageReceivedListener(getMainActivity().getHexRealTimeMessageReceivedListener())
                 .setRoomStatusUpdateListener(getMainActivity().getHexRoomStatusUpdateListener());
-    }
-
-    private MainActivity getMainActivity() {
-        return (MainActivity) getActivity();
     }
 }

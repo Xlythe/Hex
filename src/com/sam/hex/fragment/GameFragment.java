@@ -10,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,7 +39,7 @@ import com.sam.hex.view.GameOverDialog;
 /**
  * @author Will Harmon
  **/
-public class GameFragment extends Fragment {
+public class GameFragment extends HexFragment {
     public static final String GAME = "game";
     public static final String REPLAY = "replay";
     private static final SimpleDateFormat SAVE_FORMAT = new SimpleDateFormat("MMM dd, yyyy hh:mm", Locale.getDefault());
@@ -541,10 +540,6 @@ public class GameFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getMainActivity());
         builder.setMessage(getString(R.string.confirmExit)).setPositiveButton(getString(R.string.yes), dialogClickListener)
                 .setNegativeButton(getString(R.string.no), dialogClickListener).show();
-    }
-
-    public MainActivity getMainActivity() {
-        return (MainActivity) getActivity();
     }
 
     public void setPlayer1Type(Player player1Type) {

@@ -1,20 +1,18 @@
 package com.sam.hex.fragment;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.hex.core.Player;
-import com.sam.hex.MainActivity;
 import com.sam.hex.R;
 import com.sam.hex.view.SelectorLayout;
 
 /**
  * @author Will Harmon
  **/
-public class GameSelectionFragment extends Fragment {
+public class GameSelectionFragment extends HexFragment {
     SelectorLayout.Button mNetButton;
 
     @Override
@@ -63,9 +61,5 @@ public class GameSelectionFragment extends Fragment {
         });
 
         return v;
-    }
-
-    private MainActivity getMainActivity() {
-        return (MainActivity) getActivity();
     }
 }

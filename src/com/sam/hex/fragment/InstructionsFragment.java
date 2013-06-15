@@ -1,7 +1,6 @@
 package com.sam.hex.fragment;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +12,7 @@ import com.sam.hex.R;
 /**
  * @author Will Harmon
  **/
-public class InstructionsFragment extends Fragment {
+public class InstructionsFragment extends HexFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);

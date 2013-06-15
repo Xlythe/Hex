@@ -107,8 +107,125 @@ public class HexagonLayout extends View implements OnTouchListener {
         mAllowRotation = true;
         setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View v) {}
+            public void onClick(View v) {
+                for(Button b : mButtons) {
+                    if(b.isSelected() || b.isPressed()) {
+                        b.performClick();
+                    }
+                }
+            }
         });
+        setFocusable(true);
+        setOnFocusChangeListener(new OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    mFocusedButton = 3;
+                    mButtons[3].setSelected(true);
+                    invalidate();
+                }
+            }
+        });
+    }
+
+    private int mFocusedButton = -1;
+
+    @Override
+    public View focusSearch(int direction) {
+        mButtons[mFocusedButton].setSelected(false);
+        switch(direction) {
+        case View.FOCUS_RIGHT:
+            switch(mFocusedButton) {
+            case 2:
+                mFocusedButton = 1;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            case 3:
+                mFocusedButton = 2;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            case 4:
+                mFocusedButton = 5;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            case 5:
+                mFocusedButton = 0;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            }
+            break;
+        case View.FOCUS_LEFT:
+            switch(mFocusedButton) {
+            case 0:
+                mFocusedButton = 5;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            case 1:
+                mFocusedButton = 2;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            case 2:
+                mFocusedButton = 3;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            case 5:
+                mFocusedButton = 4;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            }
+            break;
+        case View.FOCUS_UP:
+            switch(mFocusedButton) {
+            case 1:
+                mFocusedButton = 0;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            case 2:
+                mFocusedButton = 5;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            case 3:
+                mFocusedButton = 4;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            }
+            break;
+        case View.FOCUS_DOWN:
+            switch(mFocusedButton) {
+            case 0:
+                mFocusedButton = 1;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            case 5:
+                mFocusedButton = 2;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            case 4:
+                mFocusedButton = 3;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            }
+            break;
+        case View.FOCUS_FORWARD:
+            break;
+        case View.FOCUS_BACKWARD:
+            break;
+        }
+        return super.focusSearch(direction);
     }
 
     private void layoutText() {
@@ -195,6 +312,10 @@ public class HexagonLayout extends View implements OnTouchListener {
             }
             if(!mButtons[i].isEnabled()) {
                 mPressedState[i].getPaint().setColor(mDisabledColor);
+                mPressedState[i].draw(canvas);
+            }
+            if(mButtons[i].isSelected()) {
+                mPressedState[i].getPaint().setColor(mPressedColor);
                 mPressedState[i].draw(canvas);
             }
         }
@@ -373,7 +494,6 @@ public class HexagonLayout extends View implements OnTouchListener {
             for(Button b : mButtons) {
                 if(b.isPressed()) {
                     performClick();
-                    b.performClick();
                     performClick = true;
                 }
                 b.setPressed(false);
@@ -520,6 +640,7 @@ public class HexagonLayout extends View implements OnTouchListener {
         private Triangle triangle;
         private boolean pressed;
         private boolean enabled = true;
+        private boolean selected;
 
         public Button(Context context) {
             this.context = context;
@@ -587,6 +708,14 @@ public class HexagonLayout extends View implements OnTouchListener {
 
         protected void setPressed(boolean pressed) {
             this.pressed = pressed;
+        }
+
+        protected boolean isSelected() {
+            return selected;
+        }
+
+        protected void setSelected(boolean selected) {
+            this.selected = selected;
         }
 
         public boolean isEnabled() {

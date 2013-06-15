@@ -24,16 +24,26 @@ import com.hex.core.Point;
  * @author Will Harmon
  **/
 public class HexagonLayout extends View implements OnTouchListener {
+    // Rotation variables
     private boolean mAllowRotation;
-
     private float mRotation;
+    private float mRotationOffset;
+    private float mOldRotation;
+    private boolean mSnapToSide;
+    private float[] mRotationHistory;
+    private float mRotationSpin;
+    private int mRotationSpinSign;
+
+    // Size and shape variables
     private Point[] corners;
     private Point center;
     private float mTopMargin;
 
+    // Background variables
     private ShapeDrawable mHexagon;
     private int mBackgroundColor;
 
+    // Title text variables
     private String mText;
     private float mTextX;
     private float mTextY;
@@ -42,6 +52,7 @@ public class HexagonLayout extends View implements OnTouchListener {
     private Paint mTextPaint;
     private ShapeDrawable mTextBackground;
 
+    // Button variables
     private HexagonLayout.Button[] mButtons;
     private ShapeDrawable[] mBorder;
     private float mBorderWidth;
@@ -54,8 +65,6 @@ public class HexagonLayout extends View implements OnTouchListener {
     private float mLineOffset;
     private int mPressedColor;
     private int mDisabledColor;
-
-    private boolean mSnapToSide;
 
     public HexagonLayout(Context context) {
         super(context);
@@ -96,6 +105,9 @@ public class HexagonLayout extends View implements OnTouchListener {
         mButtonTextPaint.setColor(Color.WHITE);
         mButtonTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, dm));
         mAllowRotation = true;
+        mRotation = 120f;
+        mRotationSpin = 100f;
+        mRotationSpinSign = 1;
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {}
@@ -133,6 +145,17 @@ public class HexagonLayout extends View implements OnTouchListener {
         if(mAllowRotation) {
             canvas.rotate(mRotation, center.x, center.y);
 
+            if(mRotationSpin > 0f) {
+                mRotation += mRotationSpin * mRotationSpinSign;
+                mRotationSpin *= 0.9f;
+                mRotationSpin -= 0.1f;
+                if(mRotationSpin < 0f) {
+                    mSnapToSide = true;
+                }
+                postInvalidateDelayed(30);
+            }
+
+            // We're done rotating. Snap to whatever side we landed on.
             if(mSnapToSide) {
                 float offset = Math.abs(mRotation % 60);
                 int sign = (int) (mRotation / Math.abs(mRotation));
@@ -331,15 +354,12 @@ public class HexagonLayout extends View implements OnTouchListener {
         layoutText();
     }
 
-    private float rotationOffset;
-    private float oldRotation;
-
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         int sign = (event.getX() > center.x) ? -1 : 1;
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
-            rotationOffset = sign * cosineInverse(center, new Point(center.x, 0), new Point((int) event.getX(), (int) event.getY()));
-            oldRotation = mRotation;
+            mRotationOffset = sign * cosineInverse(center, new Point(center.x, 0), new Point((int) event.getX(), (int) event.getY()));
+            mOldRotation = mRotation;
             for(Button b : mButtons) {
                 if(b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
                     b.setPressed(b.isEnabled());
@@ -348,33 +368,59 @@ public class HexagonLayout extends View implements OnTouchListener {
                     b.setPressed(false);
                 }
             }
+            mRotationSpin = -1f;
+            mRotationHistory = new float[4];
         }
         else if(event.getAction() == MotionEvent.ACTION_UP) {
+            boolean performClick = false;
             for(Button b : mButtons) {
                 if(b.isPressed()) {
                     performClick();
                     b.performClick();
+                    performClick = true;
                 }
                 b.setPressed(false);
             }
-            mSnapToSide = true;
+            if(!performClick) {
+                mRotationHistory[3] = mRotationHistory[2];
+                mRotationHistory[2] = mRotationHistory[1];
+                mRotationHistory[1] = mRotationHistory[0];
+                mRotationHistory[0] = mRotation % 360;
+                mRotationSpin = mRotation - getAverage(mRotationHistory);
+                mRotationSpinSign = mRotationSpin > 0 ? 1 : -1;
+                mRotationSpin *= mRotationSpinSign;
+            }
         }
         else {
-            mRotation = oldRotation + rotationOffset - sign * cosineInverse(center, new Point(center.x, 0), new Point((int) event.getX(), (int) event.getY()));
+            mRotation = mOldRotation + mRotationOffset - sign
+                    * cosineInverse(center, new Point(center.x, 0), new Point((int) event.getX(), (int) event.getY()));
+            mRotation = mRotation % 360;
             for(Button b : mButtons) {
                 if(b.isPressed()) {
                     if(!b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
                         b.setPressed(false);
                     }
-                    else if(Math.abs(Math.abs(mRotation) - Math.abs(oldRotation)) > 10f) {
+                    else if(Math.abs(Math.abs(mRotation) - Math.abs(mOldRotation)) > 10f) {
                         b.setPressed(false);
                     }
                 }
             }
+            mRotationHistory[3] = mRotationHistory[2];
+            mRotationHistory[2] = mRotationHistory[1];
+            mRotationHistory[1] = mRotationHistory[0];
+            mRotationHistory[0] = mRotation % 360;
         }
 
         invalidate();
         return true;
+    }
+
+    private float getAverage(float[] data) {
+        float sum = 0;
+        for(float f : data) {
+            sum += f;
+        }
+        return sum / data.length;
     }
 
     private float cosineInverse(Point a, Point b, Point c) {

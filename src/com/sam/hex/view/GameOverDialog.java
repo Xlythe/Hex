@@ -32,16 +32,22 @@ public class GameOverDialog extends HexDialog {
 
     @Override
     public View getPositiveView() {
-        ImageView iv = (ImageView) View.inflate(this, R.layout.donate_dialog_textview, null);
+        View v = View.inflate(this, R.layout.donate_dialog_textview, null);
+
+        ImageView iv = (ImageView) v.findViewById(R.id.image);
         iv.setImageResource(R.drawable.play_again);
-        return iv;
+
+        return v;
     }
 
     @Override
     public View getNegativeView() {
-        ImageView iv = (ImageView) View.inflate(this, R.layout.donate_dialog_textview, null);
+        View v = View.inflate(this, R.layout.donate_dialog_textview, null);
+
+        ImageView iv = (ImageView) v.findViewById(R.id.image);
         iv.setImageResource(R.drawable.home);
-        return iv;
+
+        return v;
     }
 
     @Override

@@ -127,7 +127,7 @@ public class HistoryFragment extends ListFragment {
                 if(file1.isDirectory() != file2.isDirectory()) {
                     return file1.isDirectory() ? -1 : 1;
                 }
-                return f1.file.compareTo(f2.file);
+                return f2.file.compareTo(f1.file);
             }
         });
         adapter = new ArrayAdapter<Item>(getMainActivity(), android.R.layout.select_dialog_item, android.R.id.text1, fileList) {

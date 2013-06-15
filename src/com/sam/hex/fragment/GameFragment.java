@@ -45,8 +45,6 @@ public class GameFragment extends Fragment {
     public static final String REPLAY = "replay";
     private static final SimpleDateFormat SAVE_FORMAT = new SimpleDateFormat("MMM dd, yyyy hh:mm", Locale.getDefault());
 
-    boolean mIsSignedIn = false;
-
     private Game game;
     private Player player1Type;
     private Player player2Type;
@@ -86,8 +84,7 @@ public class GameFragment extends Fragment {
             }
         }
         else if(getArguments() != null && getArguments().containsKey(GAME)) {
-            // Resume a game if one exists
-            System.out.println(getArguments().getString(GAME));
+            // Load a game if one exists
             game = Game.load(getArguments().getString(GAME));
             game.setGameListener(createGameListener());
             replay = true;
@@ -510,7 +507,7 @@ public class GameFragment extends Fragment {
                     || Integer.valueOf(prefs.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME))) * 60 * 1000 != game.gameOptions.timer.totalTime;
         }
         else if(gameLocation == GameAction.NET_GAME) {
-            return (game != null && game.isGameOver());
+            return(game != null && game.isGameOver());
         }
         else {
             return true;

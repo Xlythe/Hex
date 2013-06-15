@@ -55,15 +55,23 @@ public class GameOverDialog extends HexDialog {
         View v = View.inflate(this, R.layout.game_over_dialog_view, null);
         TextView action = (TextView) v.findViewById(R.id.action);
         TextView time = (TextView) v.findViewById(R.id.time);
+
         Game game = FRAGMENT.getGame();
-        PlayingEntity player = WINNER;
-        String actionText = player.getType().equals(Player.Human) ? getString(R.string.game_over_won) : getString(R.string.game_over_lose);
+        PlayingEntity winner = WINNER;
+
+        String actionText = winner.getType().equals(Player.Human) ? getString(R.string.game_over_won) : getString(R.string.game_over_lose);
         long hours = game.getGameLength() / (60 * 60 * 1000);
         long minutes = game.getGameLength() / (60 * 1000) - hours * 60;
         long seconds = game.getGameLength() / (1000) - minutes * 60 - hours * 60 * 60;
 
         action.setText(getString(R.string.game_over_action, actionText));
         time.setText(getString(R.string.game_over_length, hours, minutes, seconds));
+
+        if(game.getPlayer1().getType().equals(Player.Human) && game.getPlayer2().getType().equals(Player.Human)) {
+            TextView player = (TextView) v.findViewById(R.id.player);
+            player.setText(winner.getName());
+        }
+
         return v;
     }
 

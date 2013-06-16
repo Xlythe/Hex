@@ -25,10 +25,10 @@ import com.sam.hex.view.SelectorLayout;
 public class OnlineSelectionFragment extends HexFragment {
     private SelectorLayout mSelectorLayout;
     GameManager gameManager = null;
-    
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    	gameManager = getMainActivity().getGameManager();
+        gameManager = getMainActivity().getGameManager();
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.online_selection, null);
 
@@ -79,7 +79,7 @@ public class OnlineSelectionFragment extends HexFragment {
 
     @Override
     public void onActivityResult(int request, int response, Intent intent) {
-    	
+
         if(request == MainActivity.RC_SELECT_PLAYERS) {
             if(response != Activity.RESULT_OK) {
                 // user canceled
@@ -115,8 +115,8 @@ public class OnlineSelectionFragment extends HexFragment {
         }
         else if(request == MainActivity.RC_WAITING_ROOM) {
             if(response == Activity.RESULT_OK) {
-            	 Game g =this.gameManager.getGame();
-                 System.out.print("the game is served "+g);
+                Game g = this.gameManager.getGame();
+                System.out.print("the game is served " + g);
             }
             else if(response == Activity.RESULT_CANCELED || response == GamesActivityResultCodes.RESULT_LEFT_ROOM) {
                 // player wants to leave the room.
@@ -124,11 +124,11 @@ public class OnlineSelectionFragment extends HexFragment {
                 getMainActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             }
         }
-        
+
     }
 
     private void startQuickGame() {
-    
+
         // automatch criteria to invite 1 random automatch opponent.
         // You can also specify more opponents (up to 3).
         Bundle am = RoomConfig.createAutoMatchCriteria(1, 1, 0);
@@ -145,13 +145,12 @@ public class OnlineSelectionFragment extends HexFragment {
         getMainActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // go to game screen
-       //Game g =this.gameManager.getGame();
-       //System.out.print("the game is served "+g);
+        // Game g =this.gameManager.getGame();
+        // System.out.print("the game is served "+g);
     }
 
     private RoomConfig.Builder makeBasicRoomConfigBuilder() {
-        return RoomConfig.builder(gameManager.getHexRoomUpdateListener())
-                .setMessageReceivedListener(gameManager.getHexRealTimeMessageReceivedListener())
+        return RoomConfig.builder(gameManager.getHexRoomUpdateListener()).setMessageReceivedListener(gameManager.getHexRealTimeMessageReceivedListener())
                 .setRoomStatusUpdateListener(gameManager.getHexRoomStatusUpdateListener());
     }
 }

@@ -15,7 +15,6 @@ import com.android.vending.billing.util.IabResult;
 import com.google.android.gms.appstate.AppStateClient;
 import com.google.android.gms.appstate.OnStateLoadedListener;
 import com.hex.android.net.GameManager;
-import com.hex.android.net.HexRoomUpdateListener;
 import com.sam.hex.fragment.GameFragment;
 import com.sam.hex.fragment.GameSelectionFragment;
 import com.sam.hex.fragment.HistoryFragment;
@@ -38,11 +37,10 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
     private boolean mIsSignedIn = false;
 
     private GameManager gameManager = null;
- 
 
     // Donate variables
     private boolean mIabSetup;
-
+    private boolean mOpenAchievements = false;
 
     // Fragments
     private MainFragment mMainFragment;
@@ -109,9 +107,10 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        //mHexRealTimeMessageReceivedListener = new HexRealTimeMessageReceivedListener();
-        //mHexRoomStatusUpdateListener = new HexRoomStatusUpdateListener();
-        //mHexRoomUpdateListener = new HexRoomUpdateListener(this);
+        // mHexRealTimeMessageReceivedListener = new
+        // HexRealTimeMessageReceivedListener();
+        // mHexRoomStatusUpdateListener = new HexRoomStatusUpdateListener();
+        // mHexRoomUpdateListener = new HexRoomUpdateListener(this);
 
         mMainFragment = new MainFragment();
         mMainFragment.setInitialRotation(-120f);
@@ -285,18 +284,17 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
         }
     }
 
+    /**
+     * @return the gameManager
+     */
+    public GameManager getGameManager() {
+        return gameManager = new GameManager(this.mHelper, this);
+    }
 
-	/**
-	 * @return the gameManager
-	 */
-	public GameManager getGameManager() {
-		return gameManager= new GameManager(this.mHelper,this);
-	}
-
-	/**
-	 * @param gameManager the gameManager to set
-	 */
-	
+    /**
+     * @param gameManager
+     *            the gameManager to set
+     */
 
     public boolean isIabSetup() {
         return mIabSetup;

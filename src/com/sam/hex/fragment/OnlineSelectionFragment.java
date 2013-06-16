@@ -30,7 +30,7 @@ public class OnlineSelectionFragment extends HexFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         gameManager = getMainActivity().getGameManager();
         super.onCreateView(inflater, container, savedInstanceState);
-        View v = inflater.inflate(R.layout.online_selection, null);
+        View v = inflater.inflate(R.layout.fragment_online_selection, null);
 
         mSelectorLayout = (SelectorLayout) v.findViewById(R.id.buttons);
 

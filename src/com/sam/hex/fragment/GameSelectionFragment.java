@@ -16,7 +16,7 @@ public class GameSelectionFragment extends HexFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View v = inflater.inflate(R.layout.game_selection, null);
+        View v = inflater.inflate(R.layout.fragment_game_selection, null);
 
         SelectorLayout selectorLayout = (SelectorLayout) v.findViewById(R.id.buttons);
 

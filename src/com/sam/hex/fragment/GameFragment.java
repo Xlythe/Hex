@@ -130,7 +130,7 @@ public class GameFragment extends HexFragment {
     }
 
     private View applyBoard(LayoutInflater inflater) {
-        View v = inflater.inflate(R.layout.game, null);
+        View v = inflater.inflate(R.layout.fragment_game, null);
 
         board = (BoardView) v.findViewById(R.id.board);
         board.setGame(game);

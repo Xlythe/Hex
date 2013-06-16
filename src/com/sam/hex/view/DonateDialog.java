@@ -25,7 +25,7 @@ public class DonateDialog extends HexDialog {
 
     @Override
     public View getPositiveView() {
-        View v = View.inflate(this, R.layout.donate_dialog_textview, null);
+        View v = View.inflate(this, R.layout.dialog_view_donate, null);
 
         ImageView iv = (ImageView) v.findViewById(R.id.image);
         iv.setImageResource(R.drawable.donate_gold_d);
@@ -38,7 +38,7 @@ public class DonateDialog extends HexDialog {
 
     @Override
     public View getNegativeView() {
-        View v = View.inflate(this, R.layout.donate_dialog_textview, null);
+        View v = View.inflate(this, R.layout.dialog_view_donate, null);
 
         ImageView iv = (ImageView) v.findViewById(R.id.image);
         iv.setImageResource(R.drawable.donate_bronze_d);
@@ -51,7 +51,7 @@ public class DonateDialog extends HexDialog {
 
     @Override
     public View getNeutralView() {
-        View v = View.inflate(this, R.layout.donate_dialog_textview, null);
+        View v = View.inflate(this, R.layout.dialog_view_donate, null);
 
         ImageView iv = (ImageView) v.findViewById(R.id.image);
         iv.setImageResource(R.drawable.donate_silver_d);

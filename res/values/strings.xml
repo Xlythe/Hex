@@ -31,6 +31,8 @@
     <string name="main_button_history">history</string>
     <string name="main_button_instructions">how to play</string>
     <string name="main_button_achievements">achievements</string>
+    
+    <string name="main_button_log_out">Sign Out</string>
 
     <!-- Game selection page -->
     <string name="game_selection_button_computer">computer</string>

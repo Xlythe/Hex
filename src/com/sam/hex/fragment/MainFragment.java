@@ -45,7 +45,7 @@ public class MainFragment extends HexFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         getMainActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        View v = inflater.inflate(R.layout.home, null);
+        View v = inflater.inflate(R.layout.fragment_main, null);
 
         mHexagonLayout = (HexagonLayout) v.findViewById(R.id.hexagonButtons);
         HexagonLayout.Button settingsButton = mHexagonLayout.getButtons()[0];

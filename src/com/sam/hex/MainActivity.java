@@ -105,7 +105,7 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.activity_main);
 
         // mHexRealTimeMessageReceivedListener = new
         // HexRealTimeMessageReceivedListener();

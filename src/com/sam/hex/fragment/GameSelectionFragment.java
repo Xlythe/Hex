@@ -13,8 +13,6 @@ import com.sam.hex.view.SelectorLayout;
  * @author Will Harmon
  **/
 public class GameSelectionFragment extends HexFragment {
-    SelectorLayout.Button mNetButton;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
@@ -48,15 +46,20 @@ public class GameSelectionFragment extends HexFragment {
             }
         });
 
-        mNetButton = selectorLayout.getButtons()[2];
-        mNetButton.setColor(0xffcc5c57);
-        mNetButton.setText(R.string.game_selection_button_net);
-        mNetButton.setEnabled(getMainActivity().isSignedIn());
-        mNetButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
+        SelectorLayout.Button netButton = selectorLayout.getButtons()[2];
+        netButton.setColor(0xffcc5c57);
+        netButton.setText(R.string.game_selection_button_net);
+        netButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                getMainActivity().setOnlineSelectionFragment(new OnlineSelectionFragment());
-                getMainActivity().swapFragment(getMainActivity().getOnlineSelectionFragment());
+                if(getMainActivity().isSignedIn()) {
+                    getMainActivity().setOnlineSelectionFragment(new OnlineSelectionFragment());
+                    getMainActivity().swapFragment(getMainActivity().getOnlineSelectionFragment());
+                }
+                else {
+                    getMainActivity().setOpenOnlineSelectionFragment(true);
+                    getMainActivity().beginUserInitiatedSignIn();
+                }
             }
         });
 

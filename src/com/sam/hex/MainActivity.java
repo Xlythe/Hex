@@ -35,12 +35,12 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
 
     // Play variables
     private boolean mIsSignedIn = false;
-
     private GameManager gameManager = null;
+    private boolean mOpenAchievements = false;
+    private boolean mOpenOnlineSelectionFragment = false;
 
     // Donate variables
     private boolean mIabSetup;
-    private boolean mOpenAchievements = false;
 
     // Fragments
     private MainFragment mMainFragment;
@@ -155,6 +155,11 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
             mOpenAchievements = false;
             startActivityForResult(getGamesClient().getAchievementsIntent(), MainActivity.REQUEST_ACHIEVEMENTS);
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        }
+        if(mOpenOnlineSelectionFragment) {
+            mOpenOnlineSelectionFragment = false;
+            setOnlineSelectionFragment(new OnlineSelectionFragment());
+            swapFragment(this.getOnlineSelectionFragment());
         }
     }
 
@@ -306,6 +311,10 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
 
     public void setOpenAchievements(boolean open) {
         this.mOpenAchievements = open;
+    }
+
+    public void setOpenOnlineSelectionFragment(boolean open) {
+        this.mOpenOnlineSelectionFragment = open;
     }
 
 }

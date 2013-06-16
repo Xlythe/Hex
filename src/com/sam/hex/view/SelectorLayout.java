@@ -232,7 +232,7 @@ public class SelectorLayout extends View implements OnTouchListener {
             mirrorButtonPath.lineTo(mirrorHex.f.x, mirrorHex.f.y);
             mirrorButtonPath.close();
 
-            int heightOffset = 3 * mIndentHeight;
+            int heightOffset = 4 * mIndentHeight;
             mButtonDrawable[i] = new ShapeDrawable(new PathShape(buttonPath, w, h));
             mButtonDrawable[i].setBounds(0, -heightOffset + h / 2, w, h - heightOffset + h / 2);
             mMirrorButtonDrawable[i] = new ShapeDrawable(new PathShape(mirrorButtonPath, w, h));

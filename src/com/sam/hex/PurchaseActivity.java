@@ -43,6 +43,7 @@ public abstract class PurchaseActivity extends FragmentActivity implements OnIab
         IabHelper.QueryInventoryFinishedListener gotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
             @Override
             public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
+                if(inventory == null) return;
                 if(inventory.hasPurchase(ITEM_SKU_BASIC)) {
                     dealWithPurchaseSuccess(result, ITEM_SKU_BASIC);
                 }

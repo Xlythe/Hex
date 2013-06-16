@@ -12,14 +12,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/bar_background"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:layout_gravity="right" />
         <TextView
             android:id="@+id/action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/bar_background"
-            android:textSize="23sp"
+            android:textSize="21sp"
             android:textStyle="bold"
             android:layout_gravity="right" />
     </LinearLayout>
@@ -33,13 +33,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/bar_background"
-            android:textSize="23sp"
+            android:textSize="21sp"
             android:textStyle="bold" />
         <TextView
             android:id="@+id/time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/bar_background"
-            android:textSize="20sp" />
+            android:textSize="18sp" />
     </LinearLayout>
 </RelativeLayout>

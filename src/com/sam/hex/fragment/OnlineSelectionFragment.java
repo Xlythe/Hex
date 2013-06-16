@@ -58,7 +58,7 @@ public class OnlineSelectionFragment extends SherlockFragment {
         pendingButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                startActivityForResult(getMainActivity().getGamesClient().getInvitationInboxIntent(), MainActivity.RC_SELECT_PLAYERS);
+                startActivityForResult(getMainActivity().getGamesClient().getInvitationInboxIntent(), MainActivity.RC_WAITING_ROOM);
             }
         });
 
@@ -109,7 +109,8 @@ public class OnlineSelectionFragment extends SherlockFragment {
         }
         else if(request == MainActivity.RC_WAITING_ROOM) {
             if(response == Activity.RESULT_OK) {
-                // (start game)
+            	 Game g =this.gameManager.getGame();
+                 System.out.print("the game is served "+g);
             }
             else if(response == Activity.RESULT_CANCELED || response == GamesActivityResultCodes.RESULT_LEFT_ROOM) {
                 // player wants to leave the room.
@@ -117,6 +118,7 @@ public class OnlineSelectionFragment extends SherlockFragment {
                 getMainActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             }
         }
+        
     }
 
     private void startQuickGame() {
@@ -137,7 +139,8 @@ public class OnlineSelectionFragment extends SherlockFragment {
         getSherlockActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // go to game screen
-       Game g =this.gameManager.getGame();
+       //Game g =this.gameManager.getGame();
+       //System.out.print("the game is served "+g);
     }
 
     private RoomConfig.Builder makeBasicRoomConfigBuilder() {

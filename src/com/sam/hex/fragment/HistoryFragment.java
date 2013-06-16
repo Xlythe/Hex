@@ -10,6 +10,7 @@ import java.util.Comparator;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,12 +21,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockListFragment;
 import com.sam.hex.FileUtil;
 import com.sam.hex.MainActivity;
 import com.sam.hex.R;
 
-public class HistoryFragment extends SherlockListFragment {
+/**
+ * @author Will Harmon
+ **/
+public class HistoryFragment extends ListFragment {
 
     // Stores names of traversed directories
     ArrayList<String> str = new ArrayList<String>();
@@ -114,6 +117,7 @@ public class HistoryFragment extends SherlockListFragment {
         }
 
         Arrays.sort(fileList, new Comparator<Item>() {
+            @Override
             public int compare(Item f1, Item f2) {
                 if(f1.file.equals("Up")) return -1;
                 if(f2.file.equals("Up")) return 1;
@@ -123,10 +127,10 @@ public class HistoryFragment extends SherlockListFragment {
                 if(file1.isDirectory() != file2.isDirectory()) {
                     return file1.isDirectory() ? -1 : 1;
                 }
-                return f1.file.compareTo(f2.file);
+                return f2.file.compareTo(f1.file);
             }
         });
-        adapter = new ArrayAdapter<Item>(getSherlockActivity(), android.R.layout.select_dialog_item, android.R.id.text1, fileList) {
+        adapter = new ArrayAdapter<Item>(getMainActivity(), android.R.layout.select_dialog_item, android.R.id.text1, fileList) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 // creates view
@@ -186,7 +190,28 @@ public class HistoryFragment extends SherlockListFragment {
 
         // Checks if 'up' was clicked
         else if(chosenFile.equalsIgnoreCase("up") && !sel.exists()) {
+            goUp();
+        }
+        // File picked
+        else {
+            try {
+                Bundle b = new Bundle();
+                b.putString(GameFragment.GAME, FileUtil.loadGameAsString(path + File.separator + chosenFile));
+                b.putBoolean(GameFragment.REPLAY, true);
 
+                getMainActivity().setGameFragment(new GameFragment());
+                getMainActivity().getGameFragment().setArguments(b);
+                getMainActivity().swapFragment(getMainActivity().getGameFragment());
+            }
+            catch(IOException e) {
+                e.printStackTrace();
+                Toast.makeText(getMainActivity(), R.string.game_toast_failed, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    public boolean goUp() {
+        if(!firstLvl) {
             // present directory removed from list
             String s = str.remove(str.size() - 1);
 
@@ -201,26 +226,13 @@ public class HistoryFragment extends SherlockListFragment {
             }
             loadFileList();
             refreshView();
+            return true;
         }
-        // File picked
-        else {
-            try {
-                Bundle b = new Bundle();
-                b.putString(GameFragment.GAME, FileUtil.loadGameAsString(path + File.separator + chosenFile));
-                b.putBoolean(GameFragment.REPLAY, true);
 
-                getMainActivity().setGameFragment(new GameFragment());
-                getMainActivity().getGameFragment().setArguments(b);
-                getMainActivity().swapFragmentWithoutBackStack(getMainActivity().getGameFragment());
-            }
-            catch(IOException e) {
-                e.printStackTrace();
-                Toast.makeText(getMainActivity(), R.string.game_toast_failed, Toast.LENGTH_SHORT).show();
-            }
-        }
+        return false;
     }
 
     private MainActivity getMainActivity() {
-        return (MainActivity) getSherlockActivity();
+        return (MainActivity) getActivity();
     }
 }

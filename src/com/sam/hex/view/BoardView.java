@@ -20,6 +20,7 @@ import com.hex.core.Game;
 import com.hex.core.GameAction;
 import com.hex.core.Player;
 import com.hex.core.Point;
+import com.hex.core.Timer;
 import com.sam.hex.BoardTools;
 
 /**
@@ -31,6 +32,7 @@ public class BoardView extends View {
     private ShapeDrawable[][] mCell;
     private ShapeDrawable[][] mCellShadow;
     private Button[][] mButtons;
+    private Point mFocusedButton = new Point(-1, -1);
 
     private ShapeDrawable mPlayer1Background;
     private ShapeDrawable mPlayer2Background;
@@ -85,13 +87,89 @@ public class BoardView extends View {
         mTextMargin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, dm);
         setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View v) {}
+            public void onClick(View v) {
+                for(int x = 0; x < game.gameOptions.gridSize; x++) {
+                    for(int y = 0; y < game.gameOptions.gridSize; y++) {
+                        Button b = mButtons[x][y];
+                        if(b.isSelected() || b.isPressed()) {
+                            GameAction.setPiece(new Point(x, y), game);
+                        }
+                    }
+                }
+            }
         });
+        setFocusable(true);
+    }
+
+    @Override
+    public View focusSearch(int direction) {
+        mButtons[mFocusedButton.x][mFocusedButton.y].setSelected(false);
+        switch(direction) {
+        case View.FOCUS_RIGHT:
+            if(mFocusedButton.x < game.gameOptions.gridSize - 1) {
+                mFocusedButton = new Point(mFocusedButton.x + 1, mFocusedButton.y);
+                mButtons[mFocusedButton.x][mFocusedButton.y].setSelected(true);
+                invalidate();
+                return this;
+            }
+            break;
+        case View.FOCUS_LEFT:
+            if(mFocusedButton.x > 0) {
+                mFocusedButton = new Point(mFocusedButton.x - 1, mFocusedButton.y);
+                mButtons[mFocusedButton.x][mFocusedButton.y].setSelected(true);
+                invalidate();
+                return this;
+            }
+            break;
+        case View.FOCUS_UP:
+            if(mFocusedButton.y > 0) {
+                mFocusedButton = new Point(mFocusedButton.x, mFocusedButton.y - 1);
+                mButtons[mFocusedButton.x][mFocusedButton.y].setSelected(true);
+                invalidate();
+                return this;
+            }
+            break;
+        case View.FOCUS_DOWN:
+            if(mFocusedButton.y < game.gameOptions.gridSize - 1) {
+                mFocusedButton = new Point(mFocusedButton.x, mFocusedButton.y + 1);
+                mButtons[mFocusedButton.x][mFocusedButton.y].setSelected(true);
+                invalidate();
+                return this;
+            }
+            break;
+        case View.FOCUS_FORWARD:
+            break;
+        case View.FOCUS_BACKWARD:
+            break;
+        }
+        return super.focusSearch(direction);
     }
 
     public void setGame(Game game) {
         this.game = game;
+        mButtons = new Button[game.gameOptions.gridSize][game.gameOptions.gridSize];
+        for(int x = 0; x < game.gameOptions.gridSize; x++) {
+            for(int y = 0; y < game.gameOptions.gridSize; y++) {
+                mButtons[x][y] = new Button();
+            }
+        }
         this.setOnTouchListener(new TouchListener(game));
+        setOnFocusChangeListener(new OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    mFocusedButton = new Point(0, 0);
+                    mButtons[mFocusedButton.x][mFocusedButton.y].setSelected(true);
+                    invalidate();
+                }
+                else {
+                    if(!mFocusedButton.equals(new Point(-1, -1))) {
+                        mButtons[mFocusedButton.x][mFocusedButton.y].setSelected(false);
+                        invalidate();
+                    }
+                }
+            }
+        });
         invalidate();
     }
 
@@ -103,10 +181,11 @@ public class BoardView extends View {
         if(!game.replayRunning) {
             ShapeDrawable background = (game.getCurrentPlayer().getTeam() == 1) ? mPlayer1Background : mPlayer2Background;
             background.getPaint().setColor(game.getCurrentPlayer().getColor());
-            if(!game.isGameOver()) background.draw(canvas);
+            background.draw(canvas);
             mBorderBackground.draw(canvas);
 
             if(mTitleText != null && mActionText != null) {
+                mTitleText = String.format(mTitleText, game.getCurrentPlayer().getName());
                 int textLength = (int) Math.max(mTextPaint.measureText(mTitleText), mLargeTextPaint.measureText(mActionText));
                 float posX = game.getCurrentPlayer().getTeam() == 1 ? mTextMargin + textLength : getWidth() - mTextMargin;
                 float posY = game.getCurrentPlayer().getTeam() == 1 ? getHeight() / 2 : mTextMargin + mTextPaint.getTextSize();
@@ -115,7 +194,7 @@ public class BoardView extends View {
             }
         }
 
-        if(mTimerText != null && !game.replayRunning && !game.isGameOver()) {
+        if(game.gameOptions.timer.type != Timer.NO_TIMER && !game.replayRunning && !game.isGameOver()) {
             float posX = getWidth() - mTextMargin;
             float posY = getHeight() / 2;
             long minutesLeft = game.getCurrentPlayer().getTime() / (60 * 1000);
@@ -127,7 +206,7 @@ public class BoardView extends View {
 
         for(int x = 0; x < n; x++) {
             for(int y = 0; y < n; y++) {
-                int c = Color.TRANSPARENT;
+                int c = Color.WHITE;
                 if(mButtons[x][y].isPressed() && game.getCurrentPlayer().getType().equals(Player.Human)) {
                     c = Color.LTGRAY;
                 }
@@ -135,8 +214,16 @@ public class BoardView extends View {
                 else if(game.gamePieces[x][y].getTeam() == game.getPlayer2().getTeam()) c = game.getPlayer2().getColor();
                 if(game.gamePieces[x][y].isWinningPath()) c = getDarkerColor(c);
                 mCellShadow[x][y].draw(canvas);
+
+                if(mButtons[x][y].isSelected()) {
+                    mCell[x][y].getPaint().setColor(Color.YELLOW);
+                }
+                else {
+                    mCell[x][y].getPaint().setColor(Color.WHITE);
+                }
                 mCell[x][y].draw(canvas);
-                if(c != Color.TRANSPARENT) {
+
+                if(c != Color.WHITE) {
                     mDrawableOutline[x][y].getPaint().setColor(getLighterColor(c));
                     mDrawableOutline[x][y].draw(canvas);
                 }
@@ -154,7 +241,6 @@ public class BoardView extends View {
         mDrawableOutline = new ShapeDrawable[n][n];
         mCell = new ShapeDrawable[n][n];
         mCellShadow = new ShapeDrawable[n][n];
-        mButtons = new Button[n][n];
         int windowHeight = (int) (h - 2 * mMargin);
         int windowWidth = (w);
 
@@ -193,7 +279,6 @@ public class BoardView extends View {
                         + radius * 2 - (mPieceMargin * 1.1547)));
                 mCellShadow[xc][yc].getPaint().setColor(Color.BLACK);
                 mCellShadow[xc][yc].getPaint().setAlpha(15);
-                mButtons[xc][yc] = new Button();
                 mButtons[xc][yc].hexagon = new Hexagon(x - hrad, y + mMargin, radius);
             }
         }
@@ -280,13 +365,15 @@ public class BoardView extends View {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             if(event.getAction() == MotionEvent.ACTION_DOWN) {
-                for(int x = 0; x < game.gamePieces.length; x++) {
-                    for(int y = 0; y < game.gamePieces[0].length; y++) {
-                        if(mButtons[x][y].hexagon.contains(new Point((int) event.getX(), (int) event.getY()))) {
-                            mButtons[x][y].setPressed(mButtons[x][y].isEnabled());
-                        }
-                        else {
-                            mButtons[x][y].setPressed(false);
+                if(game.getCurrentPlayer().getType().equals(Player.Human)) {
+                    for(int x = 0; x < game.gamePieces.length; x++) {
+                        for(int y = 0; y < game.gamePieces[0].length; y++) {
+                            if(mButtons[x][y].hexagon.contains(new Point((int) event.getX(), (int) event.getY()))) {
+                                mButtons[x][y].setPressed(mButtons[x][y].isEnabled());
+                            }
+                            else {
+                                mButtons[x][y].setPressed(false);
+                            }
                         }
                     }
                 }
@@ -297,7 +384,6 @@ public class BoardView extends View {
                         if(mButtons[x][y].isPressed()) {
                             if(game.gamePieces[x][y].getTeam() == 0 || (game.gameOptions.swap && game.getMoveNumber() == 2)) {
                                 performClick();
-                                GameAction.setPiece(new Point(x, y), game);
                             }
                         }
                         mButtons[x][y].setPressed(false);
@@ -306,14 +392,16 @@ public class BoardView extends View {
             }
             else {
                 boolean selectedPiece = false;
-                for(int x = 0; x < game.gamePieces.length; x++) {
-                    for(int y = 0; y < game.gamePieces[0].length; y++) {
-                        if(!selectedPiece && mButtons[x][y].hexagon.contains(new Point((int) event.getX(), (int) event.getY()))) {
-                            mButtons[x][y].setPressed(true);
-                            selectedPiece = true;
-                        }
-                        else {
-                            mButtons[x][y].setPressed(false);
+                if(game.getCurrentPlayer().getType().equals(Player.Human)) {
+                    for(int x = 0; x < game.gamePieces.length; x++) {
+                        for(int y = 0; y < game.gamePieces[0].length; y++) {
+                            if(!selectedPiece && mButtons[x][y].hexagon.contains(new Point((int) event.getX(), (int) event.getY()))) {
+                                mButtons[x][y].setPressed(true);
+                                selectedPiece = true;
+                            }
+                            else {
+                                mButtons[x][y].setPressed(false);
+                            }
                         }
                     }
                 }
@@ -375,6 +463,7 @@ public class BoardView extends View {
         private Hexagon hexagon;
         private boolean pressed;
         private boolean enabled = true;
+        private boolean selected;
 
         public static interface OnClickListener {
             public void onClick();
@@ -386,6 +475,14 @@ public class BoardView extends View {
 
         protected void setPressed(boolean pressed) {
             this.pressed = pressed;
+        }
+
+        protected boolean isSelected() {
+            return selected;
+        }
+
+        protected void setSelected(boolean selected) {
+            this.selected = selected;
         }
 
         public boolean isEnabled() {

@@ -12,6 +12,9 @@ import android.os.Environment;
 
 import com.hex.core.Game;
 
+/**
+ * @author Will Harmon
+ **/
 public class FileUtil {
     public static Game loadGame(String fileName) throws IOException {
         File file = new File(fileName);
@@ -51,20 +54,20 @@ public class FileUtil {
         File saveFile = new File(fileName);
         if(!saveFile.exists()) {
             saveFile.createNewFile();
+
+            // BufferedWriter for performance, true to set append to file flag
+            BufferedWriter buf = new BufferedWriter(new FileWriter(saveFile, true));
+            buf.append(gameState);
+            buf.close();
         }
-        // BufferedWriter for performance, true to set append to file flag
-        BufferedWriter buf = new BufferedWriter(new FileWriter(saveFile, true));
-        buf.append(gameState);
-        buf.close();
     }
 
     public static void autoSaveGame(String fileName, String gameState) throws IOException {
         if(!fileName.toLowerCase(Locale.getDefault()).endsWith(".rhex")) {
             fileName = fileName + ".rhex";
         }
-        fileName = Environment.getExternalStorageDirectory() + File.separator + "Hex" + File.separator + "Autosave" + File.separator + fileName;
+        fileName = Environment.getExternalStorageDirectory() + File.separator + "Hex" + File.separator + fileName;
         FileUtil.createDirIfNoneExists(File.separator + "Hex" + File.separator);
-        FileUtil.createDirIfNoneExists(File.separator + "Hex" + File.separator + "Autosave" + File.separator);
 
         File saveFile = new File(fileName);
         if(!saveFile.exists()) {

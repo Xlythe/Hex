@@ -9,6 +9,8 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="com.android.vending.BILLING" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
 
     <application android:icon="@drawable/icon" android:allowBackup="true" android:theme="@style/LightTheme" >
         <meta-data android:name="com.google.android.gms.games.APP_ID" android:value="@string/app_id" />
@@ -37,6 +39,8 @@
             </intent-filter>
         </activity>
         <activity android:label="@string/activity_title_preferences" android:name=".PreferencesActivity" android:screenOrientation="landscape" />
+        <activity android:name=".view.DonateDialog" android:screenOrientation="landscape" android:theme="@style/HexDialog" />
+        <activity android:name=".view.GameOverDialog" android:screenOrientation="landscape" android:theme="@style/HexDialog" />
     </application>
 
 </manifest>

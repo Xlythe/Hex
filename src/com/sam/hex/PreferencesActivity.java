@@ -10,17 +10,18 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
+import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.text.InputType;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockPreferenceActivity;
-import com.actionbarsherlock.view.MenuItem;
 import com.sam.hex.fragment.PreferencesFragment;
 
 /**
@@ -28,7 +29,7 @@ import com.sam.hex.fragment.PreferencesFragment;
  **/
 @SuppressWarnings("deprecation")
 @SuppressLint("NewApi")
-public class PreferencesActivity extends SherlockPreferenceActivity {
+public class PreferencesActivity extends PreferenceActivity {
     SharedPreferences settings;
     Preference gridPref;
     Preference timerPref;
@@ -36,17 +37,25 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.preferences);
+        TextView title = (TextView) findViewById(R.id.title);
+        title.setText(R.string.activity_title_preferences);
         if(android.os.Build.VERSION.SDK_INT < 11) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             settings = PreferenceManager.getDefaultSharedPreferences(this);
             loadPreferences();
         }
         else {
             if(savedInstanceState == null) {
                 PreferencesFragment preferences = new PreferencesFragment();
-                getFragmentManager().beginTransaction().add(android.R.id.content, preferences).commit();
+                getFragmentManager().beginTransaction().add(R.id.content, preferences).commit();
             }
         }
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
     @Override
@@ -139,7 +148,6 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
     }
 
     private void loadPreferences() {
-        setContentView(R.layout.preferences);
         addPreferencesFromResource(R.layout.preferences_general);
     }
 

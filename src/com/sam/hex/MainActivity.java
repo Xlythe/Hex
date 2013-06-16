@@ -9,10 +9,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.view.KeyEvent;
 
-import com.actionbarsherlock.view.MenuItem;
+import com.android.vending.billing.util.IabResult;
 import com.google.android.gms.appstate.AppStateClient;
 import com.google.android.gms.appstate.OnStateLoadedListener;
 import com.hex.android.net.GameManager;
@@ -37,8 +36,13 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
 
     // Play variables
     private boolean mIsSignedIn = false;
+
     private GameManager gameManager = null;
-    
+ 
+
+    // Donate variables
+    private boolean mIabSetup;
+
 
     // Fragments
     private MainFragment mMainFragment;
@@ -91,6 +95,7 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
                     String s = new String(buffer, "UTF-8");
                     Stats.setGamesWon(this, Long.parseLong(s));
                 }
+                mMainFragment.setSignedIn(mIsSignedIn);
             }
             catch(Exception e) {
                 e.printStackTrace();
@@ -109,30 +114,22 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
         //mHexRoomUpdateListener = new HexRoomUpdateListener(this);
 
         mMainFragment = new MainFragment();
+        mMainFragment.setInitialRotation(-120f);
+        mMainFragment.setInitialSpin(50f);
         swapFragment(mMainFragment);
 
         popupRatingDialog();
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch(item.getItemId()) {
-        case android.R.id.home:
-            getSupportFragmentManager().popBackStack(mMainFragment.toString(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
-            swapFragment(mMainFragment);
-            return true;
-        default:
-            return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == KeyEvent.KEYCODE_BACK) {
+            if(mActiveFragment == mHistoryFragment) {
+                if(mHistoryFragment.goUp()) return true;
+            }
+
             if(mActiveFragment != mMainFragment) {
-                getSupportFragmentManager().popBackStack(mMainFragment.toString(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                swapFragment(mMainFragment);
+                returnHome();
             }
             else {
                 finish();
@@ -140,6 +137,10 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    public void returnHome() {
+        swapFragment(mMainFragment);
     }
 
     @Override
@@ -150,6 +151,12 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
         getAppStateClient().loadState(this, GAMES_PLAYED_STATE);
         getAppStateClient().loadState(this, GAMES_WON_STATE);
         mMainFragment.setSignedIn(mIsSignedIn);
+
+        if(mOpenAchievements) {
+            mOpenAchievements = false;
+            startActivityForResult(getGamesClient().getAchievementsIntent(), MainActivity.REQUEST_ACHIEVEMENTS);
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        }
     }
 
     @Override
@@ -159,13 +166,37 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
         mMainFragment.setSignedIn(mIsSignedIn);
     }
 
-    public void swapFragment(Fragment newFragment) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.content, newFragment).addToBackStack(newFragment.toString()).commit();
-        mActiveFragment = newFragment;
+    @Override
+    protected void dealWithIabSetupSuccess() {
+        setIabSetup(true);
     }
 
-    public void swapFragmentWithoutBackStack(Fragment newFragment) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.content, newFragment).commit();
+    @Override
+    protected void dealWithIabSetupFailure() {
+        setIabSetup(false);
+    }
+
+    @Override
+    protected void dealWithPurchaseSuccess(IabResult result, String sku) {
+        int amount = 0;
+        if(sku.equals(ITEM_SKU_BASIC)) {
+            amount = 1;
+        }
+        else if(sku.equals(ITEM_SKU_INTERMEDIATE)) {
+            amount = 3;
+        }
+        else if(sku.equals(ITEM_SKU_ADVANCED)) {
+            amount = 5;
+        }
+        Stats.incrementDonationAmount(this, amount);
+    }
+
+    @Override
+    protected void dealWithPurchaseFailed(IabResult result) {}
+
+    public void swapFragment(Fragment newFragment) {
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out).replace(R.id.content, newFragment)
+                .commit();
         mActiveFragment = newFragment;
     }
 
@@ -216,31 +247,7 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
     public void setOnlineSelectionFragment(OnlineSelectionFragment onlineSelectionFragment) {
         this.mOnlineSelectionFragment = onlineSelectionFragment;
     }
-/*
-    public HexRealTimeMessageReceivedListener getHexRealTimeMessageReceivedListener() {
-        return mHexRealTimeMessageReceivedListener;
-    }
 
-    public void setHexRealTimeMessageReceivedListener(HexRealTimeMessageReceivedListener mHexRealTimeMessageReceivedListener) {
-        this.mHexRealTimeMessageReceivedListener = mHexRealTimeMessageReceivedListener;
-    }
-
-    public HexRoomStatusUpdateListener getHexRoomStatusUpdateListener() {
-        return mHexRoomStatusUpdateListener;
-    }
-
-    public void setHexRoomStatusUpdateListener(HexRoomStatusUpdateListener mHexRoomStatusUpdateListener) {
-        this.mHexRoomStatusUpdateListener = mHexRoomStatusUpdateListener;
-    }
-
-    public HexRoomUpdateListener getHexRoomUpdateListener() {
-        return mHexRoomUpdateListener;
-    }
-
-    public void setHexRoomUpdateListener(HexRoomUpdateListener mHexRoomUpdateListener) {
-        this.mHexRoomUpdateListener = mHexRoomUpdateListener;
-    }
- */
     private void popupRatingDialog() {
         // Popup asking to rate app after countdown
         int numTimesAppOpened = PreferenceManager.getDefaultSharedPreferences(this).getInt("num_times_app_opened_review", 0);
@@ -265,11 +272,19 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(R.string.review_popup_title).setMessage(R.string.review_popup_message)
-                        .setPositiveButton(R.string.review_popup_ok, dialogClickListener).setNegativeButton(R.string.review_popup_never, dialogClickListener)
-                        .show();
+                        .setPositiveButton(R.string.review_popup_ok, dialogClickListener).setNegativeButton(R.string.review_popup_never, dialogClickListener);
+
+                // Wrap in try/catch because this can sometimes leak window
+                try {
+                    builder.show();
+                }
+                catch(Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
+
 
 	/**
 	 * @return the gameManager
@@ -282,4 +297,17 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
 	 * @param gameManager the gameManager to set
 	 */
 	
+
+    public boolean isIabSetup() {
+        return mIabSetup;
+    }
+
+    public void setIabSetup(boolean iabSetup) {
+        this.mIabSetup = iabSetup;
+    }
+
+    public void setOpenAchievements(boolean open) {
+        this.mOpenAchievements = open;
+    }
+
 }

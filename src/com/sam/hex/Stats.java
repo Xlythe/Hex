@@ -3,12 +3,16 @@ package com.sam.hex;
 import android.content.Context;
 import android.preference.PreferenceManager;
 
+/**
+ * @author Will Harmon
+ **/
 public class Stats {
     public static long getTimePlayed(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getLong("time_played", 0);
     }
 
     public static void incrementTimePlayed(Context context, long time) {
+        time = Math.max(time, 0);
         PreferenceManager.getDefaultSharedPreferences(context).edit().putLong("time_played", getTimePlayed(context) + time).commit();
     }
 

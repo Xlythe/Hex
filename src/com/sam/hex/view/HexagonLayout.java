@@ -14,10 +14,8 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.MotionEvent;
-import android.view.VelocityTracker;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 
 import com.hex.core.Point;
@@ -26,20 +24,26 @@ import com.hex.core.Point;
  * @author Will Harmon
  **/
 public class HexagonLayout extends View implements OnTouchListener {
+    // Rotation variables
     private boolean mAllowRotation;
-
-    // Cached ViewConfiguration and system-wide constant values
-    private int mMinFlingVelocity;
-    private int mMaxFlingVelocity;
-    private VelocityTracker mVelocityTracker;
-
     private float mRotation;
+    private float mRotationOffset;
+    private float mOldRotation;
+    private boolean mSnapToSide;
+    private float[] mRotationHistory;
+    private float mRotationSpin;
+    private int mRotationSpinSign;
+
+    // Size and shape variables
     private Point[] corners;
     private Point center;
+    private float mTopMargin;
 
+    // Background variables
     private ShapeDrawable mHexagon;
     private int mBackgroundColor;
 
+    // Title text variables
     private String mText;
     private float mTextX;
     private float mTextY;
@@ -48,6 +52,7 @@ public class HexagonLayout extends View implements OnTouchListener {
     private Paint mTextPaint;
     private ShapeDrawable mTextBackground;
 
+    // Button variables
     private HexagonLayout.Button[] mButtons;
     private ShapeDrawable[] mBorder;
     private float mBorderWidth;
@@ -55,9 +60,12 @@ public class HexagonLayout extends View implements OnTouchListener {
     private ShapeDrawable[] mBorderShadow;
     private ShapeDrawable[] mPressedState;
     private Paint mLinePaint;
+    private Paint mShadowLinePaint;
     private Paint mButtonTextPaint;
+    private float mLineOffset;
     private int mPressedColor;
     private int mDisabledColor;
+    private int mFocusedButton = -1;
 
     public HexagonLayout(Context context) {
         super(context);
@@ -75,10 +83,6 @@ public class HexagonLayout extends View implements OnTouchListener {
     }
 
     public void setUp() {
-        ViewConfiguration vc = ViewConfiguration.get(getContext());
-        mMinFlingVelocity = vc.getScaledMinimumFlingVelocity();
-        mMaxFlingVelocity = vc.getScaledMaximumFlingVelocity();
-
         DisplayMetrics dm = getResources().getDisplayMetrics();
         setOnTouchListener(this);
         mRotation = 0;
@@ -95,14 +99,138 @@ public class HexagonLayout extends View implements OnTouchListener {
         mTextPadding = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, dm);
         mLinePaint = new Paint();
         mLinePaint.setColor(Color.LTGRAY);
+        mShadowLinePaint = new Paint();
+        mShadowLinePaint.setColor(Color.WHITE);
+        mLineOffset = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, dm);
         mButtonTextPaint = new Paint();
         mButtonTextPaint.setColor(Color.WHITE);
         mButtonTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, dm));
-        mAllowRotation = false;
+        mAllowRotation = true;
         setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View v) {}
+            public void onClick(View v) {
+                for(Button b : mButtons) {
+                    if(b.isSelected() || b.isPressed()) {
+                        b.performClick();
+                    }
+                }
+            }
         });
+        setFocusable(true);
+        setOnFocusChangeListener(new OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    mFocusedButton = 3;
+                    mButtons[3].setSelected(true);
+                    invalidate();
+                }
+                else {
+                    if(mFocusedButton != -1) {
+                        mButtons[mFocusedButton].setSelected(false);
+                        invalidate();
+                    }
+                }
+            }
+        });
+    }
+
+    @Override
+    public View focusSearch(int direction) {
+        mButtons[mFocusedButton].setSelected(false);
+        switch(direction) {
+        case View.FOCUS_RIGHT:
+            switch(mFocusedButton) {
+            case 2:
+                mFocusedButton = 1;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            case 3:
+                mFocusedButton = 2;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            case 4:
+                mFocusedButton = 5;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            case 5:
+                mFocusedButton = 0;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            }
+            break;
+        case View.FOCUS_LEFT:
+            switch(mFocusedButton) {
+            case 0:
+                mFocusedButton = 5;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            case 1:
+                mFocusedButton = 2;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            case 2:
+                mFocusedButton = 3;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            case 5:
+                mFocusedButton = 4;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            }
+            break;
+        case View.FOCUS_UP:
+            switch(mFocusedButton) {
+            case 1:
+                mFocusedButton = 0;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            case 2:
+                mFocusedButton = 5;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            case 3:
+                mFocusedButton = 4;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            }
+            break;
+        case View.FOCUS_DOWN:
+            switch(mFocusedButton) {
+            case 0:
+                mFocusedButton = 1;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            case 5:
+                mFocusedButton = 2;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            case 4:
+                mFocusedButton = 3;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            }
+            break;
+        case View.FOCUS_FORWARD:
+            break;
+        case View.FOCUS_BACKWARD:
+            break;
+        }
+        return super.focusSearch(direction);
     }
 
     private void layoutText() {
@@ -132,17 +260,46 @@ public class HexagonLayout extends View implements OnTouchListener {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        canvas.save();
         if(mAllowRotation) {
-            if(spinSign * spinVelocity > 0) {
-                spinVelocity /= 2;
-                spinVelocity -= spinSign * 5;
-                mRotation += spinSign * 5f;
+            canvas.rotate(mRotation, center.x, center.y);
+
+            if(mRotationSpin > 0f) {
+                mRotation += mRotationSpin * mRotationSpinSign;
+                mRotationSpin *= 0.9f;
+                mRotationSpin -= 0.1f;
+                if(mRotationSpin < 0f) {
+                    mSnapToSide = true;
+                }
                 postInvalidateDelayed(30);
             }
-            canvas.rotate(mRotation, center.x, center.y);
+
+            // We're done rotating. Snap to whatever side we landed on.
+            if(mSnapToSide) {
+                float offset = Math.abs(mRotation % 60);
+                int sign = (int) (mRotation / Math.abs(mRotation));
+                if(offset < 5f) {
+                    mSnapToSide = false;
+                    mRotation -= mRotation % 60;
+                }
+                else if(offset < 30f) {
+                    mRotation -= 2f * sign;
+                }
+                else {
+                    mRotation += 2f * sign;
+                }
+                postInvalidateDelayed(30);
+            }
         }
 
         mHexagon.draw(canvas);
+
+        canvas.drawLine(corners[0].x + mLineOffset, corners[0].y, center.x + mLineOffset, center.y, mShadowLinePaint);
+        canvas.drawLine(corners[1].x - mLineOffset, corners[1].y, center.x - mLineOffset, center.y, mShadowLinePaint);
+        canvas.drawLine(corners[2].x, corners[2].y + mLineOffset, center.x, center.y + mLineOffset, mShadowLinePaint);
+        canvas.drawLine(corners[3].x - mLineOffset, corners[3].y, center.x - mLineOffset, center.y, mShadowLinePaint);
+        canvas.drawLine(corners[4].x + mLineOffset, corners[4].y, center.x + mLineOffset, center.y, mShadowLinePaint);
+        canvas.drawLine(corners[5].x, corners[5].y + mLineOffset, center.x, center.y + mLineOffset, mShadowLinePaint);
 
         canvas.drawLine(corners[0].x, corners[0].y, center.x, center.y, mLinePaint);
         canvas.drawLine(corners[1].x, corners[1].y, center.x, center.y, mLinePaint);
@@ -162,9 +319,11 @@ public class HexagonLayout extends View implements OnTouchListener {
                 mPressedState[i].getPaint().setColor(mDisabledColor);
                 mPressedState[i].draw(canvas);
             }
+            if(mButtons[i].isSelected()) {
+                mPressedState[i].getPaint().setColor(mPressedColor);
+                mPressedState[i].draw(canvas);
+            }
         }
-
-        canvas.drawText(mText, mTextX, mTextY, mTextPaint);
 
         canvas.save();
         for(int i = 0; i < 6; i++) {
@@ -173,9 +332,13 @@ public class HexagonLayout extends View implements OnTouchListener {
             mBorder[i].draw(canvas);
             mButtons[i].getDrawable().draw(canvas);
             canvas.drawText(mButtons[i].getText(), center.x - mButtonTextPaint.measureText(mButtons[i].getText()) / 2,
-                    (mBorderWidth + mButtonTextPaint.getTextSize()) / 2, mButtonTextPaint);
+                    (mBorderWidth + mButtonTextPaint.getTextSize()) / 2 + (int) mTopMargin, mButtonTextPaint);
         }
         canvas.restore();
+
+        canvas.restore();
+
+        canvas.drawText(mText, mTextX, mTextY, mTextPaint);
     }
 
     @Override
@@ -226,8 +389,9 @@ public class HexagonLayout extends View implements OnTouchListener {
 
     @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
+        h -= mTopMargin;
         if(mAllowRotation) {
-            h = (int) (h * 1.4);
+            h = (int) (h * 1.2);
         }
         w = (int) (h * 1.1547);
         mBorderShadowWidth = h / 2 * 0.1828f;
@@ -236,19 +400,19 @@ public class HexagonLayout extends View implements OnTouchListener {
 
         // Create a box
 
-        center = new Point(w / 2, h / 2);
+        center = new Point(w / 2, (int) (h / 2 + mTopMargin));
 
         // Get the length of a side of the hexagon
         int s = w / 2;
 
         // Create an array of the corners
         corners = new Point[6];
-        corners[0] = new Point(w / 4, 0);
-        corners[1] = new Point(3 * w / 4, 0);
-        corners[2] = new Point(w, h / 2);
-        corners[3] = new Point(3 * w / 4, h);
-        corners[4] = new Point(w / 4, h);
-        corners[5] = new Point(0, h / 2);
+        corners[0] = new Point(w / 4, (int) mTopMargin);
+        corners[1] = new Point(3 * w / 4, (int) mTopMargin);
+        corners[2] = new Point(w, h / 2 + (int) mTopMargin);
+        corners[3] = new Point(3 * w / 4, h + (int) mTopMargin);
+        corners[4] = new Point(w / 4, h + (int) mTopMargin);
+        corners[5] = new Point(0, h / 2 + (int) mTopMargin);
 
         // Shape of a hexagon
         Path hexagonPath = new Path();
@@ -272,15 +436,15 @@ public class HexagonLayout extends View implements OnTouchListener {
         Path edgePath = new Path();
         edgePath.moveTo(corners[0].x, corners[0].y);
         edgePath.lineTo(corners[1].x, corners[1].y);
-        edgePath.lineTo((int) (corners[1].x - mBorderWidth / 1.732), mBorderWidth);
-        edgePath.lineTo((int) (corners[0].x + mBorderWidth / 1.732), mBorderWidth);
+        edgePath.lineTo((int) (corners[1].x - mBorderWidth / 1.732), mBorderWidth + (int) mTopMargin);
+        edgePath.lineTo((int) (corners[0].x + mBorderWidth / 1.732), mBorderWidth + (int) mTopMargin);
         edgePath.close();
         // Shape of an edge
         Path shadowEdgePath = new Path();
         shadowEdgePath.moveTo(corners[0].x, corners[0].y);
         shadowEdgePath.lineTo(corners[1].x, corners[1].y);
-        shadowEdgePath.lineTo((int) (corners[1].x - (mBorderWidth + mBorderShadowWidth) / 1.732), (mBorderWidth + mBorderShadowWidth));
-        shadowEdgePath.lineTo((int) (corners[0].x + (mBorderWidth + mBorderShadowWidth) / 1.732), (mBorderWidth + mBorderShadowWidth));
+        shadowEdgePath.lineTo((int) (corners[1].x - (mBorderWidth + mBorderShadowWidth) / 1.732), (mBorderWidth + mBorderShadowWidth + (int) mTopMargin));
+        shadowEdgePath.lineTo((int) (corners[0].x + (mBorderWidth + mBorderShadowWidth) / 1.732), (mBorderWidth + mBorderShadowWidth + (int) mTopMargin));
         shadowEdgePath.close();
         for(int i = 0; i < 6; i++) {
             Triangle t = new Triangle(new Point(corners[(i + 1) % 6].x, corners[(i + 1) % 6].y), new Point(corners[(i + 2) % 6].x, corners[(i + 2) % 6].y),
@@ -313,17 +477,12 @@ public class HexagonLayout extends View implements OnTouchListener {
         layoutText();
     }
 
-    private float rotationOffset;
-    private float oldRotation;
-    private float spinVelocity;
-    private int spinSign;
-
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         int sign = (event.getX() > center.x) ? -1 : 1;
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
-            rotationOffset = sign * cosineInverse(center, new Point(center.x, 0), new Point((int) event.getX(), (int) event.getY()));
-            oldRotation = mRotation;
+            mRotationOffset = sign * cosineInverse(center, new Point(center.x, 0), new Point((int) event.getX(), (int) event.getY()));
+            mOldRotation = mRotation;
             for(Button b : mButtons) {
                 if(b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
                     b.setPressed(b.isEnabled());
@@ -332,57 +491,58 @@ public class HexagonLayout extends View implements OnTouchListener {
                     b.setPressed(false);
                 }
             }
-            mVelocityTracker = VelocityTracker.obtain();
-            mVelocityTracker.addMovement(event);
+            mRotationSpin = -1f;
+            mRotationHistory = new float[4];
         }
         else if(event.getAction() == MotionEvent.ACTION_UP) {
+            boolean performClick = false;
             for(Button b : mButtons) {
                 if(b.isPressed()) {
                     performClick();
-                    b.preformClick();
+                    performClick = true;
                 }
                 b.setPressed(false);
             }
-
-            if(mVelocityTracker != null) {
-                mVelocityTracker.addMovement(event);
-                mVelocityTracker.computeCurrentVelocity(1000);
-                float distance = (float) Math.sqrt(distanceSqr(new Point((int) mVelocityTracker.getXVelocity(), (int) mVelocityTracker.getYVelocity()),
-                        new Point(0, 0)));
-                if(mMinFlingVelocity <= distance && distance <= mMaxFlingVelocity) {
-                    if(Math.abs(mVelocityTracker.getXVelocity()) > Math.abs(mVelocityTracker.getYVelocity())) {
-                        spinSign = mVelocityTracker.getXVelocity() > 0 ? 1 : -1;
-                    }
-                    else {
-                        spinSign = mVelocityTracker.getYVelocity() > 0 ? 1 : -1;
-                        spinSign *= sign;
-                    }
-                    spinVelocity = spinSign * distance;
-                }
-                mVelocityTracker.recycle();
-                mVelocityTracker = null;
+            if(!performClick) {
+                mRotationHistory[3] = mRotationHistory[2];
+                mRotationHistory[2] = mRotationHistory[1];
+                mRotationHistory[1] = mRotationHistory[0];
+                mRotationHistory[0] = mRotation % 360;
+                mRotationSpin = mRotation - getAverage(mRotationHistory);
+                mRotationSpinSign = mRotationSpin > 0 ? 1 : -1;
+                mRotationSpin *= mRotationSpinSign;
             }
         }
         else {
-            mRotation = oldRotation + rotationOffset - sign * cosineInverse(center, new Point(center.x, 0), new Point((int) event.getX(), (int) event.getY()));
+            mRotation = mOldRotation + mRotationOffset - sign
+                    * cosineInverse(center, new Point(center.x, 0), new Point((int) event.getX(), (int) event.getY()));
+            mRotation = mRotation % 360;
             for(Button b : mButtons) {
                 if(b.isPressed()) {
                     if(!b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
                         b.setPressed(false);
                     }
-                    else if(Math.abs(Math.abs(mRotation) - Math.abs(oldRotation) % 360) > 10f) {
+                    else if(Math.abs(Math.abs(mRotation) - Math.abs(mOldRotation)) > 10f) {
                         b.setPressed(false);
                     }
                 }
             }
-
-            if(mVelocityTracker != null) {
-                mVelocityTracker.addMovement(event);
-            }
+            mRotationHistory[3] = mRotationHistory[2];
+            mRotationHistory[2] = mRotationHistory[1];
+            mRotationHistory[1] = mRotationHistory[0];
+            mRotationHistory[0] = mRotation % 360;
         }
 
         invalidate();
         return true;
+    }
+
+    private float getAverage(float[] data) {
+        float sum = 0;
+        for(float f : data) {
+            sum += f;
+        }
+        return sum / data.length;
     }
 
     private float cosineInverse(Point a, Point b, Point c) {
@@ -416,6 +576,25 @@ public class HexagonLayout extends View implements OnTouchListener {
 
     public String getText() {
         return mText;
+    }
+
+    public void setTopMargin(float margin) {
+        mTopMargin = margin;
+    }
+
+    public void setInitialSpin(float initialSpin) {
+        if(initialSpin > 0) {
+            mRotationSpin = initialSpin;
+            mRotationSpinSign = 1;
+        }
+        else {
+            mRotationSpin = -1 * initialSpin;
+            mRotationSpinSign = -1;
+        }
+    }
+
+    public void setInitialRotation(float initialRotation) {
+        mRotation = initialRotation;
     }
 
     private class Triangle {
@@ -466,6 +645,7 @@ public class HexagonLayout extends View implements OnTouchListener {
         private Triangle triangle;
         private boolean pressed;
         private boolean enabled = true;
+        private boolean selected;
 
         public Button(Context context) {
             this.context = context;
@@ -523,7 +703,7 @@ public class HexagonLayout extends View implements OnTouchListener {
             return triangle;
         }
 
-        public void preformClick() {
+        public void performClick() {
             if(onClickListener != null) onClickListener.onClick();
         }
 
@@ -533,6 +713,14 @@ public class HexagonLayout extends View implements OnTouchListener {
 
         protected void setPressed(boolean pressed) {
             this.pressed = pressed;
+        }
+
+        protected boolean isSelected() {
+            return selected;
+        }
+
+        protected void setSelected(boolean selected) {
+            this.selected = selected;
         }
 
         public boolean isEnabled() {

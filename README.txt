@@ -1,9 +1,6 @@
 Welcome to Hex, the hexagon connection game.
 Help us make the game better!
 
-If you want to write an AI:
-I'll write a wiki up soon, but for now you can look in src/com/sam/hex/ai for examples.
-
 If you'd rather write your own board game based off ours, email me at xlythe@gmail.com and I'll try to help with any questions.
 
 ----------LICENSE------------
@@ -34,9 +31,3 @@ A modified version of https://github.com/mburman/Android-File-Explore (Released 
 
 src/com/sam/hex/ai/bee/Bee.java
 A modified AI originally written by Konstantin Lopyrev. (No official license. Special permission granted for use)
-
-src/net/margaritov/preference/colorpicker
-An unmodified version of https://github.com/attenzione/android-ColorPickerPreference (Released under the Apache 2.0 Open Source license)
-
-src/com/sam/hex/startup/DashboardLayout.java
-An unmodified version of http://code.google.com/p/iosched/source/browse/android/src/com/google/android/apps/iosched/ui/widget/DashboardLayout.java

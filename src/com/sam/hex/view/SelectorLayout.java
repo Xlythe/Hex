@@ -27,11 +27,13 @@ public class SelectorLayout extends View implements OnTouchListener {
     private ShapeDrawable[] mMirrorButtonDrawable;
     private Paint mButtonTextPaint;
     private int mDisabledColor;
+    private int mFocusedButton = -1;
 
     private int mWidth;
     private int mIndentHeight;
     private int mMargin;
     private float mRotation;
+    private int mAnimationLength;
     private int mAnimationTick;
     private int mAnimationDelta;
     private Rect[] mOldRect;
@@ -70,11 +72,79 @@ public class SelectorLayout extends View implements OnTouchListener {
         mMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, dm);
         mRotation = 45f;
         mAnimationTick = 30;
-        mAnimationDelta = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 45, dm);
+        mAnimationLength = 255;
         setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View v) {}
+            public void onClick(View v) {
+                for(Button b : mButtons) {
+                    if(b.isSelected() || b.isPressed()) {
+                        b.setAnimate(true);
+                    }
+                }
+                invalidate();
+            }
         });
+        setFocusable(true);
+        setOnFocusChangeListener(new OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus) {
+                    mFocusedButton = 0;
+                    mButtons[0].setSelected(true);
+                    invalidate();
+                }
+                else {
+                    if(mFocusedButton != -1) {
+                        mButtons[mFocusedButton].setSelected(false);
+                        invalidate();
+                    }
+                }
+            }
+        });
+    }
+
+    @Override
+    public View focusSearch(int direction) {
+        mButtons[mFocusedButton].setSelected(false);
+        switch(direction) {
+        case View.FOCUS_RIGHT:
+            switch(mFocusedButton) {
+            case 0:
+                mFocusedButton = 1;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            case 1:
+                mFocusedButton = 2;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            }
+            break;
+        case View.FOCUS_LEFT:
+            switch(mFocusedButton) {
+            case 1:
+                mFocusedButton = 0;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            case 2:
+                mFocusedButton = 1;
+                mButtons[mFocusedButton].setSelected(true);
+                invalidate();
+                return this;
+            }
+            break;
+        case View.FOCUS_UP:
+            break;
+        case View.FOCUS_DOWN:
+            break;
+        case View.FOCUS_FORWARD:
+            break;
+        case View.FOCUS_BACKWARD:
+            break;
+        }
+        return super.focusSearch(direction);
     }
 
     @Override
@@ -86,6 +156,10 @@ public class SelectorLayout extends View implements OnTouchListener {
                 mMirrorButtonDrawable[i].getPaint().setColor(mDisabledColor);
             }
             else if(mButtons[i].isPressed()) {
+                mButtonDrawable[i].getPaint().setColor(getDarkerColor(mButtons[i].getColor()));
+                mMirrorButtonDrawable[i].getPaint().setColor(getDarkerColor(mButtons[i].getColor()));
+            }
+            else if(mButtons[i].isSelected()) {
                 mButtonDrawable[i].getPaint().setColor(getDarkerColor(mButtons[i].getColor()));
                 mMirrorButtonDrawable[i].getPaint().setColor(getDarkerColor(mButtons[i].getColor()));
             }
@@ -105,7 +179,7 @@ public class SelectorLayout extends View implements OnTouchListener {
                 }
                 else {
                     mButtons[i].setAnimate(false);
-                    mButtons[i].preformClick();
+                    mButtons[i].performClick();
                 }
             }
             mButtonDrawable[i].draw(canvas);
@@ -176,6 +250,8 @@ public class SelectorLayout extends View implements OnTouchListener {
 
             offset += margin + mWidth;
         }
+
+        mAnimationDelta = h / mAnimationLength * mAnimationTick;
     }
 
     @Override
@@ -194,7 +270,6 @@ public class SelectorLayout extends View implements OnTouchListener {
             for(Button b : mButtons) {
                 if(b.isPressed()) {
                     performClick();
-                    b.setAnimate(true);
                 }
                 b.setPressed(false);
             }
@@ -275,6 +350,7 @@ public class SelectorLayout extends View implements OnTouchListener {
         private boolean animate = false;
         private float textX;
         private float textY;
+        private boolean selected;
 
         public Button(Context context) {
             this.context = context;
@@ -320,7 +396,7 @@ public class SelectorLayout extends View implements OnTouchListener {
             return hexagon;
         }
 
-        public void preformClick() {
+        public void performClick() {
             if(onClickListener != null) onClickListener.onClick();
         }
 
@@ -330,6 +406,14 @@ public class SelectorLayout extends View implements OnTouchListener {
 
         protected void setPressed(boolean pressed) {
             this.pressed = pressed;
+        }
+
+        protected boolean isSelected() {
+            return selected;
+        }
+
+        protected void setSelected(boolean selected) {
+            this.selected = selected;
         }
 
         public boolean isEnabled() {

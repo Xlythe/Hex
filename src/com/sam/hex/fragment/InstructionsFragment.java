@@ -7,13 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.sam.hex.R;
 
 /**
  * @author Will Harmon
  **/
-public class InstructionsFragment extends SherlockFragment {
+public class InstructionsFragment extends HexFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);

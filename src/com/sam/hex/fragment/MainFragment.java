@@ -1,8 +1,8 @@
 package com.sam.hex.fragment;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,21 +10,25 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.google.android.gms.common.SignInButton;
 import com.sam.hex.MainActivity;
 import com.sam.hex.PreferencesActivity;
 import com.sam.hex.R;
 import com.sam.hex.Settings;
 import com.sam.hex.Stats;
+import com.sam.hex.view.DonateDialog;
+import com.sam.hex.view.HexDialog;
 import com.sam.hex.view.HexagonLayout;
 
 /**
  * @author Will Harmon
  **/
-public class MainFragment extends SherlockFragment {
+public class MainFragment extends HexFragment {
     // Hexagon variables
-    HexagonLayout.Button mAchievementsButton;
+    HexagonLayout mHexagonLayout;
+    HexagonLayout.Button mDonateButton;
+    private float mInitialSpin;
+    private float mInitialRotation;
 
     // Stat variables
     TextView mTitleTextView;
@@ -43,13 +47,20 @@ public class MainFragment extends SherlockFragment {
         getMainActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         View v = inflater.inflate(R.layout.home, null);
 
-        HexagonLayout hexagonLayout = (HexagonLayout) v.findViewById(R.id.hexagonButtons);
-        HexagonLayout.Button settingsButton = hexagonLayout.getButtons()[0];
-        HexagonLayout.Button donateButton = hexagonLayout.getButtons()[1];
-        HexagonLayout.Button historyButton = hexagonLayout.getButtons()[2];
-        HexagonLayout.Button instructionsButton = hexagonLayout.getButtons()[3];
-        mAchievementsButton = hexagonLayout.getButtons()[4];
-        HexagonLayout.Button playButton = hexagonLayout.getButtons()[5];
+        mHexagonLayout = (HexagonLayout) v.findViewById(R.id.hexagonButtons);
+        HexagonLayout.Button settingsButton = mHexagonLayout.getButtons()[0];
+        mDonateButton = mHexagonLayout.getButtons()[1];
+        HexagonLayout.Button historyButton = mHexagonLayout.getButtons()[2];
+        HexagonLayout.Button instructionsButton = mHexagonLayout.getButtons()[3];
+        HexagonLayout.Button achievementsButton = mHexagonLayout.getButtons()[4];
+        HexagonLayout.Button playButton = mHexagonLayout.getButtons()[5];
+
+        mHexagonLayout.setTopMargin(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 25, getResources().getDisplayMetrics()));
+        mHexagonLayout.setText(R.string.app_name);
+        mHexagonLayout.setInitialRotation(mInitialRotation);
+        mInitialRotation = 0f;
+        mHexagonLayout.setInitialSpin(mInitialSpin);
+        mInitialSpin = 0f;
 
         mTitleTextView = (TextView) v.findViewById(R.id.title);
         mTimePlayedTextView = (TextView) v.findViewById(R.id.timePlayed);
@@ -59,25 +70,25 @@ public class MainFragment extends SherlockFragment {
         mSignInButton = (SignInButton) v.findViewById(R.id.signInButton);
         mSignOutButton = (Button) v.findViewById(R.id.signOutButton);
 
-        hexagonLayout.setText(R.string.app_name);
-
         settingsButton.setText(R.string.main_button_settings);
         settingsButton.setColor(0xffcc5c57);
         settingsButton.setDrawableResource(R.drawable.settings);
         settingsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                startActivity(new Intent(getSherlockActivity(), PreferencesActivity.class));
+                startActivity(new Intent(getMainActivity(), PreferencesActivity.class));
+                getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
 
-        donateButton.setText(R.string.main_button_donate);
-        donateButton.setColor(0xff5f6ec2);
-        donateButton.setDrawableResource(R.drawable.store);
-        donateButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
+        mDonateButton.setText(R.string.main_button_donate);
+        mDonateButton.setColor(0xff5f6ec2);
+        mDonateButton.setDrawableResource(R.drawable.store);
+        mDonateButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.donate.hex")));
+                HexDialog hd = new DonateDialog(getMainActivity());
+                hd.show();
             }
         });
 
@@ -87,7 +98,8 @@ public class MainFragment extends SherlockFragment {
         historyButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                getMainActivity().swapFragment(new HistoryFragment());
+                getMainActivity().setHistoryFragment(new HistoryFragment());
+                getMainActivity().swapFragment(getMainActivity().getHistoryFragment());
             }
         });
 
@@ -97,17 +109,25 @@ public class MainFragment extends SherlockFragment {
         instructionsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                getMainActivity().swapFragment(new InstructionsFragment());
+                getMainActivity().setInstructionsFragment(new InstructionsFragment());
+                getMainActivity().swapFragment(getMainActivity().getInstructionsFragment());
             }
         });
 
-        mAchievementsButton.setText(R.string.main_button_achievements);
-        mAchievementsButton.setColor(0xfff48935);
-        mAchievementsButton.setDrawableResource(R.drawable.achievements);
-        mAchievementsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
+        achievementsButton.setText(R.string.main_button_achievements);
+        achievementsButton.setColor(0xfff48935);
+        achievementsButton.setDrawableResource(R.drawable.achievements);
+        achievementsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                startActivityForResult(getMainActivity().getGamesClient().getAchievementsIntent(), MainActivity.REQUEST_ACHIEVEMENTS);
+                if(getMainActivity().isSignedIn()) {
+                    startActivityForResult(getMainActivity().getGamesClient().getAchievementsIntent(), MainActivity.REQUEST_ACHIEVEMENTS);
+                    getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                }
+                else {
+                    getMainActivity().setOpenAchievements(true);
+                    getMainActivity().beginUserInitiatedSignIn();
+                }
             }
         });
 
@@ -145,44 +165,54 @@ public class MainFragment extends SherlockFragment {
     public void onResume() {
         super.onResume();
 
-        long timePlayedInMillis = Stats.getTimePlayed(getSherlockActivity());
+        long timePlayedInMillis = Stats.getTimePlayed(getMainActivity());
         long timePlayedInHours = timePlayedInMillis / (1000 * 60 * 60);
         long timePlayedInMintues = (timePlayedInMillis - timePlayedInHours * (1000 * 60 * 60)) / (1000 * 60);
         long timePlayedInSeconds = (timePlayedInMillis - timePlayedInHours * (1000 * 60 * 60) - timePlayedInMintues * (1000 * 60)) / (1000);
         mTimePlayedTextView.setText(String.format(getString(R.string.main_stats_time_played), timePlayedInHours, timePlayedInMintues, timePlayedInSeconds));
-        mGamesPlayedTextView.setText(String.format(getString(R.string.main_stats_games_played), Stats.getGamesPlayed(getSherlockActivity())));
-        mGamesWonTextView.setText(String.format(getString(R.string.main_stats_games_won), Stats.getGamesWon(getSherlockActivity())));
+        mGamesPlayedTextView.setText(String.format(getString(R.string.main_stats_games_played), Stats.getGamesPlayed(getMainActivity())));
+        mGamesWonTextView.setText(String.format(getString(R.string.main_stats_games_won), Stats.getGamesWon(getMainActivity())));
         showDonationStar();
     }
 
     private void refreshPlayerInformation() {
+        if(getMainActivity() == null) return;
         if(mSignOutButton != null) mSignOutButton.setVisibility(getMainActivity().isSignedIn() ? View.VISIBLE : View.GONE);
         if(mSignInButton != null) mSignInButton.setVisibility(getMainActivity().isSignedIn() ? View.GONE : View.VISIBLE);
         if(mTitleTextView != null) mTitleTextView.setText(String.format(getString(R.string.main_title),
-                Settings.getPlayer1Name(getSherlockActivity(), getMainActivity().getGamesClient())));
-        if(mAchievementsButton != null) mAchievementsButton.setEnabled(getMainActivity().isSignedIn());
-    }
-
-    private MainActivity getMainActivity() {
-        return (MainActivity) getSherlockActivity();
+                Settings.getPlayer1Name(getMainActivity(), getMainActivity().getGamesClient())));
+        if(mDonateButton != null) mDonateButton.setEnabled(getMainActivity().isIabSetup());
+        if(mHexagonLayout != null) mHexagonLayout.invalidate();
     }
 
     public void setSignedIn(boolean isSignedIn) {
         refreshPlayerInformation();
     }
 
+    public void setIabSetup(boolean isIabSetup) {
+        refreshPlayerInformation();
+    }
+
+    public void setInitialSpin(float initialSpin) {
+        mInitialSpin = initialSpin;
+    }
+
+    public void setInitialRotation(float initialRotation) {
+        mInitialRotation = initialRotation;
+    }
+
     private void showDonationStar() {
         int donationAmount = Stats.getDonationAmount(getMainActivity());
-        int resource = R.drawable.directory_up;
+        int resource = R.drawable.donate_hollow;
 
         if(donationAmount >= 5) {
-            resource = R.drawable.directory_icon;
+            resource = R.drawable.donate_gold;
         }
         else if(donationAmount >= 3) {
-            resource = R.drawable.store;
+            resource = R.drawable.donate_silver;
         }
         else if(donationAmount >= 1) {
-            resource = R.drawable.icon;
+            resource = R.drawable.donate_bronze;
         }
 
         mTitleTextView.setCompoundDrawablesWithIntrinsicBounds(resource, 0, 0, 0);

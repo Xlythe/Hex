@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.google.android.gms.games.GamesActivityResultCodes;
 import com.google.android.gms.games.GamesClient;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
@@ -20,7 +19,10 @@ import com.sam.hex.MainActivity;
 import com.sam.hex.R;
 import com.sam.hex.view.SelectorLayout;
 
-public class OnlineSelectionFragment extends SherlockFragment {
+/**
+ * @author Will Harmon
+ **/
+public class OnlineSelectionFragment extends HexFragment {
     private SelectorLayout mSelectorLayout;
     GameManager gameManager = null;
     
@@ -49,6 +51,7 @@ public class OnlineSelectionFragment extends SherlockFragment {
             @Override
             public void onClick() {
                 startActivityForResult(getMainActivity().getGamesClient().getSelectPlayersIntent(1, 1), MainActivity.RC_SELECT_PLAYERS);
+                getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
 
@@ -58,7 +61,10 @@ public class OnlineSelectionFragment extends SherlockFragment {
         pendingButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                startActivityForResult(getMainActivity().getGamesClient().getInvitationInboxIntent(), MainActivity.RC_WAITING_ROOM);
+
+                startActivityForResult(getMainActivity().getGamesClient().getInvitationInboxIntent(), MainActivity.RC_SELECT_PLAYERS);
+                getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
             }
         });
 
@@ -136,7 +142,7 @@ public class OnlineSelectionFragment extends SherlockFragment {
         getMainActivity().getGamesClient().createRoom(roomConfig);
 
         // prevent screen from sleeping during handshake
-        getSherlockActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getMainActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // go to game screen
        //Game g =this.gameManager.getGame();
@@ -147,9 +153,5 @@ public class OnlineSelectionFragment extends SherlockFragment {
         return RoomConfig.builder(gameManager.getHexRoomUpdateListener())
                 .setMessageReceivedListener(gameManager.getHexRealTimeMessageReceivedListener())
                 .setRoomStatusUpdateListener(gameManager.getHexRoomStatusUpdateListener());
-    }
-
-    private MainActivity getMainActivity() {
-        return (MainActivity) getSherlockActivity();
     }
 }

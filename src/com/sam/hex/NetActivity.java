@@ -92,9 +92,6 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     // invitation listener
     String mIncomingInvitationId = null;
 
-    // Message buffer for sending messages
-    byte[] mMsgBuf = new byte[2];
-
     // flag indicating whether we're dismissing the waiting room because the
     // game is starting
     boolean mWaitRoomDismissedFromCode = false;
@@ -148,7 +145,6 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         rtmConfigBuilder.setRoomStatusUpdateListener(this);
         rtmConfigBuilder.setAutoMatchCriteria(autoMatchCriteria);
         keepScreenOn();
-        resetGameVars();
         getGamesClient().createRoom(rtmConfigBuilder.build());
     }
 
@@ -178,7 +174,9 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
                 Log.d(TAG, "Starting game because user requested via waiting room UI.");
 
                 // let other players know we're starting.
-                broadcastStart();
+                broadcastStart("Tonight we fight!".getBytes()); // TODO
+                                                                // broadcast
+                                                                // start
 
                 // start the game!
                 startGame(true);
@@ -236,7 +234,6 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
             rtmConfigBuilder.setAutoMatchCriteria(autoMatchCriteria);
         }
         keepScreenOn();
-        resetGameVars();
         getGamesClient().createRoom(rtmConfigBuilder.build());
         Log.d(TAG, "Room created, waiting for it to be ready...");
     }
@@ -264,7 +261,6 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         RoomConfig.Builder roomConfigBuilder = RoomConfig.builder(this);
         roomConfigBuilder.setInvitationIdToAccept(invId).setMessageReceivedListener(this).setRoomStatusUpdateListener(this);
         keepScreenOn();
-        resetGameVars();
         getGamesClient().joinRoom(roomConfigBuilder.build());
     }
 
@@ -297,7 +293,6 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     // Leave the room.
     void leaveRoom() {
         Log.d(TAG, "Leaving room.");
-        mSecondsLeft = 0;
         stopKeepingScreenOn();
         if(mRoomId != null) {
             getGamesClient().leaveRoom(this, mRoomId);
@@ -462,62 +457,32 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
 
     void updateRoom(Room room) {
         mParticipants = room.getParticipants();
-        updatePeerScoresDisplay();
+        // TODO invalidate ui
     }
 
     /*
      * GAME LOGIC SECTION. Methods that implement the game's rules.
      */
 
-    // Current state of the game:
-    int mSecondsLeft = -1; // how long until the game ends (seconds)
-    final static int GAME_DURATION = 20; // game duration, seconds.
-    int mScore = 0; // user's current score
-
-    // Reset game variables in preparation for a new game.
-    void resetGameVars() {
-        mSecondsLeft = GAME_DURATION;
-        mScore = 0;
-        mParticipantScore.clear();
-        mFinishedParticipants.clear();
-    }
-
     // Start the gameplay phase of the game.
     void startGame(boolean multiplayer) {
         mMultiplayer = multiplayer;
-        broadcastScore(false);
 
         // run the gameTick() method every second to update the game.
         final Handler h = new Handler();
         h.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if(mSecondsLeft <= 0) return;
-                gameTick();
-                broadcastScore(false);
+                broadcastMessage("I'm better than you!".getBytes());
                 h.postDelayed(this, 1000);
             }
         }, 1000);
     }
 
-    // Game tick -- update countdown, check if game ended.
-    void gameTick() {
-        if(mSecondsLeft > 0) --mSecondsLeft;
-
-        if(mSecondsLeft <= 0) {
-            // finish game
-            broadcastScore(true);
-        }
-    }
-
     // indicates the player scored one point
-    void scoreOnePoint() {
-        if(mSecondsLeft <= 0) return; // too late!
-        ++mScore;
-        updatePeerScoresDisplay();
-
-        // broadcast our new score to our peers
-        broadcastScore(false);
+    void makeMove() {
+        // broadcast our move to our peers
+        broadcastMessage("I'm better than you!".getBytes());
     }
 
     /*
@@ -540,92 +505,35 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     // 'S' message, which indicates that the game should start.
     @Override
     public void onRealTimeMessageReceived(RealTimeMessage rtm) {
-        byte[] buf = rtm.getMessageData();
+        String data = new String(rtm.getMessageData());
         String sender = rtm.getSenderParticipantId();
-        Log.d(TAG, "Message received: " + (char) buf[0] + "/" + (int) buf[1]);
+        Log.d(TAG, "Message received: " + data);
 
-        if(buf[0] == 'F' || buf[0] == 'U') {
-            // score update.
-            int existingScore = mParticipantScore.containsKey(sender) ? mParticipantScore.get(sender) : 0;
-            int thisScore = (int) buf[1];
-            if(thisScore > existingScore) {
-                // this check is necessary because packets may arrive out of
-                // order, so we
-                // should only ever consider the highest score we received, as
-                // we know in our
-                // game there is no way to lose points. If there was a way to
-                // lose points,
-                // we'd have to add a "serial number" to the packet.
-                mParticipantScore.put(sender, thisScore);
-            }
-
-            // update the scores on the screen
-            updatePeerScoresDisplay();
-
-            // if it's a final score, mark this participant as having finished
-            // the game
-            if((char) buf[0] == 'F') {
-                mFinishedParticipants.add(rtm.getSenderParticipantId());
-            }
-        }
-        else if(buf[0] == 'S') {
-            // someone else started to play -- so dismiss the waiting room and
-            // get right to it!
-            Log.d(TAG, "Starting game because we got a start message.");
-            dismissWaitingRoom();
-            startGame(true);
-        }
+        // TODO do something with the received message
     }
 
     // Broadcast my score to everybody else.
-    void broadcastScore(boolean finalScore) {
+    void broadcastMessage(byte[] message) {
         if(!mMultiplayer) return; // playing single-player mode
-
-        // First byte in message indicates whether it's a final score or not
-        mMsgBuf[0] = (byte) (finalScore ? 'F' : 'U');
-
-        // Second byte is the score.
-        mMsgBuf[1] = (byte) Math.random();
 
         // Send to every other participant.
         for(Participant p : mParticipants) {
             if(p.getParticipantId().equals(mMyId)) continue;
             if(p.getStatus() != Participant.STATUS_JOINED) continue;
-            if(finalScore) {
-                // final score notification must be sent via reliable message
-                getGamesClient().sendReliableRealTimeMessage(null, mMsgBuf, mRoomId, p.getParticipantId());
-            }
-            else {
-                // it's an interim score notification, so we can use unreliable
-                getGamesClient().sendUnreliableRealTimeMessage(mMsgBuf, mRoomId, p.getParticipantId());
-            }
+            getGamesClient().sendReliableRealTimeMessage(null, message, mRoomId, p.getParticipantId());
         }
     }
 
     // Broadcast a message indicating that we're starting to play. Everyone else
     // will react
     // by dismissing their waiting room UIs and starting to play too.
-    void broadcastStart() {
+    void broadcastStart(byte[] message) {
         if(!mMultiplayer) return; // playing single-player mode
 
-        mMsgBuf[0] = 'S';
-        mMsgBuf[1] = (byte) 0;
         for(Participant p : mParticipants) {
             if(p.getParticipantId().equals(mMyId)) continue;
             if(p.getStatus() != Participant.STATUS_JOINED) continue;
-            getGamesClient().sendReliableRealTimeMessage(null, mMsgBuf, mRoomId, p.getParticipantId());
-        }
-    }
-
-    // updates the screen with the scores from our peers
-    void updatePeerScoresDisplay() {
-        if(mRoomId != null) {
-            for(Participant p : mParticipants) {
-                String pid = p.getParticipantId();
-                if(pid.equals(mMyId)) continue;
-                if(p.getStatus() != Participant.STATUS_JOINED) continue;
-                int score = mParticipantScore.containsKey(pid) ? mParticipantScore.get(pid) : 0;
-            }
+            getGamesClient().sendReliableRealTimeMessage(null, message, mRoomId, p.getParticipantId());
         }
     }
 

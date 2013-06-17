@@ -42,6 +42,7 @@ import com.sam.hex.view.GameOverDialog;
 public class GameFragment extends HexFragment {
     public static final String GAME = "game";
     public static final String REPLAY = "replay";
+    public static final String NET = "net";
     private static final SimpleDateFormat SAVE_FORMAT = new SimpleDateFormat("MMM dd, yyyy hh:mm", Locale.getDefault());
 
     private Game game;
@@ -95,6 +96,10 @@ public class GameFragment extends HexFragment {
             if(getArguments().containsKey(REPLAY) && getArguments().getBoolean(REPLAY)) {
                 replayDuration = 900;
             }
+        }
+        else if(getArguments() != null && getArguments().containsKey(NET) && getArguments().getBoolean(NET)) {
+            // Net game (game should have already been passed in)
+            game.setGameListener(createGameListener());
         }
         else {
             // Create a new game
@@ -511,7 +516,7 @@ public class GameFragment extends HexFragment {
                     || Integer.valueOf(prefs.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME))) * 60 * 1000 != game.gameOptions.timer.totalTime;
         }
         else if(gameLocation == GameAction.NET_GAME) {
-            return(game != null && game.isGameOver());
+            return (game != null && game.isGameOver());
         }
         else {
             return true;
@@ -559,5 +564,9 @@ public class GameFragment extends HexFragment {
 
     public Game getGame() {
         return game;
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
     }
 }

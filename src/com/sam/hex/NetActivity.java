@@ -40,6 +40,7 @@ import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateListener;
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateListener;
+import com.hex.core.Game;
 
 /**
  * Button Clicker 2000. A minimalistic game showing the multiplayer features of
@@ -78,9 +79,6 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     // Room ID where the currently active game is taking place; null if we're
     // not playing.
     String mRoomId = null;
-
-    // Are we playing in multiplayer mode?
-    boolean mMultiplayer = false;
 
     // The participants in the currently active game
     ArrayList<Participant> mParticipants = null;
@@ -179,7 +177,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
                                                                 // start
 
                 // start the game!
-                startGame(true);
+                startGame();
             }
             else if(responseCode == GamesActivityResultCodes.RESULT_LEFT_ROOM) {
                 // player actively indicated that they want to leave the room
@@ -465,8 +463,8 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
      */
 
     // Start the gameplay phase of the game.
-    void startGame(boolean multiplayer) {
-        mMultiplayer = multiplayer;
+    void startGame() {// TODO
+        switchToGame(null);
 
         // run the gameTick() method every second to update the game.
         final Handler h = new Handler();
@@ -514,8 +512,6 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
 
     // Broadcast my score to everybody else.
     void broadcastMessage(byte[] message) {
-        if(!mMultiplayer) return; // playing single-player mode
-
         // Send to every other participant.
         for(Participant p : mParticipants) {
             if(p.getParticipantId().equals(mMyId)) continue;
@@ -528,8 +524,6 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     // will react
     // by dismissing their waiting room UIs and starting to play too.
     void broadcastStart(byte[] message) {
-        if(!mMultiplayer) return; // playing single-player mode
-
         for(Participant p : mParticipants) {
             if(p.getParticipantId().equals(mMyId)) continue;
             if(p.getStatus() != Participant.STATUS_JOINED) continue;
@@ -540,27 +534,6 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     /*
      * MISC SECTION. Miscellaneous methods.
      */
-
-    /**
-     * Checks that the developer (that's you!) read the instructions. IMPORTANT:
-     * a method like this SHOULD NOT EXIST in your production app! It merely
-     * exists here to check that anyone running THIS PARTICULAR SAMPLE did what
-     * they were supposed to in order for the sample to work.
-     */
-    boolean verifyPlaceholderIdsReplaced() {
-        final boolean CHECK_PKGNAME = true; // set to false to disable check
-                                            // (not recommended!)
-
-        // Did the developer forget to change the package name?
-        if(CHECK_PKGNAME && getPackageName().startsWith("com.google.example.")) return false;
-
-        // Did the developer forget to replace a placeholder ID?
-        int res_ids[] = new int[] { R.string.app_id };
-        for(int i : res_ids) {
-            if(getString(i).equalsIgnoreCase("ReplaceMe")) return false;
-        }
-        return true;
-    }
 
     // Sets the flag to keep this screen on. It's recommended to do that during
     // the
@@ -575,4 +548,10 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     void stopKeepingScreenOn() {
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
+
+    /*
+     * UI Section
+     */
+
+    abstract void switchToGame(Game game);
 }

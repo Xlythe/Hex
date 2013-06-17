@@ -14,6 +14,7 @@ import android.view.KeyEvent;
 import com.android.vending.billing.util.IabResult;
 import com.google.android.gms.appstate.AppStateClient;
 import com.google.android.gms.appstate.OnStateLoadedListener;
+import com.hex.core.Game;
 import com.sam.hex.fragment.GameFragment;
 import com.sam.hex.fragment.GameSelectionFragment;
 import com.sam.hex.fragment.HistoryFragment;
@@ -303,6 +304,20 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
 
     public void setOpenOnlineSelectionFragment(boolean open) {
         this.mOpenOnlineSelectionFragment = open;
+    }
+
+    @Override
+    void switchToGame(Game game) {
+        Bundle b = new Bundle();
+        b.putBoolean(GameFragment.NET, true);
+
+        mGameFragment = new GameFragment();
+        mGameFragment.setGame(game);
+        mGameFragment.setPlayer1Type(game.getPlayer1().getType());
+        mGameFragment.setPlayer2Type(game.getPlayer2().getType());
+        mGameFragment.setArguments(b);
+
+        swapFragment(mGameFragment);
     }
 
 }

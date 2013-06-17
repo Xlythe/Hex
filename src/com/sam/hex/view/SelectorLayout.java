@@ -36,6 +36,7 @@ public class SelectorLayout extends View implements OnTouchListener {
     private int mAnimationLength;
     private int mAnimationTick;
     private int mAnimationDelta;
+    private int mMinAnimationDelta;
     private Rect[] mOldRect;
     private Rect[] mOldMirrorRect;
     private Point[] mOldTextPos;
@@ -73,6 +74,7 @@ public class SelectorLayout extends View implements OnTouchListener {
         mRotation = 45f;
         mAnimationTick = 30;
         mAnimationLength = 240;
+        mMinAnimationDelta = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 55, dm);
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -252,6 +254,7 @@ public class SelectorLayout extends View implements OnTouchListener {
         }
 
         mAnimationDelta = h / mAnimationLength * mAnimationTick;
+        mAnimationDelta = Math.max(mMinAnimationDelta, mAnimationDelta);
     }
 
     @Override

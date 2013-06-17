@@ -5,7 +5,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 
+import com.google.android.gms.games.GamesClient;
 import com.sam.hex.MainActivity;
 
 /**
@@ -29,5 +31,18 @@ public class HexFragment extends Fragment {
 
     protected MainActivity getMainActivity() {
         return (MainActivity) getActivity();
+    }
+
+    protected void keepScreenOn(boolean status) {
+        if(status) {
+            getMainActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
+        else {
+            getMainActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
+    }
+
+    protected GamesClient getGamesClient() {
+        return getMainActivity().getGamesClient();
     }
 }

@@ -121,7 +121,7 @@ public class MainFragment extends HexFragment {
             @Override
             public void onClick() {
                 if(getMainActivity().isSignedIn()) {
-                    startActivityForResult(getMainActivity().getGamesClient().getAchievementsIntent(), MainActivity.REQUEST_ACHIEVEMENTS);
+                    startActivityForResult(getMainActivity().getGamesClient().getAchievementsIntent(), MainActivity.RC_ACHIEVEMENTS);
                     getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 }
                 else {

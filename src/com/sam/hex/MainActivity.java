@@ -14,7 +14,6 @@ import android.view.KeyEvent;
 import com.android.vending.billing.util.IabResult;
 import com.google.android.gms.appstate.AppStateClient;
 import com.google.android.gms.appstate.OnStateLoadedListener;
-import com.hex.android.net.GameManager;
 import com.sam.hex.fragment.GameFragment;
 import com.sam.hex.fragment.GameSelectionFragment;
 import com.sam.hex.fragment.HistoryFragment;
@@ -25,17 +24,13 @@ import com.sam.hex.fragment.OnlineSelectionFragment;
 /**
  * @author Will Harmon
  **/
-public class MainActivity extends BaseGameActivity implements OnStateLoadedListener {
+public class MainActivity extends NetActivity implements OnStateLoadedListener {
     public static int PLAY_TIME_STATE = 0;
     public static int GAMES_PLAYED_STATE = 1;
     public static int GAMES_WON_STATE = 2;
-    public static final int REQUEST_ACHIEVEMENTS = 1001;
-    public final static int RC_SELECT_PLAYERS = 1002;
-    public final static int RC_WAITING_ROOM = 1003;
 
     // Play variables
     private boolean mIsSignedIn = false;
-    private GameManager gameManager = null;
     private boolean mOpenAchievements = false;
     private boolean mOpenOnlineSelectionFragment = false;
 
@@ -153,7 +148,7 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
 
         if(mOpenAchievements) {
             mOpenAchievements = false;
-            startActivityForResult(getGamesClient().getAchievementsIntent(), MainActivity.REQUEST_ACHIEVEMENTS);
+            startActivityForResult(getGamesClient().getAchievementsIntent(), RC_ACHIEVEMENTS);
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
         if(mOpenOnlineSelectionFragment) {
@@ -287,13 +282,6 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
                 }
             }
         }
-    }
-
-    /**
-     * @return the gameManager
-     */
-    public GameManager getGameManager() {
-        return gameManager = new GameManager(this.mHelper, this);
     }
 
     /**

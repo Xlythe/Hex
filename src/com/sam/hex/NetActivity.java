@@ -494,8 +494,8 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         }
         p1.setColor(getResources().getInteger(R.integer.DEFAULT_P1_COLOR));
         p2.setColor(getResources().getInteger(R.integer.DEFAULT_P2_COLOR));
-        p1.setName(((Participant) players[0]).getPlayer().getDisplayName().split(" ")[0]);
-        p1.setName(((Participant) players[1]).getPlayer().getDisplayName().split(" ")[0]);
+        p1.setName(((Participant) players[0]).getDisplayName().split(" ")[0]);
+        p1.setName(((Participant) players[1]).getDisplayName().split(" ")[0]);
 
         Game game = new Game(go, p1, p2);
         switchToGame(game);

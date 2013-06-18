@@ -516,7 +516,7 @@ public class GameFragment extends HexFragment {
                     || Integer.valueOf(prefs.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME))) * 60 * 1000 != game.gameOptions.timer.totalTime;
         }
         else if(gameLocation == GameAction.NET_GAME) {
-            return (game != null && game.isGameOver());
+            return(game != null && game.isGameOver());
         }
         else {
             return true;

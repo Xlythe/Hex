@@ -320,4 +320,8 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
         swapFragment(mGameFragment);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // No call for super(). Bug on API Level > 11.
+    }
 }

@@ -16,18 +16,16 @@
 package com.sam.hex;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.google.android.gms.games.GamesActivityResultCodes;
 import com.google.android.gms.games.GamesClient;
@@ -41,6 +39,12 @@ import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateListener;
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateListener;
 import com.hex.core.Game;
+import com.hex.core.Game.GameOptions;
+import com.hex.core.PlayerObject;
+import com.hex.core.PlayingEntity;
+import com.hex.core.Timer;
+import com.hex.network.NetCommunication;
+import com.hex.network.NetworkPlayer;
 
 /**
  * Button Clicker 2000. A minimalistic game showing the multiplayer features of
@@ -60,7 +64,7 @@ import com.hex.core.Game;
  * @author Bruno Oliveira (btco), 2013-04-26
  */
 public abstract class NetActivity extends BaseGameActivity implements RealTimeMessageReceivedListener, RoomStatusUpdateListener, RoomUpdateListener,
-        OnInvitationReceivedListener {
+        OnInvitationReceivedListener, NetCommunication {
 
     /*
      * API INTEGRATION SECTION. This section contains the code that integrates
@@ -462,19 +466,39 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
      * GAME LOGIC SECTION. Methods that implement the game's rules.
      */
 
-    // Start the gameplay phase of the game.
-    void startGame() {// TODO
-        switchToGame(null);
+    private NetworkPlayer mNetworkPlayer;
 
-        // run the gameTick() method every second to update the game.
-        final Handler h = new Handler();
-        h.postDelayed(new Runnable() {
+    // Start the gameplay phase of the game.
+    void startGame() {
+        Object[] players = mParticipants.toArray();
+        Arrays.sort(players, new Comparator<Object>() {
             @Override
-            public void run() {
-                broadcastMessage("I'm better than you!".getBytes());
-                h.postDelayed(this, 1000);
+            public int compare(Object lhs, Object rhs) {
+                return ((Participant) lhs).getParticipantId().compareTo(((Participant) rhs).getParticipantId());
             }
-        }, 1000);
+        });
+        GameOptions go = new GameOptions();
+        go.gridSize = 7;
+        go.swap = true;
+        go.timer = new Timer(0, 0, Timer.NO_TIMER);
+
+        PlayingEntity p1;
+        PlayingEntity p2;
+        if(((Participant) players[0]).getParticipantId().equals(mMyId)) {
+            p1 = new PlayerObject(1);
+            p2 = mNetworkPlayer = new NetworkPlayer(2, this);
+        }
+        else {
+            p1 = mNetworkPlayer = new NetworkPlayer(1, this);
+            p2 = new PlayerObject(2);
+        }
+        p1.setColor(getResources().getInteger(R.integer.DEFAULT_P1_COLOR));
+        p2.setColor(getResources().getInteger(R.integer.DEFAULT_P2_COLOR));
+        p1.setName(((Participant) players[0]).getPlayer().getDisplayName().split(" ")[0]);
+        p1.setName(((Participant) players[1]).getPlayer().getDisplayName().split(" ")[0]);
+
+        Game game = new Game(go, p1, p2);
+        switchToGame(game);
     }
 
     // indicates the player scored one point
@@ -488,13 +512,6 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
      * protocol.
      */
 
-    // Score of other participants. We update this as we receive their scores
-    // from the network.
-    Map<String, Integer> mParticipantScore = new HashMap<String, Integer>();
-
-    // Participants who sent us their final score.
-    Set<String> mFinishedParticipants = new HashSet<String>();
-
     // Called when we receive a real-time message from the network.
     // Messages in our game are made up of 2 bytes: the first one is 'F' or 'U'
     // indicating
@@ -506,6 +523,10 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         String data = new String(rtm.getMessageData());
         String sender = rtm.getSenderParticipantId();
         Log.d(TAG, "Message received: " + data);
+
+        if(mNetworkPlayer != null) mNetworkPlayer.receivedMessage(data);
+
+        Toast.makeText(this, data, Toast.LENGTH_SHORT).show();
 
         // TODO do something with the received message
     }
@@ -554,4 +575,12 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
      */
 
     abstract void switchToGame(Game game);
+
+    @Override
+    public void sendMessage(String msg) {
+        broadcastMessage(msg.getBytes());
+    }
+
+    @Override
+    public void kill() {}
 }

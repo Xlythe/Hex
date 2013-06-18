@@ -78,6 +78,7 @@
     <string name="game_over_lose">Lost</string>
     <string name="game_over_time">Time</string>
     <string name="game_over_length" formatted="false">%02d:%02d:%02d</string>
+    <string name="net_challeneger_approaches" formatted="false">%s wants to challenge you.</string>
 
     <!-- Game instructions -->
     <string name="instructions">Hex is played by two players, who take turns placing pieces on the board. The players have different colours, say red and blue. (The players themselves are sometimes referred to as Red and Blue) The four edges of the board are coloured with the same colours, in such a way that parallel edges have the same colour. Red wins if he can build a continuous chain between the two red edges, and blue wins if he can build such a chain between the blue edges.\n\n

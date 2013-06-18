@@ -25,7 +25,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import com.google.android.gms.games.GamesActivityResultCodes;
 import com.google.android.gms.games.GamesClient;
@@ -174,11 +173,6 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
             if(responseCode == Activity.RESULT_OK) {
                 // player wants to start playing
                 Log.d(TAG, "Starting game because user requested via waiting room UI.");
-
-                // let other players know we're starting.
-                broadcastStart("Tonight we fight!".getBytes()); // TODO
-                                                                // broadcast
-                                                                // start
 
                 // start the game!
                 startGame();
@@ -459,7 +453,6 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
 
     void updateRoom(Room room) {
         mParticipants = room.getParticipants();
-        // TODO invalidate ui
     }
 
     /*
@@ -521,14 +514,9 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     @Override
     public void onRealTimeMessageReceived(RealTimeMessage rtm) {
         String data = new String(rtm.getMessageData());
-        String sender = rtm.getSenderParticipantId();
         Log.d(TAG, "Message received: " + data);
 
         if(mNetworkPlayer != null) mNetworkPlayer.receivedMessage(data);
-
-        Toast.makeText(this, data, Toast.LENGTH_SHORT).show();
-
-        // TODO do something with the received message
     }
 
     // Broadcast my score to everybody else.

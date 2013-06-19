@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -45,6 +46,7 @@ import com.hex.core.PlayerObject;
 import com.hex.core.PlayingEntity;
 import com.hex.core.Timer;
 import com.hex.network.NetCommunication;
+import com.hex.network.NetworkCallbacks;
 import com.hex.network.NetworkPlayer;
 
 /**
@@ -65,7 +67,7 @@ import com.hex.network.NetworkPlayer;
  * @author Bruno Oliveira (btco), 2013-04-26
  */
 public abstract class NetActivity extends BaseGameActivity implements RealTimeMessageReceivedListener, RoomStatusUpdateListener, RoomUpdateListener,
-        OnInvitationReceivedListener, NetCommunication {
+        OnInvitationReceivedListener, NetCommunication, NetworkCallbacks {
 
     /*
      * API INTEGRATION SECTION. This section contains the code that integrates
@@ -494,6 +496,10 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
 
     // Start the gameplay phase of the game.
     void startGame() {
+        for(Participant p : mParticipants) {
+            System.out.println(p.getDisplayName());
+        }
+
         Object[] players = mParticipants.toArray();
         Arrays.sort(players, new Comparator<Object>() {
             @Override
@@ -511,6 +517,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         if(((Participant) players[0]).getParticipantId().equals(mMyId)) {
             p1 = new PlayerObject(1);
             p2 = mNetworkPlayer = new NetworkPlayer(2, this);
+            mNetworkPlayer.setCallbacks(this);
         }
         else {
             p1 = mNetworkPlayer = new NetworkPlayer(1, this);
@@ -519,7 +526,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         p1.setColor(getResources().getInteger(R.integer.DEFAULT_P1_COLOR));
         p2.setColor(getResources().getInteger(R.integer.DEFAULT_P2_COLOR));
         p1.setName(((Participant) players[0]).getDisplayName().split(" ")[0]);
-        p1.setName(((Participant) players[1]).getDisplayName().split(" ")[0]);
+        p2.setName(((Participant) players[1]).getDisplayName().split(" ")[0]);
 
         mGame = new Game(go, p1, p2);
         switchToGame(mGame);
@@ -531,11 +538,6 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
      */
 
     // Called when we receive a real-time message from the network.
-    // Messages in our game are made up of 2 bytes: the first one is 'F' or 'U'
-    // indicating
-    // whether it's a final or interim score. The second byte is the score.
-    // There is also the
-    // 'S' message, which indicates that the game should start.
     @Override
     public void onRealTimeMessageReceived(RealTimeMessage rtm) {
         String data = new String(rtm.getMessageData());
@@ -596,4 +598,101 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
 
     @Override
     public void kill() {}
+
+    public void newGame(String gameData) {}
+
+    @Override
+    public String newGameReqest() {
+        Log.d(TAG, "New game requested");
+        final LinkedBlockingQueue<Boolean> reply = new LinkedBlockingQueue<Boolean>();
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch(which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    // Yes button clicked
+                    reply.add(true);
+                    break;
+                case DialogInterface.BUTTON_NEGATIVE:
+                    // No button clicked
+                    reply.add(false);
+                    break;
+                }
+            }
+        };
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.net_challeneger_requests_new_game, mNetworkPlayer.getName()))
+                .setPositiveButton(getString(R.string.net_accept), dialogClickListener).setNegativeButton(getString(R.string.net_decline), dialogClickListener);
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                builder.show();
+            }
+        });
+
+        try {
+            if(reply.take()) {
+                mGame.clearBoard();
+            }
+            else {
+                mNetworkPlayer.forfeit();
+                mGame.getCurrentPlayer().endMove();
+            }
+        }
+        catch(InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public boolean undoRequest(final int turnNumber) {
+        Log.d(TAG, "Undo requested");
+        final LinkedBlockingQueue<Boolean> reply = new LinkedBlockingQueue<Boolean>();
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch(which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    // Yes button clicked
+                    reply.add(true);
+                    break;
+                case DialogInterface.BUTTON_NEGATIVE:
+                    // No button clicked
+                    reply.add(false);
+                    break;
+                }
+            }
+        };
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.net_challeneger_requests_undo, mNetworkPlayer.getName(), turnNumber))
+                .setPositiveButton(getString(R.string.net_accept), dialogClickListener).setNegativeButton(getString(R.string.net_decline), dialogClickListener);
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                builder.show();
+            }
+        });
+
+        try {
+            return reply.take();
+        }
+        catch(InterruptedException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public void undo(int turnNumer) {}
+
+    @Override
+    public void error() {}
+
+    @Override
+    public void chat(String message) {}
 }

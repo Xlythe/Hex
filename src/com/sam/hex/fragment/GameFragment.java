@@ -28,6 +28,7 @@ import com.hex.core.Player;
 import com.hex.core.PlayerObject;
 import com.hex.core.PlayingEntity;
 import com.hex.core.Timer;
+import com.hex.network.NetworkPlayer;
 import com.sam.hex.FileUtil;
 import com.sam.hex.MainActivity;
 import com.sam.hex.R;
@@ -189,8 +190,10 @@ public class GameFragment extends HexFragment {
         game = new Game(go, getPlayer(1, go.gridSize), getPlayer(2, go.gridSize));
         game.setGameListener(gl);
 
-        setNames();
-        setColors();
+        setName(game.getPlayer1());
+        setName(game.getPlayer2());
+        setColor(game.getPlayer1());
+        setColor(game.getPlayer2());
 
         game.gameOptions.timer.start(game);
     }
@@ -440,17 +443,25 @@ public class GameFragment extends HexFragment {
     /**
      * Refreshes both player's names Does not invalidate the board
      * */
-    protected void setNames() {
-        game.getPlayer1().setName(Settings.getPlayer1Name(getMainActivity(), getMainActivity().getGamesClient()));
-        game.getPlayer2().setName(Settings.getPlayer2Name(getMainActivity()));
+    protected void setName(PlayingEntity player) {
+        if(player.getTeam() == 1) {
+            player.setName(Settings.getPlayer1Name(getMainActivity(), getMainActivity().getGamesClient()));
+        }
+        else {
+            player.setName(Settings.getPlayer2Name(getMainActivity()));
+        }
     }
 
     /**
      * Refreshes both player's colors Does not invalidate the board
      * */
-    protected void setColors() {
-        game.getPlayer1().setColor(Settings.getPlayer1Color(getMainActivity()));
-        game.getPlayer2().setColor(Settings.getPlayer2Color(getMainActivity()));
+    protected void setColor(PlayingEntity player) {
+        if(player.getTeam() == 1) {
+            player.setColor(Settings.getPlayer1Color(getMainActivity()));
+        }
+        else {
+            player.setColor(Settings.getPlayer2Color(getMainActivity()));
+        }
     }
 
     public PlayingEntity getPlayer(int team, int gridSize) {
@@ -461,7 +472,7 @@ public class GameFragment extends HexFragment {
         case Human:
             return new PlayerObject(team);
         case Net:
-            return new PlayerObject(team);
+            return new NetworkPlayer(team, null);
         default:
             return new PlayerObject(team);
         }
@@ -497,19 +508,22 @@ public class GameFragment extends HexFragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                System.out.println("asking the question");
                 if(game.getPlayer1().supportsNewgame() && game.getPlayer2().supportsNewgame()) {
-                    System.out.println("yup");
                     getMainActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            game.getPlayer2().endMove();
-                            getMainActivity().switchToGame(new Game(game.gameOptions, game.getPlayer1(), game.getPlayer2()));
+                            stopGame(game);
+
+                            PlayingEntity p1 = getPlayer(1, game.gameOptions.gridSize);
+                            setName(p1);
+                            setColor(p1);
+                            PlayingEntity p2 = getPlayer(2, game.gameOptions.gridSize);
+                            setName(p2);
+                            setColor(p2);
+
+                            getMainActivity().switchToGame(new Game(game.gameOptions, p1, p2));
                         }
                     });
-                }
-                else {
-                    System.out.println("nope");
                 }
             }
         }).start();

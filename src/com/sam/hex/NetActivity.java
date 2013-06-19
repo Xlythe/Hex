@@ -496,10 +496,6 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
 
     // Start the gameplay phase of the game.
     void startGame() {
-        for(Participant p : mParticipants) {
-            System.out.println(p.getDisplayName());
-        }
-
         Object[] players = mParticipants.toArray();
         Arrays.sort(players, new Comparator<Object>() {
             @Override

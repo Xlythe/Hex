@@ -497,20 +497,19 @@ public class GameFragment extends HexFragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                System.out.println("asking the question");
                 if(game.getPlayer1().supportsNewgame() && game.getPlayer2().supportsNewgame()) {
-                    if(getMainActivity() != null && !isDetached()) getMainActivity().runOnUiThread(new Runnable() {
+                    System.out.println("yup");
+                    getMainActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            try {
-                                initializeNewGame();
-                                board.setGame(game);
-                                game.start();
-                            }
-                            catch(IllegalStateException e) {
-                                e.printStackTrace();
-                            }
+                            game.getPlayer2().endMove();
+                            getMainActivity().switchToGame(new Game(game.gameOptions, game.getPlayer1(), game.getPlayer2()));
                         }
                     });
+                }
+                else {
+                    System.out.println("nope");
                 }
             }
         }).start();

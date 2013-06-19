@@ -589,7 +589,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
      * UI Section
      */
 
-    abstract void switchToGame(Game game);
+    public abstract void switchToGame(Game game);
 
     @Override
     public void sendMessage(String msg) {
@@ -599,7 +599,9 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     @Override
     public void kill() {}
 
-    public void newGame(String gameData) {}
+    public void newGame(String gameData) {
+        startGame();
+    }
 
     @Override
     public String newGameReqest() {
@@ -634,17 +636,16 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
 
         try {
             if(reply.take()) {
-                mGame.clearBoard();
+                return "true";
             }
             else {
-                mNetworkPlayer.forfeit();
-                mGame.getCurrentPlayer().endMove();
+                return null;
             }
         }
         catch(InterruptedException e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     @Override

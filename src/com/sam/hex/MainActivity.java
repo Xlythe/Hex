@@ -140,7 +140,7 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
 
     @Override
     public void onSignInSucceeded() {
-        System.out.println("Signed in");
+        super.onSignInSucceeded();
         mIsSignedIn = true;
         getAppStateClient().loadState(this, PLAY_TIME_STATE);
         getAppStateClient().loadState(this, GAMES_PLAYED_STATE);
@@ -161,7 +161,7 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
 
     @Override
     public void onSignInFailed() {
-        System.out.println("Sign in failed");
+        super.onSignInFailed();
         mIsSignedIn = false;
         mMainFragment.setSignedIn(mIsSignedIn);
     }

@@ -288,7 +288,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     }
 
     // Leave the room.
-    void leaveRoom() {
+    public void leaveRoom() {
         Log.d(TAG, "Leaving room.");
         stopKeepingScreenOn();
         if(mRoomId != null) {
@@ -346,7 +346,8 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(getString(R.string.net_challeneger_approaches, invitation.getInviter().getDisplayName().split(" ")[0]))
-                .setPositiveButton(getString(R.string.yes), dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show();
+                .setPositiveButton(getString(R.string.net_accept), dialogClickListener).setNegativeButton(getString(R.string.net_decline), dialogClickListener)
+                .show();
     }
 
     /*
@@ -450,6 +451,10 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     @Override
     public void onPeerLeft(Room room, List<String> peersWhoLeft) {
         updateRoom(room);
+        if(mNetworkPlayer != null && mGame != null) {
+            mNetworkPlayer.forfeit();
+            mGame.getCurrentPlayer().endMove();
+        }
     }
 
     @Override
@@ -470,6 +475,10 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     @Override
     public void onPeersDisconnected(Room room, List<String> peers) {
         updateRoom(room);
+        if(mNetworkPlayer != null && mGame != null) {
+            mNetworkPlayer.forfeit();
+            mGame.getCurrentPlayer().endMove();
+        }
     }
 
     void updateRoom(Room room) {
@@ -481,6 +490,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
      */
 
     private NetworkPlayer mNetworkPlayer;
+    private Game mGame;
 
     // Start the gameplay phase of the game.
     void startGame() {
@@ -511,14 +521,8 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         p1.setName(((Participant) players[0]).getDisplayName().split(" ")[0]);
         p1.setName(((Participant) players[1]).getDisplayName().split(" ")[0]);
 
-        Game game = new Game(go, p1, p2);
-        switchToGame(game);
-    }
-
-    // indicates the player scored one point
-    void makeMove() {
-        // broadcast our move to our peers
-        broadcastMessage("I'm better than you!".getBytes());
+        mGame = new Game(go, p1, p2);
+        switchToGame(mGame);
     }
 
     /*

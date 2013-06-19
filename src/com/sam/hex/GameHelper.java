@@ -141,12 +141,12 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
     }
     
     private void addToScope(StringBuilder scopeStringBuilder, String scope) {
-    	if ( scopeStringBuilder.length() == 0 ) {
-    		scopeStringBuilder.append("oauth2:");
-    	} else {
-    		scopeStringBuilder.append(" ");
-    	}
-    	scopeStringBuilder.append(scope);
+        if ( scopeStringBuilder.length() == 0 ) {
+            scopeStringBuilder.append("oauth2:");
+        } else {
+            scopeStringBuilder.append(" ");
+        }
+        scopeStringBuilder.append(scope);
     }
     
     public void setup(GameHelperListener listener, int clientsToUse) {
@@ -155,12 +155,12 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
         
         Vector<String> scopesVector = new Vector<String>();
         if (0 != (clientsToUse & CLIENT_GAMES)) {
-        	scopesVector.add(Scopes.GAMES);
+            scopesVector.add(Scopes.GAMES);
         } else if (0 != (clientsToUse & CLIENT_PLUS)) {
-        	scopesVector.add(Scopes.PLUS_LOGIN);
+            scopesVector.add(Scopes.PLUS_LOGIN);
         }
         if (0 != (clientsToUse & CLIENT_APPSTATE)) {
-        	scopesVector.add(Scopes.APP_STATE);
+            scopesVector.add(Scopes.APP_STATE);
         }    
 
         mScopes = new String[scopesVector.size()];
@@ -177,8 +177,8 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
         if (0 != (clientsToUse & CLIENT_PLUS)) {
             debugLog("onCreate: creating GamesPlusClient");
             mPlusClient = new PlusClient.Builder(mContext, this, this)
-            		.setScopes(mScopes)
-            		.build();
+                    .setScopes(mScopes)
+                    .build();
         }
         
         if (0 != (clientsToUse & CLIENT_APPSTATE)) {
@@ -688,10 +688,10 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
         if (0 != (clientsToUse & CLIENT_GAMES)) {
             addToScope(scopeStringBuilder, Scopes.GAMES);
         } else if (0 != (clientsToUse & CLIENT_PLUS)) {
-        	addToScope(scopeStringBuilder, Scopes.PLUS_LOGIN);
+            addToScope(scopeStringBuilder, Scopes.PLUS_LOGIN);
         }
         if (0 != (clientsToUse & CLIENT_APPSTATE)) {
-        	addToScope(scopeStringBuilder, Scopes.APP_STATE);        	
+            addToScope(scopeStringBuilder, Scopes.APP_STATE);            
         }    
         return scopeStringBuilder.toString();
     }

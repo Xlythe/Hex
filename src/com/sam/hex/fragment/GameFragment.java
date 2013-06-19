@@ -494,11 +494,26 @@ public class GameFragment extends HexFragment {
     }
 
     public void startNewGame() {
-        if(game.getPlayer1().supportsNewgame() && game.getPlayer2().supportsNewgame()) {
-            initializeNewGame();
-            board.setGame(game);
-            game.start();
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if(game.getPlayer1().supportsNewgame() && game.getPlayer2().supportsNewgame()) {
+                    if(getMainActivity() != null && !isDetached()) getMainActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                initializeNewGame();
+                                board.setGame(game);
+                                game.start();
+                            }
+                            catch(IllegalStateException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                }
+            }
+        }).start();
     }
 
     /**
@@ -568,5 +583,11 @@ public class GameFragment extends HexFragment {
 
     public void setGame(Game game) {
         this.game = game;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        getMainActivity().leaveRoom();
     }
 }

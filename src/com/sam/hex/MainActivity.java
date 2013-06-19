@@ -14,7 +14,7 @@ import android.view.KeyEvent;
 import com.android.vending.billing.util.IabResult;
 import com.google.android.gms.appstate.AppStateClient;
 import com.google.android.gms.appstate.OnStateLoadedListener;
-import com.hex.android.net.GameManager;
+import com.hex.core.Game;
 import com.sam.hex.fragment.GameFragment;
 import com.sam.hex.fragment.GameSelectionFragment;
 import com.sam.hex.fragment.HistoryFragment;
@@ -25,22 +25,18 @@ import com.sam.hex.fragment.OnlineSelectionFragment;
 /**
  * @author Will Harmon
  **/
-public class MainActivity extends BaseGameActivity implements OnStateLoadedListener {
+public class MainActivity extends NetActivity implements OnStateLoadedListener {
     public static int PLAY_TIME_STATE = 0;
     public static int GAMES_PLAYED_STATE = 1;
     public static int GAMES_WON_STATE = 2;
-    public static final int REQUEST_ACHIEVEMENTS = 1001;
-    public final static int RC_SELECT_PLAYERS = 1002;
-    public final static int RC_WAITING_ROOM = 1003;
 
     // Play variables
     private boolean mIsSignedIn = false;
-
-    private GameManager gameManager = null;
+    private boolean mOpenAchievements = false;
+    private boolean mOpenOnlineSelectionFragment = false;
 
     // Donate variables
     private boolean mIabSetup;
-    private boolean mOpenAchievements = false;
 
     // Fragments
     private MainFragment mMainFragment;
@@ -105,7 +101,7 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.activity_main);
 
         // mHexRealTimeMessageReceivedListener = new
         // HexRealTimeMessageReceivedListener();
@@ -144,7 +140,7 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
 
     @Override
     public void onSignInSucceeded() {
-        System.out.println("Signed in");
+        super.onSignInSucceeded();
         mIsSignedIn = true;
         getAppStateClient().loadState(this, PLAY_TIME_STATE);
         getAppStateClient().loadState(this, GAMES_PLAYED_STATE);
@@ -153,14 +149,19 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
 
         if(mOpenAchievements) {
             mOpenAchievements = false;
-            startActivityForResult(getGamesClient().getAchievementsIntent(), MainActivity.REQUEST_ACHIEVEMENTS);
+            startActivityForResult(getGamesClient().getAchievementsIntent(), RC_ACHIEVEMENTS);
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        }
+        if(mOpenOnlineSelectionFragment) {
+            mOpenOnlineSelectionFragment = false;
+            setOnlineSelectionFragment(new OnlineSelectionFragment());
+            swapFragment(this.getOnlineSelectionFragment());
         }
     }
 
     @Override
     public void onSignInFailed() {
-        System.out.println("Sign in failed");
+        super.onSignInFailed();
         mIsSignedIn = false;
         mMainFragment.setSignedIn(mIsSignedIn);
     }
@@ -285,13 +286,6 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
     }
 
     /**
-     * @return the gameManager
-     */
-    public GameManager getGameManager() {
-        return gameManager = new GameManager(this.mHelper, this);
-    }
-
-    /**
      * @param gameManager
      *            the gameManager to set
      */
@@ -308,4 +302,26 @@ public class MainActivity extends BaseGameActivity implements OnStateLoadedListe
         this.mOpenAchievements = open;
     }
 
+    public void setOpenOnlineSelectionFragment(boolean open) {
+        this.mOpenOnlineSelectionFragment = open;
+    }
+
+    @Override
+    void switchToGame(Game game) {
+        Bundle b = new Bundle();
+        b.putBoolean(GameFragment.NET, true);
+
+        mGameFragment = new GameFragment();
+        mGameFragment.setGame(game);
+        mGameFragment.setPlayer1Type(game.getPlayer1().getType());
+        mGameFragment.setPlayer2Type(game.getPlayer2().getType());
+        mGameFragment.setArguments(b);
+
+        swapFragment(mGameFragment);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // No call for super(). Bug on API Level > 11.
+    }
 }

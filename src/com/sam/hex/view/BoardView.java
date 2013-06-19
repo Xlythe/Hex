@@ -153,6 +153,7 @@ public class BoardView extends View {
                 mButtons[x][y] = new Button();
             }
         }
+        onSizeChanged(getWidth(), getHeight(), getWidth(), getHeight());
         this.setOnTouchListener(new TouchListener(game));
         setOnFocusChangeListener(new OnFocusChangeListener() {
             @Override

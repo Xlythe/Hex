@@ -25,39 +25,48 @@ public class DonateDialog extends HexDialog {
 
     @Override
     public View getPositiveView() {
-        View v = View.inflate(this, R.layout.donate_dialog_textview, null);
+        View v = View.inflate(this, R.layout.dialog_view_donate, null);
 
         ImageView iv = (ImageView) v.findViewById(R.id.image);
         iv.setImageResource(R.drawable.donate_gold_d);
 
         TextView tv = (TextView) v.findViewById(R.id.text);
-        tv.setText("$4.99");
+        tv.setText(R.string.donate_gold);
+
+        TextView price = (TextView) v.findViewById(R.id.price);
+        price.setText(R.string.donate_gold_price);
 
         return v;
     }
 
     @Override
     public View getNegativeView() {
-        View v = View.inflate(this, R.layout.donate_dialog_textview, null);
+        View v = View.inflate(this, R.layout.dialog_view_donate, null);
 
         ImageView iv = (ImageView) v.findViewById(R.id.image);
         iv.setImageResource(R.drawable.donate_bronze_d);
 
         TextView tv = (TextView) v.findViewById(R.id.text);
-        tv.setText("$.99");
+        tv.setText(R.string.donate_bronze);
+
+        TextView price = (TextView) v.findViewById(R.id.price);
+        price.setText(R.string.donate_bronze_price);
 
         return v;
     }
 
     @Override
     public View getNeutralView() {
-        View v = View.inflate(this, R.layout.donate_dialog_textview, null);
+        View v = View.inflate(this, R.layout.dialog_view_donate, null);
 
         ImageView iv = (ImageView) v.findViewById(R.id.image);
         iv.setImageResource(R.drawable.donate_silver_d);
 
         TextView tv = (TextView) v.findViewById(R.id.text);
-        tv.setText("$2.99");
+        tv.setText(R.string.donate_silver);
+
+        TextView price = (TextView) v.findViewById(R.id.price);
+        price.setText(R.string.donate_silver_price);
 
         return v;
     }
@@ -127,12 +136,12 @@ public class DonateDialog extends HexDialog {
 
     @Override
     public float getPositiveYPercent() {
-        return 0.25f;
+        return 0.30f;
     }
 
     @Override
     public float getPositiveSideLengthPercent() {
-        return 0.13f;
+        return 0.15f;
     }
 
     @Override
@@ -142,12 +151,12 @@ public class DonateDialog extends HexDialog {
 
     @Override
     public float getNegativeYPercent() {
-        return 0.80f;
+        return 0.70f;
     }
 
     @Override
     public float getNegativeSideLengthPercent() {
-        return 0.08f;
+        return 0.13f;
     }
 
     @Override
@@ -162,6 +171,6 @@ public class DonateDialog extends HexDialog {
 
     @Override
     public float getNeutralSideLengthPercent() {
-        return 0.10f;
+        return 0.14f;
     }
 }

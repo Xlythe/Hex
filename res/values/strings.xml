@@ -31,6 +31,8 @@
     <string name="main_button_history">history</string>
     <string name="main_button_instructions">how to play</string>
     <string name="main_button_achievements">achievements</string>
+    
+    <string name="main_button_log_out">Sign Out</string>
 
     <!-- Game selection page -->
     <string name="game_selection_button_computer">computer</string>
@@ -76,6 +78,11 @@
     <string name="game_over_lose">Lost</string>
     <string name="game_over_time">Time</string>
     <string name="game_over_length" formatted="false">%02d:%02d:%02d</string>
+    <string name="net_challeneger_approaches" formatted="false">%s wants to challenge you.</string>
+    <string name="net_challeneger_requests_new_game" formatted="false">%s requests a new game.</string>
+    <string name="net_challeneger_requests_undo" formatted="false">%s requests an undo to move %d.</string>
+    <string name="net_accept">Accept</string>
+    <string name="net_decline">Decline</string>
 
     <!-- Game instructions -->
     <string name="instructions">Hex is played by two players, who take turns placing pieces on the board. The players have different colours, say red and blue. (The players themselves are sometimes referred to as Red and Blue) The four edges of the board are coloured with the same colours, in such a way that parallel edges have the same colour. Red wins if he can build a continuous chain between the two red edges, and blue wins if he can build such a chain between the blue edges.\n\n
@@ -101,4 +108,12 @@
     <string name="review_popup_message">Rate Hex on the Play Store</string>
     <string name="review_popup_never">No thanks</string>
     <string name="review_popup_ok">Sure</string>
+
+    <!-- Donate -->
+    <string name="donate_bronze">bronze</string>
+    <string name="donate_bronze_price">$.99</string>
+    <string name="donate_silver">silver</string>
+    <string name="donate_silver_price">$2.99</string>
+    <string name="donate_gold">gold</string>
+    <string name="donate_gold_price">$4.99</string>
 </resources>

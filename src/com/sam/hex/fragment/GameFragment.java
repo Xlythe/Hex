@@ -42,6 +42,7 @@ import com.sam.hex.view.GameOverDialog;
 public class GameFragment extends HexFragment {
     public static final String GAME = "game";
     public static final String REPLAY = "replay";
+    public static final String NET = "net";
     private static final SimpleDateFormat SAVE_FORMAT = new SimpleDateFormat("MMM dd, yyyy hh:mm", Locale.getDefault());
 
     private Game game;
@@ -96,6 +97,10 @@ public class GameFragment extends HexFragment {
                 replayDuration = 900;
             }
         }
+        else if(getArguments() != null && getArguments().containsKey(NET) && getArguments().getBoolean(NET)) {
+            // Net game (game should have already been passed in)
+            game.setGameListener(createGameListener());
+        }
         else {
             // Create a new game
             initializeNewGame();
@@ -130,7 +135,7 @@ public class GameFragment extends HexFragment {
     }
 
     private View applyBoard(LayoutInflater inflater) {
-        View v = inflater.inflate(R.layout.game, null);
+        View v = inflater.inflate(R.layout.fragment_game, null);
 
         board = (BoardView) v.findViewById(R.id.board);
         board.setGame(game);
@@ -489,11 +494,26 @@ public class GameFragment extends HexFragment {
     }
 
     public void startNewGame() {
-        if(game.getPlayer1().supportsNewgame() && game.getPlayer2().supportsNewgame()) {
-            initializeNewGame();
-            board.setGame(game);
-            game.start();
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if(game.getPlayer1().supportsNewgame() && game.getPlayer2().supportsNewgame()) {
+                    if(getMainActivity() != null && !isDetached()) getMainActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                initializeNewGame();
+                                board.setGame(game);
+                                game.start();
+                            }
+                            catch(IllegalStateException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                }
+            }
+        }).start();
     }
 
     /**
@@ -559,5 +579,15 @@ public class GameFragment extends HexFragment {
 
     public Game getGame() {
         return game;
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        getMainActivity().leaveRoom();
     }
 }

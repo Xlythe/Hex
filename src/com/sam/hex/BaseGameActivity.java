@@ -22,7 +22,6 @@ import android.os.Bundle;
 import com.google.android.gms.appstate.AppStateClient;
 import com.google.android.gms.games.GamesClient;
 import com.google.android.gms.plus.PlusClient;
-import com.hex.android.net.GameHelper;
 
 /**
  * Example base class for games. This implementation takes care of setting up
@@ -53,7 +52,7 @@ public abstract class BaseGameActivity extends PurchaseActivity implements GameH
         super();
         mHelper = new GameHelper(this);
     }
-    
+
     protected BaseGameActivity(int requestedClients) {
         super();
         mRequestedClients = requestedClients;
@@ -83,6 +82,7 @@ public abstract class BaseGameActivity extends PurchaseActivity implements GameH
         super.onActivityResult(request, response, data);
         mHelper.onActivityResult(request, response, data);
     }
+
     public GamesClient getGamesClient() {
         return mHelper.getGamesClient();
     }

@@ -36,6 +36,7 @@ public class SelectorLayout extends View implements OnTouchListener {
     private int mAnimationLength;
     private int mAnimationTick;
     private int mAnimationDelta;
+    private int mMinAnimationDelta;
     private Rect[] mOldRect;
     private Rect[] mOldMirrorRect;
     private Point[] mOldTextPos;
@@ -59,7 +60,7 @@ public class SelectorLayout extends View implements OnTouchListener {
         DisplayMetrics dm = getResources().getDisplayMetrics();
         setOnTouchListener(this);
         mButtons = new Button[3];
-        for(int i = 0; i < 3; i++) {
+        for(int i = 0; i < mButtons.length; i++) {
             mButtons[i] = new Button(getContext());
         }
         mDisabledColor = getDarkerColor(Color.LTGRAY);
@@ -67,12 +68,13 @@ public class SelectorLayout extends View implements OnTouchListener {
         mButtonTextPaint.setColor(Color.WHITE);
         mButtonTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 24, dm));
 
-        mWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 80, dm);
+        mWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 90, dm);
         mIndentHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, dm);
         mMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, dm);
         mRotation = 45f;
         mAnimationTick = 30;
-        mAnimationLength = 255;
+        mAnimationLength = 240;
+        mMinAnimationDelta = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 55, dm);
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -150,7 +152,7 @@ public class SelectorLayout extends View implements OnTouchListener {
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.rotate(mRotation);
-        for(int i = 0; i < 3; i++) {
+        for(int i = 0; i < mButtons.length; i++) {
             if(!mButtons[i].isEnabled()) {
                 mButtonDrawable[i].getPaint().setColor(mDisabledColor);
                 mMirrorButtonDrawable[i].getPaint().setColor(mDisabledColor);
@@ -197,13 +199,13 @@ public class SelectorLayout extends View implements OnTouchListener {
         int margin = (w - mWidth * 3) / 4;
         int offset = margin;
         // Create the buttons
-        mButtonDrawable = new ShapeDrawable[3];
-        mMirrorButtonDrawable = new ShapeDrawable[3];
-        mOldRect = new Rect[3];
-        mOldMirrorRect = new Rect[3];
-        mOldTextPos = new Point[3];
+        mButtonDrawable = new ShapeDrawable[mButtons.length];
+        mMirrorButtonDrawable = new ShapeDrawable[mButtons.length];
+        mOldRect = new Rect[mButtons.length];
+        mOldMirrorRect = new Rect[mButtons.length];
+        mOldTextPos = new Point[mButtons.length];
 
-        for(int i = 0; i < 3; i++) {
+        for(int i = 0; i < mButtons.length; i++) {
             Hexagon hex = new Hexagon(new Point(offset, mIndentHeight - 3 * offset), new Point(mWidth / 2 + offset, -3 * offset), new Point(mWidth + offset,
                     mIndentHeight - 3 * offset), new Point(mWidth + offset, h - offset), new Point(mWidth / 2 + offset, h - mIndentHeight - offset), new Point(
                     offset, h - offset));
@@ -232,7 +234,7 @@ public class SelectorLayout extends View implements OnTouchListener {
             mirrorButtonPath.lineTo(mirrorHex.f.x, mirrorHex.f.y);
             mirrorButtonPath.close();
 
-            int heightOffset = 3 * mIndentHeight;
+            int heightOffset = (int) (3.6 * mIndentHeight);
             mButtonDrawable[i] = new ShapeDrawable(new PathShape(buttonPath, w, h));
             mButtonDrawable[i].setBounds(0, -heightOffset + h / 2, w, h - heightOffset + h / 2);
             mMirrorButtonDrawable[i] = new ShapeDrawable(new PathShape(mirrorButtonPath, w, h));
@@ -252,6 +254,7 @@ public class SelectorLayout extends View implements OnTouchListener {
         }
 
         mAnimationDelta = h / mAnimationLength * mAnimationTick;
+        mAnimationDelta = Math.max(mMinAnimationDelta, mAnimationDelta);
     }
 
     @Override
@@ -301,7 +304,7 @@ public class SelectorLayout extends View implements OnTouchListener {
 
     public void reset() {
         if(mOldRect != null) {
-            for(int i = 0; i < 3; i++) {
+            for(int i = 0; i < mButtons.length; i++) {
                 mButtonDrawable[i].setBounds(mOldRect[i]);
                 mMirrorButtonDrawable[i].setBounds(mOldMirrorRect[i]);
                 mButtons[i].textX = mOldTextPos[i].x;

@@ -150,7 +150,8 @@ public class OnlineSelectionFragment extends HexFragment {
     }
 
     private RoomConfig.Builder makeBasicRoomConfigBuilder() {
-        return RoomConfig.builder(gameManager.getHexRoomUpdateListener()).setMessageReceivedListener(gameManager.getHexRealTimeMessageReceivedListener())
+        return RoomConfig.builder(gameManager.getHexRoomUpdateListener()).setMessageReceivedListener(
+        			gameManager.getHexRealTimeMessageReceivedListener())
                 .setRoomStatusUpdateListener(gameManager.getHexRoomStatusUpdateListener());
     }
 }

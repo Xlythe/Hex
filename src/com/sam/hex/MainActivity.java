@@ -14,6 +14,7 @@ import android.view.KeyEvent;
 import com.android.vending.billing.util.IabResult;
 import com.google.android.gms.appstate.AppStateClient;
 import com.google.android.gms.appstate.OnStateLoadedListener;
+import com.google.gson.Gson;
 import com.hex.core.Game;
 import com.sam.hex.fragment.GameFragment;
 import com.sam.hex.fragment.GameSelectionFragment;
@@ -26,9 +27,7 @@ import com.sam.hex.fragment.OnlineSelectionFragment;
  * @author Will Harmon
  **/
 public class MainActivity extends NetActivity implements OnStateLoadedListener {
-    public static int PLAY_TIME_STATE = 0;
-    public static int GAMES_PLAYED_STATE = 1;
-    public static int GAMES_WON_STATE = 2;
+    public static int STAT_STATE = 3;
 
     // Play variables
     private boolean mIsSignedIn = false;
@@ -55,17 +54,17 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
     public void onStateConflict(int stateKey, String ver, byte[] localData, byte[] serverData) {
         byte[] resolvedData = serverData;
         try {
-            if(stateKey == PLAY_TIME_STATE) {
-                resolvedData = String.valueOf(Math.max(Long.parseLong(new String(localData, "UTF-8")), Long.parseLong(new String(serverData, "UTF-8"))))
-                        .getBytes();
-            }
-            else if(stateKey == GAMES_PLAYED_STATE) {
-                resolvedData = String.valueOf(Math.max(Long.parseLong(new String(localData, "UTF-8")), Long.parseLong(new String(serverData, "UTF-8"))))
-                        .getBytes();
-            }
-            else if(stateKey == GAMES_WON_STATE) {
-                resolvedData = String.valueOf(Math.max(Long.parseLong(new String(localData, "UTF-8")), Long.parseLong(new String(serverData, "UTF-8"))))
-                        .getBytes();
+            if(stateKey == STAT_STATE) {
+                Gson gson = new Gson();
+                Stat localStat = gson.fromJson(new String(localData, "UTF-8"), Stat.class);
+                Stat serverStat = gson.fromJson(new String(serverData, "UTF-8"), Stat.class);
+                Stat resolvedStat = new Stat();
+
+                resolvedStat.setTimePlayed(Math.max(localStat.getTimePlayed(), serverStat.getTimePlayed()));
+                resolvedStat.setGamesWon(Math.max(localStat.getGamesWon(), serverStat.getGamesWon()));
+                resolvedStat.setGamesPlayed(Math.max(localStat.getGamesPlayed(), serverStat.getGamesPlayed()));
+
+                resolvedData = gson.toJson(resolvedStat).getBytes();
             }
         }
         catch(UnsupportedEncodingException e) {}
@@ -77,17 +76,13 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
     public void onStateLoaded(int statusCode, int stateKey, byte[] buffer) {
         if(statusCode == AppStateClient.STATUS_OK) {
             try {
-                if(stateKey == PLAY_TIME_STATE) {
-                    String s = new String(buffer, "UTF-8");
-                    Stats.setTimePlayed(this, Long.parseLong(s));
-                }
-                else if(stateKey == GAMES_PLAYED_STATE) {
-                    String s = new String(buffer, "UTF-8");
-                    Stats.setGamesPlayed(this, Long.parseLong(s));
-                }
-                else if(stateKey == GAMES_WON_STATE) {
-                    String s = new String(buffer, "UTF-8");
-                    Stats.setGamesWon(this, Long.parseLong(s));
+                if(stateKey == STAT_STATE) {
+                    Gson gson = new Gson();
+                    Stat stat = gson.fromJson(new String(buffer, "UTF-8"), Stat.class);
+
+                    Stats.setTimePlayed(this, stat.getTimePlayed());
+                    Stats.setGamesPlayed(this, stat.getGamesPlayed());
+                    Stats.setGamesWon(this, stat.getGamesWon());
                 }
                 mMainFragment.setSignedIn(mIsSignedIn);
             }
@@ -142,9 +137,7 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
     public void onSignInSucceeded() {
         super.onSignInSucceeded();
         mIsSignedIn = true;
-        getAppStateClient().loadState(this, PLAY_TIME_STATE);
-        getAppStateClient().loadState(this, GAMES_PLAYED_STATE);
-        getAppStateClient().loadState(this, GAMES_WON_STATE);
+        getAppStateClient().loadState(this, STAT_STATE);
         mMainFragment.setSignedIn(mIsSignedIn);
 
         if(mOpenAchievements) {
@@ -327,5 +320,29 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         // No call for super(). Bug on API Level > 11.
+    }
+
+    public static class Stat {
+        private long timePlayed;
+        private long gamesWon;
+        private long gamesPlayed;
+        public long getTimePlayed() {
+            return timePlayed;
+        }
+        public void setTimePlayed(long timePlayed) {
+            this.timePlayed = timePlayed;
+        }
+        public long getGamesWon() {
+            return gamesWon;
+        }
+        public void setGamesWon(long gamesWon) {
+            this.gamesWon = gamesWon;
+        }
+        public long getGamesPlayed() {
+            return gamesPlayed;
+        }
+        public void setGamesPlayed(long gamesPlayed) {
+            this.gamesPlayed = gamesPlayed;
+        }
     }
 }

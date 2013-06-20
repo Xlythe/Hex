@@ -165,6 +165,11 @@ public class MainFragment extends HexFragment {
     public void onResume() {
         super.onResume();
 
+        showStats();
+        showDonationStar();
+    }
+
+    private void showStats() {
         long timePlayedInMillis = Stats.getTimePlayed(getMainActivity());
         long timePlayedInHours = timePlayedInMillis / (1000 * 60 * 60);
         long timePlayedInMintues = (timePlayedInMillis - timePlayedInHours * (1000 * 60 * 60)) / (1000 * 60);
@@ -172,7 +177,6 @@ public class MainFragment extends HexFragment {
         mTimePlayedTextView.setText(String.format(getString(R.string.main_stats_time_played), timePlayedInHours, timePlayedInMintues, timePlayedInSeconds));
         mGamesPlayedTextView.setText(String.format(getString(R.string.main_stats_games_played), Stats.getGamesPlayed(getMainActivity())));
         mGamesWonTextView.setText(String.format(getString(R.string.main_stats_games_won), Stats.getGamesWon(getMainActivity())));
-        showDonationStar();
     }
 
     private void refreshPlayerInformation() {
@@ -183,6 +187,7 @@ public class MainFragment extends HexFragment {
                 Settings.getPlayer1Name(getMainActivity(), getMainActivity().getGamesClient())));
         if(mDonateButton != null) mDonateButton.setEnabled(getMainActivity().isIabSetup());
         if(mHexagonLayout != null) mHexagonLayout.invalidate();
+        if(mTimePlayedTextView != null && mGamesPlayedTextView != null && mGamesWonTextView != null) showStats();
     }
 
     public void setSignedIn(boolean isSignedIn) {

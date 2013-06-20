@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.hex.ai.BeeGameAI;
 import com.hex.core.Game;
 import com.hex.core.Game.GameListener;
@@ -31,6 +32,7 @@ import com.hex.core.Timer;
 import com.hex.network.NetworkPlayer;
 import com.sam.hex.FileUtil;
 import com.sam.hex.MainActivity;
+import com.sam.hex.MainActivity.Stat;
 import com.sam.hex.R;
 import com.sam.hex.Settings;
 import com.sam.hex.Stats;
@@ -235,12 +237,12 @@ public class GameFragment extends HexFragment {
 
                                 if(getMainActivity().isSignedIn()) {
                                     // Backup stats
-                                    getMainActivity().getAppStateClient().updateState(MainActivity.PLAY_TIME_STATE,
-                                            String.valueOf(Stats.getTimePlayed(getMainActivity())).getBytes());
-                                    getMainActivity().getAppStateClient().updateState(MainActivity.GAMES_PLAYED_STATE,
-                                            String.valueOf(Stats.getGamesPlayed(getMainActivity())).getBytes());
-                                    getMainActivity().getAppStateClient().updateState(MainActivity.GAMES_WON_STATE,
-                                            String.valueOf(Stats.getGamesWon(getMainActivity())).getBytes());
+                                    Gson gson = new Gson();
+                                    Stat stat = new Stat();
+                                    stat.setTimePlayed(Stats.getTimePlayed(getMainActivity()));
+                                    stat.setGamesWon(Stats.getGamesWon(getMainActivity()));
+                                    stat.setGamesPlayed(Stats.getGamesPlayed(getMainActivity()));
+                                    getMainActivity().getAppStateClient().updateState(MainActivity.STAT_STATE, gson.toJson(stat).getBytes());
 
                                     // Unlock the quick play achievements!
                                     if(game.getGameLength() < 30 * 1000) {

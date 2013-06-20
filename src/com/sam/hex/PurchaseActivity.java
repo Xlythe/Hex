@@ -1,8 +1,5 @@
 package com.sam.hex;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -11,7 +8,6 @@ import com.android.vending.billing.util.IabHelper;
 import com.android.vending.billing.util.IabHelper.OnIabPurchaseFinishedListener;
 import com.android.vending.billing.util.IabHelper.OnIabSetupFinishedListener;
 import com.android.vending.billing.util.IabResult;
-import com.android.vending.billing.util.Inventory;
 import com.android.vending.billing.util.Purchase;
 
 public abstract class PurchaseActivity extends FragmentActivity implements OnIabSetupFinishedListener, OnIabPurchaseFinishedListener {
@@ -38,28 +34,6 @@ public abstract class PurchaseActivity extends FragmentActivity implements OnIab
         else {
             dealWithIabSetupFailure();
         }
-
-        // Check to see if the item has already been purchased
-        IabHelper.QueryInventoryFinishedListener gotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
-            @Override
-            public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
-                if(inventory == null) return;
-                if(inventory.hasPurchase(ITEM_SKU_BASIC)) {
-                    dealWithPurchaseSuccess(result, ITEM_SKU_BASIC);
-                }
-                else if(inventory.hasPurchase(ITEM_SKU_INTERMEDIATE)) {
-                    dealWithPurchaseSuccess(result, ITEM_SKU_INTERMEDIATE);
-                }
-                else if(inventory.hasPurchase(ITEM_SKU_ADVANCED)) {
-                    dealWithPurchaseSuccess(result, ITEM_SKU_ADVANCED);
-                }
-            }
-        };
-        List<String> skuList = new ArrayList<String>();
-        skuList.add(ITEM_SKU_BASIC);
-        skuList.add(ITEM_SKU_INTERMEDIATE);
-        skuList.add(ITEM_SKU_ADVANCED);
-        billingHelper.queryInventoryAsync(true, skuList, gotInventoryListener);
     }
 
     protected abstract void dealWithIabSetupSuccess();

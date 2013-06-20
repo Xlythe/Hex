@@ -24,6 +24,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -67,7 +68,7 @@ import com.hex.network.NetworkPlayer;
  * @author Bruno Oliveira (btco), 2013-04-26
  */
 public abstract class NetActivity extends BaseGameActivity implements RealTimeMessageReceivedListener, RoomStatusUpdateListener, RoomUpdateListener,
-        OnInvitationReceivedListener, NetCommunication, NetworkCallbacks {
+        OnInvitationReceivedListener, NetCommunication, NetworkCallbacks, OnCancelListener {
 
     /*
      * API INTEGRATION SECTION. This section contains the code that integrates
@@ -493,6 +494,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
 
     private NetworkPlayer mNetworkPlayer;
     private Game mGame;
+    private boolean mShowingDialog;
 
     // Start the gameplay phase of the game.
     void startGame(boolean rematch) {
@@ -615,10 +617,12 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
                 case DialogInterface.BUTTON_POSITIVE:
                     // Yes button clicked
                     reply.add(true);
+                    mShowingDialog = false;
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:
                     // No button clicked
                     reply.add(false);
+                    mShowingDialog = false;
                     break;
                 }
             }
@@ -626,12 +630,16 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(getString(R.string.net_challeneger_requests_new_game, mNetworkPlayer.getName()))
-                .setPositiveButton(getString(R.string.net_accept), dialogClickListener).setNegativeButton(getString(R.string.net_decline), dialogClickListener);
+                .setPositiveButton(getString(R.string.net_accept), dialogClickListener).setNegativeButton(getString(R.string.net_decline), dialogClickListener)
+                .setOnCancelListener(this);
 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                builder.show();
+                if(!mShowingDialog) {
+                    builder.show();
+                    mShowingDialog = true;
+                }
             }
         });
 
@@ -660,10 +668,12 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
                 case DialogInterface.BUTTON_POSITIVE:
                     // Yes button clicked
                     reply.add(true);
+                    mShowingDialog = false;
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:
                     // No button clicked
                     reply.add(false);
+                    mShowingDialog = false;
                     break;
                 }
             }
@@ -671,12 +681,16 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(getString(R.string.net_challeneger_requests_undo, mNetworkPlayer.getName(), turnNumber))
-                .setPositiveButton(getString(R.string.net_accept), dialogClickListener).setNegativeButton(getString(R.string.net_decline), dialogClickListener);
+                .setPositiveButton(getString(R.string.net_accept), dialogClickListener).setNegativeButton(getString(R.string.net_decline), dialogClickListener)
+                .setOnCancelListener(this);
 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                builder.show();
+                if(!mShowingDialog) {
+                    builder.show();
+                    mShowingDialog = true;
+                }
             }
         });
 
@@ -699,4 +713,9 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
 
     @Override
     public void chat(String message) {}
+
+    @Override
+    public void onCancel(DialogInterface dialog) {
+        mShowingDialog = false;
+    }
 }

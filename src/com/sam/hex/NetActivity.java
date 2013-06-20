@@ -594,7 +594,9 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     }
 
     @Override
-    public void kill() {}
+    public void kill() {
+        leaveRoom();
+    }
 
     @Override
     public void newGame(String gameData) {
@@ -688,7 +690,9 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     }
 
     @Override
-    public void undo(int turnNumer) {}
+    public void undo(int turnNumber) {
+        mGame.undo(turnNumber);
+    }
 
     @Override
     public void error() {}

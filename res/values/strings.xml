@@ -54,7 +54,7 @@
     <string name="timerTitle">Timer</string>
     <string name="timerSummary">Limit the amount of time a player has (in minutes)</string>
     <string name="autosaveTitle">Autosave</string>
-    <string name="autosaveSummary">Save a replay at the end of each game to the sd card</string>
+    <string name="autosaveSummary">Save a replay at the end of each game</string>
 
     <!-- Menu choices -->
     <string name="game_undo">Undo</string>

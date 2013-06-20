@@ -15,10 +15,10 @@ import com.android.vending.billing.util.Inventory;
 import com.android.vending.billing.util.Purchase;
 
 public abstract class PurchaseActivity extends FragmentActivity implements OnIabSetupFinishedListener, OnIabPurchaseFinishedListener {
-    private static final String KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzQ+l7jJokYE9r6/mNo9JHr6CORtkxkAD22H57FJfsl0kOtHRZhFy5Lx58MmxFQFKVxhrcm824pz7sdI2L/O+qXIH2c/xU0e4YQt8RovBOUn9w58lR7yZjnSOMkRJ5vnUG8IrJUL5LTpw7juOcodACsdLm8wMpoMmwtDvAfNkANvO1Ui810WhwG5aaMyQMcfyb/HjCGxNAIAgQX+KjcndAZ8CGjV6stRFrOy0VSposeeItzihgM1MEJlWbRK3Ndgzh8fuyZkbOy6nC05fV1nYUs3kMPaywNT9BV4oDpkmJM+16HXWV34wx74e9C0HTZKvrQGrKhehTpzS6MLSK7U8VQIDAQAB";
-    public static final String ITEM_SKU_BASIC = "hex.basic";
-    public static final String ITEM_SKU_INTERMEDIATE = "hex.intermediate";
-    public static final String ITEM_SKU_ADVANCED = "hex.advanced";
+    private static final String KEY = "YOUR_KEY_HERE";
+    public static final String ITEM_SKU_BASIC = "bronze_donation";
+    public static final String ITEM_SKU_INTERMEDIATE = "silver_donation";
+    public static final String ITEM_SKU_ADVANCED = "gold_donation";
     private IabHelper billingHelper;
 
     @Override

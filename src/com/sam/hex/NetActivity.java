@@ -178,7 +178,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
                 Log.d(TAG, "Starting game because user requested via waiting room UI.");
 
                 // start the game!
-                startGame();
+                startGame(false);
             }
             else if(responseCode == GamesActivityResultCodes.RESULT_LEFT_ROOM) {
                 // player actively indicated that they want to leave the room
@@ -495,7 +495,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     private Game mGame;
 
     // Start the gameplay phase of the game.
-    void startGame() {
+    void startGame(boolean rematch) {
         Object[] players = mParticipants.toArray();
         Arrays.sort(players, new Comparator<Object>() {
             @Override
@@ -518,6 +518,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         else {
             p1 = mNetworkPlayer = new NetworkPlayer(1, this);
             p2 = new PlayerObject(2);
+            mNetworkPlayer.setCallbacks(this);
         }
         p1.setColor(getResources().getInteger(R.integer.DEFAULT_P1_COLOR));
         p2.setColor(getResources().getInteger(R.integer.DEFAULT_P2_COLOR));
@@ -525,7 +526,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         p2.setName(((Participant) players[1]).getDisplayName().split(" ")[0]);
 
         mGame = new Game(go, p1, p2);
-        switchToGame(mGame);
+        switchToGame(mGame, !rematch);
     }
 
     /*
@@ -585,7 +586,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
      * UI Section
      */
 
-    public abstract void switchToGame(Game game);
+    public abstract void switchToGame(Game game, boolean leaveRoom);
 
     @Override
     public void sendMessage(String msg) {
@@ -595,8 +596,10 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     @Override
     public void kill() {}
 
+    @Override
     public void newGame(String gameData) {
-        startGame();
+        Log.d(TAG, "New game commanded from above");
+        startGame(true);
     }
 
     @Override

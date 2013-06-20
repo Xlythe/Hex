@@ -307,7 +307,11 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
     }
 
     @Override
-    public void switchToGame(Game game) {
+    public void switchToGame(Game game, boolean leaveRoom) {
+        if(mGameFragment != null) {
+            mGameFragment.setLeaveRoom(leaveRoom);
+        }
+
         Bundle b = new Bundle();
         b.putBoolean(GameFragment.NET, true);
 

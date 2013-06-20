@@ -55,6 +55,7 @@ public class GameFragment extends HexFragment {
     private long whenGamePaused;
 
     private boolean goHome = false;
+    private boolean leaveRoom = true;
 
     /**
      * Set at the end of onWin, or when a game is loaded. Use this to avoid
@@ -521,7 +522,7 @@ public class GameFragment extends HexFragment {
                             setName(p2);
                             setColor(p2);
 
-                            getMainActivity().switchToGame(new Game(game.gameOptions, p1, p2));
+                            getMainActivity().switchToGame(new Game(game.gameOptions, p1, p2), false);
                         }
                     });
                 }
@@ -590,6 +591,10 @@ public class GameFragment extends HexFragment {
         this.goHome = goHome;
     }
 
+    public void setLeaveRoom(boolean leaveRoom) {
+        this.leaveRoom = leaveRoom;
+    }
+
     public Game getGame() {
         return game;
     }
@@ -601,6 +606,8 @@ public class GameFragment extends HexFragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        getMainActivity().leaveRoom();
+        if(leaveRoom) {
+            getMainActivity().leaveRoom();
+        }
     }
 }

@@ -137,6 +137,12 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
     public void onSignInSucceeded() {
         super.onSignInSucceeded();
         mIsSignedIn = true;
+
+        // TODO Remove this after testers have wiped their bad stats
+        getAppStateClient().updateState(0, null);
+        getAppStateClient().updateState(1, null);
+        getAppStateClient().updateState(2, null);
+
         getAppStateClient().loadState(this, STAT_STATE);
         mMainFragment.setSignedIn(mIsSignedIn);
 
@@ -326,21 +332,27 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
         private long timePlayed;
         private long gamesWon;
         private long gamesPlayed;
+
         public long getTimePlayed() {
             return timePlayed;
         }
+
         public void setTimePlayed(long timePlayed) {
             this.timePlayed = timePlayed;
         }
+
         public long getGamesWon() {
             return gamesWon;
         }
+
         public void setGamesWon(long gamesWon) {
             this.gamesWon = gamesWon;
         }
+
         public long getGamesPlayed() {
             return gamesPlayed;
         }
+
         public void setGamesPlayed(long gamesPlayed) {
             this.gamesPlayed = gamesPlayed;
         }

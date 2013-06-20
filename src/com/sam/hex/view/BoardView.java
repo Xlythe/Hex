@@ -194,6 +194,13 @@ public class BoardView extends View {
                 canvas.drawText(mActionText, posX - mLargeTextPaint.measureText(mActionText), posY + mLargeTextPaint.getTextSize(), mLargeTextPaint);
             }
         }
+        else {
+            mPlayer1Background.getPaint().setColor(game.getPlayer1().getColor());
+            mPlayer1Background.draw(canvas);
+            mPlayer2Background.getPaint().setColor(game.getPlayer2().getColor());
+            mPlayer2Background.draw(canvas);
+            mBorderBackground.draw(canvas);
+        }
 
         if(game.gameOptions.timer.type != Timer.NO_TIMER && !game.replayRunning && !game.isGameOver()) {
             float posX = getWidth() - mTextMargin;

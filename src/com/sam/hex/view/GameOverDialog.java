@@ -5,7 +5,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.vending.billing.util.IabResult;
 import com.hex.core.Game;
 import com.hex.core.Player;
 import com.hex.core.PlayingEntity;
@@ -101,18 +100,6 @@ public class GameOverDialog extends HexDialog {
     public OnClickListener getNeutralOnClickListener() {
         return null;
     }
-
-    @Override
-    protected void dealWithIabSetupSuccess() {}
-
-    @Override
-    protected void dealWithIabSetupFailure() {}
-
-    @Override
-    protected void dealWithPurchaseSuccess(IabResult result, String sku) {}
-
-    @Override
-    protected void dealWithPurchaseFailed(IabResult result) {}
 
     @Override
     public float getPositiveXPercent() {

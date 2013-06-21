@@ -242,6 +242,7 @@ public class GameFragment extends HexFragment {
                                     stat.setTimePlayed(Stats.getTimePlayed(getMainActivity()));
                                     stat.setGamesWon(Stats.getGamesWon(getMainActivity()));
                                     stat.setGamesPlayed(Stats.getGamesPlayed(getMainActivity()));
+                                    stat.setDonationRank(Stats.getDonationRank(getMainActivity()));
                                     getMainActivity().getAppStateClient().updateState(MainActivity.STAT_STATE, gson.toJson(stat).getBytes());
 
                                     // Unlock the quick play achievements!

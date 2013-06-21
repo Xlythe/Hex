@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 
+import com.android.vending.billing.util.IabResult;
 import com.sam.hex.PurchaseActivity;
 
 /**
@@ -57,6 +58,18 @@ public abstract class HexDialog extends PurchaseActivity {
         negative.setOnClickListener(getNegativeOnClickListener());
         neutral.setOnClickListener(getNeutralOnClickListener());
     }
+
+    @Override
+    protected void dealWithIabSetupSuccess() {}
+
+    @Override
+    protected void dealWithIabSetupFailure() {}
+
+    @Override
+    protected void dealWithPurchaseSuccess(IabResult result, String sku) {}
+
+    @Override
+    protected void dealWithPurchaseFailed(IabResult result) {}
 
     public abstract View getPositiveView();
 

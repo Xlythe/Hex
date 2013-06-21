@@ -44,11 +44,15 @@ public class Stats {
         PreferenceManager.getDefaultSharedPreferences(context).edit().putLong("games_won", games).commit();
     }
 
-    public static int getDonationAmount(Context context) {
+    public static int getDonationRank(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getInt("donation_amount", 0);
     }
 
-    public static void incrementDonationAmount(Context context, int amount) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("donation_amount", getDonationAmount(context) + amount).commit();
+    public static void incrementDonationRank(Context context, int amount) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("donation_amount", getDonationRank(context) + amount).commit();
+    }
+
+    public static void setDonationRank(Context context, int amount) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("donation_amount", amount).commit();
     }
 }

@@ -29,8 +29,14 @@ public class GameSelectionFragment extends HexFragment {
             @Override
             public void onClick() {
                 getMainActivity().setGameFragment(new GameFragment());
-                getMainActivity().getGameFragment().setPlayer1Type(Player.Human);
-                getMainActivity().getGameFragment().setPlayer2Type(Player.AI);
+                if(Math.random() > 0.5) {
+                    getMainActivity().getGameFragment().setPlayer1Type(Player.Human);
+                    getMainActivity().getGameFragment().setPlayer2Type(Player.AI);
+                }
+                else {
+                    getMainActivity().getGameFragment().setPlayer1Type(Player.AI);
+                    getMainActivity().getGameFragment().setPlayer2Type(Player.Human);
+                }
                 getMainActivity().swapFragment(getMainActivity().getGameFragment());
             }
         });

@@ -224,7 +224,7 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
         if(numTimesAppOpened != -1) {
             numTimesAppOpened++;
             PreferenceManager.getDefaultSharedPreferences(this).edit().putInt("num_times_app_opened_review", numTimesAppOpened).commit();
-            if(numTimesAppOpened > 2) {
+            if(numTimesAppOpened > 5) {
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

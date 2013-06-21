@@ -193,8 +193,8 @@ public class GameFragment extends HexFragment {
         game = new Game(go, getPlayer(1, go.gridSize), getPlayer(2, go.gridSize));
         game.setGameListener(gl);
 
-        setName(game.getPlayer1());
-        setName(game.getPlayer2());
+        setName(game.getPlayer1(), player1Type.equals(Player.Human) && player2Type.equals(Player.Human));
+        setName(game.getPlayer2(), player1Type.equals(Player.Human) && player2Type.equals(Player.Human));
         setColor(game.getPlayer1());
         setColor(game.getPlayer2());
 
@@ -447,12 +447,17 @@ public class GameFragment extends HexFragment {
     /**
      * Refreshes both player's names Does not invalidate the board
      * */
-    protected void setName(PlayingEntity player) {
-        if(player.getTeam() == 1) {
-            player.setName(Settings.getPlayer1Name(getMainActivity(), getMainActivity().getGamesClient()));
+    protected void setName(PlayingEntity player, boolean guest) {
+        if(guest) {
+            if(player.getTeam() == 1) {
+                player.setName(Settings.getPlayer1Name(getMainActivity(), getMainActivity().getGamesClient()));
+            }
+            else {
+                player.setName(Settings.getPlayer2Name(getMainActivity()));
+            }
         }
         else {
-            player.setName(Settings.getPlayer2Name(getMainActivity()));
+            player.setName(Settings.getPlayer1Name(getMainActivity(), getMainActivity().getGamesClient()));
         }
     }
 
@@ -519,11 +524,11 @@ public class GameFragment extends HexFragment {
                             stopGame(game);
 
                             PlayingEntity p1 = getPlayer(1, game.gameOptions.gridSize);
-                            setName(p1);
-                            setColor(p1);
+                            p1.setName(game.getPlayer1().getName());
+                            p1.setColor(game.getPlayer1().getColor());
                             PlayingEntity p2 = getPlayer(2, game.gameOptions.gridSize);
-                            setName(p2);
-                            setColor(p2);
+                            p2.setName(game.getPlayer2().getName());
+                            p2.setColor(game.getPlayer2().getColor());
 
                             getMainActivity().switchToGame(new Game(game.gameOptions, p1, p2), false);
                         }
@@ -548,7 +553,7 @@ public class GameFragment extends HexFragment {
                     || Integer.valueOf(prefs.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME))) * 60 * 1000 != game.gameOptions.timer.totalTime;
         }
         else if(gameLocation == GameAction.NET_GAME) {
-            return(game != null && game.isGameOver());
+            return (game != null && game.isGameOver());
         }
         else {
             return true;

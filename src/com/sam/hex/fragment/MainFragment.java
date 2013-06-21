@@ -207,7 +207,7 @@ public class MainFragment extends HexFragment {
     }
 
     private void showDonationStar() {
-        int donationAmount = Stats.getDonationAmount(getMainActivity());
+        int donationAmount = Stats.getDonationRank(getMainActivity());
         int resource = R.drawable.donate_hollow;
 
         if(donationAmount >= 5) {

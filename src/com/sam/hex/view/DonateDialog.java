@@ -6,7 +6,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.vending.billing.util.IabResult;
-import com.sam.hex.MainActivity;
 import com.sam.hex.R;
 import com.sam.hex.Stats;
 import com.sam.hex.view.HexDialogView.Button.OnClickListener;
@@ -76,7 +75,7 @@ public class DonateDialog extends HexDialog {
         return new OnClickListener() {
             @Override
             public void onClick() {
-                purchaseItem(MainActivity.ITEM_SKU_ADVANCED);
+                purchaseItem(ITEM_SKU_ADVANCED);
                 dismiss();
             }
         };
@@ -87,7 +86,7 @@ public class DonateDialog extends HexDialog {
         return new OnClickListener() {
             @Override
             public void onClick() {
-                purchaseItem(MainActivity.ITEM_SKU_BASIC);
+                purchaseItem(ITEM_SKU_BASIC);
                 dismiss();
             }
         };
@@ -98,7 +97,7 @@ public class DonateDialog extends HexDialog {
         return new OnClickListener() {
             @Override
             public void onClick() {
-                purchaseItem(MainActivity.ITEM_SKU_INTERMEDIATE);
+                purchaseItem(ITEM_SKU_INTERMEDIATE);
                 dismiss();
             }
         };
@@ -122,7 +121,8 @@ public class DonateDialog extends HexDialog {
         else if(sku.equals(ITEM_SKU_ADVANCED)) {
             amount = 5;
         }
-        Stats.incrementDonationAmount(this, amount);
+        Stats.incrementDonationRank(this, amount);
+
         dismiss();
     }
 

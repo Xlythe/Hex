@@ -18,7 +18,6 @@ package com.sam.hex;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 
 import com.google.android.gms.appstate.AppStateClient;
 import com.google.android.gms.games.GamesClient;
@@ -35,7 +34,7 @@ import com.google.android.gms.plus.PlusClient;
  * @author Bruno Oliveira (Google)
  * 
  */
-public abstract class BaseGameActivity extends FragmentActivity implements GameHelper.GameHelperListener {
+public abstract class BaseGameActivity extends PurchaseActivity implements GameHelper.GameHelperListener {
 
     public GameHelper mHelper;
 

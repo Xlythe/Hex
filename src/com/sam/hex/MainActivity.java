@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.KeyEvent;
 
+import com.android.vending.billing.util.IabResult;
 import com.google.android.gms.appstate.AppStateClient;
 import com.google.android.gms.appstate.OnStateLoadedListener;
 import com.google.gson.Gson;
@@ -166,6 +167,34 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
         mIsSignedIn = false;
         mMainFragment.setSignedIn(mIsSignedIn);
     }
+
+    @Override
+    protected void dealWithIabSetupSuccess() {
+        setIabSetup(true);
+    }
+
+    @Override
+    protected void dealWithIabSetupFailure() {
+        setIabSetup(false);
+    }
+
+    @Override
+    protected void dealWithPurchaseSuccess(IabResult result, String sku) {
+        int amount = 0;
+        if(sku.equals(ITEM_SKU_BASIC)) {
+            amount = 1;
+        }
+        else if(sku.equals(ITEM_SKU_INTERMEDIATE)) {
+            amount = 3;
+        }
+        else if(sku.equals(ITEM_SKU_ADVANCED)) {
+            amount = 5;
+        }
+        Stats.incrementDonationRank(this, amount);
+    }
+
+    @Override
+    protected void dealWithPurchaseFailed(IabResult result) {}
 
     public void swapFragment(Fragment newFragment) {
         getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out).replace(R.id.content, newFragment)

@@ -46,6 +46,7 @@ import com.hex.core.Game.GameOptions;
 import com.hex.core.PlayerObject;
 import com.hex.core.PlayingEntity;
 import com.hex.core.Timer;
+import com.hex.network.Errors;
 import com.hex.network.NetCommunication;
 import com.hex.network.NetworkCallbacks;
 import com.hex.network.NetworkPlayer;
@@ -709,9 +710,26 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     }
 
     @Override
-    public void error() {}
+	public void error(Errors error) {
+    	final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.error_version).
+        setPositiveButton(getString(R.string.net_accept),null).setOnCancelListener(this);
+       
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(!mShowingDialog) {
+                    builder.show();
+                    mShowingDialog = true;
+                }
+            }
+        });
+        returnHome();
+	}
 
-    @Override
+    protected abstract void returnHome();
+
+	@Override
     public void chat(String message) {}
 
     @Override

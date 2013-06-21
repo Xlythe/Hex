@@ -116,4 +116,7 @@
     <string name="donate_silver_price">$2.99</string>
     <string name="donate_gold">gold</string>
     <string name="donate_gold_price">$4.99</string>
+    <!--  Error  Dialogues-->
+    <string name="error_version">Game version error, one player has an out of data version of the game. Game aborted!</string>
+    
 </resources>

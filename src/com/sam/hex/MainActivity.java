@@ -16,6 +16,7 @@ import com.google.android.gms.appstate.AppStateClient;
 import com.google.android.gms.appstate.OnStateLoadedListener;
 import com.google.gson.Gson;
 import com.hex.core.Game;
+import com.hex.network.Errors;
 import com.sam.hex.fragment.GameFragment;
 import com.sam.hex.fragment.GameSelectionFragment;
 import com.sam.hex.fragment.HistoryFragment;
@@ -129,6 +130,7 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
         return super.onKeyDown(keyCode, event);
     }
 
+    @Override
     public void returnHome() {
         swapFragment(mMainFragment);
     }

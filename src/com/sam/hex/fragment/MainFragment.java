@@ -26,7 +26,6 @@ import com.sam.hex.view.HexagonLayout;
 public class MainFragment extends HexFragment {
     // Hexagon variables
     HexagonLayout mHexagonLayout;
-    HexagonLayout.Button mDonateButton;
     private float mInitialSpin;
     private float mInitialRotation;
 
@@ -49,7 +48,7 @@ public class MainFragment extends HexFragment {
 
         mHexagonLayout = (HexagonLayout) v.findViewById(R.id.hexagonButtons);
         HexagonLayout.Button settingsButton = mHexagonLayout.getButtons()[0];
-        mDonateButton = mHexagonLayout.getButtons()[1];
+        HexagonLayout.Button donateButton = mHexagonLayout.getButtons()[1];
         HexagonLayout.Button historyButton = mHexagonLayout.getButtons()[2];
         HexagonLayout.Button instructionsButton = mHexagonLayout.getButtons()[3];
         HexagonLayout.Button achievementsButton = mHexagonLayout.getButtons()[4];
@@ -81,10 +80,10 @@ public class MainFragment extends HexFragment {
             }
         });
 
-        mDonateButton.setText(R.string.main_button_donate);
-        mDonateButton.setColor(0xff5f6ec2);
-        mDonateButton.setDrawableResource(R.drawable.store);
-        mDonateButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
+        donateButton.setText(R.string.main_button_donate);
+        donateButton.setColor(0xff5f6ec2);
+        donateButton.setDrawableResource(R.drawable.store);
+        donateButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
                 HexDialog hd = new DonateDialog(getMainActivity());
@@ -185,7 +184,6 @@ public class MainFragment extends HexFragment {
         if(mSignInButton != null) mSignInButton.setVisibility(getMainActivity().isSignedIn() ? View.GONE : View.VISIBLE);
         if(mTitleTextView != null) mTitleTextView.setText(String.format(getString(R.string.main_title),
                 Settings.getPlayer1Name(getMainActivity(), getMainActivity().getGamesClient())));
-        if(mDonateButton != null) mDonateButton.setEnabled(getMainActivity().isIabSetup());
         if(mHexagonLayout != null) mHexagonLayout.invalidate();
         if(mTimePlayedTextView != null && mGamesPlayedTextView != null && mGamesWonTextView != null) showStats();
     }

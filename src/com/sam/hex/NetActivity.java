@@ -710,11 +710,10 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     }
 
     @Override
-	public void error(Errors error) {
-    	final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.error_version).
-        setPositiveButton(getString(R.string.net_accept),null).setOnCancelListener(this);
-       
+    public void error(Errors error) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.error_version).setPositiveButton(getString(R.string.net_accept), null).setOnCancelListener(this);
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -724,12 +723,11 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
                 }
             }
         });
-        returnHome();
-	}
 
-    protected abstract void returnHome();
+        mGame.stop();
+    }
 
-	@Override
+    @Override
     public void chat(String message) {}
 
     @Override

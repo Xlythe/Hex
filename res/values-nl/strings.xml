@@ -84,7 +84,7 @@
     <string name="net_decline">Weigeren</string>
 
     <!-- Game instructions -->
-    <string name="instructions"> Hex is een spel voor 2 spelers, die om de beurt zeshoeken op het bord leggen. De spelers hebben verschillende kleuren, rood en blauw. De vier hoeken van het bord zijn ook rood en blauw, de hoeken die parallel tegenover elkaar staan hebben dezelfde kleur. Degene die een ononderbroken pad van zeshoeken van de ene kant naar de andere kant van het bord kan aanleggen, wint.\n\n
+    <string name="instructions">Hex is een spel voor 2 spelers, die om de beurt zeshoeken op het bord leggen. De spelers hebben verschillende kleuren, rood en blauw. De vier hoeken van het bord zijn ook rood en blauw, de hoeken die parallel tegenover elkaar staan hebben dezelfde kleur. Degene die een ononderbroken pad van zeshoeken van de ene kant naar de andere kant van het bord kan aanleggen, wint.\n\n
         (Van: <a href="http://www.hexwiki.org/index.php?title=Rules">hexwiki.org</a>)</string>
 
     <!-- Confirmation -->

@@ -391,6 +391,8 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     // screen.
     @Override
     public void onDisconnectedFromRoom(Room room) {
+        mLocalPlayer.forfeit();
+        mGame.getCurrentPlayer().endMove();
         mRoomId = null;
     }
 
@@ -494,6 +496,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
      */
 
     private NetworkPlayer mNetworkPlayer;
+    private PlayerObject mLocalPlayer;
     private Game mGame;
     private boolean mShowingDialog;
 
@@ -514,13 +517,13 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         PlayingEntity p1;
         PlayingEntity p2;
         if(((Participant) players[0]).getParticipantId().equals(mMyId)) {
-            p1 = new PlayerObject(1);
+            p1 = mLocalPlayer = new PlayerObject(1);
             p2 = mNetworkPlayer = new NetworkPlayer(2, this);
             mNetworkPlayer.setCallbacks(this);
         }
         else {
             p1 = mNetworkPlayer = new NetworkPlayer(1, this);
-            p2 = new PlayerObject(2);
+            p2 = mLocalPlayer = new PlayerObject(2);
             mNetworkPlayer.setCallbacks(this);
         }
         p1.setColor(getResources().getInteger(R.integer.DEFAULT_P1_COLOR));

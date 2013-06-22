@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.hex.ai.BeeGameAI;
 import com.hex.core.Game;
 import com.hex.core.Game.GameListener;
@@ -89,16 +90,23 @@ public class GameFragment extends HexFragment {
         }
         else if(getArguments() != null && getArguments().containsKey(GAME)) {
             // Load a game
-            game = Game.load(getArguments().getString(GAME));
-            game.setGameListener(createGameListener());
-            replay = true;
-            replayDuration = 0;
-            gameHasEnded = true;
-            player1Type = Player.Human;
-            player2Type = Player.Human;
+            try {
+                game = Game.load(getArguments().getString(GAME));
+                game.setGameListener(createGameListener());
+                replay = true;
+                replayDuration = 0;
+                gameHasEnded = true;
+                player1Type = Player.Human;
+                player2Type = Player.Human;
 
-            if(getArguments().containsKey(REPLAY) && getArguments().getBoolean(REPLAY)) {
-                replayDuration = 900;
+                if(getArguments().containsKey(REPLAY) && getArguments().getBoolean(REPLAY)) {
+                    replayDuration = 900;
+                }
+            }
+            catch(JsonSyntaxException e) {
+                e.printStackTrace();
+                // Create a new game
+                initializeNewGame();
             }
         }
         else if(getArguments() != null && getArguments().containsKey(NET) && getArguments().getBoolean(NET)) {
@@ -553,7 +561,7 @@ public class GameFragment extends HexFragment {
                     || Integer.valueOf(prefs.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME))) * 60 * 1000 != game.gameOptions.timer.totalTime;
         }
         else if(gameLocation == GameAction.NET_GAME) {
-            return (game != null && game.isGameOver());
+            return(game != null && game.isGameOver());
         }
         else {
             return true;

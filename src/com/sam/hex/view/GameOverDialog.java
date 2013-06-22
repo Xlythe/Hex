@@ -52,6 +52,9 @@ public class GameOverDialog extends HexDialog {
     @Override
     public View getNeutralView() {
         View v = View.inflate(this, R.layout.dialog_view_game_over, null);
+        // Catch for resuming an activity after minimizing it too long
+        if(FRAGMENT == null) return v;
+
         TextView action = (TextView) v.findViewById(R.id.action);
         TextView time = (TextView) v.findViewById(R.id.time);
 

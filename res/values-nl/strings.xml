@@ -46,7 +46,7 @@
 
     <!-- Preferences -->
     <string name="preferences_title_game_size">Speelbord grootte</string>
-    <string name="preferences_summary_game_size" formatted="false">Kies een grootte voor het speelbord (hudig: %sx%s)</string>
+    <string name="preferences_summary_game_size" formatted="false">Kies een grootte voor het speelbord (huidig: %sx%s)</string>
     <string name="preferences_summary_custom_game_size">Vul de rastergrootte in (bijv. 9)</string>
     <string name="preferences_title_swap">Van plaats wisselen</string>
     <string name="preferences_summary_swap">Sta de tweede speler toe om met je van plaats te wisselen tijdens de eerste zet</string>

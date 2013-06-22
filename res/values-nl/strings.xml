@@ -16,106 +16,106 @@
     <string name="achievement_insane">CgkI9MX11PkIEAIQFA</string>
     
     <!-- Page titles -->
-    <string name="activity_title_instructions">How to Play</string>
-    <string name="activity_title_preferences">Settings</string>
+    <string name="activity_title_instructions">Uitleg</string>
+    <string name="activity_title_preferences">Instellingen</string>
 
     <!-- Main page -->
-    <string name="main_title" formatted="false">%s\'s stats</string>
-    <string name="main_stats_time_played" formatted="false">time played %02d:%02d:%02d</string>
-    <string name="main_stats_games_played" formatted="false">games played %s</string>
-    <string name="main_stats_games_won" formatted="false">games won %s</string>
+    <string name="main_title" formatted="false">%s\'s statistieken</string>
+    <string name="main_stats_time_played" formatted="false">tijd gespeeld %02d:%02d:%02d</string>
+    <string name="main_stats_games_played" formatted="false">aantal spellen gespeeld %s</string>
+    <string name="main_stats_games_won" formatted="false">aantal spellen gewonnen %s</string>
 
-    <string name="main_button_play">play</string>
-    <string name="main_button_settings">settings</string>
-    <string name="main_button_donate">donate</string>
-    <string name="main_button_history">history</string>
-    <string name="main_button_instructions">how to play</string>
-    <string name="main_button_achievements">achievements</string>
+    <string name="main_button_play">start spel</string>
+    <string name="main_button_settings">instellingen</string>
+    <string name="main_button_donate">doneer</string>
+    <string name="main_button_history">geschiedenis</string>
+    <string name="main_button_instructions">uitleg</string>
+    <string name="main_button_achievements">prestaties</string>
     
-    <string name="main_button_log_out">Sign Out</string>
+    <string name="main_button_log_out">Afmelden</string>
 
     <!-- Game selection page -->
     <string name="game_selection_button_computer">computer</string>
-    <string name="game_selection_button_pass">pass to play</string>
-    <string name="game_selection_button_net">online</string>
+    <string name="game_selection_button_pass">offline multiplayer</string>
+    <string name="game_selection_button_net">online multiplayer</string>
 
     <!-- Online selection page -->
-    <string name="online_selection_button_quick">Quick Game</string>
-    <string name="online_selection_button_invite">Invite Friends</string>
-    <string name="online_selection_button_pending">Pending Invites</string>
+    <string name="online_selection_button_quick">Snel spel</string>
+    <string name="online_selection_button_invite">Vrienden uitnodigen</string>
+    <string name="online_selection_button_pending">Openstaande uitnodigingen</string>
 
     <!-- Preferences -->
-    <string name="preferences_title_game_size">Board Size</string>
-    <string name="preferences_summary_game_size" formatted="false">Pick a size for the gameboard (Current: %sx%s)</string>
-    <string name="preferences_summary_custom_game_size">Enter a grid size (Ex. 9)</string>
-    <string name="preferences_title_swap">Swap</string>
-    <string name="preferences_summary_swap">Allow the second player to swap places during their first move</string>
+    <string name="preferences_title_game_size">Speelbord grootte</string>
+    <string name="preferences_summary_game_size" formatted="false">Kies een grootte voor het speelbord (hudig: %sx%s)</string>
+    <string name="preferences_summary_custom_game_size">Vul de rastergrootte in (bijv. 9)</string>
+    <string name="preferences_title_swap">Van plaats wisselen</string>
+    <string name="preferences_summary_swap">Sta de tweede speler toe om met je van plaats te wisselen tijdens de eerste zet</string>
     <string name="preferences_title_timer">Timer</string>
-    <string name="preferences_summary_timer">Limit the amount of time a player has (in minutes)</string>
-    <string name="preferences_title_autosave">Autosave</string>
-    <string name="preferences_summary_autosave">Save a replay at the end of each game</string>
+    <string name="preferences_summary_timer">Stel een tijdslimiet in (in minuten)</string>
+    <string name="preferences_title_autosave">Automatisch opslaan</string>
+    <string name="preferences_summary_autosave">Sla automatisch een bestand op in de geschiedenis aan het eind van elk spel</string>
 
     <!-- Menu choices -->
-    <string name="game_undo">Undo</string>
-    <string name="game_reload">Restart</string>
-    <string name="game_replay">Replay</string>
-    <string name="game_save_replay">Save</string>
-    <string name="game_settings">Settings</string>
-    <string name="game_quit">Exit</string>
+    <string name="game_undo">Ongedaan maken</string>
+    <string name="game_reload">Opnieuw beginnen</string>
+    <string name="game_replay">Terugkijken</string>
+    <string name="game_save_replay">Opslaan</string>
+    <string name="game_settings">Instellingen</string>
+    <string name="game_quit">Stoppen</string>
 
     <!-- In game notifications -->
     <string name="game_turn_title">%s\'s</string>
-    <string name="game_turn_msg">TURN</string>
-    <string name="game_timer_msg">Time Left</string>
-    <string name="game_toast_saved">Saved!</string>
-    <string name="game_toast_failed">Failed</string>
-    <string name="game_button_claim_victory">Claim Victory</string>
+    <string name="game_turn_msg">BEURT</string>
+    <string name="game_timer_msg">Resterende Tijd</string>
+    <string name="game_toast_saved">Opgeslagen!</string>
+    <string name="game_toast_failed">Misukt</string>
+    <string name="game_button_claim_victory">Claim Overwinning</string>
     <string name="auto_saved_file_name" formatted="false">%s %s vs %s</string>
-    <string name="game_over_you">You</string>
+    <string name="game_over_you">Jij</string>
     <string name="game_over_action">%s!</string>
-    <string name="game_over_won">Won</string>
-    <string name="game_over_lose">Lost</string>
-    <string name="game_over_time">Time</string>
+    <string name="game_over_won">hebt gewonnen</string>
+    <string name="game_over_lose">hebt verloren</string>
+    <string name="game_over_time">Tijd</string>
     <string name="game_over_length" formatted="false">%02d:%02d:%02d</string>
-    <string name="net_challeneger_approaches" formatted="false">%s wants to challenge you.</string>
-    <string name="net_challeneger_requests_new_game" formatted="false">%s requests a new game.</string>
-    <string name="net_challeneger_requests_undo" formatted="false">%s requests an undo to move %d.</string>
-    <string name="net_accept">Accept</string>
-    <string name="net_decline">Decline</string>
+    <string name="net_challeneger_approaches" formatted="false">%s daagt je uit voor een spel.</string>
+    <string name="net_challeneger_requests_new_game" formatted="false">%s wil een nieuw spel starten.</string>
+    <string name="net_challeneger_requests_undo" formatted="false">%s wil graag zet %d ongedaan maken.</string>
+    <string name="net_accept">Accepteren</string>
+    <string name="net_decline">Weigeren</string>
 
     <!-- Game instructions -->
-    <string name="instructions">Hex is played by two players, who take turns placing pieces on the board. The players have different colours, say red and blue. (The players themselves are sometimes referred to as Red and Blue) The four edges of the board are coloured with the same colours, in such a way that parallel edges have the same colour. Red wins if he can build a continuous chain between the two red edges, and blue wins if he can build such a chain between the blue edges.\n\n
-        (Taken from <a href="http://www.hexwiki.org/index.php?title=Rules">hexwiki.org</a>)</string>
+    <string name="instructions"> Hex is een spel voor 2 spelers, die om de beurt zeshoeken op het bord leggen. De spelers hebben verschillende kleuren, rood en blauw. De vier hoeken van het bord zijn ook rood en blauw, de hoeken die parallel tegenover elkaar staan hebben dezelfde kleur. Degene die een ononderbroken pad van zeshoeken van de ene kant naar de andere kant van het bord kan aanleggen, wint.\n\n
+        (Van: <a href="http://www.hexwiki.org/index.php?title=Rules">hexwiki.org</a>)</string>
 
     <!-- Confirmation -->
-    <string name="confirmExit">Are you sure you want to exit?</string>
-    <string name="confirmNewgame">Do you want to start a new game?</string>
+    <string name="confirmExit">Weet je zeker dat je wilt stoppen?</string>
+    <string name="confirmNewgame">Wil je een nieuw spel starten?</string>
 
     <!-- Dialog Options -->
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
-    <string name="enter">Enter</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nee</string>
+    <string name="enter">Ga</string>
     <string name="okay">OK</string>
-    <string name="cancel">Cancel</string>
-    <string name="submit">Submit</string>
-    <string name="rename">Rename</string>
-    <string name="delete">Delete</string>
-    <string name="enterFilename">Enter a filename</string>
+    <string name="cancel">Annuleer</string>
+    <string name="submit">Invoeren</string>
+    <string name="rename">Hernoemen</string>
+    <string name="delete">Verwijderen</string>
+    <string name="enterFilename">Voer een bestandsnaam in</string>
 
     <!-- Review -->
-    <string name="review_popup_title">Like the app?</string>
-    <string name="review_popup_message">Rate Hex on the Play Store</string>
-    <string name="review_popup_never">No thanks</string>
-    <string name="review_popup_ok">Sure</string>
+    <string name="review_popup_title">Vind jij deze app leuk?</string>
+    <string name="review_popup_message">Waardeer Hex in de Play Store</string>
+    <string name="review_popup_never">Nee, bedankt</string>
+    <string name="review_popup_ok">Natuurlijk</string>
 
     <!-- Donate -->
-    <string name="donate_bronze">bronze</string>
-    <string name="donate_bronze_price">$.99</string>
-    <string name="donate_silver">silver</string>
+    <string name="donate_bronze">brons</string>
+    <string name="donate_bronze_price">$0.99</string>
+    <string name="donate_silver">zilver</string>
     <string name="donate_silver_price">$2.99</string>
-    <string name="donate_gold">gold</string>
+    <string name="donate_gold">goud</string>
     <string name="donate_gold_price">$4.99</string>
 
     <!--  Error  Dialogues-->
-    <string name="error_version">Game version error. One of the players has an out of data version of the game. Game aborted!</string>
+    <string name="error_version">Error! Eén van de spelers heeft een oude versie van dit spel. Het spel is afgebroken!</string>
 </resources>

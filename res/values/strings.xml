@@ -117,5 +117,5 @@
     <string name="donate_gold_price">$4.99</string>
 
     <!--  Error  Dialogues-->
-    <string name="error_version">Game version error. One of the players has an out of data version of the game. Game aborted!</string>
+    <string name="error_version">Game version error. One of the players has an out of date version of the game. The game has been aborted!</string>
 </resources>

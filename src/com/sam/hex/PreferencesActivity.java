@@ -81,11 +81,11 @@ public class PreferencesActivity extends PreferenceActivity {
         public boolean onPreferenceChange(Preference preference, Object newValue) {
             if(newValue.toString().equals("0")) {
                 // Custom value needed
-                showInputDialog(getString(R.string.customGameSizeSummary));
+                showInputDialog(getString(R.string.preferences_summary_custom_game_size));
                 return false;
             }
             else {
-                preference.setSummary(String.format(getString(R.string.gameSizeSummary_onChange), newValue, newValue));
+                preference.setSummary(String.format(getString(R.string.preferences_summary_game_size), newValue, newValue));
                 return true;
             }
         }
@@ -136,7 +136,7 @@ public class PreferencesActivity extends PreferenceActivity {
             String defaultBoardSize = getString(R.integer.DEFAULT_BOARD_SIZE);
             String boardSize = Integer.valueOf(settings.getString("gameSizePref", defaultBoardSize)) == 0 ? settings.getString("customGameSizePref",
                     defaultBoardSize) : settings.getString("gameSizePref", defaultBoardSize);
-            gridPref.setSummary(String.format(getString(R.string.gameSizeSummary_onChange), boardSize, boardSize));
+            gridPref.setSummary(String.format(getString(R.string.preferences_summary_game_size), boardSize, boardSize));
             gridPref.setOnPreferenceChangeListener(new GridListener());
         }
 
@@ -172,7 +172,7 @@ public class PreferencesActivity extends PreferenceActivity {
                     settings.edit().putString("customGameSizePref", String.valueOf(input)).commit();
                     settings.edit().putString("gameSizePref", String.valueOf(0)).commit();
                     String boardSize = settings.getString("customGameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE));
-                    gridPref.setSummary(String.format(getString(R.string.gameSizeSummary_onChange), boardSize, boardSize));
+                    gridPref.setSummary(String.format(getString(R.string.preferences_summary_game_size), boardSize, boardSize));
                 }
             }
         }).setNegativeButton(getString(R.string.cancel), null).show();

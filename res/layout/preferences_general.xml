@@ -5,27 +5,27 @@
         android:title="@string/activity_title_preferences" >
 
         <ListPreference
-            android:title="@string/gameSizeTitle"
-            android:summary="@string/gameSizeSummary"
+            android:title="@string/preferences_title_game_size"
+            android:summary="@string/preferences_summary_game_size"
             android:key="gameSizePref"
             android:defaultValue="@integer/DEFAULT_BOARD_SIZE"
             android:entries="@array/gameSizeArray"
             android:entryValues="@array/gameSizeValues" />
 
         <CheckBoxPreference
-            android:title="@string/swapTitle"
-            android:summary="@string/swapSummary"
+            android:title="@string/preferences_title_swap"
+            android:summary="@string/preferences_summary_swap"
             android:defaultValue="@bool/DEFAULT_SWAP_ENABLED"
             android:key="swapPref" />
 
         <Preference
-            android:title="@string/timerTitle"
-            android:summary="@string/timerSummary"
+            android:title="@string/preferences_title_timer"
+            android:summary="@string/preferences_summary_timer"
             android:key="timerOptionsPref" />
 
         <CheckBoxPreference
-            android:title="@string/autosaveTitle"
-            android:summary="@string/autosaveSummary"
+            android:title="@string/preferences_title_autosave"
+            android:summary="@string/preferences_summary_autosave"
             android:defaultValue="@bool/DEFAULT_AUTOSAVE_ENABLED"
             android:key="autosavePref" />
 

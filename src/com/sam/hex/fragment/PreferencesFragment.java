@@ -88,9 +88,11 @@ public class PreferencesFragment extends PreferenceFragment {
             builder.setView(dialoglayout).setPositiveButton(getString(R.string.okay), new OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    String timerTime = timer.getText().toString();
+                    if(timerTime.isEmpty()) timerTime = "0";
                     settings.edit().putString("timerTypePref", getResources().getStringArray(R.array.timerTypeValues)[timerType.getSelectedItemPosition()])
                             .commit();
-                    settings.edit().putString("timerPref", timer.getText().toString()).commit();
+                    settings.edit().putString("timerPref", timerTime).commit();
                 }
             }).setNegativeButton(getString(R.string.cancel), null).show();
             return true;

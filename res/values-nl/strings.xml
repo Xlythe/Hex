@@ -57,11 +57,11 @@
 
     <!-- Menu choices -->
     <string name="game_undo">Ongedaan\nmaken</string>
-    <string name="game_reload">Opnieuw\nbeginnen</string>
+    <string name="game_reload">Opnieuw\nstarten</string>
     <string name="game_replay">Terugkijken</string>
     <string name="game_save_replay">Opslaan</string>
     <string name="game_settings">Instellingen</string>
-    <string name="game_quit">Stoppen</string>
+    <string name="game_quit">Stop</string>
 
     <!-- In game notifications -->
     <string name="game_turn_title">%s\'s</string>

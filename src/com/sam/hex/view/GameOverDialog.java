@@ -1,6 +1,7 @@
 package com.sam.hex.view;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -18,15 +19,26 @@ import com.sam.hex.view.HexDialogView.Button.OnClickListener;
 public class GameOverDialog extends HexDialog {
     private static GameFragment FRAGMENT;
     private static PlayingEntity WINNER;
+    public static boolean DISMISS_DIALOG;
 
     public GameOverDialog(Context context, GameFragment fragment, PlayingEntity winner) {
         super(context);
         FRAGMENT = fragment;
         WINNER = winner;
+        DISMISS_DIALOG = false;
     }
 
     public GameOverDialog() {
         super();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if(DISMISS_DIALOG) {
+            dismiss();
+        }
     }
 
     @Override

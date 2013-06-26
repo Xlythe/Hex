@@ -17,6 +17,7 @@ import com.sam.hex.R;
 import com.sam.hex.Settings;
 import com.sam.hex.Stats;
 import com.sam.hex.view.DonateDialog;
+import com.sam.hex.view.GameOverDialog;
 import com.sam.hex.view.HexDialog;
 import com.sam.hex.view.HexagonLayout;
 
@@ -166,6 +167,10 @@ public class MainFragment extends HexFragment {
 
         showStats();
         showDonationStar();
+
+        // GameOverDialog shows up when
+        // activity dies on winner screen.
+        GameOverDialog.DISMISS_DIALOG = true;
     }
 
     private void showStats() {

@@ -184,13 +184,19 @@ public class MainFragment extends HexFragment {
     }
 
     private void refreshPlayerInformation() {
-        if(getMainActivity() == null) return;
-        if(mSignOutButton != null) mSignOutButton.setVisibility(getMainActivity().isSignedIn() ? View.VISIBLE : View.GONE);
-        if(mSignInButton != null) mSignInButton.setVisibility(getMainActivity().isSignedIn() ? View.GONE : View.VISIBLE);
-        if(mTitleTextView != null) mTitleTextView.setText(String.format(getString(R.string.main_title),
-                Settings.getPlayer1Name(getMainActivity(), getMainActivity().getGamesClient())));
-        if(mHexagonLayout != null) mHexagonLayout.invalidate();
-        if(mTimePlayedTextView != null && mGamesPlayedTextView != null && mGamesWonTextView != null) showStats();
+        try {
+            // Network is async, no promise that we won't lose connectivity
+            if(getMainActivity() == null) return;
+            if(mSignOutButton != null) mSignOutButton.setVisibility(getMainActivity().isSignedIn() ? View.VISIBLE : View.GONE);
+            if(mSignInButton != null) mSignInButton.setVisibility(getMainActivity().isSignedIn() ? View.GONE : View.VISIBLE);
+            if(mTitleTextView != null) mTitleTextView.setText(String.format(getString(R.string.main_title),
+                    Settings.getPlayer1Name(getMainActivity(), getMainActivity().getGamesClient())));
+            if(mHexagonLayout != null) mHexagonLayout.invalidate();
+            if(mTimePlayedTextView != null && mGamesPlayedTextView != null && mGamesWonTextView != null) showStats();
+        }
+        catch(IllegalStateException e) {
+            e.printStackTrace();
+        }
     }
 
     public void setSignedIn(boolean isSignedIn) {

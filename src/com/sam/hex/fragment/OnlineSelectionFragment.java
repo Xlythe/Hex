@@ -28,7 +28,14 @@ public class OnlineSelectionFragment extends HexFragment {
         quickGameButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                getMainActivity().startQuickGame();
+                try {
+                    // Network is async, no promise that we won't lose
+                    // connectivity
+                    getMainActivity().startQuickGame();
+                }
+                catch(IllegalStateException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -38,9 +45,15 @@ public class OnlineSelectionFragment extends HexFragment {
         inviteButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                System.out.println("code:" + MainActivity.RC_SELECT_PLAYERS);
-                getMainActivity().startActivityForResult(getMainActivity().getGamesClient().getSelectPlayersIntent(1, 1), MainActivity.RC_SELECT_PLAYERS);
-                getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                try {
+                    // Network is async, no promise that we won't lose
+                    // connectivity
+                    getMainActivity().startActivityForResult(getMainActivity().getGamesClient().getSelectPlayersIntent(1, 1), MainActivity.RC_SELECT_PLAYERS);
+                    getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                }
+                catch(IllegalStateException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -50,9 +63,15 @@ public class OnlineSelectionFragment extends HexFragment {
         pendingButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                System.out.println("code:" + MainActivity.RC_INVITATION_INBOX);
-                getMainActivity().startActivityForResult(getMainActivity().getGamesClient().getInvitationInboxIntent(), MainActivity.RC_INVITATION_INBOX);
-                getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                try {
+                    // Network is async, no promise that we won't lose
+                    // connectivity
+                    getMainActivity().startActivityForResult(getMainActivity().getGamesClient().getInvitationInboxIntent(), MainActivity.RC_INVITATION_INBOX);
+                    getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                }
+                catch(IllegalStateException e) {
+                    e.printStackTrace();
+                }
             }
         });
 

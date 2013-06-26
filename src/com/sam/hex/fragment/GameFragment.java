@@ -526,21 +526,23 @@ public class GameFragment extends HexFragment {
             @Override
             public void run() {
                 if(game.getPlayer1().supportsNewgame() && game.getPlayer2().supportsNewgame()) {
-                    getMainActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            stopGame(game);
+                    if(getMainActivity() != null && !isDetached()) {
+                        getMainActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                stopGame(game);
 
-                            PlayingEntity p1 = getPlayer(1, game.gameOptions.gridSize);
-                            p1.setName(game.getPlayer1().getName());
-                            p1.setColor(game.getPlayer1().getColor());
-                            PlayingEntity p2 = getPlayer(2, game.gameOptions.gridSize);
-                            p2.setName(game.getPlayer2().getName());
-                            p2.setColor(game.getPlayer2().getColor());
+                                PlayingEntity p1 = getPlayer(1, game.gameOptions.gridSize);
+                                p1.setName(game.getPlayer1().getName());
+                                p1.setColor(game.getPlayer1().getColor());
+                                PlayingEntity p2 = getPlayer(2, game.gameOptions.gridSize);
+                                p2.setName(game.getPlayer2().getName());
+                                p2.setColor(game.getPlayer2().getColor());
 
-                            getMainActivity().switchToGame(new Game(game.gameOptions, p1, p2), false);
-                        }
-                    });
+                                getMainActivity().switchToGame(new Game(game.gameOptions, p1, p2), false);
+                            }
+                        });
+                    }
                 }
             }
         }).start();
@@ -561,7 +563,7 @@ public class GameFragment extends HexFragment {
                     || Integer.valueOf(prefs.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME))) * 60 * 1000 != game.gameOptions.timer.totalTime;
         }
         else if(gameLocation == GameAction.NET_GAME) {
-            return(game != null && game.isGameOver());
+            return (game != null && game.isGameOver());
         }
         else {
             return true;

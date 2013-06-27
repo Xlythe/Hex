@@ -39,7 +39,7 @@ public class BoardView extends View {
     private ShapeDrawable mBorderBackground;
     private int mBackgroundColor;
 
-    public Game game;
+    private Game mGame;
 
     private float mMargin;
 
@@ -88,11 +88,11 @@ public class BoardView extends View {
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                for(int x = 0; x < game.gameOptions.gridSize; x++) {
-                    for(int y = 0; y < game.gameOptions.gridSize; y++) {
+                for(int x = 0; x < mGame.gameOptions.gridSize; x++) {
+                    for(int y = 0; y < mGame.gameOptions.gridSize; y++) {
                         Button b = mButtons[x][y];
                         if(b.isSelected() || b.isPressed()) {
-                            GameAction.setPiece(new Point(x, y), game);
+                            GameAction.setPiece(new Point(x, y), mGame);
                         }
                     }
                 }
@@ -106,7 +106,7 @@ public class BoardView extends View {
         mButtons[mFocusedButton.x][mFocusedButton.y].setSelected(false);
         switch(direction) {
         case View.FOCUS_RIGHT:
-            if(mFocusedButton.x < game.gameOptions.gridSize - 1) {
+            if(mFocusedButton.x < mGame.gameOptions.gridSize - 1) {
                 mFocusedButton = new Point(mFocusedButton.x + 1, mFocusedButton.y);
                 mButtons[mFocusedButton.x][mFocusedButton.y].setSelected(true);
                 invalidate();
@@ -130,7 +130,7 @@ public class BoardView extends View {
             }
             break;
         case View.FOCUS_DOWN:
-            if(mFocusedButton.y < game.gameOptions.gridSize - 1) {
+            if(mFocusedButton.y < mGame.gameOptions.gridSize - 1) {
                 mFocusedButton = new Point(mFocusedButton.x, mFocusedButton.y + 1);
                 mButtons[mFocusedButton.x][mFocusedButton.y].setSelected(true);
                 invalidate();
@@ -146,7 +146,7 @@ public class BoardView extends View {
     }
 
     public void setGame(Game game) {
-        this.game = game;
+        this.mGame = game;
         mButtons = new Button[game.gameOptions.gridSize][game.gameOptions.gridSize];
         for(int x = 0; x < game.gameOptions.gridSize; x++) {
             for(int y = 0; y < game.gameOptions.gridSize; y++) {
@@ -176,37 +176,37 @@ public class BoardView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if(game == null) return;
-        int n = game.gameOptions.gridSize;
+        if(mGame == null) return;
+        int n = mGame.gameOptions.gridSize;
 
-        if(!game.replayRunning) {
-            ShapeDrawable background = (game.getCurrentPlayer().getTeam() == 1) ? mPlayer1Background : mPlayer2Background;
-            background.getPaint().setColor(game.getCurrentPlayer().getColor());
+        if(!mGame.replayRunning) {
+            ShapeDrawable background = (mGame.getCurrentPlayer().getTeam() == 1) ? mPlayer1Background : mPlayer2Background;
+            background.getPaint().setColor(mGame.getCurrentPlayer().getColor());
             background.draw(canvas);
             mBorderBackground.draw(canvas);
 
             if(mTitleText != null && mActionText != null) {
-                mTitleText = String.format(mTitleText, game.getCurrentPlayer().getName());
-                int textLength = (int) Math.max(mTextPaint.measureText(mTitleText), mLargeTextPaint.measureText(mActionText));
-                float posX = game.getCurrentPlayer().getTeam() == 1 ? mTextMargin + textLength : getWidth() - mTextMargin;
-                float posY = game.getCurrentPlayer().getTeam() == 1 ? getHeight() / 2 : mTextMargin + mTextPaint.getTextSize();
-                canvas.drawText(mTitleText, posX - mTextPaint.measureText(mTitleText), posY, mTextPaint);
+                String titleText = String.format(mTitleText, mGame.getCurrentPlayer().getName());
+                int textLength = (int) Math.max(mTextPaint.measureText(titleText), mLargeTextPaint.measureText(mActionText));
+                float posX = mGame.getCurrentPlayer().getTeam() == 1 ? mTextMargin + textLength : getWidth() - mTextMargin;
+                float posY = mGame.getCurrentPlayer().getTeam() == 1 ? getHeight() / 2 : mTextMargin + mTextPaint.getTextSize();
+                canvas.drawText(titleText, posX - mTextPaint.measureText(titleText), posY, mTextPaint);
                 canvas.drawText(mActionText, posX - mLargeTextPaint.measureText(mActionText), posY + mLargeTextPaint.getTextSize(), mLargeTextPaint);
             }
         }
         else {
-            mPlayer1Background.getPaint().setColor(game.getPlayer1().getColor());
+            mPlayer1Background.getPaint().setColor(mGame.getPlayer1().getColor());
             mPlayer1Background.draw(canvas);
-            mPlayer2Background.getPaint().setColor(game.getPlayer2().getColor());
+            mPlayer2Background.getPaint().setColor(mGame.getPlayer2().getColor());
             mPlayer2Background.draw(canvas);
             mBorderBackground.draw(canvas);
         }
 
-        if(game.gameOptions.timer.type != Timer.NO_TIMER && !game.replayRunning && !game.isGameOver()) {
+        if(mGame.gameOptions.timer.type != Timer.NO_TIMER && !mGame.replayRunning && !mGame.isGameOver()) {
             float posX = getWidth() - mTextMargin;
             float posY = getHeight() / 2;
-            long minutesLeft = game.getCurrentPlayer().getTime() / (60 * 1000);
-            long secondsLeft = (long) (Math.ceil(((double) game.getCurrentPlayer().getTime()) / 1000) - minutesLeft * 60);
+            long minutesLeft = mGame.getCurrentPlayer().getTime() / (60 * 1000);
+            long secondsLeft = (long) (Math.ceil(((double) mGame.getCurrentPlayer().getTime()) / 1000) - minutesLeft * 60);
             String time = String.format(Locale.getDefault(), "%d:%02d", minutesLeft, secondsLeft);
             canvas.drawText(mTimerText, posX - mTextPaint.measureText(mTimerText), posY, mTextPaint);
             canvas.drawText(time, posX - mLargeTextPaint.measureText(time), posY + mLargeTextPaint.getTextSize(), mLargeTextPaint);
@@ -215,12 +215,12 @@ public class BoardView extends View {
         for(int x = 0; x < n; x++) {
             for(int y = 0; y < n; y++) {
                 int c = Color.WHITE;
-                if(mButtons[x][y].isPressed() && game.getCurrentPlayer().getType().equals(Player.Human)) {
+                if(mButtons[x][y].isPressed() && mGame.getCurrentPlayer().getType().equals(Player.Human)) {
                     c = Color.LTGRAY;
                 }
-                if(game.gamePieces[x][y].getTeam() == game.getPlayer1().getTeam()) c = game.getPlayer1().getColor();
-                else if(game.gamePieces[x][y].getTeam() == game.getPlayer2().getTeam()) c = game.getPlayer2().getColor();
-                if(game.gamePieces[x][y].isWinningPath()) c = getDarkerColor(c);
+                if(mGame.gamePieces[x][y].getTeam() == mGame.getPlayer1().getTeam()) c = mGame.getPlayer1().getColor();
+                else if(mGame.gamePieces[x][y].getTeam() == mGame.getPlayer2().getTeam()) c = mGame.getPlayer2().getColor();
+                if(mGame.gamePieces[x][y].isWinningPath()) c = getDarkerColor(c);
                 mCellShadow[x][y].draw(canvas);
 
                 if(mButtons[x][y].isSelected()) {
@@ -243,8 +243,8 @@ public class BoardView extends View {
 
     @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
-        if(game == null) return;
-        int n = game.gameOptions.gridSize;
+        if(mGame == null) return;
+        int n = mGame.gameOptions.gridSize;
         mDrawable = new ShapeDrawable[n][n];
         mDrawableOutline = new ShapeDrawable[n][n];
         mCell = new ShapeDrawable[n][n];
@@ -252,10 +252,10 @@ public class BoardView extends View {
         int windowHeight = (int) (h - 2 * mMargin);
         int windowWidth = (w);
 
-        double radius = BoardTools.radiusCalculator(windowWidth, windowHeight, game.gameOptions.gridSize);
+        double radius = BoardTools.radiusCalculator(windowWidth, windowHeight, mGame.gameOptions.gridSize);
         double hrad = radius * Math.sqrt(3) / 2;
-        int yOffset = (int) ((windowHeight - ((3 * radius / 2) * (game.gamePieces[0].length - 1) + 2 * radius)) / 2);
-        int xOffset = (int) ((windowWidth - (hrad * game.gamePieces.length * 2 + hrad * (game.gamePieces.length - 1))) / 2);
+        int yOffset = (int) ((windowHeight - ((3 * radius / 2) * (mGame.gamePieces[0].length - 1) + 2 * radius)) / 2);
+        int xOffset = (int) ((windowWidth - (hrad * mGame.gamePieces.length * 2 + hrad * (mGame.gamePieces.length - 1))) / 2);
 
         // Shape of a hexagon
         Path path = new Path();

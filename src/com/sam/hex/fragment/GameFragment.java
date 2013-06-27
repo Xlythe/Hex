@@ -151,6 +151,8 @@ public class GameFragment extends HexFragment {
 
         board = (BoardView) v.findViewById(R.id.board);
         board.setGame(game);
+        board.setTitleText(getString(R.string.game_turn_title));
+        board.setActionText(getString(R.string.game_turn_msg));
         if(game.gameOptions.timer.type != Timer.NO_TIMER) board.setTimerText(getString(R.string.game_timer_msg));
         if(game.isGameOver() && game.getGameListener() != null) game.getGameListener().onWin(game.getCurrentPlayer());
 
@@ -334,8 +336,6 @@ public class GameFragment extends HexFragment {
                     public void run() {
                         try {
                             if(!game.isGameOver()) {
-                                board.setTitleText(getString(R.string.game_turn_title));
-                                board.setActionText(getString(R.string.game_turn_msg));
                                 board.postInvalidate();
                             }
                         }

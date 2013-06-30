@@ -55,6 +55,7 @@
     <string name="preferences_summary_timer">Limit the amount of time a player has (in minutes)</string>
     <string name="preferences_title_autosave">Autosave</string>
     <string name="preferences_summary_autosave">Save a replay at the end of each game</string>
+    <string name="preferences_title_com_difficulty">Computer Difficulty</string>
 
     <!-- Menu choices -->
     <string name="game_undo">Undo</string>

@@ -21,6 +21,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.sam.hex.R;
+import com.sam.hex.Settings;
 
 /**
  * @author Will Harmon
@@ -42,6 +43,14 @@ public class PreferencesFragment extends PreferenceFragment {
     public void onResume() {
         super.onResume();
         setListeners();
+    }
+
+    private class DifficultyListener implements OnPreferenceChangeListener {
+        @Override
+        public boolean onPreferenceChange(Preference preference, Object newValue) {
+            preference.setSummary(getResources().getStringArray(R.array.comDifficultyArray)[Integer.valueOf(newValue.toString())]);
+            return true;
+        }
     }
 
     private class GridListener implements OnPreferenceChangeListener {
@@ -103,9 +112,7 @@ public class PreferencesFragment extends PreferenceFragment {
         // Allow for custom grid sizes
         gridPref = findPreference("gameSizePref");
         if(gridPref != null) {
-            String defaultBoardSize = getString(R.integer.DEFAULT_BOARD_SIZE);
-            String boardSize = Integer.valueOf(settings.getString("gameSizePref", defaultBoardSize)) == 0 ? settings.getString("customGameSizePref",
-                    defaultBoardSize) : settings.getString("gameSizePref", defaultBoardSize);
+            String boardSize = String.valueOf(Settings.getGridSize(getActivity()));
             gridPref.setSummary(String.format(getString(R.string.preferences_summary_game_size), boardSize, boardSize));
             gridPref.setOnPreferenceChangeListener(new GridListener());
         }
@@ -114,6 +121,12 @@ public class PreferencesFragment extends PreferenceFragment {
         timerPref = findPreference("timerOptionsPref");
         if(timerPref != null) {
             timerPref.setOnPreferenceClickListener(new TimerListener());
+        }
+
+        Preference comDifficultyPref = findPreference("comDifficulty");
+        if(comDifficultyPref != null) {
+            comDifficultyPref.setOnPreferenceChangeListener(new DifficultyListener());
+            comDifficultyPref.setSummary(getResources().getStringArray(R.array.comDifficultyArray)[Settings.getComputerDifficulty(getActivity())]);
         }
     }
 

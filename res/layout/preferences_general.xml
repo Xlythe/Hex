@@ -23,19 +23,18 @@
             android:summary="@string/preferences_summary_timer"
             android:key="timerOptionsPref" />
 
+        <ListPreference
+            android:title="@string/preferences_title_com_difficulty"
+            android:key="comDifficulty"
+            android:defaultValue="@integer/DEFAULT_AI_DIFFICULTY"
+            android:entries="@array/comDifficultyArray"
+            android:entryValues="@array/comDifficultyValues" />
+
         <CheckBoxPreference
             android:title="@string/preferences_title_autosave"
             android:summary="@string/preferences_summary_autosave"
             android:defaultValue="@bool/DEFAULT_AUTOSAVE_ENABLED"
             android:key="autosavePref" />
-
-        <ListPreference
-            android:title="Computer Difficulty"
-            android:summary="Easy"
-            android:key="comDifficulty"
-            android:defaultValue="@integer/DEFAULT_BOARD_SIZE"
-            android:entries="@array/gameSizeArray"
-            android:entryValues="@array/gameSizeValues" />
 
     </PreferenceCategory>
 

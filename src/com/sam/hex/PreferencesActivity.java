@@ -14,7 +14,6 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.text.InputType;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -64,15 +63,11 @@ public class PreferencesActivity extends PreferenceActivity {
         setListeners();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch(item.getItemId()) {
-        case android.R.id.home:
-            finish();
+    private class DifficultyListener implements OnPreferenceChangeListener {
+        @Override
+        public boolean onPreferenceChange(Preference preference, Object newValue) {
+            preference.setSummary(getResources().getStringArray(R.array.comDifficultyArray)[Integer.valueOf(newValue.toString())]);
             return true;
-        default:
-            return super.onOptionsItemSelected(item);
         }
     }
 
@@ -135,9 +130,7 @@ public class PreferencesActivity extends PreferenceActivity {
         // Allow for custom grid sizes
         gridPref = findPreference("gameSizePref");
         if(gridPref != null) {
-            String defaultBoardSize = getString(R.integer.DEFAULT_BOARD_SIZE);
-            String boardSize = Integer.valueOf(settings.getString("gameSizePref", defaultBoardSize)) == 0 ? settings.getString("customGameSizePref",
-                    defaultBoardSize) : settings.getString("gameSizePref", defaultBoardSize);
+            String boardSize = String.valueOf(Settings.getGridSize(this));
             gridPref.setSummary(String.format(getString(R.string.preferences_summary_game_size), boardSize, boardSize));
             gridPref.setOnPreferenceChangeListener(new GridListener());
         }
@@ -146,6 +139,12 @@ public class PreferencesActivity extends PreferenceActivity {
         timerPref = findPreference("timerOptionsPref");
         if(timerPref != null) {
             timerPref.setOnPreferenceClickListener(new TimerListener());
+        }
+
+        Preference comDifficultyPref = findPreference("comDifficulty");
+        if(comDifficultyPref != null) {
+            comDifficultyPref.setOnPreferenceChangeListener(new DifficultyListener());
+            comDifficultyPref.setSummary(getResources().getStringArray(R.array.comDifficultyArray)[Settings.getComputerDifficulty(this)]);
         }
     }
 

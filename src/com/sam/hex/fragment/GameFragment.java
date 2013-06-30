@@ -21,7 +21,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.hex.ai.BeeGameAI;
+import com.hex.ai.AiTypes;
 import com.hex.core.Game;
 import com.hex.core.Game.GameListener;
 import com.hex.core.Game.GameOptions;
@@ -498,7 +498,7 @@ public class GameFragment extends HexFragment {
         Player p = (team == 1) ? player1Type : player2Type;
         switch(p) {
         case AI:
-            return new BeeGameAI(team, gridSize);
+            return AiTypes.newAI(AiTypes.BeeAI, team, gridSize, Settings.getComputerDifficulty(getMainActivity()));
         case Human:
             return new PlayerObject(team);
         case Net:

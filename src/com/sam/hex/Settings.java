@@ -55,4 +55,8 @@ public class Settings {
     public static int getPlayer2Color(Context context) {
         return context.getResources().getInteger(R.integer.DEFAULT_P2_COLOR);
     }
+
+    public static int getComputerDifficulty(Context context) {
+        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("comDifficulty", "0"));
+    }
 }

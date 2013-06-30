@@ -54,7 +54,7 @@
     <string name="preferences_summary_timer">Stel een tijdslimiet in (in minuten)</string>
     <string name="preferences_title_autosave">Automatisch opslaan</string>
     <string name="preferences_summary_autosave">Sla automatisch een bestand op in de geschiedenis aan het eind van elk spel</string>
-    <string name="preferences_title_com_difficulty">Computer Difficulty</string>
+    <string name="preferences_title_com_difficulty">Moeilijkheidsgraad computer</string>
 
     <!-- Menu choices -->
     <string name="game_undo">Ongedaan\nmaken</string>

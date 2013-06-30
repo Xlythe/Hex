@@ -106,7 +106,7 @@
 
     <!-- Review -->
     <string name="review_popup_title">Vind jij deze app leuk?</string>
-    <string name="review_popup_message">Waardeer Hex in de Play Store</string>
+    <string name="review_popup_message">Waardeer Hex in de Play Store!</string>
     <string name="review_popup_never">Nee, bedankt</string>
     <string name="review_popup_ok">Natuurlijk</string>
 

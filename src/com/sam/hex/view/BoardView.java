@@ -213,8 +213,6 @@ public class BoardView extends View {
             if(mTitleText != null) {
                 String p1TitleText = mGame.getPlayer1().getName();
                 String p2TitleText = mGame.getPlayer2().getName();
-                System.out.println("p1: " + p1TitleText);
-                System.out.println("p2: " + p2TitleText);
                 int p1TextLength = (int) mTextPaint.measureText(p1TitleText);
                 float p1PosX = mTextMargin + p1TextLength;
                 float p1PosY = getHeight() / 2;

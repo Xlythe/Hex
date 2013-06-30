@@ -3,12 +3,16 @@ package com.sam.hex.fragment;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.Locale;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +23,9 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.hex.core.Game;
+import com.hex.core.Game.GameListener;
+import com.hex.core.PlayingEntity;
 import com.sam.hex.FileUtil;
 import com.sam.hex.R;
 
@@ -118,6 +125,7 @@ public class HistoryFragment extends HexFragment {
     public static class HistoryAdapter extends BaseAdapter {
         private Context context;
         private final Item[] files;
+        private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
 
         public HistoryAdapter(Context context, Item[] files) {
             this.context = context;
@@ -125,22 +133,69 @@ public class HistoryFragment extends HexFragment {
         }
 
         public View getView(int position, View convertView, ViewGroup parent) {
-            Item i = files[position];
-            View v = convertView;
-            if(v == null) {
-                v = View.inflate(context, R.layout.view_history_item, null);
-            }
+            final Item i = files[position];
+            final View v = convertView != null ? convertView : View.inflate(context, R.layout.view_history_item, null);
 
-            // TODO determine winner for color, grab p1 and p2 names, grab
-            // date
-            if(i.title == null) {
-                i.title = i.file;
-            }
-            if(i.date == null) {
-                i.date = i.file;
-            }
-            if(i.color == 0) {
-                i.color = (int) (Math.random() * 2) + 1;
+            // Load up the game so we can get information
+            if(i.title == null || i.date == null || i.color == 0) {
+                try {
+                    final Handler h = new Handler();
+                    Game g = Game.load(FileUtil.loadGameAsString(path + File.separator + i.file));
+                    g.setGameListener(new GameListener() {
+                        @Override
+                        public void startTimer() {}
+
+                        @Override
+                        public void onWin(PlayingEntity player) {
+                            i.color = player.getTeam();
+                            h.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(i.color == 1) {
+                                        v.setBackgroundResource(R.drawable.history_background_red);
+                                    }
+                                    else if(i.color == 2) {
+                                        v.setBackgroundResource(R.drawable.history_background_blue);
+                                    }
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onUndo() {}
+
+                        @Override
+                        public void onTurn(PlayingEntity player) {}
+
+                        @Override
+                        public void onStop() {}
+
+                        @Override
+                        public void onStart() {}
+
+                        @Override
+                        public void onReplayStart() {}
+
+                        @Override
+                        public void onReplayEnd() {}
+
+                        @Override
+                        public void onClear() {}
+
+                        @Override
+                        public void displayTime(int minutes, int seconds) {}
+                    });
+                    g.replay(0);
+                    i.title = g.getPlayer1().getName() + " vs " + g.getPlayer2().getName();
+                    i.date = DATE_FORMAT.format(new Date(g.getGameStart()));
+                    i.color = -1;
+                }
+                catch(Exception e) {
+                    e.printStackTrace();
+                    i.title = context.getString(R.string.game_toast_failed);
+                    i.date = "";
+                    i.color = -1;
+                }
             }
 
             TextView title = (TextView) v.findViewById(R.id.title);
@@ -152,8 +207,11 @@ public class HistoryFragment extends HexFragment {
             if(i.color == 1) {
                 v.setBackgroundResource(R.drawable.history_background_red);
             }
-            else {
+            else if(i.color == 2) {
                 v.setBackgroundResource(R.drawable.history_background_blue);
+            }
+            else {
+                v.setBackgroundResource(R.drawable.history_background_black);
             }
 
             return v;

@@ -8,6 +8,7 @@
         android:src="@drawable/history_icon"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
         android:contentDescription="@null" />
     
     <TextView
@@ -15,6 +16,7 @@
         android:textSize="18sp"
         android:textColor="@color/white"
         android:gravity="right"
+        android:layout_marginRight="5dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
     
@@ -23,6 +25,8 @@
         android:textSize="18sp"
         android:textColor="@color/white"
         android:gravity="right"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="5dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

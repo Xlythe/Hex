@@ -12,7 +12,7 @@
         <item>Moeilijk</item>
     </string-array>
     <string-array name="timerTypeArray">
-        <item>Geem timer</item>
+        <item>Geen timer</item>
         <item>Per beurt</item>
         <item>Hele spel</item>
     </string-array>

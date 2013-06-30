@@ -29,6 +29,14 @@
             android:defaultValue="@bool/DEFAULT_AUTOSAVE_ENABLED"
             android:key="autosavePref" />
 
+        <ListPreference
+            android:title="Computer Difficulty"
+            android:summary="Easy"
+            android:key="comDifficulty"
+            android:defaultValue="@integer/DEFAULT_BOARD_SIZE"
+            android:entries="@array/gameSizeArray"
+            android:entryValues="@array/gameSizeValues" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

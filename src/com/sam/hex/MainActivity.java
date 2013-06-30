@@ -112,10 +112,6 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == KeyEvent.KEYCODE_BACK) {
-            if(mActiveFragment == mHistoryFragment) {
-                if(mHistoryFragment.goUp()) return true;
-            }
-
             if(mActiveFragment != mMainFragment) {
                 returnHome();
             }
@@ -136,11 +132,6 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
     public void onSignInSucceeded() {
         super.onSignInSucceeded();
         mIsSignedIn = true;
-
-        // TODO Remove this after testers have wiped their bad stats
-        getAppStateClient().updateState(0, null);
-        getAppStateClient().updateState(1, null);
-        getAppStateClient().updateState(2, null);
 
         getAppStateClient().loadState(this, STAT_STATE);
         mMainFragment.setSignedIn(mIsSignedIn);

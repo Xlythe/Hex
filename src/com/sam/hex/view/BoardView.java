@@ -19,6 +19,7 @@ import android.view.View;
 import com.hex.core.Game;
 import com.hex.core.GameAction;
 import com.hex.core.Player;
+import com.hex.core.PlayingEntity;
 import com.hex.core.Point;
 import com.hex.core.Timer;
 import com.sam.hex.BoardTools;
@@ -180,16 +181,24 @@ public class BoardView extends View {
         int n = mGame.gameOptions.gridSize;
 
         if(!mGame.replayRunning) {
-            ShapeDrawable background = (mGame.getCurrentPlayer().getTeam() == 1) ? mPlayer1Background : mPlayer2Background;
-            background.getPaint().setColor(mGame.getCurrentPlayer().getColor());
+            PlayingEntity player;
+            if(mGame.isGameOver()) {
+                player = mGame.getWinner();
+            }
+            else {
+                player = mGame.getCurrentPlayer();
+            }
+
+            ShapeDrawable background = (player.getTeam() == 1) ? mPlayer1Background : mPlayer2Background;
+            background.getPaint().setColor(player.getColor());
             background.draw(canvas);
             mBorderBackground.draw(canvas);
 
             if(mTitleText != null && mActionText != null) {
-                String titleText = String.format(mTitleText, mGame.getCurrentPlayer().getName());
+                String titleText = String.format(mTitleText, player.getName());
                 int textLength = (int) Math.max(mTextPaint.measureText(titleText), mLargeTextPaint.measureText(mActionText));
-                float posX = mGame.getCurrentPlayer().getTeam() == 1 ? mTextMargin + textLength : getWidth() - mTextMargin;
-                float posY = mGame.getCurrentPlayer().getTeam() == 1 ? getHeight() / 2 : mTextMargin + mTextPaint.getTextSize();
+                float posX = player.getTeam() == 1 ? mTextMargin + textLength : getWidth() - mTextMargin;
+                float posY = player.getTeam() == 1 ? getHeight() / 2 : mTextMargin + mTextPaint.getTextSize();
                 canvas.drawText(titleText, posX - mTextPaint.measureText(titleText), posY, mTextPaint);
                 canvas.drawText(mActionText, posX - mLargeTextPaint.measureText(mActionText), posY + mLargeTextPaint.getTextSize(), mLargeTextPaint);
             }
@@ -200,6 +209,20 @@ public class BoardView extends View {
             mPlayer2Background.getPaint().setColor(mGame.getPlayer2().getColor());
             mPlayer2Background.draw(canvas);
             mBorderBackground.draw(canvas);
+
+            if(mTitleText != null) {
+                String p1TitleText = mGame.getPlayer1().getName();
+                String p2TitleText = mGame.getPlayer2().getName();
+                System.out.println("p1: " + p1TitleText);
+                System.out.println("p2: " + p2TitleText);
+                int p1TextLength = (int) mTextPaint.measureText(p1TitleText);
+                float p1PosX = mTextMargin + p1TextLength;
+                float p1PosY = getHeight() / 2;
+                float p2PosX = getWidth() - mTextMargin;
+                float p2PosY = mTextMargin + mTextPaint.getTextSize();
+                canvas.drawText(p1TitleText, p1PosX - mTextPaint.measureText(p1TitleText), p1PosY, mTextPaint);
+                canvas.drawText(p2TitleText, p2PosX - mTextPaint.measureText(p2TitleText), p2PosY, mTextPaint);
+            }
         }
 
         if(mGame.gameOptions.timer.type != Timer.NO_TIMER && !mGame.replayRunning && !mGame.isGameOver()) {

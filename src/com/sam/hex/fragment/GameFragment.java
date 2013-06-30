@@ -246,57 +246,73 @@ public class GameFragment extends HexFragment {
                                 if(player.getType().equals(Player.Human)) Stats.incrementGamesWon(getMainActivity());
 
                                 if(getMainActivity().isSignedIn()) {
-                                    // Backup stats
-                                    Gson gson = new Gson();
-                                    Stat stat = new Stat();
-                                    stat.setTimePlayed(Stats.getTimePlayed(getMainActivity()));
-                                    stat.setGamesWon(Stats.getGamesWon(getMainActivity()));
-                                    stat.setGamesPlayed(Stats.getGamesPlayed(getMainActivity()));
-                                    stat.setDonationRank(Stats.getDonationRank(getMainActivity()));
-                                    getMainActivity().getAppStateClient().updateState(MainActivity.STAT_STATE, gson.toJson(stat).getBytes());
+                                    // Net is async and can disconnect at any
+                                    // time
+                                    try {
+                                        // Backup stats
+                                        Gson gson = new Gson();
+                                        Stat stat = new Stat();
+                                        stat.setTimePlayed(Stats.getTimePlayed(getMainActivity()));
+                                        stat.setGamesWon(Stats.getGamesWon(getMainActivity()));
+                                        stat.setGamesPlayed(Stats.getGamesPlayed(getMainActivity()));
+                                        stat.setDonationRank(Stats.getDonationRank(getMainActivity()));
+                                        getMainActivity().getAppStateClient().updateState(MainActivity.STAT_STATE, gson.toJson(stat).getBytes());
 
-                                    // Unlock the quick play achievements!
-                                    if(game.getGameLength() < 30 * 1000) {
-                                        getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_30_seconds));
-                                    }
-                                    if(game.getGameLength() < 10 * 1000) {
-                                        getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_10_seconds));
-                                    }
+                                        // Unlock the quick play achievements!
+                                        if(game.getGameLength() < 30 * 1000) {
+                                            getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_30_seconds));
+                                        }
+                                        if(game.getGameLength() < 10 * 1000) {
+                                            getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_10_seconds));
+                                        }
 
-                                    // Unlock the fill the board achievement!
-                                    boolean boardFilled = true;
-                                    for(int i = 0; i < game.gameOptions.gridSize; i++) {
-                                        for(int j = 0; j < game.gameOptions.gridSize; j++) {
-                                            if(game.gamePieces[i][j].getTeam() == 0) boardFilled = false;
+                                        // Unlock the fill the board
+                                        // achievement!
+                                        boolean boardFilled = true;
+                                        for(int i = 0; i < game.gameOptions.gridSize; i++) {
+                                            for(int j = 0; j < game.gameOptions.gridSize; j++) {
+                                                if(game.gamePieces[i][j].getTeam() == 0) boardFilled = false;
+                                            }
+                                        }
+                                        if(boardFilled) {
+                                            getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_fill_the_board));
+                                        }
+
+                                        // Unlock the montior smasher
+                                        // achievement!
+                                        if(player.getType().equals(Player.Human) && game.getOtherPlayer(player).getType().equals(Player.AI)) {
+                                            getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_monitor_smasher));
+                                        }
+
+                                        // Unlock the speed demon achievement!
+                                        if(game.gameOptions.timer.type != Timer.NO_TIMER) {
+                                            getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_speed_demon));
+                                        }
+
+                                        // Unlock the Novice achievement!
+                                        getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_novice), 1);
+
+                                        // Unlock the Intermediate achievement!
+                                        getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_intermediate), 1);
+
+                                        // Unlock the Expert achievement!
+                                        if(player.getType().equals(Player.Human)) {
+                                            getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_expert), 1);
+                                        }
+
+                                        // Unlock the Insane achievement!
+                                        if(player.getType().equals(Player.Human)) {
+                                            getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_insane), 1);
+                                        }
+
+                                        // Unlock the Net achievement
+                                        if(player.getType().equals(Player.Net) || game.getOtherPlayer(player).getType().equals(Player.Net)) {
+                                            getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_net));
                                         }
                                     }
-                                    if(boardFilled) {
-                                        getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_fill_the_board));
+                                    catch(Exception e) {
+                                        e.printStackTrace();
                                     }
-
-                                    // Unlock the montior smasher achievement!
-                                    if(player.getType().equals(Player.Human) && game.getPlayer2().getType().equals(Player.AI)) {
-                                        getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_monitor_smasher));
-                                    }
-
-                                    // Unlock the speed demon achievement!
-                                    if(game.gameOptions.timer.type != Timer.NO_TIMER) {
-                                        getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_speed_demon));
-                                    }
-
-                                    // Unlock the Novice achievement!
-                                    getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_novice), 1);
-
-                                    // Unlock the Intermediate achievement!
-                                    getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_intermediate), 1);
-
-                                    // Unlock the Expert achievement!
-                                    if(player.getType().equals(Player.Human)) getMainActivity().getGamesClient().incrementAchievement(
-                                            getString(R.string.achievement_expert), 1);
-
-                                    // Unlock the Expert achievement!
-                                    if(player.getType().equals(Player.Human)) getMainActivity().getGamesClient().incrementAchievement(
-                                            getString(R.string.achievement_insane), 1);
                                 }
                             }
                         }).start();
@@ -351,9 +367,6 @@ public class GameFragment extends HexFragment {
                 if(getMainActivity() != null && !isDetached()) getMainActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        board.setTitleText("");
-                        board.setActionText("");
-                        board.setTimerText("");
                         board.postInvalidate();
                     }
                 });
@@ -563,7 +576,7 @@ public class GameFragment extends HexFragment {
                     || Integer.valueOf(prefs.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME))) * 60 * 1000 != game.gameOptions.timer.totalTime;
         }
         else if(gameLocation == GameAction.NET_GAME) {
-            return (game != null && game.isGameOver());
+            return(game != null && game.isGameOver());
         }
         else {
             return true;

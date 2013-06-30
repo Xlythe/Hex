@@ -33,6 +33,7 @@ public class HexagonLayout extends View implements OnTouchListener {
     private float[] mRotationHistory;
     private float mRotationSpin;
     private int mRotationSpinSign;
+    private int mRotationTick;
 
     // Size and shape variables
     private Point[] corners;
@@ -106,6 +107,7 @@ public class HexagonLayout extends View implements OnTouchListener {
         mButtonTextPaint.setColor(Color.WHITE);
         mButtonTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, dm));
         mAllowRotation = true;
+        mRotationTick = 20;
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -271,7 +273,7 @@ public class HexagonLayout extends View implements OnTouchListener {
                 if(mRotationSpin < 0f) {
                     mSnapToSide = true;
                 }
-                postInvalidateDelayed(30);
+                postInvalidateDelayed(mRotationTick);
             }
 
             // We're done rotating. Snap to whatever side we landed on.
@@ -288,7 +290,7 @@ public class HexagonLayout extends View implements OnTouchListener {
                 else {
                     mRotation += 2f * sign;
                 }
-                postInvalidateDelayed(30);
+                postInvalidateDelayed(mRotationTick);
             }
         }
 

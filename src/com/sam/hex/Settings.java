@@ -57,6 +57,7 @@ public class Settings {
     }
 
     public static int getComputerDifficulty(Context context) {
-        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("comDifficulty", "0"));
+        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("comDifficulty",
+                String.valueOf(context.getResources().getInteger(R.integer.DEFAULT_AI_DIFFICULTY))));
     }
 }

@@ -192,8 +192,8 @@ public class HistoryFragment extends HexFragment {
                 }
                 catch(Exception e) {
                     e.printStackTrace();
-                    i.title = context.getString(R.string.game_toast_failed);
-                    i.date = "";
+                    i.title = "";
+                    i.date = context.getString(R.string.game_toast_failed);
                     i.color = -1;
                 }
             }

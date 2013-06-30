@@ -52,21 +52,8 @@ import com.hex.network.NetworkCallbacks;
 import com.hex.network.NetworkPlayer;
 
 /**
- * Button Clicker 2000. A minimalistic game showing the multiplayer features of
- * the Google Play game services API. The objective of this game is clicking a
- * button. Whoever clicks the button the most times within a 20 second interval
- * wins. It's that simple. This game can be played with 2, 3 or 4 players. The
- * code is organized in sections in order to make understanding as clear as
- * possible. We start with the integration section where we show how the game is
- * integrated with the Google Play game services API, then move on to
- * game-specific UI and logic. INSTRUCTIONS: To run this sample, please set up a
- * project in the Developer Console. Then, place your app ID on
- * res/values/ids.xml. Also, change the package name to the package name you
- * used to create the client ID in Developer Console. Make sure you sign the APK
- * with the certificate whose fingerprint you entered in Developer Console when
- * creating your Client Id.
- * 
  * @author Bruno Oliveira (btco), 2013-04-26
+ * @author Will Harmon
  */
 public abstract class NetActivity extends BaseGameActivity implements RealTimeMessageReceivedListener, RoomStatusUpdateListener, RoomUpdateListener,
         OnInvitationReceivedListener, NetCommunication, NetworkCallbacks, OnCancelListener {
@@ -604,14 +591,26 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         leaveRoom();
     }
 
+    private boolean mNewGameRequested = false;
+
     @Override
     public void newGame(String gameData) {
         Log.d(TAG, "New game commanded from above");
+        if(!mGame.isGameOver()) {
+            // Decide on a winner for the dying game
+            if(!mNewGameRequested) {
+                mLocalPlayer.forfeit();
+            }
+            else {
+                mNetworkPlayer.forfeit();
+            }
+        }
+        mNewGameRequested = false;
         startGame(true);
     }
 
     @Override
-    public String newGameReqest() {
+    public String newGameRequest() {
         Log.d(TAG, "New game requested");
         final LinkedBlockingQueue<Boolean> reply = new LinkedBlockingQueue<Boolean>();
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -620,6 +619,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
                 switch(which) {
                 case DialogInterface.BUTTON_POSITIVE:
                     // Yes button clicked
+                    mNewGameRequested = true;
                     reply.add(true);
                     mShowingDialog = false;
                     break;

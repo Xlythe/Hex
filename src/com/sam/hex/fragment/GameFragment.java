@@ -90,14 +90,14 @@ public class GameFragment extends HexFragment {
         }
         else if(getArguments() != null && getArguments().containsKey(GAME)) {
             // Load a game
+            player1Type = Player.Human;
+            player2Type = Player.Human;
             try {
                 game = Game.load(getArguments().getString(GAME));
                 game.setGameListener(createGameListener());
                 replay = true;
                 replayDuration = 0;
                 gameHasEnded = true;
-                player1Type = Player.Human;
-                player2Type = Player.Human;
 
                 if(getArguments().containsKey(REPLAY) && getArguments().getBoolean(REPLAY)) {
                     replayDuration = 900;

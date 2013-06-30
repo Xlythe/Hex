@@ -186,7 +186,7 @@ public class HistoryFragment extends HexFragment {
                         public void displayTime(int minutes, int seconds) {}
                     });
                     g.replay(0);
-                    i.title = g.getPlayer1().getName() + " vs " + g.getPlayer2().getName();
+                    i.title = context.getString(R.string.auto_saved_title, g.getPlayer1().getName(), g.getPlayer2().getName());
                     i.date = DATE_FORMAT.format(new Date(g.getGameStart()));
                     i.color = -1;
                 }

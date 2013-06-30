@@ -73,6 +73,7 @@
     <string name="game_toast_failed">Failed</string>
     <string name="game_button_claim_victory">Claim Victory</string>
     <string name="auto_saved_file_name" formatted="false">%s %s vs %s</string>
+    <string name="auto_saved_title" formatted="false">%s vs %s</string>
     <string name="game_over_you">You</string>
     <string name="game_over_action">%s!</string>
     <string name="game_over_won">Won</string>

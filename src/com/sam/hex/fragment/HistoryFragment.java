@@ -219,7 +219,8 @@ public class HistoryFragment extends HexFragment {
 
         @Override
         public int getCount() {
-            return files.length;
+            if(files != null) return files.length;
+            else return 0;
         }
 
         @Override

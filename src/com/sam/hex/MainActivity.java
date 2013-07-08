@@ -96,15 +96,12 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // mHexRealTimeMessageReceivedListener = new
-        // HexRealTimeMessageReceivedListener();
-        // mHexRoomStatusUpdateListener = new HexRoomStatusUpdateListener();
-        // mHexRoomUpdateListener = new HexRoomUpdateListener(this);
-
-        mMainFragment = new MainFragment();
-        mMainFragment.setInitialRotation(-120f);
-        mMainFragment.setInitialSpin(50f);
-        swapFragment(mMainFragment);
+        if(savedInstanceState == null) {
+            mMainFragment = new MainFragment();
+            mMainFragment.setInitialRotation(-120f);
+            mMainFragment.setInitialSpin(50f);
+            swapFragment(mMainFragment);
+        }
 
         popupRatingDialog();
     }

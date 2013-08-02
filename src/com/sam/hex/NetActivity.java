@@ -71,6 +71,10 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     public final static int RC_INVITATION_INBOX = 10001;
     public final static int RC_WAITING_ROOM = 10002;
     public final static int RC_ACHIEVEMENTS = 10003;
+    public final static String KILLWORKER = "Use this to gracefully kill the wokerThread";
+    
+    
+    private LinkedBlockingQueue<String> mWaitingMessages = null;
 
     // Room ID where the currently active game is taking place; null if we're
     // not playing.
@@ -372,6 +376,8 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     public void onLeftRoom(int statusCode, String roomId) {
         // we have left the room; return to main screen.
         Log.d(TAG, "onLeftRoom, code " + statusCode);
+        
+        if(this.mWaitingMessages.add(KILLWORKER));
     }
 
     // Called when we get disconnected from the room. We return to the main
@@ -380,6 +386,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     public void onDisconnectedFromRoom(Room room) {
         mLocalPlayer.forfeit();
         mGame.getCurrentPlayer().endMove();
+        if(this.mWaitingMessages.add(KILLWORKER));
         mRoomId = null;
     }
 
@@ -518,6 +525,9 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         p1.setName(((Participant) players[0]).getDisplayName().split(" ")[0]);
         p2.setName(((Participant) players[1]).getDisplayName().split(" ")[0]);
 
+        this.mWaitingMessages = new LinkedBlockingQueue<String>();
+        makeNewWorkerThread(mWaitingMessages,mNetworkPlayer);
+        
         mGame = new Game(go, p1, p2);
         switchToGame(mGame, !rematch);
     }
@@ -526,14 +536,41 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
      * COMMUNICATIONS SECTION. Methods that implement the game's network
      * protocol.
      */
+    
+// makes a worker thread to handle processing communications
+    private void makeNewWorkerThread(
+			final LinkedBlockingQueue<String> waitingMessages,
+			final NetworkPlayer networkPlayer) {
+		new Thread(){
+			@Override
+			public void run(){
+				String data;
+				try {
+					while(true){
+					data = waitingMessages.take();
+					//check to see if my work is done
+					if (data == KILLWORKER)
+						return;
+					networkPlayer.receivedMessage(data);
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					return;
+				}
+				
+			}
+		}.start();
+		
+	}
 
-    // Called when we receive a real-time message from the network.
+	// Called when we receive a real-time message from the network.
     @Override
     public void onRealTimeMessageReceived(RealTimeMessage rtm) {
         String data = new String(rtm.getMessageData());
         Log.d(TAG, "Message received: " + data);
-
-        if(mNetworkPlayer != null) mNetworkPlayer.receivedMessage(data);
+        
+        mWaitingMessages.add(data);
+       
     }
 
     // Broadcast my score to everybody else.

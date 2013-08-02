@@ -189,7 +189,7 @@ public class BoardView extends View {
                 player = mGame.getCurrentPlayer();
             }
             
-            if(player == null) return ;
+            if(player == null) return;
 
             ShapeDrawable background = (player.getTeam() == 1) ? mPlayer1Background : mPlayer2Background;
             background.getPaint().setColor(player.getColor());

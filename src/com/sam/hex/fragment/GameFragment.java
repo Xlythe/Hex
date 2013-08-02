@@ -501,7 +501,7 @@ public class GameFragment extends HexFragment {
         case AI:
             int difficulty = Settings.getComputerDifficulty(getMainActivity());
             if(difficulty == 0) return new GameAI(team);
-            return AiTypes.newAI(AiTypes.BeeAI, team, gridSize, difficulty * 2);
+            return AiTypes.newAI(AiTypes.BeeAI, team, gridSize, difficulty + 1);
         case Human:
             return new PlayerObject(team);
         case Net:

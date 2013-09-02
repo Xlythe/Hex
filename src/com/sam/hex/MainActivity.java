@@ -9,7 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.view.KeyEvent;
+import android.support.v4.app.FragmentManager;
 
 import com.google.android.gms.appstate.AppStateClient;
 import com.google.android.gms.appstate.OnStateLoadedListener;
@@ -100,29 +100,17 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
             mMainFragment = new MainFragment();
             mMainFragment.setInitialRotation(-120f);
             mMainFragment.setInitialSpin(50f);
-            swapFragment(mMainFragment);
+            getSupportFragmentManager().beginTransaction().add(R.id.content, mMainFragment).commit();
+            mActiveFragment = mMainFragment;
         }
 
         popupRatingDialog();
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode == KeyEvent.KEYCODE_BACK) {
-            if(mActiveFragment != mMainFragment) {
-                returnHome();
-            }
-            else {
-                finish();
-            }
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
     public void returnHome() {
         if(mMainFragment == null) mMainFragment = new MainFragment();
-        swapFragment(mMainFragment);
+        getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        mActiveFragment = mMainFragment;
     }
 
     @Override
@@ -153,8 +141,9 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
     }
 
     public void swapFragment(Fragment newFragment) {
-        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out).replace(R.id.content, newFragment)
-                .commit();
+        getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
+                .replace(R.id.content, newFragment).addToBackStack(null).commit();
         mActiveFragment = newFragment;
     }
 

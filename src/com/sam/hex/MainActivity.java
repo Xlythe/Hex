@@ -40,7 +40,6 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
     private HistoryFragment mHistoryFragment;
     private InstructionsFragment mInstructionsFragment;
     private OnlineSelectionFragment mOnlineSelectionFragment;
-    private Fragment mActiveFragment;
 
     public MainActivity() {
         super(CLIENT_GAMES | CLIENT_APPSTATE);
@@ -101,7 +100,6 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
             mMainFragment.setInitialRotation(-120f);
             mMainFragment.setInitialSpin(50f);
             getSupportFragmentManager().beginTransaction().add(R.id.content, mMainFragment).commit();
-            mActiveFragment = mMainFragment;
         }
 
         popupRatingDialog();
@@ -110,7 +108,6 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
     public void returnHome() {
         if(mMainFragment == null) mMainFragment = new MainFragment();
         getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        mActiveFragment = mMainFragment;
     }
 
     @Override
@@ -141,10 +138,7 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
     }
 
     public void swapFragment(Fragment newFragment) {
-        getSupportFragmentManager().beginTransaction()
-                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
-                .replace(R.id.content, newFragment).addToBackStack(null).commit();
-        mActiveFragment = newFragment;
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out).replace(R.id.content, newFragment).addToBackStack(null).commit();
     }
 
     public MainFragment getMainFragment() {
@@ -218,8 +212,7 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
                 };
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle(R.string.review_popup_title).setMessage(R.string.review_popup_message)
-                        .setPositiveButton(R.string.review_popup_ok, dialogClickListener).setNegativeButton(R.string.review_popup_never, dialogClickListener);
+                builder.setTitle(R.string.review_popup_title).setMessage(R.string.review_popup_message).setPositiveButton(R.string.review_popup_ok, dialogClickListener).setNegativeButton(R.string.review_popup_never, dialogClickListener);
 
                 // Wrap in try/catch because this can sometimes leak window
                 try {

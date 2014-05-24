@@ -46,6 +46,10 @@ import com.sam.hex.view.GameOverDialog;
  **/
 public class GameFragment extends HexFragment {
     public static final String GAME = "game";
+    public static final String PLAYER1 = "player1";
+    public static final String PLAYER2 = "player2";
+    public static final String PLAYER1_TYPE = "player1_type";
+    public static final String PLAYER2_TYPE = "player2_type";
     public static final String REPLAY = "replay";
     public static final String NET = "net";
     private static final SimpleDateFormat SAVE_FORMAT = new SimpleDateFormat("MMM dd, yyyy hh:mm", Locale.getDefault());
@@ -62,8 +66,7 @@ public class GameFragment extends HexFragment {
     private boolean leaveRoom = true;
 
     /**
-     * Set at the end of onWin, or when a game is loaded. Use this to avoid
-     * auto-saving replayed games or unlocking achievements that weren't earned.
+     * Set at the end of onWin, or when a game is loaded. Use this to avoid auto-saving replayed games or unlocking achievements that weren't earned.
      * */
     private boolean gameHasEnded = false;
 
@@ -80,7 +83,23 @@ public class GameFragment extends HexFragment {
 
         if(savedInstanceState != null && savedInstanceState.containsKey(GAME)) {
             // Resume a game if one exists
-            game = Game.load(savedInstanceState.getString(GAME));
+            boolean keys = savedInstanceState.containsKey(PLAYER1_TYPE);
+            keys &= savedInstanceState.containsKey(PLAYER2_TYPE);
+            keys &= savedInstanceState.containsKey(PLAYER1);
+            keys &= savedInstanceState.containsKey(PLAYER2);
+            if(keys) {
+                // We have additional information about the player's state
+                int gridSize = Settings.getGridSize(getMainActivity());
+                player1Type = (Player) savedInstanceState.getSerializable(PLAYER1_TYPE);
+                player2Type = (Player) savedInstanceState.getSerializable(PLAYER2_TYPE);
+                game = Game.load(savedInstanceState.getString(GAME), getPlayer(1, gridSize), getPlayer(2, gridSize));
+                game.getPlayer1().setSaveState(savedInstanceState.getSerializable(PLAYER1));
+                game.getPlayer2().setSaveState(savedInstanceState.getSerializable(PLAYER2));
+            }
+            else {
+                // Load a game with 2 humans
+                game = Game.load(savedInstanceState.getString(GAME));
+            }
             game.setGameListener(createGameListener());
             replay = true;
             replayDuration = 0;
@@ -144,7 +163,13 @@ public class GameFragment extends HexFragment {
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        if(game != null) savedInstanceState.putString(GAME, game.save());
+        if(game != null) {
+            savedInstanceState.putString(GAME, game.save());
+            savedInstanceState.putSerializable(PLAYER1, game.getPlayer1().getSaveState());
+            savedInstanceState.putSerializable(PLAYER2, game.getPlayer2().getSaveState());
+            savedInstanceState.putSerializable(PLAYER1_TYPE, player1Type);
+            savedInstanceState.putSerializable(PLAYER2_TYPE, player2Type);
+        }
     }
 
     private View applyBoard(LayoutInflater inflater) {
@@ -233,8 +258,7 @@ public class GameFragment extends HexFragment {
                                 // Auto save completed game
                                 if(Settings.getAutosave(getMainActivity())) {
                                     try {
-                                        String fileName = String.format(getString(R.string.auto_saved_file_name), SAVE_FORMAT.format(new Date()), game
-                                                .getPlayer1().getName(), game.getPlayer2().getName());
+                                        String fileName = String.format(getString(R.string.auto_saved_file_name), SAVE_FORMAT.format(new Date()), game.getPlayer1().getName(), game.getPlayer2().getName());
                                         FileUtil.autoSaveGame(fileName, game.save());
                                     }
                                     catch(IOException e) {
@@ -533,8 +557,7 @@ public class GameFragment extends HexFragment {
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getMainActivity());
-        builder.setMessage(getString(R.string.confirmNewgame)).setPositiveButton(getString(R.string.yes), dialogClickListener)
-                .setNegativeButton(getString(R.string.no), dialogClickListener).show();
+        builder.setMessage(getString(R.string.confirmNewgame)).setPositiveButton(getString(R.string.yes), dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show();
     }
 
     public void startNewGame() {
@@ -571,12 +594,7 @@ public class GameFragment extends HexFragment {
         if(game == null) return true;
         if(game.gameOptions.gridSize == 1) return true;
         if(gameLocation == GameAction.LOCAL_GAME) {
-            return (Integer.valueOf(prefs.getString("gameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE))) != game.gameOptions.gridSize && Integer
-                    .valueOf(prefs.getString("gameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE))) != 0)
-                    || (Integer.valueOf(prefs.getString("customGameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE))) != game.gameOptions.gridSize && Integer
-                            .valueOf(prefs.getString("gameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE))) == 0)
-                    || Integer.valueOf(prefs.getString("timerTypePref", getString(R.integer.DEFAULT_TIMER_TYPE))) != game.gameOptions.timer.type
-                    || Integer.valueOf(prefs.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME))) * 60 * 1000 != game.gameOptions.timer.totalTime;
+            return (Integer.valueOf(prefs.getString("gameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE))) != game.gameOptions.gridSize && Integer.valueOf(prefs.getString("gameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE))) != 0) || (Integer.valueOf(prefs.getString("customGameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE))) != game.gameOptions.gridSize && Integer.valueOf(prefs.getString("gameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE))) == 0) || Integer.valueOf(prefs.getString("timerTypePref", getString(R.integer.DEFAULT_TIMER_TYPE))) != game.gameOptions.timer.type || Integer.valueOf(prefs.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME))) * 60 * 1000 != game.gameOptions.timer.totalTime;
         }
         else if(gameLocation == GameAction.NET_GAME) {
             return(game != null && game.isGameOver());
@@ -609,8 +627,7 @@ public class GameFragment extends HexFragment {
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getMainActivity());
-        builder.setMessage(getString(R.string.confirmExit)).setPositiveButton(getString(R.string.yes), dialogClickListener)
-                .setNegativeButton(getString(R.string.no), dialogClickListener).show();
+        builder.setMessage(getString(R.string.confirmExit)).setPositiveButton(getString(R.string.yes), dialogClickListener).setNegativeButton(getString(R.string.no), dialogClickListener).show();
     }
 
     public void setPlayer1Type(Player player1Type) {

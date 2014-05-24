@@ -116,7 +116,7 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
         mIsSignedIn = true;
 
         getAppStateClient().loadState(this, STAT_STATE);
-        mMainFragment.setSignedIn(mIsSignedIn);
+        if(mMainFragment != null) mMainFragment.setSignedIn(mIsSignedIn);
 
         if(mOpenAchievements) {
             mOpenAchievements = false;
@@ -134,7 +134,7 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
     public void onSignInFailed() {
         super.onSignInFailed();
         mIsSignedIn = false;
-        mMainFragment.setSignedIn(mIsSignedIn);
+        if(mMainFragment != null) mMainFragment.setSignedIn(mIsSignedIn);
     }
 
     public void swapFragment(Fragment newFragment) {
@@ -249,11 +249,6 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
         mGameFragment.setArguments(b);
 
         swapFragment(mGameFragment);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        // No call for super(). Bug on API Level > 11.
     }
 
     public static class Stat {

@@ -138,7 +138,7 @@ public class MainActivity extends NetActivity implements OnStateLoadedListener {
     }
 
     public void swapFragment(Fragment newFragment) {
-        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out).replace(R.id.content, newFragment).addToBackStack(null).commit();
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out).replace(R.id.content, newFragment).addToBackStack(null).commitAllowingStateLoss();
     }
 
     public MainFragment getMainFragment() {

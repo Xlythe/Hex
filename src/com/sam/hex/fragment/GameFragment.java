@@ -131,7 +131,13 @@ public class GameFragment extends HexFragment {
         }
         else if(getArguments() != null && getArguments().containsKey(NET) && getArguments().getBoolean(NET)) {
             // Net game (game should have already been passed in)
-            game.setGameListener(createGameListener());
+            if(game == null) {
+                ((MainActivity) getActivity()).returnHome();
+                initializeNewGame();
+            }
+            else {
+                game.setGameListener(createGameListener());
+            }
         }
         else {
             // Create a new game

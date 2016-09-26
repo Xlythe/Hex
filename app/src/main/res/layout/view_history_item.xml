@@ -1,0 +1,33 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="bottom" >
+    
+    <ImageView
+        android:src="@drawable/history_icon"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
+        android:contentDescription="@null" />
+    
+    <TextView
+        android:id="@+id/title"
+        android:textSize="18sp"
+        android:textColor="@color/white"
+        android:gravity="right"
+        android:layout_marginRight="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    
+    <TextView
+        android:id="@+id/date"
+        android:textSize="18sp"
+        android:textColor="@color/white"
+        android:gravity="right"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

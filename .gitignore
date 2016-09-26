@@ -27,3 +27,8 @@ scr
 
 gen/*
 *.idea
+
+.gradle/*
+*.iml
+*.apk
+.settings/*

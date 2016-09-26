@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="gameSizeArray">
+        <item>7x7</item>
+        <item>9x9</item>
+        <item>11x11</item>
+        <item>Custom</item>
+    </string-array>
+    <string-array name="gameSizeValues">
+        <item>7</item>
+        <item>9</item>
+        <item>11</item>
+        <item>0</item>
+    </string-array>
+    <string-array name="comDifficultyArray">
+        <item>Easy</item>
+        <item>Medium</item>
+        <item>Hard</item>
+    </string-array>
+    <string-array name="comDifficultyValues">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="timerTypeArray">
+        <item>No timer</item>
+        <item>Per move</item>
+        <item>Entire match</item>
+    </string-array>
+    <string-array name="timerTypeValues">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+</resources>

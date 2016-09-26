@@ -1,0 +1,52 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background" >
+
+    <com.sam.hex.view.BoardView
+        android:id="@+id/board"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_alignParentBottom="true" >
+
+        <Button
+            android:id="@+id/exit"
+            android:text="@string/game_quit"
+            android:textSize="14sp"
+            android:padding="5dp"
+            android:background="@android:drawable/list_selector_background"
+            android:textColor="@color/white"
+            android:drawableTop="@drawable/exit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/reload"
+            android:text="@string/game_reload"
+            android:textSize="14sp"
+            android:padding="5dp"
+            android:background="@android:drawable/list_selector_background"
+            android:textColor="@color/white"
+            android:drawableTop="@drawable/restart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/undo"
+            android:text="@string/game_undo"
+            android:textSize="14sp"
+            android:padding="5dp"
+            android:background="@android:drawable/list_selector_background"
+            android:textColor="@color/white"
+            android:drawableTop="@drawable/undo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+</RelativeLayout>

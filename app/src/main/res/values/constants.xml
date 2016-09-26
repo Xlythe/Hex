@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <integer name="DEFAULT_P1_COLOR">@integer/COLOR_RED</integer>
+    <integer name="DEFAULT_P2_COLOR">@integer/COLOR_BLUE</integer>
+    <string name="DEFAULT_P1_NAME">Player1</string>
+    <string name="DEFAULT_P2_NAME">Guest</string>
+    <integer name="DEFAULT_AI_DIFFICULTY">1</integer>
+    <integer name="DEFAULT_BOARD_SIZE">7</integer>
+    <item type="bool" name="DEFAULT_SWAP_ENABLED">true</item>
+    <integer name="DEFAULT_TIMER_TYPE">0</integer>
+    <integer name="DEFAULT_TIMER_TIME">0</integer>
+    <item type="bool" name="DEFAULT_AUTOSAVE_ENABLED">true</item>
+</resources>

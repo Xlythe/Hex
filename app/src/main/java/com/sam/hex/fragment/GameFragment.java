@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.games.Games;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.hex.ai.AiTypes;
@@ -287,14 +288,14 @@ public class GameFragment extends HexFragment {
                                         stat.setGamesWon(Stats.getGamesWon(getMainActivity()));
                                         stat.setGamesPlayed(Stats.getGamesPlayed(getMainActivity()));
                                         stat.setDonationRank(Stats.getDonationRank(getMainActivity()));
-                                        getMainActivity().getAppStateClient().updateState(MainActivity.STAT_STATE, gson.toJson(stat).getBytes());
+                                        //getMainActivity().getAppStateClient().updateState(MainActivity.STAT_STATE, gson.toJson(stat).getBytes());
 
                                         // Unlock the quick play achievements!
                                         if(game.getGameLength() < 30 * 1000) {
-                                            getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_30_seconds));
+                                            Games.Achievements.unlock(getGamesClient(), getString(R.string.achievement_30_seconds));
                                         }
                                         if(game.getGameLength() < 10 * 1000) {
-                                            getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_10_seconds));
+                                            Games.Achievements.unlock(getGamesClient(), getString(R.string.achievement_10_seconds));
                                         }
 
                                         // Unlock the fill the board
@@ -306,39 +307,39 @@ public class GameFragment extends HexFragment {
                                             }
                                         }
                                         if(boardFilled) {
-                                            getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_fill_the_board));
+                                            Games.Achievements.unlock(getGamesClient(), getString(R.string.achievement_fill_the_board));
                                         }
 
                                         // Unlock the montior smasher
                                         // achievement!
                                         if(player.getType().equals(Player.Human) && game.getOtherPlayer(player).getType().equals(Player.AI)) {
-                                            getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_monitor_smasher));
+                                            Games.Achievements.unlock(getGamesClient(), getString(R.string.achievement_monitor_smasher));
                                         }
 
                                         // Unlock the speed demon achievement!
                                         if(game.gameOptions.timer.type != Timer.NO_TIMER) {
-                                            getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_speed_demon));
+                                            Games.Achievements.unlock(getGamesClient(), getString(R.string.achievement_speed_demon));
                                         }
 
                                         // Unlock the Novice achievement!
-                                        getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_novice), 1);
+                                        Games.Achievements.increment(getGamesClient(), getString(R.string.achievement_novice), 1);
 
                                         // Unlock the Intermediate achievement!
-                                        getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_intermediate), 1);
+                                        Games.Achievements.increment(getGamesClient(), getString(R.string.achievement_intermediate), 1);
 
                                         // Unlock the Expert achievement!
                                         if(player.getType().equals(Player.Human)) {
-                                            getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_expert), 1);
+                                            Games.Achievements.increment(getGamesClient(), getString(R.string.achievement_expert), 1);
                                         }
 
                                         // Unlock the Insane achievement!
                                         if(player.getType().equals(Player.Human)) {
-                                            getMainActivity().getGamesClient().incrementAchievement(getString(R.string.achievement_insane), 1);
+                                            Games.Achievements.increment(getGamesClient(), getString(R.string.achievement_insane), 1);
                                         }
 
                                         // Unlock the Net achievement
                                         if(player.getType().equals(Player.Net) || game.getOtherPlayer(player).getType().equals(Player.Net)) {
-                                            getMainActivity().getGamesClient().unlockAchievement(getString(R.string.achievement_net));
+                                            Games.Achievements.unlock(getGamesClient(), getString(R.string.achievement_net));
                                         }
                                     }
                                     catch(Exception e) {
@@ -502,14 +503,14 @@ public class GameFragment extends HexFragment {
     protected void setName(PlayingEntity player, boolean guest) {
         if(guest) {
             if(player.getTeam() == 1) {
-                player.setName(Settings.getPlayer1Name(getMainActivity(), getMainActivity().getGamesClient()));
+                player.setName(Settings.getPlayer1Name(getMainActivity(), getGamesClient()));
             }
             else {
                 player.setName(Settings.getPlayer2Name(getMainActivity()));
             }
         }
         else {
-            player.setName(Settings.getPlayer1Name(getMainActivity(), getMainActivity().getGamesClient()));
+            player.setName(Settings.getPlayer1Name(getMainActivity(), getGamesClient()));
         }
     }
 
@@ -600,7 +601,12 @@ public class GameFragment extends HexFragment {
         if(game == null) return true;
         if(game.gameOptions.gridSize == 1) return true;
         if(gameLocation == GameAction.LOCAL_GAME) {
-            return (Integer.valueOf(prefs.getString("gameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE))) != game.gameOptions.gridSize && Integer.valueOf(prefs.getString("gameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE))) != 0) || (Integer.valueOf(prefs.getString("customGameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE))) != game.gameOptions.gridSize && Integer.valueOf(prefs.getString("gameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE))) == 0) || Integer.valueOf(prefs.getString("timerTypePref", getString(R.integer.DEFAULT_TIMER_TYPE))) != game.gameOptions.timer.type || Integer.valueOf(prefs.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME))) * 60 * 1000 != game.gameOptions.timer.totalTime;
+            return (Integer.valueOf(prefs.getString("gameSizePref", Integer.toString(getResources().getInteger(R.integer.DEFAULT_BOARD_SIZE)))) != game.gameOptions.gridSize
+                    && Integer.valueOf(prefs.getString("gameSizePref", Integer.toString(getResources().getInteger(R.integer.DEFAULT_BOARD_SIZE)))) != 0)
+                    || (Integer.valueOf(prefs.getString("customGameSizePref", Integer.toString(getResources().getInteger(R.integer.DEFAULT_BOARD_SIZE)))) != game.gameOptions.gridSize
+                    && Integer.valueOf(prefs.getString("gameSizePref", Integer.toString(getResources().getInteger(R.integer.DEFAULT_BOARD_SIZE)))) == 0)
+                    || Integer.valueOf(prefs.getString("timerTypePref", getString(R.integer.DEFAULT_TIMER_TYPE))) != game.gameOptions.timer.type
+                    || Integer.valueOf(prefs.getString("timerPref", Integer.toString(getResources().getInteger(R.integer.DEFAULT_TIMER_TIME)))) * 60 * 1000 != game.gameOptions.timer.totalTime;
         }
         else if(gameLocation == GameAction.NET_GAME) {
             return(game != null && game.isGameOver());

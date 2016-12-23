@@ -28,7 +28,7 @@ public abstract class BaseGameActivity extends FragmentActivity implements Googl
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         mSignedIn = true;
-        onSignInSucceeded();
+        onSignInSucceeded(bundle);
     }
 
     @Override
@@ -59,7 +59,7 @@ public abstract class BaseGameActivity extends FragmentActivity implements Googl
         Games.signOut(mGoogleApiClient);
     }
 
-    public void onSignInSucceeded() {
+    public void onSignInSucceeded(@Nullable Bundle bundle) {
 
     }
 

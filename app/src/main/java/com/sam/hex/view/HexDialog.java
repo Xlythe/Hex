@@ -6,13 +6,20 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 
-import com.android.vending.billing.util.IabResult;
-import com.sam.hex.PurchaseActivity;
+import com.android.vending.billing.util.PurchaseActivity;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Will Harmon
  **/
 public abstract class HexDialog extends PurchaseActivity {
+    private static final String KEY = "YOUR_KEY_HERE";
+    public static final String ITEM_SKU_BASIC = "bronze_donation";
+    public static final String ITEM_SKU_INTERMEDIATE = "silver_donation";
+    public static final String ITEM_SKU_ADVANCED = "gold_donation";
+
     private HexDialogView view;
 
     private Context context;
@@ -23,6 +30,21 @@ public abstract class HexDialog extends PurchaseActivity {
 
     public HexDialog() {
         super();
+    }
+
+    @Override
+    protected String getKey() {
+        return KEY;
+    }
+
+    @Override
+    protected List<String> getSkus() {
+        return Arrays.asList(ITEM_SKU_BASIC, ITEM_SKU_INTERMEDIATE, ITEM_SKU_ADVANCED);
+    }
+
+    @Override
+    protected void skuFound(String sku, boolean found) {
+        // Do nothing
     }
 
     @Override
@@ -58,18 +80,6 @@ public abstract class HexDialog extends PurchaseActivity {
         negative.setOnClickListener(getNegativeOnClickListener());
         neutral.setOnClickListener(getNeutralOnClickListener());
     }
-
-    @Override
-    protected void dealWithIabSetupSuccess() {}
-
-    @Override
-    protected void dealWithIabSetupFailure() {}
-
-    @Override
-    protected void dealWithPurchaseSuccess(IabResult result, String sku) {}
-
-    @Override
-    protected void dealWithPurchaseFailed(IabResult result) {}
 
     public abstract View getPositiveView();
 

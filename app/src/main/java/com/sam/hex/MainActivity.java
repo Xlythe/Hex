@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
@@ -107,8 +108,8 @@ public class MainActivity extends NetActivity {
     }
 
     @Override
-    public void onSignInSucceeded() {
-        super.onSignInSucceeded();
+    public void onSignInSucceeded(@Nullable Bundle bundle) {
+        super.onSignInSucceeded(bundle);
         mIsSignedIn = true;
 
         //getAppStateClient().loadState(this, STAT_STATE);

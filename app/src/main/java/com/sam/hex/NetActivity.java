@@ -36,6 +36,7 @@ import com.google.android.gms.common.api.ResolvingResultCallbacks;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesActivityResultCodes;
+import com.google.android.gms.games.GamesStatusCodes;
 import com.google.android.gms.games.multiplayer.Invitation;
 import com.google.android.gms.games.multiplayer.Multiplayer;
 import com.google.android.gms.games.multiplayer.OnInvitationReceivedListener;
@@ -46,8 +47,6 @@ import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateListener;
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateListener;
-import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig;
-import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer;
 import com.hex.core.Game;
 import com.hex.core.Game.GameOptions;
 import com.hex.core.PlayerObject;
@@ -115,20 +114,14 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
      * react by going to our main screen.
      */
     @Override
-    public void onSignInSucceeded() {
+    public void onSignInSucceeded(@Nullable Bundle bundle) {
         Log.d(TAG, "Sign-in succeeded.");
 
-        // install invitation listener so we get notified if we receive an
-        // invitation to play
-        // a game.
-        Games.TurnBasedMultiplayer.invi
-        getGamesClient().registerInvitationListener(this);
-
-        // if we received an invite via notification, accept it; otherwise, go
-        // to main screen
-        if(getInvitationId() != null) {
-            acceptInviteToRoom(getInvitationId());
-            return;
+        if (bundle != null) {
+            Invitation inv = bundle.getParcelable(Multiplayer.EXTRA_INVITATION);
+            if (inv != null) {
+                acceptInviteToRoom(inv.getInvitationId());
+            }
         }
     }
 
@@ -136,10 +129,12 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         // quick-start a game with 1 randomly selected opponent
         final int MIN_OPPONENTS = 1, MAX_OPPONENTS = 1;
         Bundle autoMatchCriteria = RoomConfig.createAutoMatchCriteria(MIN_OPPONENTS, MAX_OPPONENTS, 0);
+        RoomConfig.Builder roomConfigBuilder = RoomConfig.builder(this)
+                .setMessageReceivedListener(this)
+                .setRoomStatusUpdateListener(this)
+                .setAutoMatchCriteria(autoMatchCriteria);
         keepScreenOn();
-        Games.TurnBasedMultiplayer.createMatch(getClient(), TurnBasedMatchConfig.builder()
-                .setAutoMatchCriteria(autoMatchCriteria)
-                .build());
+        Games.RealTimeMultiplayer.create(getClient(), roomConfigBuilder.build());
     }
 
     @Override
@@ -214,25 +209,14 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
 
         // create the room
         Log.d(TAG, "Creating room...");
-        TurnBasedMatchConfig tbmc = TurnBasedMatchConfig.builder()
-                .addInvitedPlayers(invitees)
-                .setAutoMatchCriteria(autoMatchCriteria)
-                .build();
-
         keepScreenOn();
-        Games.TurnBasedMultiplayer
-                .createMatch(getClient(), tbmc)
-                .setResultCallback(new ResolvingResultCallbacks<TurnBasedMultiplayer.InitiateMatchResult>(this, RC_AWAITING_SELECT_PLAYERS) {
-                    @Override
-                    public void onSuccess(@NonNull TurnBasedMultiplayer.InitiateMatchResult initiateMatchResult) {
-                        Log.d("TEST", "Success");
-                    }
 
-                    @Override
-                    public void onUnresolvableFailure(@NonNull Status status) {
-                        Log.d("TEST", "Failure");
-                    }
-                });
+        RoomConfig.Builder roomConfigBuilder = RoomConfig.builder(this)
+                .setMessageReceivedListener(this)
+                .setRoomStatusUpdateListener(this)
+                .addPlayersToInvite(invitees)
+                .setAutoMatchCriteria(autoMatchCriteria);
+        Games.RealTimeMultiplayer.create(getClient(), roomConfigBuilder.build());
         Log.d(TAG, "Room created, waiting for it to be ready...");
     }
 
@@ -246,25 +230,29 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         }
 
         Log.d(TAG, "Invitation inbox UI succeeded.");
-        Invitation inv = data.getExtras().getParcelable(GamesClient.EXTRA_INVITATION);
-
-        // accept invitation
-        acceptInviteToRoom(inv.getInvitationId());
+        Invitation inv = data.getExtras().getParcelable(Multiplayer.EXTRA_INVITATION);
+        if (inv != null) {
+            // accept invitation
+            acceptInviteToRoom(inv.getInvitationId());
+        }
     }
 
     // Accept the given invitation.
     void acceptInviteToRoom(String invId) {
-        // accept the invitation
         Log.d(TAG, "Accepting invitation: " + invId);
         keepScreenOn();
-        Games.TurnBasedMultiplayer.acceptInvitation(getClient(), invId);
+
+        RoomConfig.Builder roomConfigBuilder = RoomConfig.builder(this)
+                .setMessageReceivedListener(this)
+                .setRoomStatusUpdateListener(this)
+                .setInvitationIdToAccept(invId);
+
+        Games.RealTimeMultiplayer.join(getClient(), roomConfigBuilder.build());
     }
 
     // Activity is going to the background. We have to leave the current room.
     @Override
     public void onStop() {
-        Log.d(TAG, "**** got onStop");
-
         // if we're in a room, leave it.
         leaveRoom();
 
@@ -291,7 +279,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         Log.d(TAG, "Leaving room.");
         stopKeepingScreenOn();
         if(mRoomId != null) {
-            getGamesClient().leaveRoom(this, mRoomId);
+            Games.RealTimeMultiplayer.leave(getClient(), null, mRoomId);
             mRoomId = null;
         }
     }
@@ -304,7 +292,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
 
         // minimum number of players required for our game
         final int MIN_PLAYERS = 2;
-        Intent i = getGamesClient().getRealTimeWaitingRoomIntent(room, MIN_PLAYERS);
+        Intent i = Games.RealTimeMultiplayer.getWaitingRoomIntent(getClient(), room, MIN_PLAYERS);
 
         // show waiting room UI
         startActivityForResult(i, RC_WAITING_ROOM);
@@ -364,7 +352,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         // get room ID, participants and my ID:
         mRoomId = room.getRoomId();
         mParticipants = room.getParticipants();
-        mMyId = room.getParticipantId(getGamesClient().getCurrentPlayerId());
+        mMyId = room.getParticipantId(Games.Players.getCurrentPlayerId(getClient()));
 
         // print out the list of participants (for debug purposes)
         Log.d(TAG, "Room ID: " + mRoomId);
@@ -395,7 +383,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     @Override
     public void onRoomCreated(int statusCode, Room room) {
         Log.d(TAG, "onRoomCreated(" + statusCode + ", " + room + ")");
-        if(statusCode != GamesClient.STATUS_OK) {
+        if(statusCode != GamesStatusCodes.STATUS_OK) {
             Log.e(TAG, "*** Error: onRoomCreated, status " + statusCode);
             return;
         }
@@ -408,7 +396,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     @Override
     public void onRoomConnected(int statusCode, Room room) {
         Log.d(TAG, "onRoomConnected(" + statusCode + ", " + room + ")");
-        if(statusCode != GamesClient.STATUS_OK) {
+        if(statusCode != GamesStatusCodes.STATUS_OK) {
             Log.e(TAG, "*** Error: onRoomConnected, status " + statusCode);
             return;
         }
@@ -418,7 +406,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     @Override
     public void onJoinedRoom(int statusCode, Room room) {
         Log.d(TAG, "onJoinedRoom(" + statusCode + ", " + room + ")");
-        if(statusCode != GamesClient.STATUS_OK) {
+        if(statusCode != GamesStatusCodes.STATUS_OK) {
             Log.e(TAG, "*** Error: onRoomConnected, status " + statusCode);
             return;
         }
@@ -550,7 +538,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         for(Participant p : mParticipants) {
             if(p.getParticipantId().equals(mMyId)) continue;
             if(p.getStatus() != Participant.STATUS_JOINED) continue;
-            getGamesClient().sendReliableRealTimeMessage(null, message, mRoomId, p.getParticipantId());
+            Games.RealTimeMultiplayer.sendReliableMessage(getClient(), null, message, mRoomId, p.getParticipantId());
         }
     }
 
@@ -561,7 +549,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         for(Participant p : mParticipants) {
             if(p.getParticipantId().equals(mMyId)) continue;
             if(p.getStatus() != Participant.STATUS_JOINED) continue;
-            getGamesClient().sendReliableRealTimeMessage(null, message, mRoomId, p.getParticipantId());
+            Games.RealTimeMultiplayer.sendReliableMessage(getClient(), null, message, mRoomId, p.getParticipantId());
         }
     }
 
@@ -744,5 +732,20 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     @Override
     public void onCancel(DialogInterface dialog) {
         mShowingDialog = false;
+    }
+
+    @Override
+    public void onP2PConnected(String s) {
+
+    }
+
+    @Override
+    public void onP2PDisconnected(String s) {
+
+    }
+
+    @Override
+    public void onInvitationRemoved(String s) {
+        
     }
 }

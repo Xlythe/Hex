@@ -6,6 +6,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.vending.billing.util.IabResult;
+import com.android.vending.billing.util.Purchase;
 import com.sam.hex.R;
 import com.sam.hex.Stats;
 import com.sam.hex.view.HexDialogView.Button.OnClickListener;
@@ -104,30 +105,25 @@ public class DonateDialog extends HexDialog {
     }
 
     @Override
-    protected void dealWithIabSetupSuccess() {}
+    protected void onPurchaseSuccess(IabResult result, Purchase info) {
+        String sku = info.getSku();
 
-    @Override
-    protected void dealWithIabSetupFailure() {}
-
-    @Override
-    protected void dealWithPurchaseSuccess(IabResult result, String sku) {
         int amount = 0;
-        if(sku.equals(ITEM_SKU_BASIC)) {
-            amount = 1;
-        }
-        else if(sku.equals(ITEM_SKU_INTERMEDIATE)) {
-            amount = 3;
-        }
-        else if(sku.equals(ITEM_SKU_ADVANCED)) {
-            amount = 5;
+        switch (sku) {
+            case ITEM_SKU_BASIC:
+                amount = 1;
+                break;
+            case ITEM_SKU_INTERMEDIATE:
+                amount = 3;
+                break;
+            case ITEM_SKU_ADVANCED:
+                amount = 5;
+                break;
         }
         Stats.incrementDonationRank(this, amount);
 
         dismiss();
     }
-
-    @Override
-    protected void dealWithPurchaseFailed(IabResult result) {}
 
     @Override
     public float getPositiveXPercent() {

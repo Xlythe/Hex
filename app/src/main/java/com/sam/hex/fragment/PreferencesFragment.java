@@ -12,6 +12,7 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,7 +48,7 @@ public class PreferencesFragment extends PreferenceFragment {
 
     private class DifficultyListener implements OnPreferenceChangeListener {
         @Override
-        public boolean onPreferenceChange(Preference preference, Object newValue) {
+        public boolean onPreferenceChange(@NonNull Preference preference, @NonNull Object newValue) {
             preference.setSummary(getResources().getStringArray(R.array.comDifficultyArray)[Integer.valueOf(newValue.toString())]);
             return true;
         }
@@ -55,13 +56,12 @@ public class PreferencesFragment extends PreferenceFragment {
 
     private class GridListener implements OnPreferenceChangeListener {
         @Override
-        public boolean onPreferenceChange(Preference preference, Object newValue) {
-            if(newValue.toString().equals("0")) {
+        public boolean onPreferenceChange(@NonNull Preference preference, @NonNull Object newValue) {
+            if (newValue.toString().equals("0")) {
                 // Custom value needed
                 showInputDialog(getString(R.string.preferences_summary_custom_game_size));
                 return false;
-            }
-            else {
+            } else {
                 preference.setSummary(String.format(getString(R.string.preferences_summary_game_size), newValue, newValue));
                 return true;
             }
@@ -80,10 +80,9 @@ public class PreferencesFragment extends PreferenceFragment {
             timerType.setOnItemSelectedListener(new OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int arg2, long arg3) {
-                    if(arg2 > 0) {
+                    if (arg2 > 0) {
                         timer.setVisibility(View.VISIBLE);
-                    }
-                    else {
+                    } else {
                         timer.setVisibility(View.GONE);
                     }
                 }
@@ -98,7 +97,7 @@ public class PreferencesFragment extends PreferenceFragment {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     String timerTime = timer.getText().toString();
-                    if(timerTime.isEmpty()) timerTime = "0";
+                    if (timerTime.isEmpty()) timerTime = "0";
                     settings.edit().putString("timerTypePref", getResources().getStringArray(R.array.timerTypeValues)[timerType.getSelectedItemPosition()])
                             .commit();
                     settings.edit().putString("timerPref", timerTime).commit();
@@ -111,7 +110,7 @@ public class PreferencesFragment extends PreferenceFragment {
     private void setListeners() {
         // Allow for custom grid sizes
         gridPref = findPreference("gameSizePref");
-        if(gridPref != null) {
+        if (gridPref != null) {
             String boardSize = String.valueOf(Settings.getGridSize(getActivity()));
             gridPref.setSummary(String.format(getString(R.string.preferences_summary_game_size), boardSize, boardSize));
             gridPref.setOnPreferenceChangeListener(new GridListener());
@@ -119,12 +118,12 @@ public class PreferencesFragment extends PreferenceFragment {
 
         // Give a custom popup for timers
         timerPref = findPreference("timerOptionsPref");
-        if(timerPref != null) {
+        if (timerPref != null) {
             timerPref.setOnPreferenceClickListener(new TimerListener());
         }
 
         Preference comDifficultyPref = findPreference("comDifficulty");
-        if(comDifficultyPref != null) {
+        if (comDifficultyPref != null) {
             comDifficultyPref.setOnPreferenceChangeListener(new DifficultyListener());
             comDifficultyPref.setSummary(getResources().getStringArray(R.array.comDifficultyArray)[Settings.getComputerDifficulty(getActivity())]);
         }
@@ -136,7 +135,7 @@ public class PreferencesFragment extends PreferenceFragment {
 
     /**
      * Popup for custom grid sizes
-     * */
+     */
     private void showInputDialog(String message) {
         final EditText editText = new EditText(getActivity());
         editText.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -144,12 +143,11 @@ public class PreferencesFragment extends PreferenceFragment {
         builder.setTitle(message).setView(editText).setPositiveButton(getString(R.string.okay), new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if(!editText.getText().toString().equals("")) {
+                if (!editText.getText().toString().equals("")) {
                     int input = Integer.decode(editText.getText().toString());
-                    if(input > 30) {
+                    if (input > 30) {
                         input = 30;
-                    }
-                    else if(input < 4) {
+                    } else if (input < 4) {
                         input = 4;
                     }
                     settings.edit().putString("customGameSizePref", String.valueOf(input)).commit();

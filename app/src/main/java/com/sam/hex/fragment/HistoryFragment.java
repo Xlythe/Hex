@@ -13,6 +13,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,19 +36,19 @@ import com.sam.hex.R;
  **/
 public class HistoryFragment extends HexFragment {
     private Item[] fileList;
+    @NonNull
     public static File path = new File(Environment.getExternalStorageDirectory() + File.separator + "Hex" + File.separator);
     public static String chosenFile;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.fragment_history, null);
 
         GridView games = (GridView) v.findViewById(R.id.games);
         try {
             loadFileList();
-        }
-        catch(NullPointerException e) {
+        } catch (NullPointerException e) {
             e.printStackTrace();
         }
         games.setAdapter(new HistoryAdapter(getMainActivity(), fileList));
@@ -63,16 +65,15 @@ public class HistoryFragment extends HexFragment {
     private void loadFileList() {
         try {
             path.mkdirs();
-        }
-        catch(SecurityException e) {
+        } catch (SecurityException e) {
             e.printStackTrace();
         }
 
         // Checks whether path exists
-        if(path.exists()) {
+        if (path.exists()) {
             FilenameFilter filter = new FilenameFilter() {
                 @Override
-                public boolean accept(File dir, String filename) {
+                public boolean accept(File dir, @NonNull String filename) {
                     File sel = new File(dir, filename);
                     // Filters based on whether the file is hidden or not
                     return (sel.isFile() || sel.isDirectory()) && !sel.isHidden();
@@ -82,14 +83,14 @@ public class HistoryFragment extends HexFragment {
 
             String[] fList = path.list(filter);
             fileList = new Item[fList.length];
-            for(int i = 0; i < fList.length; i++) {
+            for (int i = 0; i < fList.length; i++) {
                 fileList[i] = new Item(fList[i]);
             }
         }
 
         Arrays.sort(fileList, new Comparator<Item>() {
             @Override
-            public int compare(Item f1, Item f2) {
+            public int compare(@NonNull Item f1, @NonNull Item f2) {
                 return f2.file.compareTo(f1.file);
             }
         });
@@ -115,8 +116,7 @@ public class HistoryFragment extends HexFragment {
             getMainActivity().setGameFragment(new GameFragment());
             getMainActivity().getGameFragment().setArguments(b);
             getMainActivity().swapFragment(getMainActivity().getGameFragment());
-        }
-        catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(getMainActivity(), R.string.game_toast_failed, Toast.LENGTH_SHORT).show();
         }
@@ -132,29 +132,30 @@ public class HistoryFragment extends HexFragment {
             this.files = files;
         }
 
-        public View getView(int position, View convertView, ViewGroup parent) {
+        @Nullable
+        public View getView(int position, @Nullable View convertView, ViewGroup parent) {
             final Item i = files[position];
             final View v = convertView != null ? convertView : View.inflate(context, R.layout.view_history_item, null);
 
             // Load up the game so we can get information
-            if(i.title == null || i.date == null || i.color == 0) {
+            if (i.title == null || i.date == null || i.color == 0) {
                 try {
                     final Handler h = new Handler();
                     Game g = Game.load(FileUtil.loadGameAsString(path + File.separator + i.file));
                     g.setGameListener(new GameListener() {
                         @Override
-                        public void startTimer() {}
+                        public void startTimer() {
+                        }
 
                         @Override
-                        public void onWin(PlayingEntity player) {
+                        public void onWin(@NonNull PlayingEntity player) {
                             i.color = player.getTeam();
                             h.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    if(i.color == 1) {
+                                    if (i.color == 1) {
                                         v.setBackgroundResource(R.drawable.history_background_red);
-                                    }
-                                    else if(i.color == 2) {
+                                    } else if (i.color == 2) {
                                         v.setBackgroundResource(R.drawable.history_background_blue);
                                     }
                                 }
@@ -162,35 +163,42 @@ public class HistoryFragment extends HexFragment {
                         }
 
                         @Override
-                        public void onUndo() {}
+                        public void onUndo() {
+                        }
 
                         @Override
-                        public void onTurn(PlayingEntity player) {}
+                        public void onTurn(PlayingEntity player) {
+                        }
 
                         @Override
-                        public void onStop() {}
+                        public void onStop() {
+                        }
 
                         @Override
-                        public void onStart() {}
+                        public void onStart() {
+                        }
 
                         @Override
-                        public void onReplayStart() {}
+                        public void onReplayStart() {
+                        }
 
                         @Override
-                        public void onReplayEnd() {}
+                        public void onReplayEnd() {
+                        }
 
                         @Override
-                        public void onClear() {}
+                        public void onClear() {
+                        }
 
                         @Override
-                        public void displayTime(int minutes, int seconds) {}
+                        public void displayTime(int minutes, int seconds) {
+                        }
                     });
                     g.replay(0);
                     i.title = context.getString(R.string.auto_saved_title, g.getPlayer1().getName(), g.getPlayer2().getName());
                     i.date = DATE_FORMAT.format(new Date(g.getGameStart()));
                     i.color = -1;
-                }
-                catch(Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     i.title = "";
                     i.date = context.getString(R.string.game_toast_failed);
@@ -204,13 +212,11 @@ public class HistoryFragment extends HexFragment {
             title.setText(i.title);
             date.setText(i.date);
 
-            if(i.color == 1) {
+            if (i.color == 1) {
                 v.setBackgroundResource(R.drawable.history_background_red);
-            }
-            else if(i.color == 2) {
+            } else if (i.color == 2) {
                 v.setBackgroundResource(R.drawable.history_background_blue);
-            }
-            else {
+            } else {
                 v.setBackgroundResource(R.drawable.history_background_black);
             }
 
@@ -219,7 +225,7 @@ public class HistoryFragment extends HexFragment {
 
         @Override
         public int getCount() {
-            if(files != null) return files.length;
+            if (files != null) return files.length;
             else return 0;
         }
 

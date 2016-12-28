@@ -2,6 +2,8 @@ package com.sam.hex.view;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -36,7 +38,7 @@ public class GameOverDialog extends HexDialog {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(DISMISS_DIALOG) {
+        if (DISMISS_DIALOG) {
             dismiss();
         }
     }
@@ -65,7 +67,7 @@ public class GameOverDialog extends HexDialog {
     public View getNeutralView() {
         View v = View.inflate(this, R.layout.dialog_view_game_over, null);
         // Catch for resuming an activity after minimizing it too long
-        if(FRAGMENT == null) return v;
+        if (FRAGMENT == null) return v;
 
         TextView action = (TextView) v.findViewById(R.id.action);
         TextView time = (TextView) v.findViewById(R.id.time);
@@ -81,7 +83,7 @@ public class GameOverDialog extends HexDialog {
         action.setText(getString(R.string.game_over_action, actionText));
         time.setText(getString(R.string.game_over_length, hours, minutes, seconds));
 
-        if(game.getPlayer1().getType().equals(Player.Human) && game.getPlayer2().getType().equals(Player.Human)) {
+        if (game.getPlayer1().getType().equals(Player.Human) && game.getPlayer2().getType().equals(Player.Human)) {
             TextView player = (TextView) v.findViewById(R.id.player);
             player.setText(winner.getName());
         }
@@ -89,6 +91,7 @@ public class GameOverDialog extends HexDialog {
         return v;
     }
 
+    @NonNull
     @Override
     public OnClickListener getPositiveOnClickListener() {
         return new OnClickListener() {
@@ -100,6 +103,7 @@ public class GameOverDialog extends HexDialog {
         };
     }
 
+    @NonNull
     @Override
     public OnClickListener getNegativeOnClickListener() {
         return new OnClickListener() {
@@ -111,6 +115,7 @@ public class GameOverDialog extends HexDialog {
         };
     }
 
+    @Nullable
     @Override
     public OnClickListener getNeutralOnClickListener() {
         return null;

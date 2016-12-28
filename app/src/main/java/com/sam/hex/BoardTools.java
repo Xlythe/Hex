@@ -6,7 +6,7 @@ public class BoardTools {
         double spaceH = n + (n - 1) / 2; // always bigger.
         spaceH = (w / (spaceH * Math.sqrt(3)));
         spaceV = (h / spaceV);
-        if(spaceV < spaceH) {
+        if (spaceV < spaceH) {
             return spaceV;
         }
         return spaceH;

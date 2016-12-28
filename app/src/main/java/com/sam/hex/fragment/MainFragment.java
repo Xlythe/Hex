@@ -2,6 +2,7 @@ package com.sam.hex.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,9 +42,11 @@ public class MainFragment extends HexFragment {
     SignInButton mSignInButton;
     Button mSignOutButton;
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         getMainActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         View v = inflater.inflate(R.layout.fragment_main, null);
@@ -121,11 +124,10 @@ public class MainFragment extends HexFragment {
         achievementsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                if(getMainActivity().isSignedIn()) {
+                if (getMainActivity().isSignedIn()) {
                     startActivityForResult(Games.Achievements.getAchievementsIntent(getMainActivity().getClient()), MainActivity.RC_ACHIEVEMENTS);
                     getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                }
-                else {
+                } else {
                     getMainActivity().setOpenAchievements(true);
                     getMainActivity().beginUserInitiatedSignIn();
                 }
@@ -187,15 +189,18 @@ public class MainFragment extends HexFragment {
     private void refreshPlayerInformation() {
         try {
             // Network is async, no promise that we won't lose connectivity
-            if(getMainActivity() == null) return;
-            if(mSignOutButton != null) mSignOutButton.setVisibility(getMainActivity().isSignedIn() ? View.VISIBLE : View.GONE);
-            if(mSignInButton != null) mSignInButton.setVisibility(getMainActivity().isSignedIn() ? View.GONE : View.VISIBLE);
-            if(mTitleTextView != null) mTitleTextView.setText(String.format(getString(R.string.main_title),
-                    Settings.getPlayer1Name(getMainActivity(), getMainActivity().getClient())));
-            if(mHexagonLayout != null) mHexagonLayout.invalidate();
-            if(mTimePlayedTextView != null && mGamesPlayedTextView != null && mGamesWonTextView != null) showStats();
-        }
-        catch(IllegalStateException e) {
+            if (getMainActivity() == null) return;
+            if (mSignOutButton != null)
+                mSignOutButton.setVisibility(getMainActivity().isSignedIn() ? View.VISIBLE : View.GONE);
+            if (mSignInButton != null)
+                mSignInButton.setVisibility(getMainActivity().isSignedIn() ? View.GONE : View.VISIBLE);
+            if (mTitleTextView != null)
+                mTitleTextView.setText(String.format(getString(R.string.main_title),
+                        Settings.getPlayer1Name(getMainActivity(), getMainActivity().getClient())));
+            if (mHexagonLayout != null) mHexagonLayout.invalidate();
+            if (mTimePlayedTextView != null && mGamesPlayedTextView != null && mGamesWonTextView != null)
+                showStats();
+        } catch (IllegalStateException e) {
             e.printStackTrace();
         }
     }
@@ -220,13 +225,11 @@ public class MainFragment extends HexFragment {
         int donationAmount = Stats.getDonationRank(getMainActivity());
         int resource = R.drawable.donate_hollow;
 
-        if(donationAmount >= 5) {
+        if (donationAmount >= 5) {
             resource = R.drawable.donate_gold;
-        }
-        else if(donationAmount >= 3) {
+        } else if (donationAmount >= 3) {
             resource = R.drawable.donate_silver;
-        }
-        else if(donationAmount >= 1) {
+        } else if (donationAmount >= 1) {
             resource = R.drawable.donate_bronze;
         }
 

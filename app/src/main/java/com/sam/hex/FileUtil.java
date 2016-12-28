@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.Locale;
 
 import android.os.Environment;
+import android.support.annotation.NonNull;
 
 import com.hex.core.Game;
 
@@ -16,13 +17,13 @@ import com.hex.core.Game;
  * @author Will Harmon
  **/
 public class FileUtil {
-    public static Game loadGame(String fileName) throws IOException {
+    public static Game loadGame(@NonNull String fileName) throws IOException {
         File file = new File(fileName);
         StringBuilder text = new StringBuilder();
         BufferedReader br = new BufferedReader(new FileReader(file));
         String line;
 
-        while((line = br.readLine()) != null) {
+        while ((line = br.readLine()) != null) {
             text.append(line);
             text.append('\n');
         }
@@ -30,13 +31,13 @@ public class FileUtil {
         return Game.load(text.toString());
     }
 
-    public static String loadGameAsString(String fileName) throws IOException {
+    public static String loadGameAsString(@NonNull String fileName) throws IOException {
         File file = new File(fileName);
         StringBuilder text = new StringBuilder();
         BufferedReader br = new BufferedReader(new FileReader(file));
         String line;
 
-        while((line = br.readLine()) != null) {
+        while ((line = br.readLine()) != null) {
             text.append(line);
             text.append('\n');
         }
@@ -44,15 +45,15 @@ public class FileUtil {
         return text.toString();
     }
 
-    public static void saveGame(String fileName, String gameState) throws IOException {
-        if(!fileName.toLowerCase(Locale.getDefault()).endsWith(".rhex")) {
+    public static void saveGame(@NonNull String fileName, String gameState) throws IOException {
+        if (!fileName.toLowerCase(Locale.getDefault()).endsWith(".rhex")) {
             fileName = fileName + ".rhex";
         }
         fileName = Environment.getExternalStorageDirectory() + File.separator + "Hex" + File.separator + fileName;
         FileUtil.createDirIfNoneExists(File.separator + "Hex" + File.separator);
 
         File saveFile = new File(fileName);
-        if(!saveFile.exists()) {
+        if (!saveFile.exists()) {
             saveFile.createNewFile();
 
             // BufferedWriter for performance, true to set append to file flag
@@ -62,15 +63,15 @@ public class FileUtil {
         }
     }
 
-    public static void autoSaveGame(String fileName, String gameState) throws IOException {
-        if(!fileName.toLowerCase(Locale.getDefault()).endsWith(".rhex")) {
+    public static void autoSaveGame(@NonNull String fileName, String gameState) throws IOException {
+        if (!fileName.toLowerCase(Locale.getDefault()).endsWith(".rhex")) {
             fileName = fileName + ".rhex";
         }
         fileName = Environment.getExternalStorageDirectory() + File.separator + "Hex" + File.separator + fileName;
         FileUtil.createDirIfNoneExists(File.separator + "Hex" + File.separator);
 
         File saveFile = new File(fileName);
-        if(!saveFile.exists()) {
+        if (!saveFile.exists()) {
             saveFile.createNewFile();
         }
         // BufferedWriter for performance, true to set append to file flag
@@ -79,12 +80,12 @@ public class FileUtil {
         buf.close();
     }
 
-    public static boolean createDirIfNoneExists(String path) {
+    public static boolean createDirIfNoneExists(@NonNull String path) {
         boolean ret = true;
 
         File file = new File(Environment.getExternalStorageDirectory(), path);
-        if(!file.exists()) {
-            if(!file.mkdirs()) {
+        if (!file.exists()) {
+            if (!file.mkdirs()) {
                 ret = false;
             }
         }

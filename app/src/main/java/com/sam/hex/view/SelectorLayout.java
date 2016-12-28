@@ -9,6 +9,7 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.PathShape;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -60,7 +61,7 @@ public class SelectorLayout extends View implements OnTouchListener {
         DisplayMetrics dm = getResources().getDisplayMetrics();
         setOnTouchListener(this);
         mButtons = new Button[3];
-        for(int i = 0; i < mButtons.length; i++) {
+        for (int i = 0; i < mButtons.length; i++) {
             mButtons[i] = new Button(getContext());
         }
         mDisabledColor = getDarkerColor(Color.LTGRAY);
@@ -78,8 +79,8 @@ public class SelectorLayout extends View implements OnTouchListener {
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                for(Button b : mButtons) {
-                    if(b.isSelected() || b.isPressed()) {
+                for (Button b : mButtons) {
+                    if (b.isSelected() || b.isPressed()) {
                         b.setAnimate(true);
                     }
                 }
@@ -90,13 +91,12 @@ public class SelectorLayout extends View implements OnTouchListener {
         setOnFocusChangeListener(new OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus) {
+                if (hasFocus) {
                     mFocusedButton = 0;
                     mButtons[0].setSelected(true);
                     invalidate();
-                }
-                else {
-                    if(mFocusedButton != -1) {
+                } else {
+                    if (mFocusedButton != -1) {
                         mButtons[mFocusedButton].setSelected(false);
                         invalidate();
                     }
@@ -108,78 +108,74 @@ public class SelectorLayout extends View implements OnTouchListener {
     @Override
     public View focusSearch(int direction) {
         mButtons[mFocusedButton].setSelected(false);
-        switch(direction) {
-        case View.FOCUS_RIGHT:
-            switch(mFocusedButton) {
-            case 0:
-                mFocusedButton = 1;
-                mButtons[mFocusedButton].setSelected(true);
-                invalidate();
-                return this;
-            case 1:
-                mFocusedButton = 2;
-                mButtons[mFocusedButton].setSelected(true);
-                invalidate();
-                return this;
-            }
-            break;
-        case View.FOCUS_LEFT:
-            switch(mFocusedButton) {
-            case 1:
-                mFocusedButton = 0;
-                mButtons[mFocusedButton].setSelected(true);
-                invalidate();
-                return this;
-            case 2:
-                mFocusedButton = 1;
-                mButtons[mFocusedButton].setSelected(true);
-                invalidate();
-                return this;
-            }
-            break;
-        case View.FOCUS_UP:
-            break;
-        case View.FOCUS_DOWN:
-            break;
-        case View.FOCUS_FORWARD:
-            break;
-        case View.FOCUS_BACKWARD:
-            break;
+        switch (direction) {
+            case View.FOCUS_RIGHT:
+                switch (mFocusedButton) {
+                    case 0:
+                        mFocusedButton = 1;
+                        mButtons[mFocusedButton].setSelected(true);
+                        invalidate();
+                        return this;
+                    case 1:
+                        mFocusedButton = 2;
+                        mButtons[mFocusedButton].setSelected(true);
+                        invalidate();
+                        return this;
+                }
+                break;
+            case View.FOCUS_LEFT:
+                switch (mFocusedButton) {
+                    case 1:
+                        mFocusedButton = 0;
+                        mButtons[mFocusedButton].setSelected(true);
+                        invalidate();
+                        return this;
+                    case 2:
+                        mFocusedButton = 1;
+                        mButtons[mFocusedButton].setSelected(true);
+                        invalidate();
+                        return this;
+                }
+                break;
+            case View.FOCUS_UP:
+                break;
+            case View.FOCUS_DOWN:
+                break;
+            case View.FOCUS_FORWARD:
+                break;
+            case View.FOCUS_BACKWARD:
+                break;
         }
         return super.focusSearch(direction);
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NonNull Canvas canvas) {
         canvas.rotate(mRotation);
-        for(int i = 0; i < mButtons.length; i++) {
-            if(!mButtons[i].isEnabled()) {
+        for (int i = 0; i < mButtons.length; i++) {
+            if (!mButtons[i].isEnabled()) {
                 mButtonDrawable[i].getPaint().setColor(mDisabledColor);
                 mMirrorButtonDrawable[i].getPaint().setColor(mDisabledColor);
-            }
-            else if(mButtons[i].isPressed()) {
+            } else if (mButtons[i].isPressed()) {
                 mButtonDrawable[i].getPaint().setColor(getDarkerColor(mButtons[i].getColor()));
                 mMirrorButtonDrawable[i].getPaint().setColor(getDarkerColor(mButtons[i].getColor()));
-            }
-            else if(mButtons[i].isSelected()) {
+            } else if (mButtons[i].isSelected()) {
                 mButtonDrawable[i].getPaint().setColor(getDarkerColor(mButtons[i].getColor()));
                 mMirrorButtonDrawable[i].getPaint().setColor(getDarkerColor(mButtons[i].getColor()));
-            }
-            else {
+            } else {
                 mButtonDrawable[i].getPaint().setColor(mButtons[i].getColor());
                 mMirrorButtonDrawable[i].getPaint().setColor(mButtons[i].getColor());
             }
 
-            if(mButtons[i].isAnimate()) {
-                if(mButtonDrawable[i].getBounds().bottom + 3 * mIndentHeight > 0) {
+            if (mButtons[i].isAnimate()) {
+                if (mButtonDrawable[i].getBounds().bottom + 3 * mIndentHeight > 0) {
                     mButtonDrawable[i].setBounds(mButtonDrawable[i].getBounds().left, mButtonDrawable[i].getBounds().top - mAnimationDelta,
                             mButtonDrawable[i].getBounds().right, mButtonDrawable[i].getBounds().bottom - mAnimationDelta);
                     mMirrorButtonDrawable[i].setBounds(mMirrorButtonDrawable[i].getBounds().left, mMirrorButtonDrawable[i].getBounds().top + mAnimationDelta,
                             mMirrorButtonDrawable[i].getBounds().right, mMirrorButtonDrawable[i].getBounds().bottom + mAnimationDelta);
                     mButtons[i].textX += mAnimationDelta;
                     postInvalidateDelayed(mAnimationTick);
-                }
-                else {
+                } else {
                     mButtons[i].setAnimate(false);
                     mButtons[i].performClick();
                 }
@@ -205,7 +201,7 @@ public class SelectorLayout extends View implements OnTouchListener {
         mOldMirrorRect = new Rect[mButtons.length];
         mOldTextPos = new Point[mButtons.length];
 
-        for(int i = 0; i < mButtons.length; i++) {
+        for (int i = 0; i < mButtons.length; i++) {
             Hexagon hex = new Hexagon(new Point(offset, mIndentHeight - 3 * offset), new Point(mWidth / 2 + offset, -3 * offset), new Point(mWidth + offset,
                     mIndentHeight - 3 * offset), new Point(mWidth + offset, h - offset), new Point(mWidth / 2 + offset, h - mIndentHeight - offset), new Point(
                     offset, h - offset));
@@ -258,29 +254,26 @@ public class SelectorLayout extends View implements OnTouchListener {
     }
 
     @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        if(event.getAction() == MotionEvent.ACTION_DOWN) {
-            for(Button b : mButtons) {
-                if(b.getHexagon().contains(new Point((int) event.getX(), (int) event.getY()))) {
+    public boolean onTouch(View v, @NonNull MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            for (Button b : mButtons) {
+                if (b.getHexagon().contains(new Point((int) event.getX(), (int) event.getY()))) {
                     b.setPressed(b.isEnabled());
-                }
-                else {
+                } else {
                     b.setPressed(false);
                 }
             }
-        }
-        else if(event.getAction() == MotionEvent.ACTION_UP) {
-            for(Button b : mButtons) {
-                if(b.isPressed()) {
+        } else if (event.getAction() == MotionEvent.ACTION_UP) {
+            for (Button b : mButtons) {
+                if (b.isPressed()) {
                     performClick();
                 }
                 b.setPressed(false);
             }
-        }
-        else {
-            for(Button b : mButtons) {
-                if(b.isPressed()) {
-                    if(!b.getHexagon().contains(new Point((int) event.getX(), (int) event.getY()))) {
+        } else {
+            for (Button b : mButtons) {
+                if (b.isPressed()) {
+                    if (!b.getHexagon().contains(new Point((int) event.getX(), (int) event.getY()))) {
                         b.setPressed(false);
                     }
                 }
@@ -303,8 +296,8 @@ public class SelectorLayout extends View implements OnTouchListener {
     }
 
     public void reset() {
-        if(mOldRect != null) {
-            for(int i = 0; i < mButtons.length; i++) {
+        if (mOldRect != null) {
+            for (int i = 0; i < mButtons.length; i++) {
                 mButtonDrawable[i].setBounds(mOldRect[i]);
                 mMirrorButtonDrawable[i].setBounds(mOldMirrorRect[i]);
                 mButtons[i].textX = mOldTextPos[i].x;
@@ -316,7 +309,9 @@ public class SelectorLayout extends View implements OnTouchListener {
 
     private class Hexagon {
         private final Point a, b, c, d, e, f;
+        @NonNull
         private final Matrix m;
+        @NonNull
         private final float[] points;
 
         private Hexagon(Point a, Point b, Point c, Point d, Point e, Point f) {
@@ -331,7 +326,7 @@ public class SelectorLayout extends View implements OnTouchListener {
             m.postRotate(-mRotation);
         }
 
-        public boolean contains(Point p) {
+        public boolean contains(@NonNull Point p) {
             points[0] = p.x;
             points[1] = p.y;
             m.mapPoints(points);
@@ -359,8 +354,8 @@ public class SelectorLayout extends View implements OnTouchListener {
             this.context = context;
         }
 
-        public static interface OnClickListener {
-            public void onClick();
+        public interface OnClickListener {
+            void onClick();
         }
 
         public void setOnClickListener(SelectorLayout.Button.OnClickListener onClickListener) {
@@ -400,7 +395,7 @@ public class SelectorLayout extends View implements OnTouchListener {
         }
 
         public void performClick() {
-            if(onClickListener != null) onClickListener.onClick();
+            if (onClickListener != null) onClickListener.onClick();
         }
 
         protected boolean isPressed() {

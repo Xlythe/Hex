@@ -3,6 +3,7 @@ package com.sam.hex.view;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.Window;
 
@@ -32,11 +33,13 @@ public abstract class HexDialog extends PurchaseActivity {
         super();
     }
 
+    @NonNull
     @Override
     protected String getKey() {
         return KEY;
     }
 
+    @NonNull
     @Override
     protected List<String> getSkus() {
         return Arrays.asList(ITEM_SKU_BASIC, ITEM_SKU_INTERMEDIATE, ITEM_SKU_ADVANCED);

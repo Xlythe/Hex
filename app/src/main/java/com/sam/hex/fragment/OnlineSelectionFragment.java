@@ -1,6 +1,7 @@
 package com.sam.hex.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +18,7 @@ public class OnlineSelectionFragment extends HexFragment {
     private SelectorLayout mSelectorLayout;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.fragment_online_selection, null);
 
@@ -33,8 +34,7 @@ public class OnlineSelectionFragment extends HexFragment {
                     // Network is async, no promise that we won't lose
                     // connectivity
                     getMainActivity().startQuickGame();
-                }
-                catch(IllegalStateException e) {
+                } catch (IllegalStateException e) {
                     e.printStackTrace();
                 }
             }
@@ -51,8 +51,7 @@ public class OnlineSelectionFragment extends HexFragment {
                     // connectivity
                     getMainActivity().startActivityForResult(Games.TurnBasedMultiplayer.getSelectOpponentsIntent(getMainActivity().getClient(), 1, 1), MainActivity.RC_SELECT_PLAYERS);
                     getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                }
-                catch(IllegalStateException e) {
+                } catch (IllegalStateException e) {
                     e.printStackTrace();
                 }
             }
@@ -69,8 +68,7 @@ public class OnlineSelectionFragment extends HexFragment {
                     // connectivity
                     getMainActivity().startActivityForResult(Games.TurnBasedMultiplayer.getInboxIntent(getMainActivity().getClient()), MainActivity.RC_INVITATION_INBOX);
                     getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                }
-                catch(IllegalStateException e) {
+                } catch (IllegalStateException e) {
                     e.printStackTrace();
                 }
             }

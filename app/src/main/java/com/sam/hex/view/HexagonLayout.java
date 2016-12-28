@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.graphics.drawable.shapes.PathShape;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -89,7 +90,7 @@ public class HexagonLayout extends View implements OnTouchListener {
         mRotation = 0;
         mBackgroundColor = 0xfff1f1f1;
         mButtons = new Button[6];
-        for(int i = 0; i < 6; i++) {
+        for (int i = 0; i < 6; i++) {
             mButtons[i] = new Button(getContext());
         }
         mPressedColor = Color.LTGRAY;
@@ -111,8 +112,8 @@ public class HexagonLayout extends View implements OnTouchListener {
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                for(Button b : mButtons) {
-                    if(b.isSelected() || b.isPressed()) {
+                for (Button b : mButtons) {
+                    if (b.isSelected() || b.isPressed()) {
                         b.performClick();
                     }
                 }
@@ -122,13 +123,12 @@ public class HexagonLayout extends View implements OnTouchListener {
         setOnFocusChangeListener(new OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus) {
+                if (hasFocus) {
                     mFocusedButton = 3;
                     mButtons[3].setSelected(true);
                     invalidate();
-                }
-                else {
-                    if(mFocusedButton != -1) {
+                } else {
+                    if (mFocusedButton != -1) {
                         mButtons[mFocusedButton].setSelected(false);
                         invalidate();
                     }
@@ -140,97 +140,97 @@ public class HexagonLayout extends View implements OnTouchListener {
     @Override
     public View focusSearch(int direction) {
         mButtons[mFocusedButton].setSelected(false);
-        switch(direction) {
-        case View.FOCUS_RIGHT:
-            switch(mFocusedButton) {
-            case 2:
-                mFocusedButton = 1;
-                mButtons[mFocusedButton].setSelected(true);
-                invalidate();
-                return this;
-            case 3:
-                mFocusedButton = 2;
-                mButtons[mFocusedButton].setSelected(true);
-                invalidate();
-                return this;
-            case 4:
-                mFocusedButton = 5;
-                mButtons[mFocusedButton].setSelected(true);
-                invalidate();
-                return this;
-            case 5:
-                mFocusedButton = 0;
-                mButtons[mFocusedButton].setSelected(true);
-                invalidate();
-                return this;
-            }
-            break;
-        case View.FOCUS_LEFT:
-            switch(mFocusedButton) {
-            case 0:
-                mFocusedButton = 5;
-                mButtons[mFocusedButton].setSelected(true);
-                invalidate();
-                return this;
-            case 1:
-                mFocusedButton = 2;
-                mButtons[mFocusedButton].setSelected(true);
-                invalidate();
-                return this;
-            case 2:
-                mFocusedButton = 3;
-                mButtons[mFocusedButton].setSelected(true);
-                invalidate();
-                return this;
-            case 5:
-                mFocusedButton = 4;
-                mButtons[mFocusedButton].setSelected(true);
-                invalidate();
-                return this;
-            }
-            break;
-        case View.FOCUS_UP:
-            switch(mFocusedButton) {
-            case 1:
-                mFocusedButton = 0;
-                mButtons[mFocusedButton].setSelected(true);
-                invalidate();
-                return this;
-            case 2:
-                mFocusedButton = 5;
-                mButtons[mFocusedButton].setSelected(true);
-                invalidate();
-                return this;
-            case 3:
-                mFocusedButton = 4;
-                mButtons[mFocusedButton].setSelected(true);
-                invalidate();
-                return this;
-            }
-            break;
-        case View.FOCUS_DOWN:
-            switch(mFocusedButton) {
-            case 0:
-                mFocusedButton = 1;
-                mButtons[mFocusedButton].setSelected(true);
-                invalidate();
-                return this;
-            case 5:
-                mFocusedButton = 2;
-                mButtons[mFocusedButton].setSelected(true);
-                invalidate();
-                return this;
-            case 4:
-                mFocusedButton = 3;
-                mButtons[mFocusedButton].setSelected(true);
-                invalidate();
-                return this;
-            }
-            break;
-        case View.FOCUS_FORWARD:
-            break;
-        case View.FOCUS_BACKWARD:
-            break;
+        switch (direction) {
+            case View.FOCUS_RIGHT:
+                switch (mFocusedButton) {
+                    case 2:
+                        mFocusedButton = 1;
+                        mButtons[mFocusedButton].setSelected(true);
+                        invalidate();
+                        return this;
+                    case 3:
+                        mFocusedButton = 2;
+                        mButtons[mFocusedButton].setSelected(true);
+                        invalidate();
+                        return this;
+                    case 4:
+                        mFocusedButton = 5;
+                        mButtons[mFocusedButton].setSelected(true);
+                        invalidate();
+                        return this;
+                    case 5:
+                        mFocusedButton = 0;
+                        mButtons[mFocusedButton].setSelected(true);
+                        invalidate();
+                        return this;
+                }
+                break;
+            case View.FOCUS_LEFT:
+                switch (mFocusedButton) {
+                    case 0:
+                        mFocusedButton = 5;
+                        mButtons[mFocusedButton].setSelected(true);
+                        invalidate();
+                        return this;
+                    case 1:
+                        mFocusedButton = 2;
+                        mButtons[mFocusedButton].setSelected(true);
+                        invalidate();
+                        return this;
+                    case 2:
+                        mFocusedButton = 3;
+                        mButtons[mFocusedButton].setSelected(true);
+                        invalidate();
+                        return this;
+                    case 5:
+                        mFocusedButton = 4;
+                        mButtons[mFocusedButton].setSelected(true);
+                        invalidate();
+                        return this;
+                }
+                break;
+            case View.FOCUS_UP:
+                switch (mFocusedButton) {
+                    case 1:
+                        mFocusedButton = 0;
+                        mButtons[mFocusedButton].setSelected(true);
+                        invalidate();
+                        return this;
+                    case 2:
+                        mFocusedButton = 5;
+                        mButtons[mFocusedButton].setSelected(true);
+                        invalidate();
+                        return this;
+                    case 3:
+                        mFocusedButton = 4;
+                        mButtons[mFocusedButton].setSelected(true);
+                        invalidate();
+                        return this;
+                }
+                break;
+            case View.FOCUS_DOWN:
+                switch (mFocusedButton) {
+                    case 0:
+                        mFocusedButton = 1;
+                        mButtons[mFocusedButton].setSelected(true);
+                        invalidate();
+                        return this;
+                    case 5:
+                        mFocusedButton = 2;
+                        mButtons[mFocusedButton].setSelected(true);
+                        invalidate();
+                        return this;
+                    case 4:
+                        mFocusedButton = 3;
+                        mButtons[mFocusedButton].setSelected(true);
+                        invalidate();
+                        return this;
+                }
+                break;
+            case View.FOCUS_FORWARD:
+                break;
+            case View.FOCUS_BACKWARD:
+                break;
         }
         return super.focusSearch(direction);
     }
@@ -240,16 +240,15 @@ public class HexagonLayout extends View implements OnTouchListener {
         final int screenHeight = center.y * 2;
 
         Paint paint = mTextPaint;
-        if(mTextSize != 0f) paint.setTextSize(mTextSize);
+        if (mTextSize != 0f) paint.setTextSize(mTextSize);
         float textWidth = paint.measureText(mText);
         float width = screenWidth;
         float textSize = mTextSize;
-        if(textWidth > width) {
+        if (textWidth > width) {
             paint.setTextSize(textSize * width / textWidth);
             mTextX = getPaddingLeft();
             mTextSize = textSize;
-        }
-        else {
+        } else {
             mTextX = (screenWidth - textWidth) / 2;
         }
         mTextY = (screenHeight - paint.ascent() - paint.descent()) / 2;
@@ -261,33 +260,31 @@ public class HexagonLayout extends View implements OnTouchListener {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NonNull Canvas canvas) {
         canvas.save();
-        if(mAllowRotation) {
+        if (mAllowRotation) {
             canvas.rotate(mRotation, center.x, center.y);
 
-            if(mRotationSpin > 0f) {
+            if (mRotationSpin > 0f) {
                 mRotation += mRotationSpin * mRotationSpinSign;
                 mRotationSpin *= 0.9f;
                 mRotationSpin -= 0.1f;
-                if(mRotationSpin < 0f) {
+                if (mRotationSpin < 0f) {
                     mSnapToSide = true;
                 }
                 postInvalidateDelayed(mRotationTick);
             }
 
             // We're done rotating. Snap to whatever side we landed on.
-            if(mSnapToSide) {
+            if (mSnapToSide) {
                 float offset = Math.abs(mRotation % 60);
                 int sign = (int) (mRotation / Math.abs(mRotation));
-                if(offset < 5f) {
+                if (offset < 5f) {
                     mSnapToSide = false;
                     mRotation -= mRotation % 60;
-                }
-                else if(offset < 30f) {
+                } else if (offset < 30f) {
                     mRotation -= 2f * sign;
-                }
-                else {
+                } else {
                     mRotation += 2f * sign;
                 }
                 postInvalidateDelayed(mRotationTick);
@@ -312,23 +309,23 @@ public class HexagonLayout extends View implements OnTouchListener {
 
         mTextBackground.draw(canvas);
 
-        for(int i = 0; i < 6; i++) {
-            if(mButtons[i].isPressed()) {
+        for (int i = 0; i < 6; i++) {
+            if (mButtons[i].isPressed()) {
                 mPressedState[i].getPaint().setColor(mPressedColor);
                 mPressedState[i].draw(canvas);
             }
-            if(!mButtons[i].isEnabled()) {
+            if (!mButtons[i].isEnabled()) {
                 mPressedState[i].getPaint().setColor(mDisabledColor);
                 mPressedState[i].draw(canvas);
             }
-            if(mButtons[i].isSelected()) {
+            if (mButtons[i].isSelected()) {
                 mPressedState[i].getPaint().setColor(mPressedColor);
                 mPressedState[i].draw(canvas);
             }
         }
 
         canvas.save();
-        for(int i = 0; i < 6; i++) {
+        for (int i = 0; i < 6; i++) {
             canvas.rotate(60, center.x, center.y);
             mBorderShadow[i].draw(canvas);
             mBorder[i].draw(canvas);
@@ -358,29 +355,25 @@ public class HexagonLayout extends View implements OnTouchListener {
         int height;
 
         // Measure Width
-        if(widthMode == MeasureSpec.EXACTLY) {
+        if (widthMode == MeasureSpec.EXACTLY) {
             // Must be this size
             width = widthSize;
-        }
-        else if(widthMode == MeasureSpec.AT_MOST) {
+        } else if (widthMode == MeasureSpec.AT_MOST) {
             // Can't be bigger than...
             width = Math.min(desiredWidth, widthSize);
-        }
-        else {
+        } else {
             // Be whatever you want
             width = desiredWidth;
         }
 
         // Measure Height
-        if(heightMode == MeasureSpec.EXACTLY) {
+        if (heightMode == MeasureSpec.EXACTLY) {
             // Must be this size
             height = heightSize;
-        }
-        else if(heightMode == MeasureSpec.AT_MOST) {
+        } else if (heightMode == MeasureSpec.AT_MOST) {
             // Can't be bigger than...
             height = Math.min(desiredHeight, heightSize);
-        }
-        else {
+        } else {
             // Be whatever you want
             height = desiredHeight;
         }
@@ -392,7 +385,7 @@ public class HexagonLayout extends View implements OnTouchListener {
     @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
         h -= mTopMargin;
-        if(mAllowRotation) {
+        if (mAllowRotation) {
             h = (int) (h * 1.2);
         }
         w = (int) (h * 1.1547);
@@ -448,7 +441,7 @@ public class HexagonLayout extends View implements OnTouchListener {
         shadowEdgePath.lineTo((int) (corners[1].x - (mBorderWidth + mBorderShadowWidth) / 1.732), (mBorderWidth + mBorderShadowWidth + (int) mTopMargin));
         shadowEdgePath.lineTo((int) (corners[0].x + (mBorderWidth + mBorderShadowWidth) / 1.732), (mBorderWidth + mBorderShadowWidth + (int) mTopMargin));
         shadowEdgePath.close();
-        for(int i = 0; i < 6; i++) {
+        for (int i = 0; i < 6; i++) {
             Triangle t = new Triangle(new Point(corners[(i + 1) % 6].x, corners[(i + 1) % 6].y), new Point(corners[(i + 2) % 6].x, corners[(i + 2) % 6].y),
                     new Point(center.x, center.y));
             // Shape of a pressed state
@@ -480,32 +473,30 @@ public class HexagonLayout extends View implements OnTouchListener {
     }
 
     @Override
-    public boolean onTouch(View v, MotionEvent event) {
+    public boolean onTouch(View v, @NonNull MotionEvent event) {
         int sign = (event.getX() > center.x) ? -1 : 1;
-        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
             mRotationOffset = sign * cosineInverse(center, new Point(center.x, 0), new Point((int) event.getX(), (int) event.getY()));
             mOldRotation = mRotation;
-            for(Button b : mButtons) {
-                if(b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
+            for (Button b : mButtons) {
+                if (b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
                     b.setPressed(b.isEnabled());
-                }
-                else {
+                } else {
                     b.setPressed(false);
                 }
             }
             mRotationSpin = -1f;
             mRotationHistory = new float[4];
-        }
-        else if(event.getAction() == MotionEvent.ACTION_UP) {
+        } else if (event.getAction() == MotionEvent.ACTION_UP) {
             boolean performClick = false;
-            for(Button b : mButtons) {
-                if(b.isPressed()) {
+            for (Button b : mButtons) {
+                if (b.isPressed()) {
                     performClick();
                     performClick = true;
                 }
                 b.setPressed(false);
             }
-            if(!performClick) {
+            if (!performClick) {
                 mRotationHistory[3] = mRotationHistory[2];
                 mRotationHistory[2] = mRotationHistory[1];
                 mRotationHistory[1] = mRotationHistory[0];
@@ -514,17 +505,15 @@ public class HexagonLayout extends View implements OnTouchListener {
                 mRotationSpinSign = mRotationSpin > 0 ? 1 : -1;
                 mRotationSpin *= mRotationSpinSign;
             }
-        }
-        else {
+        } else {
             mRotation = mOldRotation + mRotationOffset - sign
                     * cosineInverse(center, new Point(center.x, 0), new Point((int) event.getX(), (int) event.getY()));
             mRotation = mRotation % 360;
-            for(Button b : mButtons) {
-                if(b.isPressed()) {
-                    if(!b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
+            for (Button b : mButtons) {
+                if (b.isPressed()) {
+                    if (!b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
                         b.setPressed(false);
-                    }
-                    else if(Math.abs(Math.abs(mRotation) - Math.abs(mOldRotation)) > 10f) {
+                    } else if (Math.abs(Math.abs(mRotation) - Math.abs(mOldRotation)) > 10f) {
                         b.setPressed(false);
                     }
                 }
@@ -539,21 +528,21 @@ public class HexagonLayout extends View implements OnTouchListener {
         return true;
     }
 
-    private float getAverage(float[] data) {
+    private float getAverage(@NonNull float[] data) {
         float sum = 0;
-        for(float f : data) {
+        for (float f : data) {
             sum += f;
         }
         return sum / data.length;
     }
 
-    private float cosineInverse(Point a, Point b, Point c) {
+    private float cosineInverse(@NonNull Point a, @NonNull Point b, @NonNull Point c) {
         double top = distanceSqr(a, b) + distanceSqr(a, c) - distanceSqr(b, c);
         double bottom = 2 * Math.sqrt(distanceSqr(a, b)) * Math.sqrt(distanceSqr(a, c));
         return (float) (Math.acos(top / bottom) * 180 / Math.PI);
     }
 
-    private double distanceSqr(Point a, Point b) {
+    private double distanceSqr(@NonNull Point a, @NonNull Point b) {
         return ((a.x - b.x) * (a.x - b.x)) + ((a.y - b.y) * (a.y - b.y));
     }
 
@@ -585,11 +574,10 @@ public class HexagonLayout extends View implements OnTouchListener {
     }
 
     public void setInitialSpin(float initialSpin) {
-        if(initialSpin > 0) {
+        if (initialSpin > 0) {
             mRotationSpin = initialSpin;
             mRotationSpinSign = 1;
-        }
-        else {
+        } else {
             mRotationSpin = -1 * initialSpin;
             mRotationSpinSign = -1;
         }
@@ -601,7 +589,9 @@ public class HexagonLayout extends View implements OnTouchListener {
 
     private class Triangle {
         private final Point a, b, c;
+        @NonNull
         private final Matrix m;
+        @NonNull
         private final float[] points;
 
         private Triangle(Point a, Point b, Point c) {
@@ -612,8 +602,8 @@ public class HexagonLayout extends View implements OnTouchListener {
             m = new Matrix();
         }
 
-        public boolean contains(Point p) {
-            if(mAllowRotation) {
+        public boolean contains(@NonNull Point p) {
+            if (mAllowRotation) {
                 points[0] = p.x;
                 points[1] = p.y;
                 m.reset();
@@ -653,8 +643,8 @@ public class HexagonLayout extends View implements OnTouchListener {
             this.context = context;
         }
 
-        public static interface OnClickListener {
-            public void onClick();
+        public interface OnClickListener {
+            void onClick();
         }
 
         public void setOnClickListener(HexagonLayout.Button.OnClickListener onClickListener) {
@@ -706,7 +696,7 @@ public class HexagonLayout extends View implements OnTouchListener {
         }
 
         public void performClick() {
-            if(onClickListener != null) onClickListener.onClick();
+            if (onClickListener != null) onClickListener.onClick();
         }
 
         protected boolean isPressed() {

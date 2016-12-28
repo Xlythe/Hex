@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -86,13 +87,15 @@ public class MainActivity extends NetActivity {
 //        }
 //    }
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if(savedInstanceState == null) {
+        if (savedInstanceState == null) {
             mMainFragment = new MainFragment();
             mMainFragment.setInitialRotation(-120f);
             mMainFragment.setInitialSpin(50f);
@@ -103,7 +106,7 @@ public class MainActivity extends NetActivity {
     }
 
     public void returnHome() {
-        if(mMainFragment == null) mMainFragment = new MainFragment();
+        if (mMainFragment == null) mMainFragment = new MainFragment();
         getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 
@@ -113,14 +116,14 @@ public class MainActivity extends NetActivity {
         mIsSignedIn = true;
 
         //getAppStateClient().loadState(this, STAT_STATE);
-        if(mMainFragment != null) mMainFragment.setSignedIn(mIsSignedIn);
+        if (mMainFragment != null) mMainFragment.setSignedIn(mIsSignedIn);
 
-        if(mOpenAchievements) {
+        if (mOpenAchievements) {
             mOpenAchievements = false;
             startActivityForResult(Games.Achievements.getAchievementsIntent(getClient()), RC_ACHIEVEMENTS);
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
-        if(mOpenOnlineSelectionFragment) {
+        if (mOpenOnlineSelectionFragment) {
             mOpenOnlineSelectionFragment = false;
             setOnlineSelectionFragment(new OnlineSelectionFragment());
             swapFragment(this.getOnlineSelectionFragment());
@@ -131,7 +134,7 @@ public class MainActivity extends NetActivity {
     public void onSignInFailed() {
         super.onSignInFailed();
         mIsSignedIn = false;
-        if(mMainFragment != null) mMainFragment.setSignedIn(mIsSignedIn);
+        if (mMainFragment != null) mMainFragment.setSignedIn(mIsSignedIn);
     }
 
     public void swapFragment(Fragment newFragment) {
@@ -189,21 +192,21 @@ public class MainActivity extends NetActivity {
     private void popupRatingDialog() {
         // Popup asking to rate app after countdown
         int numTimesAppOpened = PreferenceManager.getDefaultSharedPreferences(this).getInt("num_times_app_opened_review", 0);
-        if(numTimesAppOpened != -1) {
+        if (numTimesAppOpened != -1) {
             numTimesAppOpened++;
             PreferenceManager.getDefaultSharedPreferences(this).edit().putInt("num_times_app_opened_review", numTimesAppOpened).commit();
-            if(numTimesAppOpened > 5) {
+            if (numTimesAppOpened > 5) {
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        switch(which) {
-                        case DialogInterface.BUTTON_POSITIVE:
-                            PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putInt("num_times_app_opened_review", -1).commit();
-                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.sam.hex")));
-                            break;
-                        case DialogInterface.BUTTON_NEGATIVE:
-                            PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putInt("num_times_app_opened_review", -1).commit();
-                            break;
+                        switch (which) {
+                            case DialogInterface.BUTTON_POSITIVE:
+                                PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putInt("num_times_app_opened_review", -1).commit();
+                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.sam.hex")));
+                                break;
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putInt("num_times_app_opened_review", -1).commit();
+                                break;
                         }
                     }
                 };
@@ -214,8 +217,7 @@ public class MainActivity extends NetActivity {
                 // Wrap in try/catch because this can sometimes leak window
                 try {
                     builder.show();
-                }
-                catch(Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -231,8 +233,8 @@ public class MainActivity extends NetActivity {
     }
 
     @Override
-    public void switchToGame(Game game, boolean leaveRoom) {
-        if(mGameFragment != null) {
+    public void switchToGame(@NonNull Game game, boolean leaveRoom) {
+        if (mGameFragment != null) {
             mGameFragment.setLeaveRoom(leaveRoom);
         }
 

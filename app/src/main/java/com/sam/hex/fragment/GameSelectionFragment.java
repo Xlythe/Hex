@@ -1,6 +1,7 @@
 package com.sam.hex.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +17,7 @@ public class GameSelectionFragment extends HexFragment {
     private SelectorLayout mSelectorLayout;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.fragment_game_selection, null);
 
@@ -29,11 +30,10 @@ public class GameSelectionFragment extends HexFragment {
             @Override
             public void onClick() {
                 getMainActivity().setGameFragment(new GameFragment());
-                if(Math.random() > 0.5) {
+                if (Math.random() > 0.5) {
                     getMainActivity().getGameFragment().setPlayer1Type(Player.Human);
                     getMainActivity().getGameFragment().setPlayer2Type(Player.AI);
-                }
-                else {
+                } else {
                     getMainActivity().getGameFragment().setPlayer1Type(Player.AI);
                     getMainActivity().getGameFragment().setPlayer2Type(Player.Human);
                 }
@@ -60,11 +60,10 @@ public class GameSelectionFragment extends HexFragment {
         netButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
             @Override
             public void onClick() {
-                if(getMainActivity().isSignedIn()) {
+                if (getMainActivity().isSignedIn()) {
                     getMainActivity().setOnlineSelectionFragment(new OnlineSelectionFragment());
                     getMainActivity().swapFragment(getMainActivity().getOnlineSelectionFragment());
-                }
-                else {
+                } else {
                     getMainActivity().setOpenOnlineSelectionFragment(true);
                     getMainActivity().beginUserInitiatedSignIn();
                 }

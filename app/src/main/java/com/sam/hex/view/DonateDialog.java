@@ -1,6 +1,7 @@
 package com.sam.hex.view;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -71,6 +72,7 @@ public class DonateDialog extends HexDialog {
         return v;
     }
 
+    @NonNull
     @Override
     public OnClickListener getPositiveOnClickListener() {
         return new OnClickListener() {
@@ -82,6 +84,7 @@ public class DonateDialog extends HexDialog {
         };
     }
 
+    @NonNull
     @Override
     public OnClickListener getNegativeOnClickListener() {
         return new OnClickListener() {
@@ -93,6 +96,7 @@ public class DonateDialog extends HexDialog {
         };
     }
 
+    @NonNull
     @Override
     public OnClickListener getNeutralOnClickListener() {
         return new OnClickListener() {
@@ -105,7 +109,7 @@ public class DonateDialog extends HexDialog {
     }
 
     @Override
-    protected void onPurchaseSuccess(IabResult result, Purchase info) {
+    protected void onPurchaseSuccess(IabResult result, @NonNull Purchase info) {
         String sku = info.getSku();
 
         int amount = 0;

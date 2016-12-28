@@ -78,16 +78,20 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
 
     // Room ID where the currently active game is taking place; null if we're
     // not playing.
+    @Nullable
     String mRoomId = null;
 
     // The participants in the currently active game
+    @Nullable
     ArrayList<Participant> mParticipants = null;
 
     // My participant ID in the currently active game
+    @Nullable
     String mMyId = null;
 
     // If non-null, this is the id of the invitation we received via the
     // invitation listener
+    @Nullable
     String mIncomingInvitationId = null;
 
     // flag indicating whether we're dismissing the waiting room because the
@@ -138,37 +142,35 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     }
 
     @Override
-    public void onActivityResult(int requestCode, int responseCode, Intent intent) {
+    public void onActivityResult(int requestCode, int responseCode, @NonNull Intent intent) {
         super.onActivityResult(requestCode, responseCode, intent);
-        switch(requestCode) {
-        case RC_SELECT_PLAYERS:
-            // we got the result from the "select players" UI -- ready to create
-            // the room
-            handleSelectPlayersResult(responseCode, intent);
-            break;
-        case RC_INVITATION_INBOX:
-            // we got the result from the "select invitation" UI (invitation
-            // inbox). We're
-            // ready to accept the selected invitation:
-            handleInvitationInboxResult(responseCode, intent);
-            break;
-        case RC_WAITING_ROOM:
-            // ignore result if we dismissed the waiting room from code:
-            if(mWaitRoomDismissedFromCode) break;
+        switch (requestCode) {
+            case RC_SELECT_PLAYERS:
+                // we got the result from the "select players" UI -- ready to create
+                // the room
+                handleSelectPlayersResult(responseCode, intent);
+                break;
+            case RC_INVITATION_INBOX:
+                // we got the result from the "select invitation" UI (invitation
+                // inbox). We're
+                // ready to accept the selected invitation:
+                handleInvitationInboxResult(responseCode, intent);
+                break;
+            case RC_WAITING_ROOM:
+                // ignore result if we dismissed the waiting room from code:
+                if (mWaitRoomDismissedFromCode) break;
 
-            // we got the result from the "waiting room" UI.
-            if(responseCode == Activity.RESULT_OK) {
-                // player wants to start playing
-                Log.d(TAG, "Starting game because user requested via waiting room UI.");
+                // we got the result from the "waiting room" UI.
+                if (responseCode == Activity.RESULT_OK) {
+                    // player wants to start playing
+                    Log.d(TAG, "Starting game because user requested via waiting room UI.");
 
-                // start the game!
-                startGame(false);
-            }
-            else if(responseCode == GamesActivityResultCodes.RESULT_LEFT_ROOM) {
-                // player actively indicated that they want to leave the room
-                leaveRoom();
-            }
-            else if(responseCode == Activity.RESULT_CANCELED) {
+                    // start the game!
+                    startGame(false);
+                } else if (responseCode == GamesActivityResultCodes.RESULT_LEFT_ROOM) {
+                    // player actively indicated that they want to leave the room
+                    leaveRoom();
+                } else if (responseCode == Activity.RESULT_CANCELED) {
                 /*
                  * Dialog was cancelled (user pressed back key, for instance).
                  * In our game, this means leaving the room too. In more
@@ -176,18 +178,18 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
                  * minimizing the waiting room UI but continue in the handshake
                  * process).
                  */
-                leaveRoom();
-            }
+                    leaveRoom();
+                }
 
-            break;
+                break;
         }
     }
 
     // Handle the result of the "Select players UI" we launched when the user
     // clicked the
     // "Invite friends" button. We react by creating a room with those players.
-    private void handleSelectPlayersResult(int response, Intent data) {
-        if(response != Activity.RESULT_OK) {
+    private void handleSelectPlayersResult(int response, @NonNull Intent data) {
+        if (response != Activity.RESULT_OK) {
             Log.w(TAG, "*** select players UI cancelled, " + response);
             return;
         }
@@ -202,7 +204,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         Bundle autoMatchCriteria = null;
         int minAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MIN_AUTOMATCH_PLAYERS, 0);
         int maxAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS, 0);
-        if(minAutoMatchPlayers > 0 || maxAutoMatchPlayers > 0) {
+        if (minAutoMatchPlayers > 0 || maxAutoMatchPlayers > 0) {
             autoMatchCriteria = RoomConfig.createAutoMatchCriteria(minAutoMatchPlayers, maxAutoMatchPlayers, 0);
             Log.d(TAG, "Automatch criteria: " + autoMatchCriteria);
         }
@@ -223,8 +225,8 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     // Handle the result of the invitation inbox UI, where the player can pick
     // an invitation
     // to accept. We react by accepting the selected invitation, if any.
-    private void handleInvitationInboxResult(int response, Intent data) {
-        if(response != Activity.RESULT_OK) {
+    private void handleInvitationInboxResult(int response, @NonNull Intent data) {
+        if (response != Activity.RESULT_OK) {
             Log.w(TAG, "*** invitation inbox UI cancelled, " + response);
             return;
         }
@@ -238,7 +240,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     }
 
     // Accept the given invitation.
-    void acceptInviteToRoom(String invId) {
+    void acceptInviteToRoom(@NonNull String invId) {
         Log.d(TAG, "Accepting invitation: " + invId);
         keepScreenOn();
 
@@ -278,7 +280,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     public void leaveRoom() {
         Log.d(TAG, "Leaving room.");
         stopKeepingScreenOn();
-        if(mRoomId != null) {
+        if (mRoomId != null) {
             Games.RealTimeMultiplayer.leave(getClient(), null, mRoomId);
             mRoomId = null;
         }
@@ -309,7 +311,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     // Called when we get an invitation to play a game. We react by showing that
     // to the user.
     @Override
-    public void onInvitationReceived(Invitation invitation) {
+    public void onInvitationReceived(@NonNull Invitation invitation) {
         // We got an invitation to play a game! So, store it in
         // mIncomingInvitationId
         // and show the popup on the screen.
@@ -318,15 +320,15 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch(which) {
-                case DialogInterface.BUTTON_POSITIVE:
-                    // Yes button clicked
-                    acceptInviteToRoom(mIncomingInvitationId);
-                    break;
-                case DialogInterface.BUTTON_NEGATIVE:
-                    // No button clicked
-                    // Do nothing
-                    break;
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        // Yes button clicked
+                        acceptInviteToRoom(mIncomingInvitationId);
+                        break;
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        // No button clicked
+                        // Do nothing
+                        break;
                 }
             }
         };
@@ -346,7 +348,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     // (maybe not everybody
     // is connected yet).
     @Override
-    public void onConnectedToRoom(Room room) {
+    public void onConnectedToRoom(@NonNull Room room) {
         Log.d(TAG, "onConnectedToRoom.");
 
         // get room ID, participants and my ID:
@@ -383,7 +385,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     @Override
     public void onRoomCreated(int statusCode, Room room) {
         Log.d(TAG, "onRoomCreated(" + statusCode + ", " + room + ")");
-        if(statusCode != GamesStatusCodes.STATUS_OK) {
+        if (statusCode != GamesStatusCodes.STATUS_OK) {
             Log.e(TAG, "*** Error: onRoomCreated, status " + statusCode);
             return;
         }
@@ -394,9 +396,9 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
 
     // Called when room is fully connected.
     @Override
-    public void onRoomConnected(int statusCode, Room room) {
+    public void onRoomConnected(int statusCode, @NonNull Room room) {
         Log.d(TAG, "onRoomConnected(" + statusCode + ", " + room + ")");
-        if(statusCode != GamesStatusCodes.STATUS_OK) {
+        if (statusCode != GamesStatusCodes.STATUS_OK) {
             Log.e(TAG, "*** Error: onRoomConnected, status " + statusCode);
             return;
         }
@@ -406,7 +408,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     @Override
     public void onJoinedRoom(int statusCode, Room room) {
         Log.d(TAG, "onJoinedRoom(" + statusCode + ", " + room + ")");
-        if(statusCode != GamesStatusCodes.STATUS_OK) {
+        if (statusCode != GamesStatusCodes.STATUS_OK) {
             Log.e(TAG, "*** Error: onRoomConnected, status " + statusCode);
             return;
         }
@@ -423,54 +425,54 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     // from the screen,
     // etc.
     @Override
-    public void onPeerDeclined(Room room, List<String> arg1) {
+    public void onPeerDeclined(@NonNull Room room, List<String> arg1) {
         updateRoom(room);
     }
 
     @Override
-    public void onPeerInvitedToRoom(Room room, List<String> arg1) {
+    public void onPeerInvitedToRoom(@NonNull Room room, List<String> arg1) {
         updateRoom(room);
     }
 
     @Override
-    public void onPeerJoined(Room room, List<String> arg1) {
+    public void onPeerJoined(@NonNull Room room, List<String> arg1) {
         updateRoom(room);
     }
 
     @Override
-    public void onPeerLeft(Room room, List<String> peersWhoLeft) {
+    public void onPeerLeft(@NonNull Room room, List<String> peersWhoLeft) {
         updateRoom(room);
-        if(mNetworkPlayer != null && mGame != null) {
+        if (mNetworkPlayer != null && mGame != null) {
             mNetworkPlayer.forfeit();
             mGame.getCurrentPlayer().endMove();
         }
     }
 
     @Override
-    public void onRoomAutoMatching(Room room) {
+    public void onRoomAutoMatching(@NonNull Room room) {
         updateRoom(room);
     }
 
     @Override
-    public void onRoomConnecting(Room room) {
+    public void onRoomConnecting(@NonNull Room room) {
         updateRoom(room);
     }
 
     @Override
-    public void onPeersConnected(Room room, List<String> peers) {
+    public void onPeersConnected(@NonNull Room room, List<String> peers) {
         updateRoom(room);
     }
 
     @Override
-    public void onPeersDisconnected(Room room, List<String> peers) {
+    public void onPeersDisconnected(@NonNull Room room, List<String> peers) {
         updateRoom(room);
-        if(mNetworkPlayer != null && mGame != null) {
+        if (mNetworkPlayer != null && mGame != null) {
             mNetworkPlayer.forfeit();
             mGame.getCurrentPlayer().endMove();
         }
     }
 
-    void updateRoom(Room room) {
+    void updateRoom(@NonNull Room room) {
         mParticipants = room.getParticipants();
     }
 
@@ -488,7 +490,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         Object[] players = mParticipants.toArray();
         Arrays.sort(players, new Comparator<Object>() {
             @Override
-            public int compare(Object lhs, Object rhs) {
+            public int compare(@NonNull Object lhs, @NonNull Object rhs) {
                 return ((Participant) lhs).getParticipantId().compareTo(((Participant) rhs).getParticipantId());
             }
         });
@@ -499,12 +501,11 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
 
         PlayingEntity p1;
         PlayingEntity p2;
-        if(((Participant) players[0]).getParticipantId().equals(mMyId)) {
+        if (((Participant) players[0]).getParticipantId().equals(mMyId)) {
             p1 = mLocalPlayer = new PlayerObject(1);
             p2 = mNetworkPlayer = new NetworkPlayer(2, this);
             mNetworkPlayer.setCallbacks(this);
-        }
-        else {
+        } else {
             p1 = mNetworkPlayer = new NetworkPlayer(1, this);
             p2 = mLocalPlayer = new PlayerObject(2);
             mNetworkPlayer.setCallbacks(this);
@@ -525,19 +526,19 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
 
     // Called when we receive a real-time message from the network.
     @Override
-    public void onRealTimeMessageReceived(RealTimeMessage rtm) {
+    public void onRealTimeMessageReceived(@NonNull RealTimeMessage rtm) {
         String data = new String(rtm.getMessageData());
         Log.d(TAG, "Message received: " + data);
 
-        if(mNetworkPlayer != null) mNetworkPlayer.receivedMessage(data);
+        if (mNetworkPlayer != null) mNetworkPlayer.receivedMessage(data);
     }
 
     // Broadcast my score to everybody else.
     void broadcastMessage(byte[] message) {
         // Send to every other participant.
-        for(Participant p : mParticipants) {
-            if(p.getParticipantId().equals(mMyId)) continue;
-            if(p.getStatus() != Participant.STATUS_JOINED) continue;
+        for (Participant p : mParticipants) {
+            if (p.getParticipantId().equals(mMyId)) continue;
+            if (p.getStatus() != Participant.STATUS_JOINED) continue;
             Games.RealTimeMultiplayer.sendReliableMessage(getClient(), null, message, mRoomId, p.getParticipantId());
         }
     }
@@ -546,9 +547,9 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     // will react
     // by dismissing their waiting room UIs and starting to play too.
     void broadcastStart(byte[] message) {
-        for(Participant p : mParticipants) {
-            if(p.getParticipantId().equals(mMyId)) continue;
-            if(p.getStatus() != Participant.STATUS_JOINED) continue;
+        for (Participant p : mParticipants) {
+            if (p.getParticipantId().equals(mMyId)) continue;
+            if (p.getStatus() != Participant.STATUS_JOINED) continue;
             Games.RealTimeMultiplayer.sendReliableMessage(getClient(), null, message, mRoomId, p.getParticipantId());
         }
     }
@@ -578,7 +579,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     public abstract void switchToGame(Game game, boolean leaveRoom);
 
     @Override
-    public void sendMessage(String msg) {
+    public void sendMessage(@NonNull String msg) {
         broadcastMessage(msg.getBytes());
     }
 
@@ -592,12 +593,11 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     @Override
     public void newGame(String gameData) {
         Log.d(TAG, "New game commanded from above");
-        if(!mGame.isGameOver()) {
+        if (!mGame.isGameOver()) {
             // Decide on a winner for the dying game
-            if(!mNewGameRequested) {
+            if (!mNewGameRequested) {
                 mLocalPlayer.forfeit();
-            }
-            else {
+            } else {
                 mNetworkPlayer.forfeit();
             }
         }
@@ -605,6 +605,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         startGame(true);
     }
 
+    @Nullable
     @Override
     public String newGameRequest() {
         Log.d(TAG, "New game requested");
@@ -612,18 +613,18 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch(which) {
-                case DialogInterface.BUTTON_POSITIVE:
-                    // Yes button clicked
-                    mNewGameRequested = true;
-                    reply.add(true);
-                    mShowingDialog = false;
-                    break;
-                case DialogInterface.BUTTON_NEGATIVE:
-                    // No button clicked
-                    reply.add(false);
-                    mShowingDialog = false;
-                    break;
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        // Yes button clicked
+                        mNewGameRequested = true;
+                        reply.add(true);
+                        mShowingDialog = false;
+                        break;
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        // No button clicked
+                        reply.add(false);
+                        mShowingDialog = false;
+                        break;
                 }
             }
         };
@@ -636,7 +637,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(!mShowingDialog) {
+                if (!mShowingDialog) {
                     builder.show();
                     mShowingDialog = true;
                 }
@@ -644,14 +645,12 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         });
 
         try {
-            if(reply.take()) {
+            if (reply.take()) {
                 return "true";
-            }
-            else {
+            } else {
                 return null;
             }
-        }
-        catch(InterruptedException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
             return null;
         }
@@ -664,17 +663,17 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch(which) {
-                case DialogInterface.BUTTON_POSITIVE:
-                    // Yes button clicked
-                    reply.add(true);
-                    mShowingDialog = false;
-                    break;
-                case DialogInterface.BUTTON_NEGATIVE:
-                    // No button clicked
-                    reply.add(false);
-                    mShowingDialog = false;
-                    break;
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        // Yes button clicked
+                        reply.add(true);
+                        mShowingDialog = false;
+                        break;
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        // No button clicked
+                        reply.add(false);
+                        mShowingDialog = false;
+                        break;
                 }
             }
         };
@@ -687,7 +686,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(!mShowingDialog) {
+                if (!mShowingDialog) {
                     builder.show();
                     mShowingDialog = true;
                 }
@@ -696,8 +695,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
 
         try {
             return reply.take();
-        }
-        catch(InterruptedException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
             return false;
         }
@@ -716,7 +714,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(!mShowingDialog) {
+                if (!mShowingDialog) {
                     builder.show();
                     mShowingDialog = true;
                 }
@@ -727,7 +725,8 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     }
 
     @Override
-    public void chat(String message) {}
+    public void chat(String message) {
+    }
 
     @Override
     public void onCancel(DialogInterface dialog) {
@@ -746,6 +745,6 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
 
     @Override
     public void onInvitationRemoved(String s) {
-        
+
     }
 }

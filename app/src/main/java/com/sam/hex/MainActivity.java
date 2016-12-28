@@ -1,7 +1,5 @@
 package com.sam.hex;
 
-import java.io.UnsupportedEncodingException;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,7 +12,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
 import com.google.android.gms.games.Games;
-import com.google.gson.Gson;
 import com.hex.core.Game;
 import com.sam.hex.fragment.GameFragment;
 import com.sam.hex.fragment.GameSelectionFragment;
@@ -41,52 +38,7 @@ public class MainActivity extends NetActivity {
     private HistoryFragment mHistoryFragment;
     private InstructionsFragment mInstructionsFragment;
     private OnlineSelectionFragment mOnlineSelectionFragment;
-
-//    TODO
-//    @Override
-//    public void onStateConflict(int stateKey, String ver, byte[] localData, byte[] serverData) {
-//        byte[] resolvedData = serverData;
-//        try {
-//            if(stateKey == STAT_STATE) {
-//                Gson gson = new Gson();
-//                Stat localStat = gson.fromJson(new String(localData, "UTF-8"), Stat.class);
-//                Stat serverStat = gson.fromJson(new String(serverData, "UTF-8"), Stat.class);
-//                Stat resolvedStat = new Stat();
-//
-//                resolvedStat.setTimePlayed(Math.max(localStat.getTimePlayed(), serverStat.getTimePlayed()));
-//                resolvedStat.setGamesWon(Math.max(localStat.getGamesWon(), serverStat.getGamesWon()));
-//                resolvedStat.setGamesPlayed(Math.max(localStat.getGamesPlayed(), serverStat.getGamesPlayed()));
-//                resolvedStat.setDonationRank(Math.max(localStat.getDonationRank(), serverStat.getDonationRank()));
-//
-//                resolvedData = gson.toJson(resolvedStat).getBytes();
-//            }
-//        }
-//        catch(UnsupportedEncodingException e) {}
-//
-//        getAppStateClient().resolveState(this, stateKey, ver, resolvedData);
-//    }
-//
-//    @Override
-//    public void onStateLoaded(int statusCode, int stateKey, byte[] buffer) {
-//        if(statusCode == AppStateClient.STATUS_OK) {
-//            try {
-//                if(stateKey == STAT_STATE) {
-//                    Gson gson = new Gson();
-//                    Stat stat = gson.fromJson(new String(buffer, "UTF-8"), Stat.class);
-//
-//                    Stats.setTimePlayed(this, stat.getTimePlayed());
-//                    Stats.setGamesPlayed(this, stat.getGamesPlayed());
-//                    Stats.setGamesWon(this, stat.getGamesWon());
-//                    Stats.setDonationRank(this, stat.getDonationRank());
-//                }
-//                mMainFragment.setSignedIn(mIsSignedIn);
-//            }
-//            catch(Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-
+    
     /**
      * Called when the activity is first created.
      */

@@ -1,5 +1,10 @@
 package com.sam.hex;
 
+import android.os.Environment;
+import android.support.annotation.NonNull;
+
+import com.hex.core.Game;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -7,11 +12,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Locale;
-
-import android.os.Environment;
-import android.support.annotation.NonNull;
-
-import com.hex.core.Game;
 
 /**
  * @author Will Harmon

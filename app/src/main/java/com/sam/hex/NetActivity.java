@@ -15,12 +15,6 @@
 
 package com.sam.hex;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -32,8 +26,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.WindowManager;
 
-import com.google.android.gms.common.api.ResolvingResultCallbacks;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesActivityResultCodes;
 import com.google.android.gms.games.GamesStatusCodes;
@@ -56,6 +48,12 @@ import com.hex.network.Errors;
 import com.hex.network.NetCommunication;
 import com.hex.network.NetworkCallbacks;
 import com.hex.network.NetworkPlayer;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class NetActivity extends BaseGameActivity implements RealTimeMessageReceivedListener,
         RoomStatusUpdateListener, RoomUpdateListener, OnInvitationReceivedListener, NetCommunication,

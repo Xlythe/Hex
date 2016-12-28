@@ -1,7 +1,5 @@
 package com.sam.hex.view;
 
-import java.util.Locale;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -24,6 +22,8 @@ import com.hex.core.PlayingEntity;
 import com.hex.core.Point;
 import com.hex.core.Timer;
 import com.sam.hex.BoardTools;
+
+import java.util.Locale;
 
 /**
  * @author Will Harmon

@@ -1,10 +1,5 @@
 package com.sam.hex.fragment;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -43,6 +38,11 @@ import com.sam.hex.Settings;
 import com.sam.hex.Stats;
 import com.sam.hex.view.BoardView;
 import com.sam.hex.view.GameOverDialog;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * @author Will Harmon

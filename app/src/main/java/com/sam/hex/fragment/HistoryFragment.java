@@ -1,14 +1,5 @@
 package com.sam.hex.fragment;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Locale;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
@@ -30,6 +21,15 @@ import com.hex.core.Game.GameListener;
 import com.hex.core.PlayingEntity;
 import com.sam.hex.FileUtil;
 import com.sam.hex.R;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * @author Will Harmon

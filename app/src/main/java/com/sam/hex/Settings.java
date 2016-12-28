@@ -13,12 +13,42 @@ import com.hex.core.Timer;
  * @author Will Harmon
  **/
 public class Settings {
+    static final int MAX_BOARD_SIZE = 30;
+    static final int MIN_BOARD_SIZE = 4;
+
+    private static final String NUM_TIMES_OPENED = "num_times_app_opened_review";
+    static final String GAME_SIZE = "gameSizePref";
+    static final String CUSTOM_GAME_SIZE = "customGameSizePref";
+    private static final String SWAP = "swapPref";
+    private static final String AUTOSAVE = "autosavePref";
+    static final String TIMER_TYPE = "timerTypePref";
+    static final String TIMER = "timerPref";
+    static final String TIMER_OPTIONS = "timerOptionsPref";
+    static final String DIFFICULTY = "comDifficulty";
+
+    public static int getNumTimesOpened(@NonNull Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getInt(NUM_TIMES_OPENED, 0);
+    }
+
+    public static void incrementNumTimesOpened(@NonNull Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        int numTimesOpened = prefs.getInt(NUM_TIMES_OPENED, 0);
+        prefs.edit().putInt(NUM_TIMES_OPENED, numTimesOpened + 1).apply();
+    }
+
+    public static void setTimesOpened(@NonNull Context context, int times) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        prefs.edit().putInt(NUM_TIMES_OPENED, times).apply();
+    }
+
     public static int getGridSize(@NonNull Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        int gridSize = Integer.valueOf(prefs.getString("gameSizePref", Integer.toString(context.getResources().getInteger(R.integer.DEFAULT_BOARD_SIZE))));
-        if (gridSize == 0)
-            gridSize = Integer.valueOf(prefs.getString("customGameSizePref", Integer.toString(context.getResources().getInteger(R.integer.DEFAULT_BOARD_SIZE))));
+        int gridSize = Integer.valueOf(prefs.getString(GAME_SIZE, Integer.toString(context.getResources().getInteger(R.integer.DEFAULT_BOARD_SIZE))));
+        if (gridSize == 0) {
+            gridSize = Integer.valueOf(prefs.getString(CUSTOM_GAME_SIZE, Integer.toString(context.getResources().getInteger(R.integer.DEFAULT_BOARD_SIZE))));
+        }
 
         // We don't want 0x0 games
         if (gridSize <= 0) gridSize = 1;
@@ -26,20 +56,20 @@ public class Settings {
     }
 
     public static boolean getSwap(@NonNull Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("swapPref", context.getResources().getBoolean(R.bool.DEFAULT_SWAP_ENABLED));
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(SWAP, context.getResources().getBoolean(R.bool.DEFAULT_SWAP_ENABLED));
     }
 
     public static boolean getAutosave(@NonNull Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("autosavePref",
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(AUTOSAVE,
                 context.getResources().getBoolean(R.bool.DEFAULT_AUTOSAVE_ENABLED));
     }
 
     public static int getTimerType(Context context) {
-        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("timerTypePref", String.valueOf(Timer.NO_TIMER)));
+        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString(TIMER_TYPE, String.valueOf(Timer.NO_TIMER)));
     }
 
     public static int getTimeAmount(Context context) {
-        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("timerPref", "0"));
+        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString(TIMER, "0"));
     }
 
     public static String getPlayer1Name(@NonNull Context context, @NonNull GoogleApiClient gamesClient) {
@@ -61,7 +91,7 @@ public class Settings {
     }
 
     public static int getComputerDifficulty(@NonNull Context context) {
-        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("comDifficulty",
+        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString(DIFFICULTY,
                 String.valueOf(context.getResources().getInteger(R.integer.DEFAULT_AI_DIFFICULTY))));
     }
 }

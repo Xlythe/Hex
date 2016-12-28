@@ -3,20 +3,21 @@ package com.sam.hex;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
 
-public abstract class BaseGameActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public abstract class BaseGameActivity extends AppCompatActivity implements
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private GoogleApiClient mGoogleApiClient;
     private boolean mSignedIn = false;
 
     @Override
-    public void onCreate(Bundle b) {
-        super.onCreate(b);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -32,7 +33,7 @@ public abstract class BaseGameActivity extends FragmentActivity implements Googl
     }
 
     @Override
-    public void onConnectionSuspended(int i) {
+    public void onConnectionSuspended(int reason) {
         // Attempt to reconnect
         mGoogleApiClient.connect();
     }
@@ -59,11 +60,7 @@ public abstract class BaseGameActivity extends FragmentActivity implements Googl
         Games.signOut(mGoogleApiClient);
     }
 
-    public void onSignInSucceeded(@Nullable Bundle bundle) {
+    public void onSignInSucceeded(@Nullable Bundle bundle) {}
 
-    }
-
-    public void onSignInFailed() {
-
-    }
+    public void onSignInFailed() {}
 }

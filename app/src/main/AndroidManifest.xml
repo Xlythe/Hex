@@ -18,7 +18,7 @@
         android:theme="@style/LightTheme" >
         <meta-data android:name="com.google.android.gms.games.APP_ID" android:value="@string/app_id" />
         <meta-data android:name="com.google.android.gms.appstate.APP_ID" android:value="@string/app_id" />
-        <activity android:label="@string/app_name" android:name="com.sam.hex.MainActivity" android:screenOrientation="landscape" >
+        <activity android:name=".MainActivity" android:label="@string/app_name" android:screenOrientation="landscape" >
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -41,7 +41,7 @@
                 <data android:pathPattern=".*\\.rhex" />
             </intent-filter>
         </activity>
-        <activity android:label="@string/activity_title_preferences" android:name=".PreferencesActivity" android:screenOrientation="landscape" />
+        <activity android:name=".PreferencesActivity" android:label="@string/activity_title_preferences" android:screenOrientation="landscape" />
         <activity android:name=".view.DonateDialog" android:screenOrientation="landscape" android:theme="@style/HexDialog" />
         <activity android:name=".view.GameOverDialog" android:screenOrientation="landscape" android:theme="@style/HexDialog" />
     </application>

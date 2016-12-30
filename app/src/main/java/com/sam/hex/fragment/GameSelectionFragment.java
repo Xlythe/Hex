@@ -24,7 +24,7 @@ public class GameSelectionFragment extends HexFragment {
         mSelectorLayout = (SelectorLayout) v.findViewById(R.id.buttons);
 
         SelectorLayout.Button computerButton = mSelectorLayout.getButtons()[0];
-        computerButton.setColor(0xffb7cf47);
+        computerButton.setColor(getResources().getColor(R.color.select_computer));
         computerButton.setText(R.string.game_selection_button_computer);
         computerButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
             @Override
@@ -42,7 +42,7 @@ public class GameSelectionFragment extends HexFragment {
         });
 
         SelectorLayout.Button hotseatButton = mSelectorLayout.getButtons()[1];
-        hotseatButton.setColor(0xff4ba5e2);
+        hotseatButton.setColor(getResources().getColor(R.color.select_pass_to_play));
         hotseatButton.setText(R.string.game_selection_button_pass);
         hotseatButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
             @Override
@@ -55,7 +55,7 @@ public class GameSelectionFragment extends HexFragment {
         });
 
         SelectorLayout.Button netButton = mSelectorLayout.getButtons()[2];
-        netButton.setColor(0xffcc5c57);
+        netButton.setColor(getResources().getColor(R.color.select_online));
         netButton.setText(R.string.game_selection_button_net);
         netButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
             @Override

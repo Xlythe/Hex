@@ -25,7 +25,7 @@ public class OnlineSelectionFragment extends HexFragment {
         mSelectorLayout = (SelectorLayout) v.findViewById(R.id.buttons);
 
         SelectorLayout.Button quickGameButton = mSelectorLayout.getButtons()[0];
-        quickGameButton.setColor(0xfff9db00);
+        quickGameButton.setColor(getResources().getColor(R.color.select_quick_game));
         quickGameButton.setText(R.string.online_selection_button_quick);
         quickGameButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
             @Override
@@ -41,7 +41,7 @@ public class OnlineSelectionFragment extends HexFragment {
         });
 
         SelectorLayout.Button inviteButton = mSelectorLayout.getButtons()[1];
-        inviteButton.setColor(0xff5f6ec2);
+        inviteButton.setColor(getResources().getColor(R.color.select_friends));
         inviteButton.setText(R.string.online_selection_button_invite);
         inviteButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
             @Override
@@ -58,7 +58,7 @@ public class OnlineSelectionFragment extends HexFragment {
         });
 
         SelectorLayout.Button pendingButton = mSelectorLayout.getButtons()[2];
-        pendingButton.setColor(0xfff48935);
+        pendingButton.setColor(getResources().getColor(R.color.select_pending_invites));
         pendingButton.setText(R.string.online_selection_button_pending);
         pendingButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
             @Override

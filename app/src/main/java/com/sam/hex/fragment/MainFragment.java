@@ -75,7 +75,7 @@ public class MainFragment extends HexFragment {
         mSignOutButton = (Button) v.findViewById(R.id.signOutButton);
 
         settingsButton.setText(R.string.main_button_settings);
-        settingsButton.setColor(0xffcc5c57);
+        settingsButton.setColor(getResources().getColor(R.color.main_settings));
         settingsButton.setDrawableResource(R.drawable.settings);
         settingsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
@@ -86,7 +86,7 @@ public class MainFragment extends HexFragment {
         });
 
         donateButton.setText(R.string.main_button_donate);
-        donateButton.setColor(0xff5f6ec2);
+        donateButton.setColor(getResources().getColor(R.color.main_donate));
         donateButton.setDrawableResource(R.drawable.store);
         donateButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
@@ -97,7 +97,7 @@ public class MainFragment extends HexFragment {
         });
 
         historyButton.setText(R.string.main_button_history);
-        historyButton.setColor(0xfff9db00);
+        historyButton.setColor(getResources().getColor(R.color.main_history));
         historyButton.setDrawableResource(R.drawable.history);
         historyButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
@@ -108,7 +108,7 @@ public class MainFragment extends HexFragment {
         });
 
         instructionsButton.setText(R.string.main_button_instructions);
-        instructionsButton.setColor(0xffb7cf47);
+        instructionsButton.setColor(getResources().getColor(R.color.main_instructions));
         instructionsButton.setDrawableResource(R.drawable.howtoplay);
         instructionsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
@@ -119,7 +119,7 @@ public class MainFragment extends HexFragment {
         });
 
         achievementsButton.setText(R.string.main_button_achievements);
-        achievementsButton.setColor(0xfff48935);
+        achievementsButton.setColor(getResources().getColor(R.color.main_achievements));
         achievementsButton.setDrawableResource(R.drawable.achievements);
         achievementsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override
@@ -135,7 +135,7 @@ public class MainFragment extends HexFragment {
         });
 
         playButton.setText(R.string.main_button_play);
-        playButton.setColor(0xff4ba5e2);
+        playButton.setColor(getResources().getColor(R.color.main_play));
         playButton.setDrawableResource(R.drawable.play);
         playButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
             @Override

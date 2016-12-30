@@ -9,4 +9,19 @@
     <drawable name="black">#00000000</drawable>
     <color name="background">#D2D2D2</color>
     <color name="bar_background">#333333</color>
+
+    <color name="main_settings">#cc5c57</color>
+    <color name="main_donate">#5f6ec2</color>
+    <color name="main_history">#f9db00</color>
+    <color name="main_instructions">#b7cf47</color>
+    <color name="main_achievements">#f48935</color>
+    <color name="main_play">#4ba5e2</color>
+
+    <color name="select_computer">#b7cf47</color>
+    <color name="select_pass_to_play">#4ba5e2</color>
+    <color name="select_online">#cc5c57</color>
+
+    <color name="select_quick_game">#f9db00</color>
+    <color name="select_friends">#5f6ec2</color>
+    <color name="select_pending_invites">#f48935</color>
 </resources>

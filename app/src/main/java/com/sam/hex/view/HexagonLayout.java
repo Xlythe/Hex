@@ -1,5 +1,7 @@
 package com.sam.hex.view;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -13,13 +15,17 @@ import android.graphics.drawable.shapes.PathShape;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 
 import com.hex.core.Point;
+
+import static com.sam.hex.Settings.TAG;
 
 /**
  * @author Will Harmon
@@ -30,11 +36,8 @@ public class HexagonLayout extends View implements OnTouchListener {
     private float mRotation;
     private float mRotationOffset;
     private float mOldRotation;
-    private boolean mSnapToSide;
     private float[] mRotationHistory;
-    private float mRotationSpin;
-    private int mRotationSpinSign;
-    private int mRotationTick;
+    private ValueAnimator mAnimator;
 
     // Size and shape variables
     private Point[] corners;
@@ -108,7 +111,6 @@ public class HexagonLayout extends View implements OnTouchListener {
         mButtonTextPaint.setColor(Color.WHITE);
         mButtonTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, dm));
         mAllowRotation = true;
-        mRotationTick = 20;
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -264,31 +266,6 @@ public class HexagonLayout extends View implements OnTouchListener {
         canvas.save();
         if (mAllowRotation) {
             canvas.rotate(mRotation, center.x, center.y);
-
-            if (mRotationSpin > 0f) {
-                mRotation += mRotationSpin * mRotationSpinSign;
-                mRotationSpin *= 0.9f;
-                mRotationSpin -= 0.1f;
-                if (mRotationSpin < 0f) {
-                    mSnapToSide = true;
-                }
-                postInvalidateDelayed(mRotationTick);
-            }
-
-            // We're done rotating. Snap to whatever side we landed on.
-            if (mSnapToSide) {
-                float offset = Math.abs(mRotation % 60);
-                int sign = (int) (mRotation / Math.abs(mRotation));
-                if (offset < 5f) {
-                    mSnapToSide = false;
-                    mRotation -= mRotation % 60;
-                } else if (offset < 30f) {
-                    mRotation -= 2f * sign;
-                } else {
-                    mRotation += 2f * sign;
-                }
-                postInvalidateDelayed(mRotationTick);
-            }
         }
 
         mHexagon.draw(canvas);
@@ -485,7 +462,9 @@ public class HexagonLayout extends View implements OnTouchListener {
                     b.setPressed(false);
                 }
             }
-            mRotationSpin = -1f;
+            if (mAnimator != null) {
+                mAnimator.cancel();
+            }
             mRotationHistory = new float[4];
         } else if (event.getAction() == MotionEvent.ACTION_UP) {
             boolean performClick = false;
@@ -501,9 +480,7 @@ public class HexagonLayout extends View implements OnTouchListener {
                 mRotationHistory[2] = mRotationHistory[1];
                 mRotationHistory[1] = mRotationHistory[0];
                 mRotationHistory[0] = mRotation % 360;
-                mRotationSpin = mRotation - getAverage(mRotationHistory);
-                mRotationSpinSign = mRotationSpin > 0 ? 1 : -1;
-                mRotationSpin *= mRotationSpinSign;
+                spin(mRotation - getAverage(mRotationHistory));
             }
         } else {
             mRotation = mOldRotation + mRotationOffset - sign
@@ -534,6 +511,71 @@ public class HexagonLayout extends View implements OnTouchListener {
             sum += f;
         }
         return sum / data.length;
+    }
+
+    private void spin(float velocity) {
+        spinExactly(2.3f * velocity, false);
+    }
+
+    private void spinExactly(final float rotation, final boolean constantDuration) {
+        if (getWidth() == 0) {
+            postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    spinExactly(rotation, constantDuration);
+                }
+            }, 1500);
+            return;
+        }
+
+        if (mAnimator != null) {
+            mAnimator.cancel();
+        }
+
+        final float initialRotation = mRotation;
+        Log.d(TAG, "Spinning " + rotation + " degrees");
+
+        mAnimator = ValueAnimator.ofFloat(0, rotation);
+        mAnimator.setInterpolator(new DecelerateInterpolator());
+        mAnimator.setDuration(constantDuration ? 300 : (long) (Math.abs(rotation) / 50 * 300));
+        mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                float value = (Float) valueAnimator.getAnimatedValue();
+                mRotation = initialRotation + value;
+                invalidate();
+            }
+        });
+        mAnimator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {}
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                // We're done rotating. Snap to whatever side we landed on.
+                float offset = Math.abs(mRotation % 60);
+                if (offset > 30) {
+                    offset = 60f - offset;
+                }
+                Log.d(TAG, "We ended our spin " + offset + " degrees away from where we need to be");
+                if (offset < 1f) {
+                    Log.d(TAG, "We're close enough that we'll just jump to the position");
+                    mRotation -= mRotation % 60;
+                    invalidate();
+                } else if ((mRotation + offset) % 60 == 0) {
+                    spinExactly(offset, true);
+                } else {
+                    spinExactly(-offset, true);
+                }
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {}
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {}
+        });
+        mAnimator.start();
     }
 
     private float cosineInverse(@NonNull Point a, @NonNull Point b, @NonNull Point c) {
@@ -573,17 +615,12 @@ public class HexagonLayout extends View implements OnTouchListener {
         mTopMargin = margin;
     }
 
-    public void setInitialSpin(float initialSpin) {
-        if (initialSpin > 0) {
-            mRotationSpin = initialSpin;
-            mRotationSpinSign = 1;
-        } else {
-            mRotationSpin = -1 * initialSpin;
-            mRotationSpinSign = -1;
-        }
+    public void setInitialSpin(float spin) {
+        spin(spin);
     }
 
     public void setInitialRotation(float initialRotation) {
+        Log.v(TAG, "Initial rotation set to " + initialRotation);
         mRotation = initialRotation;
     }
 

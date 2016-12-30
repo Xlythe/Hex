@@ -13,7 +13,7 @@ import com.hex.core.Timer;
  * @author Will Harmon
  **/
 public class Settings {
-    static final String TAG = "Hex";
+    public static final String TAG = "Hex";
 
     public static final int MAX_BOARD_SIZE = 30;
     public static final int MIN_BOARD_SIZE = 4;

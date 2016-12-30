@@ -70,7 +70,6 @@ public abstract class BaseGameActivity extends AppCompatActivity implements
         if (result.hasResolution()) {
             Log.v(TAG, "Resolution is available");
             mConnectionResult = result;
-            beginUserInitiatedSignIn();
         }
         onSignInFailed();
     }

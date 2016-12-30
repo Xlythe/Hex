@@ -5,7 +5,7 @@ android {
     buildToolsVersion "24.0.3"
     defaultConfig {
         applicationId "com.sam.hex"
-        minSdkVersion 18
+        minSdkVersion 14
         targetSdkVersion 25
         versionCode 25
         versionName "3.1.1"

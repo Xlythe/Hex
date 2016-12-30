@@ -1,5 +1,7 @@
 package com.sam.hex.view;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -16,6 +18,7 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.animation.AccelerateInterpolator;
 
 import com.hex.core.Point;
 
@@ -24,8 +27,6 @@ import com.hex.core.Point;
  **/
 public class SelectorLayout extends View implements OnTouchListener {
     private SelectorLayout.Button[] mButtons;
-    private ShapeDrawable[] mButtonDrawable;
-    private ShapeDrawable[] mMirrorButtonDrawable;
     private Paint mButtonTextPaint;
     private int mDisabledColor;
     private int mFocusedButton = -1;
@@ -34,10 +35,6 @@ public class SelectorLayout extends View implements OnTouchListener {
     private int mIndentHeight;
     private int mMargin;
     private float mRotation;
-    private int mAnimationLength;
-    private int mAnimationTick;
-    private int mAnimationDelta;
-    private int mMinAnimationDelta;
     private Rect[] mOldRect;
     private Rect[] mOldMirrorRect;
     private Point[] mOldTextPos;
@@ -73,15 +70,45 @@ public class SelectorLayout extends View implements OnTouchListener {
         mIndentHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, dm);
         mMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, dm);
         mRotation = 45f;
-        mAnimationTick = 30;
-        mAnimationLength = 240;
-        mMinAnimationDelta = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 55, dm);
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                for (Button b : mButtons) {
+                for (final Button b : mButtons) {
                     if (b.isSelected() || b.isPressed()) {
-                        b.setAnimate(true);
+                        final float initialTextX = b.textX;
+                        final Rect initialButtonBounds = b.buttonDrawable.copyBounds();
+                        final Rect initialMirrorButtonBounds = b.mirrorButtonDrawable.copyBounds();
+
+                        ValueAnimator animator = ValueAnimator.ofInt(0, 3 * getHeight() / 2);
+                        animator.setInterpolator(new AccelerateInterpolator());
+                        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                            @Override
+                            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                                int value = (Integer) valueAnimator.getAnimatedValue();
+                                b.buttonDrawable.setBounds(initialButtonBounds.left, initialButtonBounds.top - value,
+                                        initialButtonBounds.right, initialButtonBounds.bottom - value);
+                                b.mirrorButtonDrawable.setBounds(initialMirrorButtonBounds.left, initialMirrorButtonBounds.top + value,
+                                        initialMirrorButtonBounds.right, initialMirrorButtonBounds.bottom + value);
+                                b.textX = initialTextX + value;
+                                invalidate();
+                            }
+                        });
+                        animator.addListener(new Animator.AnimatorListener() {
+                            @Override
+                            public void onAnimationStart(Animator animator) {}
+
+                            @Override
+                            public void onAnimationEnd(Animator animator) {
+                                b.performClick();
+                            }
+
+                            @Override
+                            public void onAnimationCancel(Animator animator) {}
+
+                            @Override
+                            public void onAnimationRepeat(Animator animator) {}
+                        });
+                        animator.start();
                     }
                 }
                 invalidate();
@@ -154,34 +181,21 @@ public class SelectorLayout extends View implements OnTouchListener {
         canvas.rotate(mRotation);
         for (int i = 0; i < mButtons.length; i++) {
             if (!mButtons[i].isEnabled()) {
-                mButtonDrawable[i].getPaint().setColor(mDisabledColor);
-                mMirrorButtonDrawable[i].getPaint().setColor(mDisabledColor);
+                mButtons[i].buttonDrawable.getPaint().setColor(mDisabledColor);
+                mButtons[i].mirrorButtonDrawable.getPaint().setColor(mDisabledColor);
             } else if (mButtons[i].isPressed()) {
-                mButtonDrawable[i].getPaint().setColor(getDarkerColor(mButtons[i].getColor()));
-                mMirrorButtonDrawable[i].getPaint().setColor(getDarkerColor(mButtons[i].getColor()));
+                mButtons[i].buttonDrawable.getPaint().setColor(getDarkerColor(mButtons[i].getColor()));
+                mButtons[i].mirrorButtonDrawable.getPaint().setColor(getDarkerColor(mButtons[i].getColor()));
             } else if (mButtons[i].isSelected()) {
-                mButtonDrawable[i].getPaint().setColor(getDarkerColor(mButtons[i].getColor()));
-                mMirrorButtonDrawable[i].getPaint().setColor(getDarkerColor(mButtons[i].getColor()));
+                mButtons[i].buttonDrawable.getPaint().setColor(getDarkerColor(mButtons[i].getColor()));
+                mButtons[i].mirrorButtonDrawable.getPaint().setColor(getDarkerColor(mButtons[i].getColor()));
             } else {
-                mButtonDrawable[i].getPaint().setColor(mButtons[i].getColor());
-                mMirrorButtonDrawable[i].getPaint().setColor(mButtons[i].getColor());
+                mButtons[i].buttonDrawable.getPaint().setColor(mButtons[i].getColor());
+                mButtons[i].mirrorButtonDrawable.getPaint().setColor(mButtons[i].getColor());
             }
 
-            if (mButtons[i].isAnimate()) {
-                if (mButtonDrawable[i].getBounds().bottom + 3 * mIndentHeight > 0) {
-                    mButtonDrawable[i].setBounds(mButtonDrawable[i].getBounds().left, mButtonDrawable[i].getBounds().top - mAnimationDelta,
-                            mButtonDrawable[i].getBounds().right, mButtonDrawable[i].getBounds().bottom - mAnimationDelta);
-                    mMirrorButtonDrawable[i].setBounds(mMirrorButtonDrawable[i].getBounds().left, mMirrorButtonDrawable[i].getBounds().top + mAnimationDelta,
-                            mMirrorButtonDrawable[i].getBounds().right, mMirrorButtonDrawable[i].getBounds().bottom + mAnimationDelta);
-                    mButtons[i].textX += mAnimationDelta;
-                    postInvalidateDelayed(mAnimationTick);
-                } else {
-                    mButtons[i].setAnimate(false);
-                    mButtons[i].performClick();
-                }
-            }
-            mButtonDrawable[i].draw(canvas);
-            mMirrorButtonDrawable[i].draw(canvas);
+            mButtons[i].buttonDrawable.draw(canvas);
+            mButtons[i].mirrorButtonDrawable.draw(canvas);
             canvas.save();
             canvas.rotate(-90f, mButtons[i].getHexagon().b.x, mButtons[i].getHexagon().d.y / 2);
             canvas.drawText(mButtons[i].getText(), mButtons[i].textX, mButtons[i].textY, mButtonTextPaint);
@@ -195,8 +209,6 @@ public class SelectorLayout extends View implements OnTouchListener {
         int margin = (w - mWidth * 3) / 4;
         int offset = margin;
         // Create the buttons
-        mButtonDrawable = new ShapeDrawable[mButtons.length];
-        mMirrorButtonDrawable = new ShapeDrawable[mButtons.length];
         mOldRect = new Rect[mButtons.length];
         mOldMirrorRect = new Rect[mButtons.length];
         mOldTextPos = new Point[mButtons.length];
@@ -231,10 +243,10 @@ public class SelectorLayout extends View implements OnTouchListener {
             mirrorButtonPath.close();
 
             int heightOffset = (int) (3.6 * mIndentHeight);
-            mButtonDrawable[i] = new ShapeDrawable(new PathShape(buttonPath, w, h));
-            mButtonDrawable[i].setBounds(0, -heightOffset + h / 2, w, h - heightOffset + h / 2);
-            mMirrorButtonDrawable[i] = new ShapeDrawable(new PathShape(mirrorButtonPath, w, h));
-            mMirrorButtonDrawable[i].setBounds(0, (h - mIndentHeight) + mMargin - heightOffset + h / 2, w, (2 * h - mIndentHeight) + mMargin - heightOffset + h
+            mButtons[i].buttonDrawable = new ShapeDrawable(new PathShape(buttonPath, w, h));
+            mButtons[i].buttonDrawable.setBounds(0, -heightOffset + h / 2, w, h - heightOffset + h / 2);
+            mButtons[i].mirrorButtonDrawable = new ShapeDrawable(new PathShape(mirrorButtonPath, w, h));
+            mButtons[i].mirrorButtonDrawable.setBounds(0, (h - mIndentHeight) + mMargin - heightOffset + h / 2, w, (2 * h - mIndentHeight) + mMargin - heightOffset + h
                     / 2);
 
             mButtons[i].setHexagon(hex);
@@ -242,15 +254,12 @@ public class SelectorLayout extends View implements OnTouchListener {
             mButtons[i].textX = mButtons[i].getHexagon().b.x * 2 - mButtonTextPaint.measureText(mButtons[i].getText()) / 2 - (int) (1.7 * i * margin);
             mButtons[i].textY = mButtons[i].getHexagon().d.y / 2 + mButtonTextPaint.getTextSize() / 4;
 
-            mOldRect[i] = mButtonDrawable[i].copyBounds();
-            mOldMirrorRect[i] = mMirrorButtonDrawable[i].copyBounds();
+            mOldRect[i] = mButtons[i].buttonDrawable.copyBounds();
+            mOldMirrorRect[i] = mButtons[i].mirrorButtonDrawable.copyBounds();
             mOldTextPos[i] = new Point((int) mButtons[i].textX, (int) mButtons[i].textY);
 
             offset += margin + mWidth;
         }
-
-        mAnimationDelta = h / mAnimationLength * mAnimationTick;
-        mAnimationDelta = Math.max(mMinAnimationDelta, mAnimationDelta);
     }
 
     @Override
@@ -298,8 +307,8 @@ public class SelectorLayout extends View implements OnTouchListener {
     public void reset() {
         if (mOldRect != null) {
             for (int i = 0; i < mButtons.length; i++) {
-                mButtonDrawable[i].setBounds(mOldRect[i]);
-                mMirrorButtonDrawable[i].setBounds(mOldMirrorRect[i]);
+                mButtons[i].buttonDrawable.setBounds(mOldRect[i]);
+                mButtons[i].mirrorButtonDrawable.setBounds(mOldMirrorRect[i]);
                 mButtons[i].textX = mOldTextPos[i].x;
                 mButtons[i].textY = mOldTextPos[i].y;
             }
@@ -345,10 +354,11 @@ public class SelectorLayout extends View implements OnTouchListener {
         private Hexagon hexagon;
         private boolean pressed = false;
         private boolean enabled = true;
-        private boolean animate = false;
         private float textX;
         private float textY;
         private boolean selected;
+        private ShapeDrawable buttonDrawable;
+        private ShapeDrawable mirrorButtonDrawable;
 
         public Button(Context context) {
             this.context = context;
@@ -420,14 +430,6 @@ public class SelectorLayout extends View implements OnTouchListener {
 
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
-        }
-
-        public boolean isAnimate() {
-            return animate;
-        }
-
-        public void setAnimate(boolean animate) {
-            this.animate = animate;
         }
     }
 }

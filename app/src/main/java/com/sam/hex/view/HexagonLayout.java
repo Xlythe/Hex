@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.graphics.drawable.shapes.PathShape;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -21,6 +22,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.DecelerateInterpolator;
 
 import com.hex.core.Point;
@@ -519,12 +521,17 @@ public class HexagonLayout extends View implements OnTouchListener {
 
     private void spinExactly(final float rotation, final boolean constantDuration) {
         if (getWidth() == 0) {
-            postDelayed(new Runnable() {
+            getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
-                public void run() {
+                public void onGlobalLayout() {
+                    if (Build.VERSION.SDK_INT <= 16) {
+                        getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                    } else {
+                        getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    }
                     spinExactly(rotation, constantDuration);
                 }
-            }, 1500);
+            });
             return;
         }
 

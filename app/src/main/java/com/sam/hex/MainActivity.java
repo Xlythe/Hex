@@ -66,6 +66,23 @@ public class MainActivity extends NetActivity {
             getSupportFragmentManager().beginTransaction().add(R.id.content, mMainFragment).commit();
 
             popupRatingDialog();
+        } else {
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.content);
+            if (fragment != null) {
+                if (fragment instanceof MainFragment) {
+                    mMainFragment = (MainFragment) fragment;
+                } else if (fragment instanceof GameFragment) {
+                    mGameFragment = (GameFragment) fragment;
+                } else if (fragment instanceof GameSelectionFragment) {
+                    mGameSelectionFragment = (GameSelectionFragment) fragment;
+                } else if (fragment instanceof HistoryFragment) {
+                    mHistoryFragment = (HistoryFragment) fragment;
+                } else if (fragment instanceof InstructionsFragment) {
+                    mInstructionsFragment = (InstructionsFragment) fragment;
+                } else if (fragment instanceof OnlineSelectionFragment) {
+                    mOnlineSelectionFragment = (OnlineSelectionFragment) fragment;
+                }
+            }
         }
 
         if (!hasPermissions(this, REQUIRED_PERMISSIONS)) {
@@ -92,7 +109,6 @@ public class MainActivity extends NetActivity {
         super.onSignInSucceeded(bundle);
         mIsSignedIn = true;
 
-        //getAppStateClient().loadState(this, STAT_STATE);
         if (mMainFragment != null) mMainFragment.setSignedIn(mIsSignedIn);
 
         if (mOpenAchievements) {

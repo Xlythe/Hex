@@ -1,6 +1,5 @@
 package com.sam.hex;
 
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
@@ -25,7 +24,7 @@ public abstract class BaseGameActivity extends AppCompatActivity implements
 
     private GoogleApiClient mGoogleApiClient;
     private boolean mSignedIn = false;
-    private boolean mConnecting = false;
+    private boolean mAwaitingResolution = false;
 
     @Nullable
     private ConnectionResult mConnectionResult;
@@ -43,16 +42,20 @@ public abstract class BaseGameActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        if (!mConnecting) {
-            mConnecting = true;
+        if (!mAwaitingResolution) {
             mGoogleApiClient.connect();
         }
     }
 
     @Override
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
     public void onConnected(@Nullable Bundle bundle) {
         mSignedIn = true;
-        mConnecting = false;
         onSignInSucceeded(bundle);
     }
 
@@ -65,7 +68,6 @@ public abstract class BaseGameActivity extends AppCompatActivity implements
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult result) {
         mSignedIn = false;
-        mConnecting = false;
         Log.w(TAG, String.format("Connection failed: %s", toString(result)));
         if (result.hasResolution()) {
             Log.v(TAG, "Resolution is available");
@@ -77,9 +79,9 @@ public abstract class BaseGameActivity extends AppCompatActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == REQUEST_CODE_RESOLUTION) {
+            mAwaitingResolution = false;
             if (resultCode == RESULT_OK) {
                 Log.v(TAG, "Resolution succeeded");
-                mConnecting = true;
                 mGoogleApiClient.connect();
             } else {
                 Log.w(TAG, "Resolution failed: " + resultCode);
@@ -99,9 +101,9 @@ public abstract class BaseGameActivity extends AppCompatActivity implements
 
     public void beginUserInitiatedSignIn() {
         Log.v(TAG, "User initiated sign in");
-        mConnecting = true;
         if (mConnectionResult != null) {
             Log.v(TAG, "Attempting resolution");
+            mAwaitingResolution = true;
             try {
                 mConnectionResult.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
             } catch (IntentSender.SendIntentException e) {

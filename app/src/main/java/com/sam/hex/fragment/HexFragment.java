@@ -32,7 +32,6 @@ public class HexFragment extends Fragment {
         mContainer.requestFocus();
     }
 
-    @NonNull
     protected MainActivity getMainActivity() {
         return (MainActivity) getActivity();
     }

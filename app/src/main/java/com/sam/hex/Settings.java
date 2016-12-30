@@ -13,18 +13,20 @@ import com.hex.core.Timer;
  * @author Will Harmon
  **/
 public class Settings {
-    static final int MAX_BOARD_SIZE = 30;
-    static final int MIN_BOARD_SIZE = 4;
+    static final String TAG = "Hex";
+
+    public static final int MAX_BOARD_SIZE = 30;
+    public static final int MIN_BOARD_SIZE = 4;
 
     private static final String NUM_TIMES_OPENED = "num_times_app_opened_review";
-    static final String GAME_SIZE = "gameSizePref";
-    static final String CUSTOM_GAME_SIZE = "customGameSizePref";
+    public static final String GAME_SIZE = "gameSizePref";
+    public static final String CUSTOM_GAME_SIZE = "customGameSizePref";
     private static final String SWAP = "swapPref";
     private static final String AUTOSAVE = "autosavePref";
-    static final String TIMER_TYPE = "timerTypePref";
-    static final String TIMER = "timerPref";
-    static final String TIMER_OPTIONS = "timerOptionsPref";
-    static final String DIFFICULTY = "comDifficulty";
+    public static final String TIMER_TYPE = "timerTypePref";
+    public static final String TIMER = "timerPref";
+    public static final String TIMER_OPTIONS = "timerOptionsPref";
+    public static final String DIFFICULTY = "comDifficulty";
 
     public static int getNumTimesOpened(@NonNull Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);

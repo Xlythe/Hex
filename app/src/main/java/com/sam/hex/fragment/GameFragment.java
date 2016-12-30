@@ -614,7 +614,7 @@ public class GameFragment extends HexFragment {
                     && Integer.valueOf(prefs.getString("gameSizePref", Integer.toString(getResources().getInteger(R.integer.DEFAULT_BOARD_SIZE)))) != 0)
                     || (Integer.valueOf(prefs.getString("customGameSizePref", Integer.toString(getResources().getInteger(R.integer.DEFAULT_BOARD_SIZE)))) != game.gameOptions.gridSize
                     && Integer.valueOf(prefs.getString("gameSizePref", Integer.toString(getResources().getInteger(R.integer.DEFAULT_BOARD_SIZE)))) == 0)
-                    || Integer.valueOf(prefs.getString("timerTypePref", getString(R.integer.DEFAULT_TIMER_TYPE))) != game.gameOptions.timer.type
+                    || Integer.valueOf(prefs.getString("timerTypePref", Integer.toString(getResources().getInteger(R.integer.DEFAULT_TIMER_TYPE)))) != game.gameOptions.timer.type
                     || Integer.valueOf(prefs.getString("timerPref", Integer.toString(getResources().getInteger(R.integer.DEFAULT_TIMER_TIME)))) * 60 * 1000 != game.gameOptions.timer.totalTime;
         } else if (gameLocation == GameAction.NET_GAME) {
             return (game != null && game.isGameOver());

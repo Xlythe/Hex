@@ -150,7 +150,7 @@ public class PreferencesActivity extends PreferenceActivity {
     }
 
     private void loadPreferences() {
-        addPreferencesFromResource(R.layout.preferences_general);
+        addPreferencesFromResource(R.xml.preferences_general);
     }
 
     /**

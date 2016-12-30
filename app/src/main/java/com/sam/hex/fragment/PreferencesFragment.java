@@ -75,8 +75,8 @@ public class PreferencesFragment extends PreferenceFragment {
             View dialoglayout = inflater.inflate(R.layout.preferences_timer, null);
             final Spinner timerType = (Spinner) dialoglayout.findViewById(R.id.timerType);
             final EditText timer = (EditText) dialoglayout.findViewById(R.id.timer);
-            timer.setText(settings.getString("timerPref", getString(R.integer.DEFAULT_TIMER_TIME)));
-            timerType.setSelection(Integer.valueOf(settings.getString("timerTypePref", getString(R.integer.DEFAULT_TIMER_TYPE))));
+            timer.setText(settings.getString(Settings.TIMER, Integer.toString(getResources().getInteger(R.integer.DEFAULT_TIMER_TIME))));
+            timerType.setSelection(Integer.valueOf(settings.getString(Settings.TIMER_TYPE, Integer.toString(getResources().getInteger(R.integer.DEFAULT_TIMER_TYPE)))));
             timerType.setOnItemSelectedListener(new OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int arg2, long arg3) {
@@ -98,9 +98,10 @@ public class PreferencesFragment extends PreferenceFragment {
                 public void onClick(DialogInterface dialog, int which) {
                     String timerTime = timer.getText().toString();
                     if (timerTime.isEmpty()) timerTime = "0";
-                    settings.edit().putString("timerTypePref", getResources().getStringArray(R.array.timerTypeValues)[timerType.getSelectedItemPosition()])
-                            .commit();
-                    settings.edit().putString("timerPref", timerTime).commit();
+                    settings.edit()
+                            .putString(Settings.TIMER_TYPE, getResources().getStringArray(R.array.timerTypeValues)[timerType.getSelectedItemPosition()])
+                            .putString(Settings.TIMER, timerTime)
+                            .apply();
                 }
             }).setNegativeButton(getString(R.string.cancel), null).show();
             return true;
@@ -109,7 +110,7 @@ public class PreferencesFragment extends PreferenceFragment {
 
     private void setListeners() {
         // Allow for custom grid sizes
-        gridPref = findPreference("gameSizePref");
+        gridPref = findPreference(Settings.GAME_SIZE);
         if (gridPref != null) {
             String boardSize = String.valueOf(Settings.getGridSize(getActivity()));
             gridPref.setSummary(String.format(getString(R.string.preferences_summary_game_size), boardSize, boardSize));
@@ -117,12 +118,12 @@ public class PreferencesFragment extends PreferenceFragment {
         }
 
         // Give a custom popup for timers
-        timerPref = findPreference("timerOptionsPref");
+        timerPref = findPreference(Settings.TIMER_OPTIONS);
         if (timerPref != null) {
             timerPref.setOnPreferenceClickListener(new TimerListener());
         }
 
-        Preference comDifficultyPref = findPreference("comDifficulty");
+        Preference comDifficultyPref = findPreference(Settings.DIFFICULTY);
         if (comDifficultyPref != null) {
             comDifficultyPref.setOnPreferenceChangeListener(new DifficultyListener());
             comDifficultyPref.setSummary(getResources().getStringArray(R.array.comDifficultyArray)[Settings.getComputerDifficulty(getActivity())]);
@@ -130,7 +131,7 @@ public class PreferencesFragment extends PreferenceFragment {
     }
 
     private void loadPreferences() {
-        addPreferencesFromResource(R.layout.preferences_general);
+        addPreferencesFromResource(R.xml.preferences_general);
     }
 
     /**
@@ -145,14 +146,14 @@ public class PreferencesFragment extends PreferenceFragment {
             public void onClick(DialogInterface dialog, int which) {
                 if (!editText.getText().toString().equals("")) {
                     int input = Integer.decode(editText.getText().toString());
-                    if (input > 30) {
-                        input = 30;
-                    } else if (input < 4) {
-                        input = 4;
+                    if (input > Settings.MAX_BOARD_SIZE) {
+                        input = Settings.MAX_BOARD_SIZE;
+                    } else if (input < Settings.MIN_BOARD_SIZE) {
+                        input = Settings.MIN_BOARD_SIZE;
                     }
-                    settings.edit().putString("customGameSizePref", String.valueOf(input)).commit();
-                    settings.edit().putString("gameSizePref", String.valueOf(0)).commit();
-                    String boardSize = settings.getString("customGameSizePref", getString(R.integer.DEFAULT_BOARD_SIZE));
+                    settings.edit().putString(Settings.CUSTOM_GAME_SIZE, String.valueOf(input)).apply();
+                    settings.edit().putString(Settings.GAME_SIZE, String.valueOf(0)).apply();
+                    String boardSize = settings.getString(Settings.CUSTOM_GAME_SIZE, Integer.toString(getResources().getInteger(R.integer.DEFAULT_BOARD_SIZE)));
                     gridPref.setSummary(String.format(getString(R.string.preferences_summary_game_size), boardSize, boardSize));
                 }
             }

@@ -115,7 +115,10 @@ public abstract class BaseGameActivity extends AppCompatActivity implements
     }
 
     public void signOut() {
+        mSignedIn = false;
         Games.signOut(mGoogleApiClient);
+        mGoogleApiClient.disconnect();
+        onSignInFailed();
     }
 
     public void onSignInSucceeded(@Nullable Bundle bundle) {}

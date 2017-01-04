@@ -55,7 +55,7 @@ public class GameFragment extends HexFragment {
     public static final String PLAYER2_TYPE = "player2_type";
     public static final String REPLAY = "replay";
     public static final String NET = "net";
-    private static final SimpleDateFormat SAVE_FORMAT = new SimpleDateFormat("MMM dd, yyyy hh:mm", Locale.getDefault());
+    private static final SimpleDateFormat SAVE_FORMAT = new SimpleDateFormat("yyyy/mm/dd hh:mm", Locale.getDefault());
 
     @Nullable
     private Game game;

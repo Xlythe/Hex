@@ -2,6 +2,7 @@ package com.sam.hex;
 
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.hex.core.Game;
 
@@ -17,6 +18,8 @@ import java.util.Locale;
  * @author Will Harmon
  **/
 public class FileUtil {
+    final static String TAG = "Hex";
+
     public static Game loadGame(@NonNull String fileName) throws IOException {
         File file = new File(fileName);
         StringBuilder text = new StringBuilder();
@@ -72,7 +75,10 @@ public class FileUtil {
 
         File saveFile = new File(fileName);
         if (!saveFile.exists()) {
-            saveFile.createNewFile();
+            boolean result = saveFile.createNewFile();
+            if (!result) {
+                Log.w(TAG, "Failed to create file " + fileName);
+            }
         }
         // BufferedWriter for performance, true to set append to file flag
         BufferedWriter buf = new BufferedWriter(new FileWriter(saveFile, true));

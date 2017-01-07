@@ -3,10 +3,14 @@
     package="com.sam.hex"
     android:installLocation="auto" >
 
+    <!-- For net play -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
+    <!-- For saving replays -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
+    <!-- For donations -->
     <uses-permission android:name="com.android.vending.BILLING" />
 
     <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>

@@ -72,8 +72,6 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     public final static int RC_WAITING_ROOM = 10002;
     public final static int RC_ACHIEVEMENTS = 10003;
 
-    public final static int RC_AWAITING_SELECT_PLAYERS = 10004;
-
     // Room ID where the currently active game is taking place; null if we're
     // not playing.
     @Nullable
@@ -140,8 +138,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     }
 
     @Override
-    public void onActivityResult(int requestCode, int responseCode, @NonNull Intent intent) {
-        super.onActivityResult(requestCode, responseCode, intent);
+    public void onActivityResult(int requestCode, int responseCode, Intent intent) {
         switch (requestCode) {
             case RC_SELECT_PLAYERS:
                 // we got the result from the "select players" UI -- ready to create
@@ -169,16 +166,18 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
                     // player actively indicated that they want to leave the room
                     leaveRoom();
                 } else if (responseCode == Activity.RESULT_CANCELED) {
-                /*
-                 * Dialog was cancelled (user pressed back key, for instance).
-                 * In our game, this means leaving the room too. In more
-                 * elaborate games,this could mean something else (like
-                 * minimizing the waiting room UI but continue in the handshake
-                 * process).
-                 */
+                    /*
+                     * Dialog was cancelled (user pressed back key, for instance).
+                     * In our game, this means leaving the room too. In more
+                     * elaborate games, this could mean something else (like
+                     * minimizing the waiting room UI but continue in the handshake
+                     * process).
+                     */
                     leaveRoom();
                 }
-
+                break;
+            default:
+                super.onActivityResult(requestCode, responseCode, intent);
                 break;
         }
     }
@@ -279,7 +278,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         Log.d(TAG, "Leaving room.");
         stopKeepingScreenOn();
         if (mRoomId != null) {
-            Games.RealTimeMultiplayer.leave(getClient(), null, mRoomId);
+            Games.RealTimeMultiplayer.leave(getClient(), this, mRoomId);
             mRoomId = null;
         }
     }

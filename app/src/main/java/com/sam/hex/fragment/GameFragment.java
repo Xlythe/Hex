@@ -252,6 +252,8 @@ public class GameFragment extends HexFragment {
         return new GameListener() {
             @Override
             public void onWin(@NonNull final PlayingEntity player) {
+                // TODO There seems to be a bug with forfeiting. The person who did not forfeit is
+                // always declared the loser.
                 if (getMainActivity() != null && !isDetached())
                     getMainActivity().runOnUiThread(new Runnable() {
                         @Override
@@ -287,13 +289,11 @@ public class GameFragment extends HexFragment {
                                         // time
                                         try {
                                             // Backup stats
-                                            Gson gson = new Gson();
                                             Stat stat = new Stat();
                                             stat.setTimePlayed(Stats.getTimePlayed(getMainActivity()));
                                             stat.setGamesWon(Stats.getGamesWon(getMainActivity()));
                                             stat.setGamesPlayed(Stats.getGamesPlayed(getMainActivity()));
                                             stat.setDonationRank(Stats.getDonationRank(getMainActivity()));
-                                            //getMainActivity().getAppStateClient().updateState(MainActivity.STAT_STATE, gson.toJson(stat).getBytes());
 
                                             // Unlock the quick play achievements!
                                             if (game.getGameLength() < 30 * 1000) {

@@ -14,12 +14,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Locale;
 
+import static com.sam.hex.Settings.TAG;
+
 /**
  * @author Will Harmon
  **/
 public class FileUtil {
-    final static String TAG = "Hex";
-
     public static Game loadGame(@NonNull String fileName) throws IOException {
         File file = new File(fileName);
         StringBuilder text = new StringBuilder();

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +18,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.games.Games;
-import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.hex.ai.AiTypes;
 import com.hex.ai.GameAI;
@@ -43,6 +43,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
+import static com.sam.hex.Settings.TAG;
 
 /**
  * @author Will Harmon
@@ -259,6 +261,8 @@ public class GameFragment extends HexFragment {
                         @Override
                         public void run() {
                             board.invalidate();
+
+                            Log.v(TAG, player.getName() + " won!");
 
                             GameOverDialog dialog = new GameOverDialog(getMainActivity(), GameFragment.this, player);
                             dialog.show();

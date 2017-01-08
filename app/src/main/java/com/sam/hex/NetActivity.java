@@ -55,6 +55,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import static com.sam.hex.Settings.TAG;
+
 public abstract class NetActivity extends BaseGameActivity implements RealTimeMessageReceivedListener,
         RoomStatusUpdateListener, RoomUpdateListener, OnInvitationReceivedListener, NetCommunication,
         NetworkCallbacks, OnCancelListener {
@@ -63,8 +65,6 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
      * API INTEGRATION SECTION. This section contains the code that integrates
      * the game with the Google Play game services API.
      */
-
-    final static String TAG = "Hex";
 
     // Request codes for the UIs that we show with startActivityForResult:
     public final static int RC_SELECT_PLAYERS = 10000;

@@ -314,19 +314,16 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         // and show the popup on the screen.
         mIncomingInvitationId = invitation.getInvitationId();
 
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        // Yes button clicked
-                        acceptInviteToRoom(mIncomingInvitationId);
-                        break;
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        // No button clicked
-                        // Do nothing
-                        break;
-                }
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    // Yes button clicked
+                    acceptInviteToRoom(mIncomingInvitationId);
+                    break;
+                case DialogInterface.BUTTON_NEGATIVE:
+                    // No button clicked
+                    // Do nothing
+                    break;
             }
         };
 
@@ -485,12 +482,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     // Start the gameplay phase of the game.
     void startGame(boolean rematch) {
         Object[] players = mParticipants.toArray();
-        Arrays.sort(players, new Comparator<Object>() {
-            @Override
-            public int compare(@NonNull Object lhs, @NonNull Object rhs) {
-                return ((Participant) lhs).getParticipantId().compareTo(((Participant) rhs).getParticipantId());
-            }
-        });
+        Arrays.sort(players, (lhs, rhs) -> ((Participant) lhs).getParticipantId().compareTo(((Participant) rhs).getParticipantId()));
         GameOptions go = new GameOptions();
         go.gridSize = 7;
         go.swap = true;
@@ -696,13 +688,10 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.error_version).setPositiveButton(getString(R.string.net_accept), null).setOnCancelListener(this);
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (!mShowingDialog) {
-                    builder.show();
-                    mShowingDialog = true;
-                }
+        runOnUiThread(() -> {
+            if (!mShowingDialog) {
+                builder.show();
+                mShowingDialog = true;
             }
         });
 

@@ -51,9 +51,9 @@ public class MainFragment extends HexFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         getMainActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        View v = inflater.inflate(R.layout.fragment_main, null);
+        View view = inflater.inflate(R.layout.fragment_main, null);
 
-        mHexagonLayout = (HexagonLayout) v.findViewById(R.id.hexagonButtons);
+        mHexagonLayout = view.findViewById(R.id.hexagonButtons);
         HexagonLayout.Button settingsButton = mHexagonLayout.getButtons()[0];
         HexagonLayout.Button donateButton = mHexagonLayout.getButtons()[1];
         HexagonLayout.Button historyButton = mHexagonLayout.getButtons()[2];
@@ -68,13 +68,13 @@ public class MainFragment extends HexFragment {
         mHexagonLayout.setInitialSpin(mInitialSpin);
         mInitialSpin = 0f;
 
-        mTitleTextView = v.findViewById(R.id.title);
-        mTimePlayedTextView = v.findViewById(R.id.timePlayed);
-        mGamesPlayedTextView = v.findViewById(R.id.gamesPlayed);
-        mGamesWonTextView = v.findViewById(R.id.gamesWon);
+        mTitleTextView = view.findViewById(R.id.title);
+        mTimePlayedTextView = view.findViewById(R.id.timePlayed);
+        mGamesPlayedTextView = view.findViewById(R.id.gamesPlayed);
+        mGamesWonTextView = view.findViewById(R.id.gamesWon);
 
-        mSignInButton = v.findViewById(R.id.signInButton);
-        mSignOutButton = v.findViewById(R.id.signOutButton);
+        mSignInButton = view.findViewById(R.id.signInButton);
+        mSignOutButton = view.findViewById(R.id.signOutButton);
 
         settingsButton.setText(R.string.main_button_settings);
         settingsButton.setColor(getResources().getColor(R.color.main_settings));
@@ -137,7 +137,7 @@ public class MainFragment extends HexFragment {
         });
         refreshPlayerInformation();
 
-        return v;
+        return view;
     }
 
     @Override

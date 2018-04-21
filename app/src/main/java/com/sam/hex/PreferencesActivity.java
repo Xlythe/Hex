@@ -92,8 +92,8 @@ public class PreferencesActivity extends PreferenceActivity {
         public boolean onPreferenceClick(Preference pref) {
             LayoutInflater inflater = (LayoutInflater) PreferencesActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View dialoglayout = inflater.inflate(R.layout.preferences_timer, null);
-            final Spinner timerType = (Spinner) dialoglayout.findViewById(R.id.timerType);
-            final EditText timer = (EditText) dialoglayout.findViewById(R.id.timer);
+            final Spinner timerType = dialoglayout.findViewById(R.id.timerType);
+            final EditText timer = dialoglayout.findViewById(R.id.timer);
             timer.setText(settings.getString(Settings.TIMER, Integer.toString(getResources().getInteger(R.integer.DEFAULT_TIMER_TIME))));
             timerType.setSelection(Integer.valueOf(settings.getString(Settings.TIMER_TYPE, Integer.toString(getResources().getInteger(R.integer.DEFAULT_TIMER_TYPE)))));
             timerType.setOnItemSelectedListener(new OnItemSelectedListener() {
@@ -112,16 +112,13 @@ public class PreferencesActivity extends PreferenceActivity {
                 }
             });
             AlertDialog.Builder builder = new AlertDialog.Builder(PreferencesActivity.this);
-            builder.setView(dialoglayout).setPositiveButton(getString(R.string.okay), new OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    String timerTime = timer.getText().toString();
-                    if (timerTime.isEmpty()) timerTime = "0";
-                    settings.edit()
-                            .putString(Settings.TIMER_TYPE, getResources().getStringArray(R.array.timerTypeValues)[timerType.getSelectedItemPosition()])
-                            .putString(Settings.TIMER, timerTime)
-                            .apply();
-                }
+            builder.setView(dialoglayout).setPositiveButton(getString(R.string.okay), (dialog, which) -> {
+                String timerTime = timer.getText().toString();
+                if (timerTime.isEmpty()) timerTime = "0";
+                settings.edit()
+                        .putString(Settings.TIMER_TYPE, getResources().getStringArray(R.array.timerTypeValues)[timerType.getSelectedItemPosition()])
+                        .putString(Settings.TIMER, timerTime)
+                        .apply();
             }).setNegativeButton(getString(R.string.cancel), null).show();
             return true;
         }
@@ -160,23 +157,20 @@ public class PreferencesActivity extends PreferenceActivity {
         final EditText editText = new EditText(this);
         editText.setInputType(InputType.TYPE_CLASS_NUMBER);
         AlertDialog.Builder builder = new AlertDialog.Builder(PreferencesActivity.this);
-        builder.setTitle(message).setView(editText).setPositiveButton(getString(R.string.okay), new OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (!editText.getText().toString().equals("")) {
-                    int input = Integer.decode(editText.getText().toString());
-                    if (input > Settings.MAX_BOARD_SIZE) {
-                        input = Settings.MAX_BOARD_SIZE;
-                    } else if (input < Settings.MIN_BOARD_SIZE) {
-                        input = Settings.MIN_BOARD_SIZE;
-                    }
-                    settings.edit()
-                            .putString(Settings.CUSTOM_GAME_SIZE, String.valueOf(input))
-                            .putString(Settings.GAME_SIZE, String.valueOf(0))
-                            .apply();
-                    String boardSize = settings.getString(Settings.CUSTOM_GAME_SIZE, Integer.toString(getResources().getInteger(R.integer.DEFAULT_BOARD_SIZE)));
-                    gridPref.setSummary(String.format(getString(R.string.preferences_summary_game_size), boardSize, boardSize));
+        builder.setTitle(message).setView(editText).setPositiveButton(getString(R.string.okay), (dialog, which) -> {
+            if (!editText.getText().toString().equals("")) {
+                int input = Integer.decode(editText.getText().toString());
+                if (input > Settings.MAX_BOARD_SIZE) {
+                    input = Settings.MAX_BOARD_SIZE;
+                } else if (input < Settings.MIN_BOARD_SIZE) {
+                    input = Settings.MIN_BOARD_SIZE;
                 }
+                settings.edit()
+                        .putString(Settings.CUSTOM_GAME_SIZE, String.valueOf(input))
+                        .putString(Settings.GAME_SIZE, String.valueOf(0))
+                        .apply();
+                String boardSize = settings.getString(Settings.CUSTOM_GAME_SIZE, Integer.toString(getResources().getInteger(R.integer.DEFAULT_BOARD_SIZE)));
+                gridPref.setSummary(String.format(getString(R.string.preferences_summary_game_size), boardSize, boardSize));
             }
         }).setNegativeButton(getString(R.string.cancel), null).show();
     }

@@ -69,8 +69,8 @@ public class GameOverDialog extends HexDialog {
         // Catch for resuming an activity after minimizing it too long
         if (FRAGMENT == null) return v;
 
-        TextView action = (TextView) v.findViewById(R.id.action);
-        TextView time = (TextView) v.findViewById(R.id.time);
+        TextView action = v.findViewById(R.id.action);
+        TextView time = v.findViewById(R.id.time);
 
         Game game = FRAGMENT.getGame();
         PlayingEntity winner = WINNER;
@@ -84,7 +84,7 @@ public class GameOverDialog extends HexDialog {
         time.setText(getString(R.string.game_over_length, hours, minutes, seconds));
 
         if (game.getPlayer1().getType().equals(Player.Human) && game.getPlayer2().getType().equals(Player.Human)) {
-            TextView player = (TextView) v.findViewById(R.id.player);
+            TextView player = v.findViewById(R.id.player);
             player.setText(winner.getName());
         }
 
@@ -94,24 +94,18 @@ public class GameOverDialog extends HexDialog {
     @NonNull
     @Override
     public OnClickListener getPositiveOnClickListener() {
-        return new OnClickListener() {
-            @Override
-            public void onClick() {
-                FRAGMENT.startNewGame();
-                dismiss();
-            }
+        return () -> {
+            FRAGMENT.startNewGame();
+            dismiss();
         };
     }
 
     @NonNull
     @Override
     public OnClickListener getNegativeOnClickListener() {
-        return new OnClickListener() {
-            @Override
-            public void onClick() {
-                FRAGMENT.setGoHome(true);
-                dismiss();
-            }
+        return () -> {
+            FRAGMENT.setGoHome(true);
+            dismiss();
         };
     }
 

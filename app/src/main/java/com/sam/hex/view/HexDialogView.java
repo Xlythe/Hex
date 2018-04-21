@@ -81,34 +81,28 @@ public class HexDialogView extends View implements OnTouchListener {
         mOpeningAnimationScaleSize = 0.5f;
         mClosingAnimationScaleSize = 1.0f;
         mClosingButton = -1;
-        setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                for (int i = 0; i < mButtons.length; i++) {
-                    Button b = mButtons[i];
-                    if (b.isSelected() || b.isPressed()) {
-                        mClosingButton = i;
-                        invalidate();
-                    }
+        setOnClickListener(v -> {
+            for (int i = 0; i < mButtons.length; i++) {
+                Button b = mButtons[i];
+                if (b.isSelected() || b.isPressed()) {
+                    mClosingButton = i;
+                    invalidate();
                 }
             }
         });
         setFocusable(true);
-        setOnFocusChangeListener(new OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    mFocusedButton = mButtons[0];
-                    while (mFocusedButton != getToLeftOf(mFocusedButton)) {
-                        mFocusedButton = getToLeftOf(mFocusedButton);
-                    }
-                    mFocusedButton.setSelected(true);
+        setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                mFocusedButton = mButtons[0];
+                while (mFocusedButton != getToLeftOf(mFocusedButton)) {
+                    mFocusedButton = getToLeftOf(mFocusedButton);
+                }
+                mFocusedButton.setSelected(true);
+                invalidate();
+            } else {
+                if (mFocusedButton != null) {
+                    mFocusedButton.setSelected(false);
                     invalidate();
-                } else {
-                    if (mFocusedButton != null) {
-                        mFocusedButton.setSelected(false);
-                        invalidate();
-                    }
                 }
             }
         });

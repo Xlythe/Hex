@@ -18,14 +18,18 @@ android {
     lintOptions {
         abortOnError false
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
     def withoutSupportLib = { exclude group: 'com.android.support' }
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    testImplementation 'junit:junit:4.12'
-    implementation 'com.xlythe:play-billing:1.0.1', withoutSupportLib
-    implementation 'com.google.android.gms:play-services-games:+'
     implementation 'com.android.support:appcompat-v7:27.+'
     implementation 'com.android.support:design:27.+'
+    implementation 'com.google.android.gms:play-services-games:+'
+    implementation 'com.xlythe:play-billing:1.0.1', withoutSupportLib
+    testImplementation 'junit:junit:4.12'
 }

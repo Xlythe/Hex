@@ -19,10 +19,10 @@ public class InstructionsFragment extends HexFragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.fragment_instructions, null);
 
-        TextView title = (TextView) v.findViewById(R.id.title);
+        TextView title = v.findViewById(R.id.title);
         title.setText(R.string.activity_title_instructions);
 
-        TextView rules = (TextView) v.findViewById(R.id.rules);
+        TextView rules = v.findViewById(R.id.rules);
         rules.setMovementMethod(LinkMovementMethod.getInstance());
 
         return v;

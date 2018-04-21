@@ -2,7 +2,9 @@ package com.sam.hex.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,7 +48,7 @@ public class MainFragment extends HexFragment {
      * Called when the activity is first created.
      */
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         getMainActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         View v = inflater.inflate(R.layout.fragment_main, null);
@@ -66,98 +68,72 @@ public class MainFragment extends HexFragment {
         mHexagonLayout.setInitialSpin(mInitialSpin);
         mInitialSpin = 0f;
 
-        mTitleTextView = (TextView) v.findViewById(R.id.title);
-        mTimePlayedTextView = (TextView) v.findViewById(R.id.timePlayed);
-        mGamesPlayedTextView = (TextView) v.findViewById(R.id.gamesPlayed);
-        mGamesWonTextView = (TextView) v.findViewById(R.id.gamesWon);
+        mTitleTextView = v.findViewById(R.id.title);
+        mTimePlayedTextView = v.findViewById(R.id.timePlayed);
+        mGamesPlayedTextView = v.findViewById(R.id.gamesPlayed);
+        mGamesWonTextView = v.findViewById(R.id.gamesWon);
 
-        mSignInButton = (SignInButton) v.findViewById(R.id.signInButton);
-        mSignOutButton = (Button) v.findViewById(R.id.signOutButton);
+        mSignInButton = v.findViewById(R.id.signInButton);
+        mSignOutButton = v.findViewById(R.id.signOutButton);
 
         settingsButton.setText(R.string.main_button_settings);
         settingsButton.setColor(getResources().getColor(R.color.main_settings));
         settingsButton.setDrawableResource(R.drawable.settings);
-        settingsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
-            @Override
-            public void onClick() {
-                startActivity(new Intent(getMainActivity(), PreferencesActivity.class));
-                getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-            }
+        settingsButton.setOnClickListener(() -> {
+            startActivity(new Intent(getMainActivity(), PreferencesActivity.class));
+            getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         });
 
         donateButton.setText(R.string.main_button_donate);
         donateButton.setColor(getResources().getColor(R.color.main_donate));
         donateButton.setDrawableResource(R.drawable.store);
-        donateButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
-            @Override
-            public void onClick() {
-                HexDialog hd = new DonateDialog(getMainActivity());
-                hd.show();
-            }
+        donateButton.setOnClickListener(() -> {
+            HexDialog hd = new DonateDialog(getMainActivity());
+            hd.show();
         });
 
         historyButton.setText(R.string.main_button_history);
         historyButton.setColor(getResources().getColor(R.color.main_history));
         historyButton.setDrawableResource(R.drawable.history);
-        historyButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
-            @Override
-            public void onClick() {
-                getMainActivity().setHistoryFragment(new HistoryFragment());
-                getMainActivity().swapFragment(getMainActivity().getHistoryFragment());
-            }
+        historyButton.setOnClickListener(() -> {
+            getMainActivity().setHistoryFragment(new HistoryFragment());
+            getMainActivity().swapFragment(getMainActivity().getHistoryFragment());
         });
 
         instructionsButton.setText(R.string.main_button_instructions);
         instructionsButton.setColor(getResources().getColor(R.color.main_instructions));
         instructionsButton.setDrawableResource(R.drawable.howtoplay);
-        instructionsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
-            @Override
-            public void onClick() {
-                getMainActivity().setInstructionsFragment(new InstructionsFragment());
-                getMainActivity().swapFragment(getMainActivity().getInstructionsFragment());
-            }
+        instructionsButton.setOnClickListener(() -> {
+            getMainActivity().setInstructionsFragment(new InstructionsFragment());
+            getMainActivity().swapFragment(getMainActivity().getInstructionsFragment());
         });
 
         achievementsButton.setText(R.string.main_button_achievements);
         achievementsButton.setColor(getResources().getColor(R.color.main_achievements));
         achievementsButton.setDrawableResource(R.drawable.achievements);
-        achievementsButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
-            @Override
-            public void onClick() {
-                if (getMainActivity().isSignedIn()) {
-                    startActivityForResult(Games.Achievements.getAchievementsIntent(getMainActivity().getClient()), MainActivity.RC_ACHIEVEMENTS);
-                    getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                } else {
-                    getMainActivity().setOpenAchievements(true);
-                    getMainActivity().beginUserInitiatedSignIn();
-                }
+        achievementsButton.setOnClickListener(() -> {
+            if (getMainActivity().isSignedIn()) {
+                startActivityForResult(Games.Achievements.getAchievementsIntent(getMainActivity().getClient()), MainActivity.RC_ACHIEVEMENTS);
+                getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            } else {
+                getMainActivity().setOpenAchievements(true);
+                getMainActivity().beginUserInitiatedSignIn();
             }
         });
 
         playButton.setText(R.string.main_button_play);
         playButton.setColor(getResources().getColor(R.color.main_play));
         playButton.setDrawableResource(R.drawable.play);
-        playButton.setOnClickListener(new HexagonLayout.Button.OnClickListener() {
-            @Override
-            public void onClick() {
-                getMainActivity().setGameSelectionFragment(new GameSelectionFragment());
-                getMainActivity().swapFragment(getMainActivity().getGameSelectionFragment());
-            }
+        playButton.setOnClickListener(() -> {
+            getMainActivity().setGameSelectionFragment(new GameSelectionFragment());
+            getMainActivity().swapFragment(getMainActivity().getGameSelectionFragment());
         });
 
-        mSignInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getMainActivity().beginUserInitiatedSignIn();
-            }
-        });
+        mSignInButton.setOnClickListener(v -> getMainActivity().beginUserInitiatedSignIn());
 
-        mSignOutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getMainActivity().signOut();
-                refreshPlayerInformation();
-            }
+        mSignOutButton.setOnClickListener(v -> {
+            getMainActivity().signOut();
+            refreshPlayerInformation();
         });
         refreshPlayerInformation();
 
@@ -223,7 +199,7 @@ public class MainFragment extends HexFragment {
 
     private void showDonationStar() {
         int donationAmount = Stats.getDonationRank(getMainActivity());
-        int resource = R.drawable.donate_hollow;
+        @DrawableRes int resource = R.drawable.donate_hollow;
 
         if (donationAmount >= 5) {
             resource = R.drawable.donate_gold;

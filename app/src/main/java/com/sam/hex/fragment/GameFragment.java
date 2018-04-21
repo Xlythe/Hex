@@ -183,9 +183,9 @@ public class GameFragment extends HexFragment {
     }
 
     private View applyBoard(@NonNull LayoutInflater inflater) {
-        View v = inflater.inflate(R.layout.fragment_game, null);
+        View view = inflater.inflate(R.layout.fragment_game, null);
 
-        board = (BoardView) v.findViewById(R.id.board);
+        board = view.findViewById(R.id.board);
         board.setGame(game);
         board.setTitleText(getString(R.string.game_turn_title));
         board.setActionText(getString(R.string.game_turn_msg));
@@ -194,32 +194,17 @@ public class GameFragment extends HexFragment {
         if (game.isGameOver() && game.getGameListener() != null)
             game.getGameListener().onWin(game.getCurrentPlayer());
 
-        exit = (Button) v.findViewById(R.id.exit);
-        exit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                quit();
-            }
-        });
-        newGame = (Button) v.findViewById(R.id.reload);
-        newGame.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                newGame();
-            }
-        });
-        undo = (Button) v.findViewById(R.id.undo);
-        undo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                undo();
-            }
-        });
+        exit = view.findViewById(R.id.exit);
+        exit.setOnClickListener(v -> quit());
+        newGame = view.findViewById(R.id.reload);
+        newGame.setOnClickListener(v -> newGame());
+        undo = view.findViewById(R.id.undo);
+        undo.setOnClickListener(v -> undo());
 
         undo.setNextFocusRightId(R.id.board);
         board.setNextFocusLeftId(R.id.undo);
 
-        return v;
+        return view;
     }
 
     protected void initializeNewGame() {
@@ -257,130 +242,114 @@ public class GameFragment extends HexFragment {
                 // TODO There seems to be a bug with forfeiting. The person who did not forfeit is
                 // always declared the loser.
                 if (getMainActivity() != null && !isDetached())
-                    getMainActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            board.invalidate();
+                    getMainActivity().runOnUiThread(() -> {
+                        board.invalidate();
 
-                            Log.v(TAG, player.getName() + " won!");
+                        Log.v(TAG, player.getName() + " won!");
 
-                            GameOverDialog dialog = new GameOverDialog(getMainActivity(), GameFragment.this, player);
-                            dialog.show();
+                        GameOverDialog dialog = new GameOverDialog(getMainActivity(), GameFragment.this, player);
+                        dialog.show();
 
-                            if (gameHasEnded) return;
-                            else gameHasEnded = true;
+                        if (gameHasEnded) return;
+                        else gameHasEnded = true;
 
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    // Auto save completed game
-                                    if (Settings.getAutosave(getMainActivity())) {
-                                        try {
-                                            String fileName = String.format(getString(R.string.auto_saved_file_name), SAVE_FORMAT.format(new Date()), game.getPlayer1().getName(), game.getPlayer2().getName());
-                                            FileUtil.autoSaveGame(fileName, game.save());
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-
-                                    Stats.incrementTimePlayed(getMainActivity(), game.getGameLength() - timeGamePaused);
-                                    Stats.incrementGamesPlayed(getMainActivity());
-                                    if (player.getType().equals(Player.Human))
-                                        Stats.incrementGamesWon(getMainActivity());
-
-                                    if (getMainActivity().isSignedIn()) {
-                                        // Net is async and can disconnect at any
-                                        // time
-                                        try {
-                                            // Backup stats
-                                            Stat stat = new Stat();
-                                            stat.setTimePlayed(Stats.getTimePlayed(getMainActivity()));
-                                            stat.setGamesWon(Stats.getGamesWon(getMainActivity()));
-                                            stat.setGamesPlayed(Stats.getGamesPlayed(getMainActivity()));
-                                            stat.setDonationRank(Stats.getDonationRank(getMainActivity()));
-
-                                            // Unlock the quick play achievements!
-                                            if (game.getGameLength() < 30 * 1000) {
-                                                Games.Achievements.unlock(getGamesClient(), getString(R.string.achievement_30_seconds));
-                                            }
-                                            if (game.getGameLength() < 10 * 1000) {
-                                                Games.Achievements.unlock(getGamesClient(), getString(R.string.achievement_10_seconds));
-                                            }
-
-                                            // Unlock the fill the board
-                                            // achievement!
-                                            boolean boardFilled = true;
-                                            for (int i = 0; i < game.gameOptions.gridSize; i++) {
-                                                for (int j = 0; j < game.gameOptions.gridSize; j++) {
-                                                    if (game.gamePieces[i][j].getTeam() == 0)
-                                                        boardFilled = false;
-                                                }
-                                            }
-                                            if (boardFilled) {
-                                                Games.Achievements.unlock(getGamesClient(), getString(R.string.achievement_fill_the_board));
-                                            }
-
-                                            // Unlock the montior smasher
-                                            // achievement!
-                                            if (player.getType().equals(Player.Human) && game.getOtherPlayer(player).getType().equals(Player.AI)) {
-                                                Games.Achievements.unlock(getGamesClient(), getString(R.string.achievement_monitor_smasher));
-                                            }
-
-                                            // Unlock the speed demon achievement!
-                                            if (game.gameOptions.timer.type != Timer.NO_TIMER) {
-                                                Games.Achievements.unlock(getGamesClient(), getString(R.string.achievement_speed_demon));
-                                            }
-
-                                            // Unlock the Novice achievement!
-                                            Games.Achievements.increment(getGamesClient(), getString(R.string.achievement_novice), 1);
-
-                                            // Unlock the Intermediate achievement!
-                                            Games.Achievements.increment(getGamesClient(), getString(R.string.achievement_intermediate), 1);
-
-                                            // Unlock the Expert achievement!
-                                            if (player.getType().equals(Player.Human)) {
-                                                Games.Achievements.increment(getGamesClient(), getString(R.string.achievement_expert), 1);
-                                            }
-
-                                            // Unlock the Insane achievement!
-                                            if (player.getType().equals(Player.Human)) {
-                                                Games.Achievements.increment(getGamesClient(), getString(R.string.achievement_insane), 1);
-                                            }
-
-                                            // Unlock the Net achievement
-                                            if (player.getType().equals(Player.Net) || game.getOtherPlayer(player).getType().equals(Player.Net)) {
-                                                Games.Achievements.unlock(getGamesClient(), getString(R.string.achievement_net));
-                                            }
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
+                        new Thread(() -> {
+                            // Auto save completed game
+                            if (Settings.getAutosave(getMainActivity())) {
+                                try {
+                                    String fileName = String.format(getString(R.string.auto_saved_file_name), SAVE_FORMAT.format(new Date()), game.getPlayer1().getName(), game.getPlayer2().getName());
+                                    FileUtil.autoSaveGame(fileName, game.save());
+                                } catch (IOException e) {
+                                    e.printStackTrace();
                                 }
-                            }).start();
-                        }
+                            }
+
+                            Stats.incrementTimePlayed(getMainActivity(), game.getGameLength() - timeGamePaused);
+                            Stats.incrementGamesPlayed(getMainActivity());
+                            if (player.getType().equals(Player.Human))
+                                Stats.incrementGamesWon(getMainActivity());
+
+                            if (getMainActivity().isSignedIn()) {
+                                // Net is async and can disconnect at any
+                                // time
+                                try {
+                                    // Backup stats
+                                    Stat stat = new Stat();
+                                    stat.setTimePlayed(Stats.getTimePlayed(getMainActivity()));
+                                    stat.setGamesWon(Stats.getGamesWon(getMainActivity()));
+                                    stat.setGamesPlayed(Stats.getGamesPlayed(getMainActivity()));
+                                    stat.setDonationRank(Stats.getDonationRank(getMainActivity()));
+
+                                    // Unlock the quick play achievements!
+                                    if (game.getGameLength() < 30 * 1000) {
+                                        Games.Achievements.unlock(getGamesClient(), getString(R.string.achievement_30_seconds));
+                                    }
+                                    if (game.getGameLength() < 10 * 1000) {
+                                        Games.Achievements.unlock(getGamesClient(), getString(R.string.achievement_10_seconds));
+                                    }
+
+                                    // Unlock the fill the board
+                                    // achievement!
+                                    boolean boardFilled = true;
+                                    for (int i = 0; i < game.gameOptions.gridSize; i++) {
+                                        for (int j = 0; j < game.gameOptions.gridSize; j++) {
+                                            if (game.gamePieces[i][j].getTeam() == 0)
+                                                boardFilled = false;
+                                        }
+                                    }
+                                    if (boardFilled) {
+                                        Games.Achievements.unlock(getGamesClient(), getString(R.string.achievement_fill_the_board));
+                                    }
+
+                                    // Unlock the montior smasher
+                                    // achievement!
+                                    if (player.getType().equals(Player.Human) && game.getOtherPlayer(player).getType().equals(Player.AI)) {
+                                        Games.Achievements.unlock(getGamesClient(), getString(R.string.achievement_monitor_smasher));
+                                    }
+
+                                    // Unlock the speed demon achievement!
+                                    if (game.gameOptions.timer.type != Timer.NO_TIMER) {
+                                        Games.Achievements.unlock(getGamesClient(), getString(R.string.achievement_speed_demon));
+                                    }
+
+                                    // Unlock the Novice achievement!
+                                    Games.Achievements.increment(getGamesClient(), getString(R.string.achievement_novice), 1);
+
+                                    // Unlock the Intermediate achievement!
+                                    Games.Achievements.increment(getGamesClient(), getString(R.string.achievement_intermediate), 1);
+
+                                    // Unlock the Expert achievement!
+                                    if (player.getType().equals(Player.Human)) {
+                                        Games.Achievements.increment(getGamesClient(), getString(R.string.achievement_expert), 1);
+                                    }
+
+                                    // Unlock the Insane achievement!
+                                    if (player.getType().equals(Player.Human)) {
+                                        Games.Achievements.increment(getGamesClient(), getString(R.string.achievement_insane), 1);
+                                    }
+
+                                    // Unlock the Net achievement
+                                    if (player.getType().equals(Player.Net) || game.getOtherPlayer(player).getType().equals(Player.Net)) {
+                                        Games.Achievements.unlock(getGamesClient(), getString(R.string.achievement_net));
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).start();
                     });
             }
 
             @Override
             public void onClear() {
                 if (getMainActivity() != null && !isDetached())
-                    getMainActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            board.postInvalidate();
-                        }
-                    });
+                    getMainActivity().runOnUiThread(() -> board.postInvalidate());
             }
 
             @Override
             public void onStart() {
                 if (getMainActivity() != null && !isDetached())
-                    getMainActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            board.postInvalidate();
-                        }
-                    });
+                    getMainActivity().runOnUiThread(() -> board.postInvalidate());
             }
 
             @Override
@@ -391,16 +360,13 @@ public class GameFragment extends HexFragment {
             @Override
             public void onTurn(final PlayingEntity player) {
                 if (getMainActivity() != null && !isDetached())
-                    getMainActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                if (!game.isGameOver()) {
-                                    board.postInvalidate();
-                                }
-                            } catch (IllegalStateException e) {
-                                e.printStackTrace();
+                    getMainActivity().runOnUiThread(() -> {
+                        try {
+                            if (!game.isGameOver()) {
+                                board.postInvalidate();
                             }
+                        } catch (IllegalStateException e) {
+                            e.printStackTrace();
                         }
                     });
             }
@@ -408,55 +374,31 @@ public class GameFragment extends HexFragment {
             @Override
             public void onReplayStart() {
                 if (getMainActivity() != null && !isDetached())
-                    getMainActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            board.postInvalidate();
-                        }
-                    });
+                    getMainActivity().runOnUiThread(() -> board.postInvalidate());
             }
 
             @Override
             public void onReplayEnd() {
                 if (getMainActivity() != null && !isDetached())
-                    getMainActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            board.postInvalidate();
-                        }
-                    });
+                    getMainActivity().runOnUiThread(() -> board.postInvalidate());
             }
 
             @Override
             public void onUndo() {
                 if (getMainActivity() != null && !isDetached())
-                    getMainActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            board.postInvalidate();
-                        }
-                    });
+                    getMainActivity().runOnUiThread(() -> board.postInvalidate());
             }
 
             @Override
             public void startTimer() {
                 if (getMainActivity() != null && !isDetached())
-                    getMainActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                        }
-                    });
+                    getMainActivity().runOnUiThread(() -> board.postInvalidate());
             }
 
             @Override
             public void displayTime(final int minutes, final int seconds) {
                 if (getMainActivity() != null && !isDetached())
-                    getMainActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            board.postInvalidate();
-                        }
-                    });
+                    getMainActivity().runOnUiThread(() -> board.postInvalidate());
             }
         };
     }
@@ -489,16 +431,13 @@ public class GameFragment extends HexFragment {
         editText.setInputType(InputType.TYPE_CLASS_TEXT);
         editText.setText(SAVE_FORMAT.format(new Date()));
         AlertDialog.Builder builder = new AlertDialog.Builder(getMainActivity());
-        builder.setTitle(R.string.enterFilename).setView(editText).setPositiveButton(android.R.string.ok, new OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                try {
-                    FileUtil.saveGame(editText.getText().toString(), game.save());
-                    Toast.makeText(getMainActivity(), R.string.game_toast_saved, Toast.LENGTH_SHORT).show();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(getMainActivity(), R.string.game_toast_failed, Toast.LENGTH_SHORT).show();
-                }
+        builder.setTitle(R.string.enterFilename).setView(editText).setPositiveButton(android.R.string.ok, (dialog, which) -> {
+            try {
+                FileUtil.saveGame(editText.getText().toString(), game.save());
+                Toast.makeText(getMainActivity(), R.string.game_toast_saved, Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(getMainActivity(), R.string.game_toast_failed, Toast.LENGTH_SHORT).show();
             }
         }).setNegativeButton(R.string.cancel, null).show();
     }
@@ -560,19 +499,16 @@ public class GameFragment extends HexFragment {
     }
 
     protected void newGame() {
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        // Yes button clicked
-                        startNewGame();
-                        break;
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        // No button clicked
-                        // Do nothing
-                        break;
-                }
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    // Yes button clicked
+                    startNewGame();
+                    break;
+                case DialogInterface.BUTTON_NEGATIVE:
+                    // No button clicked
+                    // Do nothing
+                    break;
             }
         };
 
@@ -581,27 +517,21 @@ public class GameFragment extends HexFragment {
     }
 
     public void startNewGame() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (game.getPlayer1().supportsNewgame() && game.getPlayer2().supportsNewgame()) {
-                    if (getMainActivity() != null && !isDetached()) {
-                        getMainActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                stopGame(game);
+        new Thread(() -> {
+            if (game.getPlayer1().supportsNewgame() && game.getPlayer2().supportsNewgame()) {
+                if (getMainActivity() != null && !isDetached()) {
+                    getMainActivity().runOnUiThread(() -> {
+                        stopGame(game);
 
-                                PlayingEntity p1 = getPlayer(1, game.gameOptions.gridSize);
-                                p1.setName(game.getPlayer1().getName());
-                                p1.setColor(game.getPlayer1().getColor());
-                                PlayingEntity p2 = getPlayer(2, game.gameOptions.gridSize);
-                                p2.setName(game.getPlayer2().getName());
-                                p2.setColor(game.getPlayer2().getColor());
+                        PlayingEntity p1 = getPlayer(1, game.gameOptions.gridSize);
+                        p1.setName(game.getPlayer1().getName());
+                        p1.setColor(game.getPlayer1().getColor());
+                        PlayingEntity p2 = getPlayer(2, game.gameOptions.gridSize);
+                        p2.setName(game.getPlayer2().getName());
+                        p2.setColor(game.getPlayer2().getColor());
 
-                                getMainActivity().switchToGame(new Game(game.gameOptions, p1, p2), false);
-                            }
-                        });
-                    }
+                        getMainActivity().switchToGame(new Game(game.gameOptions, p1, p2), false);
+                    });
                 }
             }
         }).start();
@@ -632,20 +562,17 @@ public class GameFragment extends HexFragment {
     }
 
     private void quit() {
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        // Yes button clicked
-                        stopGame(game);
-                        getMainActivity().returnHome();
-                        break;
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        // No button clicked
-                        // Do nothing
-                        break;
-                }
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    // Yes button clicked
+                    stopGame(game);
+                    getMainActivity().returnHome();
+                    break;
+                case DialogInterface.BUTTON_NEGATIVE:
+                    // No button clicked
+                    // Do nothing
+                    break;
             }
         };
 

@@ -28,13 +28,13 @@ public class DonateDialog extends HexDialog {
     public View getPositiveView() {
         View v = View.inflate(this, R.layout.dialog_view_donate, null);
 
-        ImageView iv = (ImageView) v.findViewById(R.id.image);
+        ImageView iv = v.findViewById(R.id.image);
         iv.setImageResource(R.drawable.donate_gold_d);
 
-        TextView tv = (TextView) v.findViewById(R.id.text);
+        TextView tv = v.findViewById(R.id.text);
         tv.setText(R.string.donate_gold);
 
-        TextView price = (TextView) v.findViewById(R.id.price);
+        TextView price = v.findViewById(R.id.price);
         price.setText(R.string.donate_gold_price);
 
         return v;
@@ -44,13 +44,13 @@ public class DonateDialog extends HexDialog {
     public View getNegativeView() {
         View v = View.inflate(this, R.layout.dialog_view_donate, null);
 
-        ImageView iv = (ImageView) v.findViewById(R.id.image);
+        ImageView iv = v.findViewById(R.id.image);
         iv.setImageResource(R.drawable.donate_bronze_d);
 
-        TextView tv = (TextView) v.findViewById(R.id.text);
+        TextView tv = v.findViewById(R.id.text);
         tv.setText(R.string.donate_bronze);
 
-        TextView price = (TextView) v.findViewById(R.id.price);
+        TextView price = v.findViewById(R.id.price);
         price.setText(R.string.donate_bronze_price);
 
         return v;
@@ -60,13 +60,13 @@ public class DonateDialog extends HexDialog {
     public View getNeutralView() {
         View v = View.inflate(this, R.layout.dialog_view_donate, null);
 
-        ImageView iv = (ImageView) v.findViewById(R.id.image);
+        ImageView iv = v.findViewById(R.id.image);
         iv.setImageResource(R.drawable.donate_silver_d);
 
-        TextView tv = (TextView) v.findViewById(R.id.text);
+        TextView tv = v.findViewById(R.id.text);
         tv.setText(R.string.donate_silver);
 
-        TextView price = (TextView) v.findViewById(R.id.price);
+        TextView price = v.findViewById(R.id.price);
         price.setText(R.string.donate_silver_price);
 
         return v;
@@ -75,36 +75,27 @@ public class DonateDialog extends HexDialog {
     @NonNull
     @Override
     public OnClickListener getPositiveOnClickListener() {
-        return new OnClickListener() {
-            @Override
-            public void onClick() {
-                purchaseItem(ITEM_SKU_ADVANCED);
-                dismiss();
-            }
+        return () -> {
+            purchaseItem(ITEM_SKU_ADVANCED);
+            dismiss();
         };
     }
 
     @NonNull
     @Override
     public OnClickListener getNegativeOnClickListener() {
-        return new OnClickListener() {
-            @Override
-            public void onClick() {
-                purchaseItem(ITEM_SKU_BASIC);
-                dismiss();
-            }
+        return () -> {
+            purchaseItem(ITEM_SKU_BASIC);
+            dismiss();
         };
     }
 
     @NonNull
     @Override
     public OnClickListener getNeutralOnClickListener() {
-        return new OnClickListener() {
-            @Override
-            public void onClick() {
-                purchaseItem(ITEM_SKU_INTERMEDIATE);
-                dismiss();
-            }
+        return () -> {
+            purchaseItem(ITEM_SKU_INTERMEDIATE);
+            dismiss();
         };
     }
 

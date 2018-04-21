@@ -81,17 +81,14 @@ public class SelectorLayout extends View implements OnTouchListener {
 
                         ValueAnimator animator = ValueAnimator.ofInt(0, 3 * getHeight() / 2);
                         animator.setInterpolator(new AccelerateInterpolator());
-                        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                            @Override
-                            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                                int value = (Integer) valueAnimator.getAnimatedValue();
-                                b.buttonDrawable.setBounds(initialButtonBounds.left, initialButtonBounds.top - value,
-                                        initialButtonBounds.right, initialButtonBounds.bottom - value);
-                                b.mirrorButtonDrawable.setBounds(initialMirrorButtonBounds.left, initialMirrorButtonBounds.top + value,
-                                        initialMirrorButtonBounds.right, initialMirrorButtonBounds.bottom + value);
-                                b.textX = initialTextX + value;
-                                invalidate();
-                            }
+                        animator.addUpdateListener((valueAnimator) -> {
+                            int value = (Integer) valueAnimator.getAnimatedValue();
+                            b.buttonDrawable.setBounds(initialButtonBounds.left, initialButtonBounds.top - value,
+                                    initialButtonBounds.right, initialButtonBounds.bottom - value);
+                            b.mirrorButtonDrawable.setBounds(initialMirrorButtonBounds.left, initialMirrorButtonBounds.top + value,
+                                    initialMirrorButtonBounds.right, initialMirrorButtonBounds.bottom + value);
+                            b.textX = initialTextX + value;
+                            invalidate();
                         });
                         animator.addListener(new Animator.AnimatorListener() {
                             @Override
@@ -115,18 +112,15 @@ public class SelectorLayout extends View implements OnTouchListener {
             }
         });
         setFocusable(true);
-        setOnFocusChangeListener(new OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    mFocusedButton = 0;
-                    mButtons[0].setSelected(true);
+        setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                mFocusedButton = 0;
+                mButtons[0].setSelected(true);
+                invalidate();
+            } else {
+                if (mFocusedButton != -1) {
+                    mButtons[mFocusedButton].setSelected(false);
                     invalidate();
-                } else {
-                    if (mFocusedButton != -1) {
-                        mButtons[mFocusedButton].setSelected(false);
-                        invalidate();
-                    }
                 }
             }
         });

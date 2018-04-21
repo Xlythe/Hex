@@ -43,23 +43,18 @@ public class HistoryFragment extends HexFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View v = inflater.inflate(R.layout.fragment_history, null);
+        View view = inflater.inflate(R.layout.fragment_history, null);
 
-        GridView games = (GridView) v.findViewById(R.id.games);
+        GridView games = view.findViewById(R.id.games);
         try {
             loadFileList();
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
         games.setAdapter(new HistoryAdapter(getMainActivity(), fileList));
-        games.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                openFile(path + File.separator + fileList[position].file);
-            }
-        });
+        games.setOnItemClickListener((parent, v, position, id) -> openFile(path + File.separator + fileList[position].file));
 
-        return v;
+        return view;
     }
 
     private void loadFileList() {
@@ -71,14 +66,10 @@ public class HistoryFragment extends HexFragment {
 
         // Checks whether path exists
         if (path.exists()) {
-            FilenameFilter filter = new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, @NonNull String filename) {
-                    File sel = new File(dir, filename);
-                    // Filters based on whether the file is hidden or not
-                    return (sel.isFile() || sel.isDirectory()) && !sel.isHidden();
-
-                }
+            FilenameFilter filter = (dir, filename) -> {
+                File sel = new File(dir, filename);
+                // Filters based on whether the file is hidden or not
+                return (sel.isFile() || sel.isDirectory()) && !sel.isHidden();
             };
 
             String[] fList = path.list(filter);
@@ -88,19 +79,14 @@ public class HistoryFragment extends HexFragment {
             }
         }
 
-        Arrays.sort(fileList, new Comparator<Item>() {
-            @Override
-            public int compare(@NonNull Item f1, @NonNull Item f2) {
-                return f2.file.compareTo(f1.file);
-            }
-        });
+        Arrays.sort(fileList, (f1, f2) -> f2.file.compareTo(f1.file));
     }
 
     private class Item {
         public final String file;
         public String title;
         public String date;
-        public int color;
+        public int team;
 
         public Item(String file) {
             this.file = file;
@@ -138,7 +124,7 @@ public class HistoryFragment extends HexFragment {
             final View v = convertView != null ? convertView : View.inflate(context, R.layout.view_history_item, null);
 
             // Load up the game so we can get information
-            if (i.title == null || i.date == null || i.color == 0) {
+            if (i.title == null || i.date == null || i.team == 0) {
                 try {
                     final Handler h = new Handler();
                     Game g = Game.load(FileUtil.loadGameAsString(path + File.separator + i.file));
@@ -149,15 +135,12 @@ public class HistoryFragment extends HexFragment {
 
                         @Override
                         public void onWin(@NonNull PlayingEntity player) {
-                            i.color = player.getTeam();
-                            h.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (i.color == 1) {
-                                        v.setBackgroundResource(R.drawable.history_background_red);
-                                    } else if (i.color == 2) {
-                                        v.setBackgroundResource(R.drawable.history_background_blue);
-                                    }
+                            i.team = player.getTeam();
+                            h.post(() -> {
+                                if (i.team == 1) {
+                                    v.setBackgroundResource(R.drawable.history_background_red);
+                                } else if (i.team == 2) {
+                                    v.setBackgroundResource(R.drawable.history_background_blue);
                                 }
                             });
                         }
@@ -197,24 +180,24 @@ public class HistoryFragment extends HexFragment {
                     g.replay(0);
                     i.title = context.getString(R.string.auto_saved_title, g.getPlayer1().getName(), g.getPlayer2().getName());
                     i.date = DATE_FORMAT.format(new Date(g.getGameStart()));
-                    i.color = -1;
+                    i.team = -1;
                 } catch (Exception e) {
                     e.printStackTrace();
                     i.title = "";
                     i.date = context.getString(R.string.game_toast_failed);
-                    i.color = -1;
+                    i.team = -1;
                 }
             }
 
-            TextView title = (TextView) v.findViewById(R.id.title);
-            TextView date = (TextView) v.findViewById(R.id.date);
+            TextView title = v.findViewById(R.id.title);
+            TextView date = v.findViewById(R.id.date);
 
             title.setText(i.title);
             date.setText(i.date);
 
-            if (i.color == 1) {
+            if (i.team == 1) {
                 v.setBackgroundResource(R.drawable.history_background_red);
-            } else if (i.color == 2) {
+            } else if (i.team == 2) {
                 v.setBackgroundResource(R.drawable.history_background_blue);
             } else {
                 v.setBackgroundResource(R.drawable.history_background_black);

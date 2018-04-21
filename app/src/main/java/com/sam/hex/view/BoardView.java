@@ -88,15 +88,12 @@ public class BoardView extends View {
         mLargeTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 32, dm));
         mLargeTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
         mTextMargin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, dm);
-        setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                for (int x = 0; x < mGame.gameOptions.gridSize; x++) {
-                    for (int y = 0; y < mGame.gameOptions.gridSize; y++) {
-                        Button b = mButtons[x][y];
-                        if (b.isSelected() || b.isPressed()) {
-                            GameAction.setPiece(new Point(x, y), mGame);
-                        }
+        setOnClickListener(v -> {
+            for (int x = 0; x < mGame.gameOptions.gridSize; x++) {
+                for (int y = 0; y < mGame.gameOptions.gridSize; y++) {
+                    Button b = mButtons[x][y];
+                    if (b.isSelected() || b.isPressed()) {
+                        GameAction.setPiece(new Point(x, y), mGame);
                     }
                 }
             }
@@ -158,18 +155,15 @@ public class BoardView extends View {
         }
         onSizeChanged(getWidth(), getHeight(), getWidth(), getHeight());
         this.setOnTouchListener(new TouchListener(game));
-        setOnFocusChangeListener(new OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    mFocusedButton = new Point(0, 0);
-                    mButtons[mFocusedButton.x][mFocusedButton.y].setSelected(true);
+        setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                mFocusedButton = new Point(0, 0);
+                mButtons[mFocusedButton.x][mFocusedButton.y].setSelected(true);
+                invalidate();
+            } else {
+                if (!mFocusedButton.equals(new Point(-1, -1))) {
+                    mButtons[mFocusedButton.x][mFocusedButton.y].setSelected(false);
                     invalidate();
-                } else {
-                    if (!mFocusedButton.equals(new Point(-1, -1))) {
-                        mButtons[mFocusedButton.x][mFocusedButton.y].setSelected(false);
-                        invalidate();
-                    }
                 }
             }
         });

@@ -21,52 +21,43 @@ public class GameSelectionFragment extends HexFragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.fragment_game_selection, null);
 
-        mSelectorLayout = (SelectorLayout) v.findViewById(R.id.buttons);
+        mSelectorLayout = v.findViewById(R.id.buttons);
 
         SelectorLayout.Button computerButton = mSelectorLayout.getButtons()[0];
         computerButton.setColor(getResources().getColor(R.color.select_computer));
         computerButton.setText(R.string.game_selection_button_computer);
-        computerButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
-            @Override
-            public void onClick() {
-                getMainActivity().setGameFragment(new GameFragment());
-                if (Math.random() > 0.5) {
-                    getMainActivity().getGameFragment().setPlayer1Type(Player.Human);
-                    getMainActivity().getGameFragment().setPlayer2Type(Player.AI);
-                } else {
-                    getMainActivity().getGameFragment().setPlayer1Type(Player.AI);
-                    getMainActivity().getGameFragment().setPlayer2Type(Player.Human);
-                }
-                getMainActivity().swapFragment(getMainActivity().getGameFragment());
+        computerButton.setOnClickListener(() -> {
+            getMainActivity().setGameFragment(new GameFragment());
+            if (Math.random() > 0.5) {
+                getMainActivity().getGameFragment().setPlayer1Type(Player.Human);
+                getMainActivity().getGameFragment().setPlayer2Type(Player.AI);
+            } else {
+                getMainActivity().getGameFragment().setPlayer1Type(Player.AI);
+                getMainActivity().getGameFragment().setPlayer2Type(Player.Human);
             }
+            getMainActivity().swapFragment(getMainActivity().getGameFragment());
         });
 
         SelectorLayout.Button hotseatButton = mSelectorLayout.getButtons()[1];
         hotseatButton.setColor(getResources().getColor(R.color.select_pass_to_play));
         hotseatButton.setText(R.string.game_selection_button_pass);
-        hotseatButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
-            @Override
-            public void onClick() {
-                getMainActivity().setGameFragment(new GameFragment());
-                getMainActivity().getGameFragment().setPlayer1Type(Player.Human);
-                getMainActivity().getGameFragment().setPlayer2Type(Player.Human);
-                getMainActivity().swapFragment(getMainActivity().getGameFragment());
-            }
+        hotseatButton.setOnClickListener(() -> {
+            getMainActivity().setGameFragment(new GameFragment());
+            getMainActivity().getGameFragment().setPlayer1Type(Player.Human);
+            getMainActivity().getGameFragment().setPlayer2Type(Player.Human);
+            getMainActivity().swapFragment(getMainActivity().getGameFragment());
         });
 
         SelectorLayout.Button netButton = mSelectorLayout.getButtons()[2];
         netButton.setColor(getResources().getColor(R.color.select_online));
         netButton.setText(R.string.game_selection_button_net);
-        netButton.setOnClickListener(new SelectorLayout.Button.OnClickListener() {
-            @Override
-            public void onClick() {
-                if (getMainActivity().isSignedIn()) {
-                    getMainActivity().setOnlineSelectionFragment(new OnlineSelectionFragment());
-                    getMainActivity().swapFragment(getMainActivity().getOnlineSelectionFragment());
-                } else {
-                    getMainActivity().setOpenOnlineSelectionFragment(true);
-                    getMainActivity().beginUserInitiatedSignIn();
-                }
+        netButton.setOnClickListener(() -> {
+            if (getMainActivity().isSignedIn()) {
+                getMainActivity().setOnlineSelectionFragment(new OnlineSelectionFragment());
+                getMainActivity().swapFragment(getMainActivity().getOnlineSelectionFragment());
+            } else {
+                getMainActivity().setOpenOnlineSelectionFragment(true);
+                getMainActivity().beginUserInitiatedSignIn();
             }
         });
 

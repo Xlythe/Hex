@@ -95,7 +95,7 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     boolean mWaitRoomDismissedFromCode = false;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
@@ -607,22 +607,19 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     public String newGameRequest() {
         Log.d(TAG, "New game requested");
         final LinkedBlockingQueue<Boolean> reply = new LinkedBlockingQueue<Boolean>();
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        // Yes button clicked
-                        mNewGameRequested = true;
-                        reply.add(true);
-                        mShowingDialog = false;
-                        break;
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        // No button clicked
-                        reply.add(false);
-                        mShowingDialog = false;
-                        break;
-                }
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    // Yes button clicked
+                    mNewGameRequested = true;
+                    reply.add(true);
+                    mShowingDialog = false;
+                    break;
+                case DialogInterface.BUTTON_NEGATIVE:
+                    // No button clicked
+                    reply.add(false);
+                    mShowingDialog = false;
+                    break;
             }
         };
 
@@ -631,13 +628,10 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
                 .setPositiveButton(getString(R.string.net_accept), dialogClickListener).setNegativeButton(getString(R.string.net_decline), dialogClickListener)
                 .setOnCancelListener(this);
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (!mShowingDialog) {
-                    builder.show();
-                    mShowingDialog = true;
-                }
+        runOnUiThread(() -> {
+            if (!mShowingDialog) {
+                builder.show();
+                mShowingDialog = true;
             }
         });
 
@@ -657,21 +651,18 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
     public boolean undoRequest(final int turnNumber) {
         Log.d(TAG, "Undo requested");
         final LinkedBlockingQueue<Boolean> reply = new LinkedBlockingQueue<Boolean>();
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        // Yes button clicked
-                        reply.add(true);
-                        mShowingDialog = false;
-                        break;
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        // No button clicked
-                        reply.add(false);
-                        mShowingDialog = false;
-                        break;
-                }
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    // Yes button clicked
+                    reply.add(true);
+                    mShowingDialog = false;
+                    break;
+                case DialogInterface.BUTTON_NEGATIVE:
+                    // No button clicked
+                    reply.add(false);
+                    mShowingDialog = false;
+                    break;
             }
         };
 
@@ -680,13 +671,10 @@ public abstract class NetActivity extends BaseGameActivity implements RealTimeMe
                 .setPositiveButton(getString(R.string.net_accept), dialogClickListener).setNegativeButton(getString(R.string.net_decline), dialogClickListener)
                 .setOnCancelListener(this);
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (!mShowingDialog) {
-                    builder.show();
-                    mShowingDialog = true;
-                }
+        runOnUiThread(() -> {
+            if (!mShowingDialog) {
+                builder.show();
+                mShowingDialog = true;
             }
         });
 

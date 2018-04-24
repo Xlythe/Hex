@@ -5,7 +5,7 @@ If you'd rather write your own board game based off ours, email me at xlythe@gma
 
 ----------LICENSE------------
 
-Copyright (c) 2012 SLSW All rights reserved.
+Copyright (c) 2018 Xlythe LLC All rights reserved.
  
 Developed by: Xlythe
         University of Illinois, University of Waterloo

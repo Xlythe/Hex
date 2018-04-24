@@ -9,21 +9,21 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.PathShape;
 import android.support.annotation.NonNull;
+import android.support.annotation.UiThread;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.hex.core.Game;
 import com.hex.core.GameAction;
 import com.hex.core.Player;
 import com.hex.core.PlayingEntity;
 import com.hex.core.Point;
-import com.hex.core.Timer;
-import com.sam.hex.BoardTools;
+import com.sam.hex.compat.Game;
 
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Will Harmon
@@ -89,8 +89,8 @@ public class BoardView extends View {
         mLargeTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
         mTextMargin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, dm);
         setOnClickListener(v -> {
-            for (int x = 0; x < mGame.gameOptions.gridSize; x++) {
-                for (int y = 0; y < mGame.gameOptions.gridSize; y++) {
+            for (int x = 0; x < mGame.getGridSize(); x++) {
+                for (int y = 0; y < mGame.getGridSize(); y++) {
                     Button b = mButtons[x][y];
                     if (b.isSelected() || b.isPressed()) {
                         GameAction.setPiece(new Point(x, y), mGame);
@@ -106,7 +106,7 @@ public class BoardView extends View {
         mButtons[mFocusedButton.x][mFocusedButton.y].setSelected(false);
         switch (direction) {
             case View.FOCUS_RIGHT:
-                if (mFocusedButton.x < mGame.gameOptions.gridSize - 1) {
+                if (mFocusedButton.x < mGame.getGridSize() - 1) {
                     mFocusedButton = new Point(mFocusedButton.x + 1, mFocusedButton.y);
                     mButtons[mFocusedButton.x][mFocusedButton.y].setSelected(true);
                     invalidate();
@@ -130,7 +130,7 @@ public class BoardView extends View {
                 }
                 break;
             case View.FOCUS_DOWN:
-                if (mFocusedButton.y < mGame.gameOptions.gridSize - 1) {
+                if (mFocusedButton.y < mGame.getGridSize() - 1) {
                     mFocusedButton = new Point(mFocusedButton.x, mFocusedButton.y + 1);
                     mButtons[mFocusedButton.x][mFocusedButton.y].setSelected(true);
                     invalidate();
@@ -145,11 +145,12 @@ public class BoardView extends View {
         return super.focusSearch(direction);
     }
 
+    @UiThread
     public void setGame(@NonNull Game game) {
         this.mGame = game;
-        mButtons = new Button[game.gameOptions.gridSize][game.gameOptions.gridSize];
-        for (int x = 0; x < game.gameOptions.gridSize; x++) {
-            for (int y = 0; y < game.gameOptions.gridSize; y++) {
+        mButtons = new Button[game.getGridSize()][game.getGridSize()];
+        for (int x = 0; x < game.getGridSize(); x++) {
+            for (int y = 0; y < game.getGridSize(); y++) {
                 mButtons[x][y] = new Button();
             }
         }
@@ -173,7 +174,7 @@ public class BoardView extends View {
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         if (mGame == null) return;
-        int n = mGame.gameOptions.gridSize;
+        int n = mGame.getGridSize();
 
         if (!mGame.replayRunning) {
             PlayingEntity player;
@@ -217,11 +218,11 @@ public class BoardView extends View {
             }
         }
 
-        if (mGame.gameOptions.timer.type != Timer.NO_TIMER && !mGame.replayRunning && !mGame.isGameOver()) {
+        if (mGame.hasTimer() && !mGame.replayRunning && !mGame.isGameOver()) {
             float posX = getWidth() - mTextMargin;
             float posY = getHeight() / 2;
-            long minutesLeft = mGame.getCurrentPlayer().getTime() / (60 * 1000);
-            long secondsLeft = (long) (Math.ceil(((double) mGame.getCurrentPlayer().getTime()) / 1000) - minutesLeft * 60);
+            long minutesLeft = TimeUnit.MILLISECONDS.toMinutes(mGame.getCurrentPlayer().getTime());
+            long secondsLeft = TimeUnit.MILLISECONDS.toSeconds(mGame.getCurrentPlayer().getTime()) - TimeUnit.MINUTES.toSeconds(minutesLeft);
             String time = String.format(Locale.getDefault(), "%d:%02d", minutesLeft, secondsLeft);
             canvas.drawText(mTimerText, posX - mTextPaint.measureText(mTimerText), posY, mTextPaint);
             canvas.drawText(time, posX - mLargeTextPaint.measureText(time), posY + mLargeTextPaint.getTextSize(), mLargeTextPaint);
@@ -260,15 +261,15 @@ public class BoardView extends View {
     @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
         if (mGame == null) return;
-        int n = mGame.gameOptions.gridSize;
+        int n = mGame.getGridSize();
         mDrawable = new ShapeDrawable[n][n];
         mDrawableOutline = new ShapeDrawable[n][n];
         mCell = new ShapeDrawable[n][n];
         mCellShadow = new ShapeDrawable[n][n];
         int windowHeight = (int) (h - 2 * mMargin);
-        int windowWidth = (w);
+        int windowWidth = w;
 
-        double radius = BoardTools.radiusCalculator(windowWidth, windowHeight, mGame.gameOptions.gridSize);
+        double radius = radiusCalculator(windowWidth, windowHeight, mGame.getGridSize());
         double hrad = radius * Math.sqrt(3) / 2;
         int yOffset = (int) ((windowHeight - ((3 * radius / 2) * (mGame.gamePieces[0].length - 1) + 2 * radius)) / 2);
         int xOffset = (int) ((windowWidth - (hrad * mGame.gamePieces.length * 2 + hrad * (mGame.gamePieces.length - 1))) / 2);
@@ -355,34 +356,51 @@ public class BoardView extends View {
         return Color.HSVToColor(hsv);
     }
 
+    @UiThread
     public String getTitleText() {
         return mTitleText;
     }
 
+    @UiThread
     public void setTitleText(String titleText) {
         this.mTitleText = titleText;
     }
 
+    @UiThread
     public String getTimerText() {
         return mTimerText;
     }
 
+    @UiThread
     public void setTimerText(String timerText) {
         this.mTimerText = timerText;
     }
 
+    @UiThread
     public String getActionText() {
         return mActionText;
     }
 
+    @UiThread
     public void setActionText(String mActionText) {
         this.mActionText = mActionText;
+    }
+
+    private static double radiusCalculator(double w, double h, double n) {
+        double spaceV = (((n - 1) * 3 / 2) + 2);
+        double spaceH = n + (n - 1) / 2; // always bigger.
+        spaceH = (w / (spaceH * Math.sqrt(3)));
+        spaceV = (h / spaceV);
+        if (spaceV < spaceH) {
+            return spaceV;
+        }
+        return spaceH;
     }
 
     private class TouchListener implements OnTouchListener {
         Game game;
 
-        public TouchListener(Game game) {
+        TouchListener(Game game) {
             this.game = game;
         }
 
@@ -404,7 +422,7 @@ public class BoardView extends View {
                 for (int x = 0; x < game.gamePieces.length; x++) {
                     for (int y = 0; y < game.gamePieces[0].length; y++) {
                         if (mButtons[x][y].isPressed()) {
-                            if (game.gamePieces[x][y].getTeam() == 0 || (game.gameOptions.swap && game.getMoveNumber() == 2)) {
+                            if (game.gamePieces[x][y].getTeam() == 0 || (game.isFirstMoveSwapEnabled() && game.getMoveNumber() == 2)) {
                                 performClick();
                             }
                         }
@@ -440,7 +458,7 @@ public class BoardView extends View {
         // Number of sides in the polygon.
         private final int polySides = 6;
 
-        public Hexagon(double x, double y, double r) {
+        Hexagon(double x, double y, double r) {
             polyX = getXCoordinates(x, y, r, 6, Math.PI / 2);
             polyY = getYCoordinates(x, y, r, 6, Math.PI / 2);
         }
@@ -458,7 +476,7 @@ public class BoardView extends View {
         }
 
         @NonNull
-        protected int[] getXCoordinates(double x, double y, double r, int vertexCount, double startAngle) {
+        int[] getXCoordinates(double x, double y, double r, int vertexCount, double startAngle) {
             int res[] = new int[vertexCount];
             double addAngle = 2 * Math.PI / vertexCount;
             double angle = startAngle;
@@ -470,7 +488,7 @@ public class BoardView extends View {
         }
 
         @NonNull
-        protected int[] getYCoordinates(double x, double y, double r, int vertexCount, double startAngle) {
+        int[] getYCoordinates(double x, double y, double r, int vertexCount, double startAngle) {
             int res[] = new int[vertexCount];
             double addAngle = 2 * Math.PI / vertexCount;
             double angle = startAngle;
@@ -487,10 +505,6 @@ public class BoardView extends View {
         private boolean pressed;
         private boolean enabled = true;
         private boolean selected;
-
-        public interface OnClickListener {
-            void onClick();
-        }
 
         protected boolean isPressed() {
             return pressed;

@@ -1,7 +1,6 @@
 package com.sam.hex.view;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -19,35 +18,44 @@ import com.sam.hex.view.HexDialogView.Button.OnClickListener;
  * @author Will Harmon
  **/
 public class GameOverDialog extends HexDialog {
-    private static GameFragment FRAGMENT;
-    private static PlayingEntity WINNER;
-    public static boolean DISMISS_DIALOG;
+    private static GameFragment gameFragment;
+    private static PlayingEntity winner;
 
-    public GameOverDialog(Context context, GameFragment fragment, PlayingEntity winner) {
-        super(context);
-        FRAGMENT = fragment;
-        WINNER = winner;
-        DISMISS_DIALOG = false;
-    }
+    public static class Builder {
+        private final GameOverDialog gameOverDialog = new GameOverDialog();
 
-    public GameOverDialog() {
-        super();
+        public Builder(Context context) {
+            gameOverDialog.attachBaseContext(context);
+        }
+
+        public Builder setGameFragment(GameFragment fragment) {
+            gameFragment = fragment;
+            return this;
+        }
+
+        public Builder setWinner(PlayingEntity playingEntity) {
+            winner = playingEntity;
+            return this;
+        }
+
+        public void show() {
+            gameOverDialog.show();
+        }
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onDestroy() {
+        gameFragment = null;
+        winner = null;
 
-        if (DISMISS_DIALOG) {
-            dismiss();
-        }
+        super.onDestroy();
     }
 
     @Override
     public View getPositiveView() {
         View v = View.inflate(this, R.layout.dialog_view_game_over_icon, null);
 
-        ImageView iv = (ImageView) v.findViewById(R.id.image);
+        ImageView iv = v.findViewById(R.id.image);
         iv.setImageResource(R.drawable.play_again);
 
         return v;
@@ -57,7 +65,7 @@ public class GameOverDialog extends HexDialog {
     public View getNegativeView() {
         View v = View.inflate(this, R.layout.dialog_view_game_over_icon, null);
 
-        ImageView iv = (ImageView) v.findViewById(R.id.image);
+        ImageView iv = v.findViewById(R.id.image);
         iv.setImageResource(R.drawable.home);
 
         return v;
@@ -66,14 +74,12 @@ public class GameOverDialog extends HexDialog {
     @Override
     public View getNeutralView() {
         View v = View.inflate(this, R.layout.dialog_view_game_over, null);
-        // Catch for resuming an activity after minimizing it too long
-        if (FRAGMENT == null) return v;
 
         TextView action = v.findViewById(R.id.action);
         TextView time = v.findViewById(R.id.time);
 
-        Game game = FRAGMENT.getGame();
-        PlayingEntity winner = WINNER;
+        Game game = gameFragment.getGame();
+        PlayingEntity winner = this.winner;
 
         String actionText = winner.getType().equals(Player.Human) ? getString(R.string.game_over_won) : getString(R.string.game_over_lose);
         long hours = game.getGameLength() / (60 * 60 * 1000);
@@ -95,7 +101,7 @@ public class GameOverDialog extends HexDialog {
     @Override
     public OnClickListener getPositiveOnClickListener() {
         return () -> {
-            FRAGMENT.startNewGame();
+            gameFragment.startNewGame();
             dismiss();
         };
     }
@@ -104,7 +110,7 @@ public class GameOverDialog extends HexDialog {
     @Override
     public OnClickListener getNegativeOnClickListener() {
         return () -> {
-            FRAGMENT.setGoHome(true);
+            gameFragment.setGoHome(true);
             dismiss();
         };
     }

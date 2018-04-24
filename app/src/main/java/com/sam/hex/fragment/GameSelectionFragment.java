@@ -19,7 +19,7 @@ public class GameSelectionFragment extends HexFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View v = inflater.inflate(R.layout.fragment_game_selection, null);
+        View v = inflater.inflate(R.layout.fragment_game_selection, container, false);
 
         mSelectorLayout = v.findViewById(R.id.buttons);
 
@@ -27,25 +27,25 @@ public class GameSelectionFragment extends HexFragment {
         computerButton.setColor(getResources().getColor(R.color.select_computer));
         computerButton.setText(R.string.game_selection_button_computer);
         computerButton.setOnClickListener(() -> {
-            getMainActivity().setGameFragment(new GameFragment());
+            GameFragment gameFragment = new GameFragment();
             if (Math.random() > 0.5) {
-                getMainActivity().getGameFragment().setPlayer1Type(Player.Human);
-                getMainActivity().getGameFragment().setPlayer2Type(Player.AI);
+                gameFragment.setPlayer1Type(Player.Human);
+                gameFragment.setPlayer2Type(Player.AI);
             } else {
-                getMainActivity().getGameFragment().setPlayer1Type(Player.AI);
-                getMainActivity().getGameFragment().setPlayer2Type(Player.Human);
+                gameFragment.setPlayer1Type(Player.AI);
+                gameFragment.setPlayer2Type(Player.Human);
             }
-            getMainActivity().swapFragment(getMainActivity().getGameFragment());
+            swapFragment(gameFragment);
         });
 
         SelectorLayout.Button hotseatButton = mSelectorLayout.getButtons()[1];
         hotseatButton.setColor(getResources().getColor(R.color.select_pass_to_play));
         hotseatButton.setText(R.string.game_selection_button_pass);
         hotseatButton.setOnClickListener(() -> {
-            getMainActivity().setGameFragment(new GameFragment());
-            getMainActivity().getGameFragment().setPlayer1Type(Player.Human);
-            getMainActivity().getGameFragment().setPlayer2Type(Player.Human);
-            getMainActivity().swapFragment(getMainActivity().getGameFragment());
+            GameFragment gameFragment = new GameFragment();
+            gameFragment.setPlayer1Type(Player.Human);
+            gameFragment.setPlayer2Type(Player.Human);
+            swapFragment(gameFragment);
         });
 
         SelectorLayout.Button netButton = mSelectorLayout.getButtons()[2];
@@ -53,11 +53,10 @@ public class GameSelectionFragment extends HexFragment {
         netButton.setText(R.string.game_selection_button_net);
         netButton.setOnClickListener(() -> {
             if (getMainActivity().isSignedIn()) {
-                getMainActivity().setOnlineSelectionFragment(new OnlineSelectionFragment());
-                getMainActivity().swapFragment(getMainActivity().getOnlineSelectionFragment());
+                swapFragment(new OnlineSelectionFragment());
             } else {
                 getMainActivity().setOpenOnlineSelectionFragment(true);
-                getMainActivity().beginUserInitiatedSignIn();
+                signIn();
             }
         });
 

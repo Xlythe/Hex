@@ -16,12 +16,17 @@ import com.sam.hex.view.HexDialogView.Button.OnClickListener;
  * @author Will Harmon
  **/
 public class DonateDialog extends HexDialog {
-    public DonateDialog(Context context) {
-        super(context);
-    }
 
-    public DonateDialog() {
-        super();
+    public static class Builder {
+        private final DonateDialog donateDialog = new DonateDialog();
+
+        public Builder(Context context) {
+            donateDialog.attachBaseContext(context);
+        }
+
+        public void show() {
+            donateDialog.show();
+        }
     }
 
     @Override

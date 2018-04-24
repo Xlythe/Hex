@@ -13,7 +13,10 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.graphics.drawable.shapes.PathShape;
 import android.os.Build;
+import android.support.annotation.ColorInt;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -113,29 +116,23 @@ public class HexagonLayout extends View implements OnTouchListener {
         mButtonTextPaint.setColor(Color.WHITE);
         mButtonTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, dm));
         mAllowRotation = true;
-        setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                for (Button b : mButtons) {
-                    if (b.isSelected() || b.isPressed()) {
-                        b.performClick();
-                    }
+        setOnClickListener(v -> {
+            for (Button b : mButtons) {
+                if (b.isSelected() || b.isPressed()) {
+                    b.performClick();
                 }
             }
         });
         setFocusable(true);
-        setOnFocusChangeListener(new OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    mFocusedButton = 3;
-                    mButtons[3].setSelected(true);
+        setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                mFocusedButton = 3;
+                mButtons[3].setSelected(true);
+                invalidate();
+            } else {
+                if (mFocusedButton != -1) {
+                    mButtons[mFocusedButton].setSelected(false);
                     invalidate();
-                } else {
-                    if (mFocusedButton != -1) {
-                        mButtons[mFocusedButton].setSelected(false);
-                        invalidate();
-                    }
                 }
             }
         });
@@ -540,18 +537,14 @@ public class HexagonLayout extends View implements OnTouchListener {
         }
 
         final float initialRotation = mRotation;
-        Log.d(TAG, "Spinning " + rotation + " degrees");
 
         mAnimator = ValueAnimator.ofFloat(0, rotation);
         mAnimator.setInterpolator(new DecelerateInterpolator());
         mAnimator.setDuration(constantDuration ? 300 : (long) (Math.abs(rotation) / 50 * 300));
-        mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                float value = (Float) valueAnimator.getAnimatedValue();
+        mAnimator.addUpdateListener(animator -> {
+                float value = (Float) animator.getAnimatedValue();
                 mRotation = initialRotation + value;
                 invalidate();
-            }
         });
         mAnimator.addListener(new Animator.AnimatorListener() {
             @Override
@@ -564,9 +557,8 @@ public class HexagonLayout extends View implements OnTouchListener {
                 if (offset > 30) {
                     offset = 60f - offset;
                 }
-                Log.d(TAG, "We ended our spin " + offset + " degrees away from where we need to be");
+
                 if (offset < 1f) {
-                    Log.d(TAG, "We're close enough that we'll just jump to the position");
                     mRotation -= mRotation % 60;
                     invalidate();
                 } else if ((mRotation + offset) % 60 == 0) {
@@ -646,7 +638,7 @@ public class HexagonLayout extends View implements OnTouchListener {
             m = new Matrix();
         }
 
-        public boolean contains(@NonNull Point p) {
+        boolean contains(@NonNull Point p) {
             if (mAllowRotation) {
                 points[0] = p.x;
                 points[1] = p.y;
@@ -703,7 +695,7 @@ public class HexagonLayout extends View implements OnTouchListener {
             this.drawable = drawable;
         }
 
-        public void setDrawableResource(int id) {
+        public void setDrawableResource(@DrawableRes int id) {
             setDrawable(context.getResources().getDrawable(id));
         }
 
@@ -715,7 +707,7 @@ public class HexagonLayout extends View implements OnTouchListener {
             this.text = text;
         }
 
-        public void setText(int resId) {
+        public void setText(@StringRes int resId) {
             setText(context.getString(resId));
         }
 
@@ -723,7 +715,7 @@ public class HexagonLayout extends View implements OnTouchListener {
             return text;
         }
 
-        public void setColor(int color) {
+        public void setColor(@ColorInt int color) {
             this.color = color;
         }
 

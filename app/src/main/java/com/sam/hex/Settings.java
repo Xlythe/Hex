@@ -3,10 +3,11 @@ package com.sam.hex;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.games.Games;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.hex.core.Timer;
 
 /**
@@ -74,9 +75,10 @@ public class Settings {
         return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString(TIMER, "0"));
     }
 
-    public static String getPlayer1Name(@NonNull Context context, @NonNull GoogleApiClient gamesClient) {
-        if (gamesClient.isConnected())
-            return Games.Players.getCurrentPlayer(gamesClient).getDisplayName().split(" ")[0];
+    public static String getPlayer1Name(@NonNull Context context, @Nullable GoogleSignInAccount googleSignInAccount) {
+        if (googleSignInAccount != null && googleSignInAccount.getDisplayName() != null) {
+            return googleSignInAccount.getDisplayName().split(" ")[0];
+        }
         return context.getString(R.string.DEFAULT_P1_NAME);
     }
 
@@ -84,10 +86,12 @@ public class Settings {
         return context.getString(R.string.DEFAULT_P2_NAME);
     }
 
+    @ColorInt
     public static int getPlayer1Color(@NonNull Context context) {
         return context.getResources().getInteger(R.integer.DEFAULT_P1_COLOR);
     }
 
+    @ColorInt
     public static int getPlayer2Color(@NonNull Context context) {
         return context.getResources().getInteger(R.integer.DEFAULT_P2_COLOR);
     }

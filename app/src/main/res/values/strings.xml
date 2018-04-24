@@ -88,7 +88,7 @@
 
     <!-- Game instructions -->
     <string name="instructions">Hex is played by two players, who take turns placing pieces on the board. The players have different colours, say red and blue. (The players themselves are sometimes referred to as Red and Blue) The four edges of the board are coloured with the same colours, in such a way that parallel edges have the same colour. Red wins if he can build a continuous chain between the two red edges, and blue wins if he can build such a chain between the blue edges.\n\n
-        (Taken from <a href="http://www.hexwiki.org/index.php?title=Rules">hexwiki.org</a>)</string>
+        (<a href="https://en.m.wikipedia.org/wiki/Hex_(board_game)">wikipedia.org</a>)</string>
 
     <!-- Confirmation -->
     <string name="confirmExit">Are you sure you want to exit?</string>

@@ -17,7 +17,7 @@ public class InstructionsFragment extends HexFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View v = inflater.inflate(R.layout.fragment_instructions, null);
+        View v = inflater.inflate(R.layout.fragment_instructions, container, false);
 
         TextView title = v.findViewById(R.id.title);
         title.setText(R.string.activity_title_instructions);

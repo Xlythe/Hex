@@ -3,8 +3,6 @@ package com.sam.hex.fragment;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -13,6 +11,7 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,7 +33,7 @@ public class PreferencesFragment extends PreferenceFragment {
     Preference timerPref;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
         loadPreferences();

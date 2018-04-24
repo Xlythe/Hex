@@ -1,9 +1,9 @@
 package com.sam.hex.view;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.Window;
 
@@ -22,12 +22,6 @@ public abstract class HexDialog extends PurchaseActivity {
     public static final String ITEM_SKU_ADVANCED = "gold_donation";
 
     private HexDialogView view;
-
-    private Context context;
-
-    public HexDialog(Context context) {
-        this.context = context;
-    }
 
     public HexDialog() {
         super();
@@ -51,8 +45,14 @@ public abstract class HexDialog extends PurchaseActivity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            dismiss();
+            return;
+        }
+
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         view = new HexDialogView(this, this);
@@ -119,6 +119,6 @@ public abstract class HexDialog extends PurchaseActivity {
     }
 
     public void show() {
-        context.startActivity(new Intent(context, this.getClass()));
+        startActivity(new Intent(this, getClass()));
     }
 }

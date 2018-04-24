@@ -1,18 +1,13 @@
 package com.sam.hex;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.InputType;
@@ -29,8 +24,6 @@ import com.sam.hex.fragment.PreferencesFragment;
 /**
  * @author Will Harmon
  **/
-@SuppressWarnings("deprecation")
-@SuppressLint("NewApi")
 public class PreferencesActivity extends PreferenceActivity {
     SharedPreferences settings;
     Preference gridPref;
@@ -40,16 +33,11 @@ public class PreferencesActivity extends PreferenceActivity {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.preferences);
-        TextView title = (TextView) findViewById(R.id.title);
+        TextView title = findViewById(R.id.title);
         title.setText(R.string.activity_title_preferences);
-        if (Build.VERSION.SDK_INT < 11) {
-            settings = PreferenceManager.getDefaultSharedPreferences(this);
-            loadPreferences();
-        } else {
-            if (savedInstanceState == null) {
-                PreferencesFragment preferences = new PreferencesFragment();
-                getFragmentManager().beginTransaction().add(R.id.content, preferences).commit();
-            }
+        if (savedInstanceState == null) {
+            PreferencesFragment preferences = new PreferencesFragment();
+            getFragmentManager().beginTransaction().add(R.id.content, preferences).commit();
         }
     }
 
@@ -144,10 +132,6 @@ public class PreferencesActivity extends PreferenceActivity {
             comDifficultyPref.setOnPreferenceChangeListener(new DifficultyListener());
             comDifficultyPref.setSummary(getResources().getStringArray(R.array.comDifficultyArray)[Settings.getComputerDifficulty(this)]);
         }
-    }
-
-    private void loadPreferences() {
-        addPreferencesFromResource(R.xml.preferences_general);
     }
 
     /**

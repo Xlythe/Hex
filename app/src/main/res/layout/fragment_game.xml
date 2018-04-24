@@ -8,45 +8,41 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <LinearLayout
+    <Button
+        android:id="@+id/exit"
+        android:text="@string/game_quit"
+        android:textSize="13sp"
+        android:paddingBottom="7dp"
+        android:textColor="@color/white"
+        android:drawableTop="@drawable/exit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="7dp"
-        android:layout_alignParentBottom="true" >
+        android:layout_alignParentBottom="true"
+        style="?android:attr/borderlessButtonStyle" />
 
-        <Button
-            android:id="@+id/exit"
-            android:text="@string/game_quit"
-            android:textSize="13sp"
-            android:padding="4dp"
-            android:background="@android:drawable/list_selector_background"
-            android:textColor="@color/white"
-            android:drawableTop="@drawable/exit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/reload"
+        android:text="@string/game_reload"
+        android:textSize="13sp"
+        android:paddingBottom="7dp"
+        android:textColor="@color/white"
+        android:drawableTop="@drawable/restart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/exit"
+        style="?android:attr/borderlessButtonStyle" />
 
-        <Button
-            android:id="@+id/reload"
-            android:text="@string/game_reload"
-            android:textSize="13sp"
-            android:padding="4dp"
-            android:background="@android:drawable/list_selector_background"
-            android:textColor="@color/white"
-            android:drawableTop="@drawable/restart"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <Button
-            android:id="@+id/undo"
-            android:text="@string/game_undo"
-            android:textSize="13sp"
-            android:padding="4dp"
-            android:background="@android:drawable/list_selector_background"
-            android:textColor="@color/white"
-            android:drawableTop="@drawable/undo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-    </LinearLayout>
+    <Button
+        android:id="@+id/undo"
+        android:text="@string/game_undo"
+        android:textSize="13sp"
+        android:paddingBottom="7dp"
+        android:textColor="@color/white"
+        android:drawableTop="@drawable/undo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/exit"
+        android:layout_alignParentBottom="true"
+        style="?android:attr/borderlessButtonStyle" />
 
 </RelativeLayout>

@@ -6,11 +6,10 @@ import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
@@ -27,9 +26,10 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
+
+import static com.sam.hex.Settings.TAG;
 
 /**
  * @author Will Harmon
@@ -37,13 +37,12 @@ import java.util.Locale;
 public class HistoryFragment extends HexFragment {
     private Item[] fileList;
     @NonNull
-    public static File path = new File(Environment.getExternalStorageDirectory() + File.separator + "Hex" + File.separator);
-    public static String chosenFile;
+    public static final File path = new File(Environment.getExternalStorageDirectory() + File.separator + "Hex" + File.separator);
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View view = inflater.inflate(R.layout.fragment_history, null);
+        View view = inflater.inflate(R.layout.fragment_history, container, false);
 
         GridView games = view.findViewById(R.id.games);
         try {
@@ -59,7 +58,9 @@ public class HistoryFragment extends HexFragment {
 
     private void loadFileList() {
         try {
-            path.mkdirs();
+            if (path.mkdirs()) {
+                Log.d(TAG, "Successfully made the directory for history");
+            }
         } catch (SecurityException e) {
             e.printStackTrace();
         }
@@ -88,7 +89,7 @@ public class HistoryFragment extends HexFragment {
         public String date;
         public int team;
 
-        public Item(String file) {
+        Item(String file) {
             this.file = file;
         }
     }
@@ -99,21 +100,21 @@ public class HistoryFragment extends HexFragment {
             b.putString(GameFragment.GAME, FileUtil.loadGameAsString(fileName));
             b.putBoolean(GameFragment.REPLAY, true);
 
-            getMainActivity().setGameFragment(new GameFragment());
-            getMainActivity().getGameFragment().setArguments(b);
-            getMainActivity().swapFragment(getMainActivity().getGameFragment());
+            GameFragment gameFragment = new GameFragment();
+            gameFragment.setArguments(b);
+            swapFragment(gameFragment);
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(getMainActivity(), R.string.game_toast_failed, Toast.LENGTH_SHORT).show();
         }
     }
 
-    public static class HistoryAdapter extends BaseAdapter {
+    static class HistoryAdapter extends BaseAdapter {
         private Context context;
         private final Item[] files;
         private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
 
-        public HistoryAdapter(Context context, Item[] files) {
+        HistoryAdapter(Context context, Item[] files) {
             this.context = context;
             this.files = files;
         }

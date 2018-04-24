@@ -9,20 +9,15 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.games.Games;
-import com.sam.hex.MainActivity;
 import com.sam.hex.PreferencesActivity;
 import com.sam.hex.R;
 import com.sam.hex.Settings;
 import com.sam.hex.Stats;
 import com.sam.hex.view.DonateDialog;
-import com.sam.hex.view.GameOverDialog;
-import com.sam.hex.view.HexDialog;
 import com.sam.hex.view.HexagonLayout;
 
 /**
@@ -30,19 +25,19 @@ import com.sam.hex.view.HexagonLayout;
  **/
 public class MainFragment extends HexFragment {
     // Hexagon variables
-    HexagonLayout mHexagonLayout;
+    private HexagonLayout mHexagonLayout;
     private float mInitialSpin;
     private float mInitialRotation;
 
     // Stat variables
-    TextView mTitleTextView;
-    TextView mTimePlayedTextView;
-    TextView mGamesPlayedTextView;
-    TextView mGamesWonTextView;
+    private TextView mTitleTextView;
+    private TextView mTimePlayedTextView;
+    private TextView mGamesPlayedTextView;
+    private TextView mGamesWonTextView;
 
     // Play variables
-    SignInButton mSignInButton;
-    Button mSignOutButton;
+    private SignInButton mSignInButton;
+    private Button mSignOutButton;
 
     /**
      * Called when the activity is first created.
@@ -50,8 +45,8 @@ public class MainFragment extends HexFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        getMainActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        View view = inflater.inflate(R.layout.fragment_main, null);
+        keepScreenOn(false);
+        View view = inflater.inflate(R.layout.fragment_main, container, false);
 
         mHexagonLayout = view.findViewById(R.id.hexagonButtons);
         HexagonLayout.Button settingsButton = mHexagonLayout.getButtons()[0];
@@ -81,58 +76,45 @@ public class MainFragment extends HexFragment {
         settingsButton.setDrawableResource(R.drawable.settings);
         settingsButton.setOnClickListener(() -> {
             startActivity(new Intent(getMainActivity(), PreferencesActivity.class));
-            getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         });
 
         donateButton.setText(R.string.main_button_donate);
         donateButton.setColor(getResources().getColor(R.color.main_donate));
         donateButton.setDrawableResource(R.drawable.store);
-        donateButton.setOnClickListener(() -> {
-            HexDialog hd = new DonateDialog(getMainActivity());
-            hd.show();
-        });
+        donateButton.setOnClickListener(() -> new DonateDialog.Builder(getMainActivity()).show());
 
         historyButton.setText(R.string.main_button_history);
         historyButton.setColor(getResources().getColor(R.color.main_history));
         historyButton.setDrawableResource(R.drawable.history);
-        historyButton.setOnClickListener(() -> {
-            getMainActivity().setHistoryFragment(new HistoryFragment());
-            getMainActivity().swapFragment(getMainActivity().getHistoryFragment());
-        });
+        historyButton.setOnClickListener(() -> swapFragment(new HistoryFragment()));
 
         instructionsButton.setText(R.string.main_button_instructions);
         instructionsButton.setColor(getResources().getColor(R.color.main_instructions));
         instructionsButton.setDrawableResource(R.drawable.howtoplay);
-        instructionsButton.setOnClickListener(() -> {
-            getMainActivity().setInstructionsFragment(new InstructionsFragment());
-            getMainActivity().swapFragment(getMainActivity().getInstructionsFragment());
-        });
+        instructionsButton.setOnClickListener(() -> swapFragment(new InstructionsFragment()));
 
         achievementsButton.setText(R.string.main_button_achievements);
         achievementsButton.setColor(getResources().getColor(R.color.main_achievements));
         achievementsButton.setDrawableResource(R.drawable.achievements);
         achievementsButton.setOnClickListener(() -> {
-            if (getMainActivity().isSignedIn()) {
-                startActivityForResult(Games.Achievements.getAchievementsIntent(getMainActivity().getClient()), MainActivity.RC_ACHIEVEMENTS);
-                getMainActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            if (isSignedIn()) {
+                openAchievements();
             } else {
                 getMainActivity().setOpenAchievements(true);
-                getMainActivity().beginUserInitiatedSignIn();
+                signIn();
             }
         });
 
         playButton.setText(R.string.main_button_play);
         playButton.setColor(getResources().getColor(R.color.main_play));
         playButton.setDrawableResource(R.drawable.play);
-        playButton.setOnClickListener(() -> {
-            getMainActivity().setGameSelectionFragment(new GameSelectionFragment());
-            getMainActivity().swapFragment(getMainActivity().getGameSelectionFragment());
-        });
+        playButton.setOnClickListener(() -> swapFragment(new GameSelectionFragment()));
 
-        mSignInButton.setOnClickListener(v -> getMainActivity().beginUserInitiatedSignIn());
+        mSignInButton.setOnClickListener(v -> signIn());
 
         mSignOutButton.setOnClickListener(v -> {
-            getMainActivity().signOut();
+            signOut();
             refreshPlayerInformation();
         });
         refreshPlayerInformation();
@@ -146,10 +128,6 @@ public class MainFragment extends HexFragment {
 
         showStats();
         showDonationStar();
-
-        // GameOverDialog shows up when
-        // activity dies on winner screen.
-        GameOverDialog.DISMISS_DIALOG = true;
     }
 
     private void showStats() {
@@ -157,9 +135,9 @@ public class MainFragment extends HexFragment {
         long timePlayedInHours = timePlayedInMillis / (1000 * 60 * 60);
         long timePlayedInMintues = (timePlayedInMillis - timePlayedInHours * (1000 * 60 * 60)) / (1000 * 60);
         long timePlayedInSeconds = (timePlayedInMillis - timePlayedInHours * (1000 * 60 * 60) - timePlayedInMintues * (1000 * 60)) / (1000);
-        mTimePlayedTextView.setText(String.format(getString(R.string.main_stats_time_played), timePlayedInHours, timePlayedInMintues, timePlayedInSeconds));
-        mGamesPlayedTextView.setText(String.format(getString(R.string.main_stats_games_played), Stats.getGamesPlayed(getMainActivity())));
-        mGamesWonTextView.setText(String.format(getString(R.string.main_stats_games_won), Stats.getGamesWon(getMainActivity())));
+        mTimePlayedTextView.setText(getString(R.string.main_stats_time_played, timePlayedInHours, timePlayedInMintues, timePlayedInSeconds));
+        mGamesPlayedTextView.setText(getString(R.string.main_stats_games_played, Stats.getGamesPlayed(getMainActivity())));
+        mGamesWonTextView.setText(getString(R.string.main_stats_games_won, Stats.getGamesWon(getMainActivity())));
     }
 
     private void refreshPlayerInformation() {
@@ -167,12 +145,12 @@ public class MainFragment extends HexFragment {
             // Network is async, no promise that we won't lose connectivity
             if (getMainActivity() == null) return;
             if (mSignOutButton != null)
-                mSignOutButton.setVisibility(getMainActivity().isSignedIn() ? View.VISIBLE : View.GONE);
+                mSignOutButton.setVisibility(isSignedIn() ? View.VISIBLE : View.GONE);
             if (mSignInButton != null)
-                mSignInButton.setVisibility(getMainActivity().isSignedIn() ? View.GONE : View.VISIBLE);
+                mSignInButton.setVisibility(isSignedIn() ? View.GONE : View.VISIBLE);
             if (mTitleTextView != null)
-                mTitleTextView.setText(String.format(getString(R.string.main_title),
-                        Settings.getPlayer1Name(getMainActivity(), getMainActivity().getClient())));
+                mTitleTextView.setText(getString(R.string.main_title,
+                        Settings.getPlayer1Name(getMainActivity(), getGoogleSignInAccount())));
             if (mHexagonLayout != null) mHexagonLayout.invalidate();
             if (mTimePlayedTextView != null && mGamesPlayedTextView != null && mGamesWonTextView != null)
                 showStats();
@@ -182,10 +160,6 @@ public class MainFragment extends HexFragment {
     }
 
     public void setSignedIn(boolean isSignedIn) {
-        refreshPlayerInformation();
-    }
-
-    public void setIabSetup(boolean isIabSetup) {
         refreshPlayerInformation();
     }
 

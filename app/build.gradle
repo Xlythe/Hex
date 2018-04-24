@@ -7,12 +7,19 @@ android {
         applicationId "com.sam.hex"
         minSdkVersion 14
         targetSdkVersion 27
-        versionCode 26
-        versionName "4.0.0"
+        versionCode 27
+        versionName "4.1.0"
+    }
+    signingConfigs {
+        release {
+        }
     }
     buildTypes {
         release {
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+            debuggable true
         }
     }
     lintOptions {
@@ -29,6 +36,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.+'
     implementation 'com.android.support:design:27.+'
+    implementation 'com.google.android.gms:play-services-auth:+'
     implementation 'com.google.android.gms:play-services-games:+'
     implementation 'com.xlythe:play-billing:1.0.1', withoutSupportLib
     testImplementation 'junit:junit:4.12'

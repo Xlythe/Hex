@@ -30,6 +30,8 @@ gen/*
 
 .gradle/*
 
+gradle/*
+
 .idea/*
 
 build/*
@@ -37,3 +39,7 @@ build/*
 *.iml
 
 local.properties
+
+gradlew
+
+gradlew.bat

@@ -103,6 +103,11 @@ public class NetworkPlayer implements PlayingEntity {
      */
     @Override
     public void getPlayerTurn(Game game) {
+        // Ignore replays. We'll wait for the replay to finish before continuing to make moves.
+        if (game.replayRunning) {
+            return;
+        }
+
         // As long as this wasn't the very first move, send the local move to the remote side before waiting for their response.
         MoveList moveList = game.getMoveList();
         if (moveList.size() > 0) {

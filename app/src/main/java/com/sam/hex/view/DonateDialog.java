@@ -1,6 +1,7 @@
 package com.sam.hex.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,14 +19,14 @@ import com.sam.hex.view.HexDialogView.Button.OnClickListener;
 public class DonateDialog extends HexDialog {
 
     public static class Builder {
-        private final DonateDialog donateDialog = new DonateDialog();
+        private final Context context;
 
         public Builder(Context context) {
-            donateDialog.attachBaseContext(context);
+            this.context = context;
         }
 
         public void show() {
-            donateDialog.show();
+            context.startActivity(new Intent(context, DonateDialog.class));
         }
     }
 

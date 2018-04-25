@@ -46,7 +46,13 @@ public class HexFragment extends Fragment {
     }
 
     protected void keepScreenOn(boolean screenOn) {
-        getMainActivity().keepScreenOn(screenOn);
+        MainActivity activity = getMainActivity();
+        if (activity == null || isDetached()) {
+            Log.w(TAG, "Unable to change screen on state because fragment is detached.");
+            return;
+        }
+
+        activity.keepScreenOn(screenOn);
     }
 
     protected void overridePendingTransition(@AnimRes int enterAnim, @AnimRes int exitAnim) {
@@ -59,6 +65,7 @@ public class HexFragment extends Fragment {
             Log.w(TAG, "Unable to run runnable on ui thread because fragment is detached.");
             return;
         }
+
         activity.runOnUiThread(r);
     }
 
@@ -68,6 +75,7 @@ public class HexFragment extends Fragment {
             Log.w(TAG, "Unable to swap fragment because current fragment is detached.");
             return;
         }
+
         activity.swapFragment(fragment);
     }
 
@@ -89,42 +97,100 @@ public class HexFragment extends Fragment {
 
     @Nullable
     protected GoogleSignInAccount getGoogleSignInAccount() {
-        return getMainActivity().getGoogleSignInAccount();
+        MainActivity activity = getMainActivity();
+        if (activity == null || isDetached()) {
+            return null;
+        }
+
+        return activity.getGoogleSignInAccount();
     }
 
     protected boolean isSignedIn() {
-        return getMainActivity().isSignedIn();
+        MainActivity activity = getMainActivity();
+        if (activity == null || isDetached()) {
+            return false;
+        }
+
+        return activity.isSignedIn();
     }
 
     protected void signIn() {
-        getMainActivity().signIn();
+        MainActivity activity = getMainActivity();
+        if (activity == null || isDetached()) {
+            Log.w(TAG, "Unable to sign in because current fragment is detached.");
+            return;
+        }
+
+        activity.signIn();
     }
 
     protected void signOut() {
-        getMainActivity().signOut();
+        MainActivity activity = getMainActivity();
+        if (activity == null || isDetached()) {
+            Log.w(TAG, "Unable to sign out because current fragment is detached.");
+            return;
+        }
+
+        activity.signOut();
     }
 
     protected void returnHome() {
-        getMainActivity().returnHome();
+        MainActivity activity = getMainActivity();
+        if (activity == null || isDetached()) {
+            Log.w(TAG, "Unable to return home because current fragment is detached.");
+            return;
+        }
+
+        activity.returnHome();
     }
 
     protected void startQuickGame() {
-        getMainActivity().startQuickGame();
+        MainActivity activity = getMainActivity();
+        if (activity == null || isDetached()) {
+            Log.w(TAG, "Unable to start a quick game because current fragment is detached.");
+            return;
+        }
+
+        activity.startQuickGame();
     }
 
     protected void inviteFriends() {
-        getMainActivity().inviteFriends();
+        MainActivity activity = getMainActivity();
+        if (activity == null || isDetached()) {
+            Log.w(TAG, "Unable to invite friends because current fragment is detached.");
+            return;
+        }
+
+        activity.inviteFriends();
     }
 
     protected void checkInvites() {
-        getMainActivity().checkInvites();
+        MainActivity activity = getMainActivity();
+        if (activity == null || isDetached()) {
+            Log.w(TAG, "Unable to check invites because current fragment is detached.");
+            return;
+        }
+
+        activity.checkInvites();
     }
 
     protected void openAchievements() {
-        getMainActivity().openAchievements();
+        MainActivity activity = getMainActivity();
+        if (activity == null || isDetached()) {
+            Log.w(TAG, "Unable to open achievements because current fragment is detached.");
+            return;
+        }
+
+        activity.openAchievements();
     }
 
     protected void switchToGame(Game game) {
-        getMainActivity().switchToGame(game);
+        MainActivity activity = getMainActivity();
+        if (activity == null || isDetached()) {
+            Log.w(TAG, "Unable to switch to game because current fragment is detached.");
+            return;
+        }
+
+        activity.switchToGame(game);
     }
 }

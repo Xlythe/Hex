@@ -1,6 +1,7 @@
 package com.sam.hex.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -22,10 +23,10 @@ public class GameOverDialog extends HexDialog {
     private static PlayingEntity winner;
 
     public static class Builder {
-        private final GameOverDialog gameOverDialog = new GameOverDialog();
+        private final Context context;
 
         public Builder(Context context) {
-            gameOverDialog.attachBaseContext(context);
+            this.context = context;
         }
 
         public Builder setGameFragment(GameFragment fragment) {
@@ -39,7 +40,7 @@ public class GameOverDialog extends HexDialog {
         }
 
         public void show() {
-            gameOverDialog.show();
+            context.startActivity(new Intent(context, GameOverDialog.class));
         }
     }
 

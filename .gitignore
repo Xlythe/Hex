@@ -43,3 +43,6 @@ local.properties
 gradlew
 
 gradlew.bat
+.gradle/
+.idea/
+gradle/

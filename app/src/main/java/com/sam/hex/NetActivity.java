@@ -152,8 +152,8 @@ public abstract class NetActivity extends BaseGameActivity {
             game = Game.load(new String(match.getData()), players[0], players[1]);
         } else {
             GameOptions gameOptions = new GameOptions.Builder()
-                    .setGridSize(7)
-                    .setSwapEnabled(true)
+                    .setGridSize(Settings.getGridSize(this))
+                    .setSwapEnabled(Settings.getSwap(this))
                     .setNoTimer()
                     .build();
 

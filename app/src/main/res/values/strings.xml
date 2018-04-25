@@ -105,12 +105,6 @@
     <string name="delete">Delete</string>
     <string name="enterFilename">Enter a filename</string>
 
-    <!-- Review -->
-    <string name="review_popup_title">Like the app?</string>
-    <string name="review_popup_message">Rate Hex on the Play Store</string>
-    <string name="review_popup_never">No thanks</string>
-    <string name="review_popup_ok">Sure</string>
-
     <!-- Donate -->
     <string name="donate_bronze">bronze</string>
     <string name="donate_bronze_price">$.99</string>
@@ -121,4 +115,7 @@
 
     <!--  Error  Dialogues-->
     <string name="error_version">Game version error. One of the players has an out of date version of the game. The game has been aborted!</string>
+
+    <!-- Network specific phrases -->
+    <string name="player_automatch">AUTOMATCH</string>
 </resources>

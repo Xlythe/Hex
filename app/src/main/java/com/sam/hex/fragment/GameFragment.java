@@ -93,8 +93,8 @@ public class GameFragment extends HexFragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDetach() {
+        super.onDetach();
         stopGame(game);
     }
 

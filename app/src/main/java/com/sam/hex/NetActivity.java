@@ -175,8 +175,20 @@ public abstract class NetActivity extends BaseGameActivity {
 
     private PlayingEntity[] getPlayers(TurnBasedMatch match) {
         List<Player> playerList = getPlayerList(mPlayerId, match);
+
         String localParticipantId = match.getParticipantId(getLocalPlayer(mPlayerId, playerList).getPlayerId());
-        String remoteParticipantId = match.getParticipantId(getRemotePlayer(mPlayerId, playerList).getPlayerId());
+
+        // In automatch games, the next participant doesn't exist yet.
+        String remoteParticipantId;
+        if (playerList.size() == 1) {
+            // Automatch game.
+            remoteParticipantId = null;
+        } else {
+            // Fully matched game.
+            remoteParticipantId = match.getParticipantId(getRemotePlayer(mPlayerId, playerList).getPlayerId());
+        }
+
+
         Log.d(TAG, "Participants: " + playerList);
         Log.d(TAG, "Local PlayerId: " + mPlayerId);
 
@@ -185,6 +197,7 @@ public abstract class NetActivity extends BaseGameActivity {
             players[0] = new PlayerObject(1);
             players[1] = new NetworkPlayer(
                     2,
+                    this,
                     localParticipantId,
                     remoteParticipantId,
                     match,
@@ -192,6 +205,7 @@ public abstract class NetActivity extends BaseGameActivity {
         } else {
             players[0] = new NetworkPlayer(
                     1,
+                    this,
                     localParticipantId,
                     remoteParticipantId,
                     match,
@@ -203,7 +217,12 @@ public abstract class NetActivity extends BaseGameActivity {
         players[1].setColor(getResources().getInteger(R.integer.DEFAULT_P2_COLOR));
 
         players[0].setName(getShortName(playerList.get(0)));
-        players[1].setName(getShortName(playerList.get(1)));
+
+        if (playerList.size() == 1) {
+            players[1].setName(getString(R.string.player_automatch));
+        } else {
+            players[1].setName(getShortName(playerList.get(1)));
+        }
 
         return players;
     }
@@ -255,7 +274,11 @@ public abstract class NetActivity extends BaseGameActivity {
     }
 
     private static String getShortName(Player player) {
-        return player.getDisplayName().split(" ")[0];
+        String name = player.getDisplayName().split(" ")[0];
+        if (name.length() > 10) {
+            return name.substring(0, 10);
+        }
+        return name;
     }
 
     // Returns true if the local device is player 1.

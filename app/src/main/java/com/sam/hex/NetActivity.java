@@ -3,11 +3,13 @@ package com.sam.hex;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.Player;
+import com.google.android.gms.games.multiplayer.Invitation;
 import com.google.android.gms.games.multiplayer.Multiplayer;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
@@ -39,6 +41,23 @@ public abstract class NetActivity extends BaseGameActivity {
     public void onSignInSucceeded(GoogleSignInAccount googleSignInAccount) {
         super.onSignInSucceeded(googleSignInAccount);
         getPlayersClient().getCurrentPlayer().addOnSuccessListener(player -> mPlayerId = player.getPlayerId());
+        getGamesClient().getActivationHint().addOnSuccessListener(bundle -> {
+           if (bundle == null) {
+               return;
+           }
+
+            if (bundle.containsKey(Multiplayer.EXTRA_INVITATION)) {
+                Invitation invitation = bundle.getParcelable(Multiplayer.EXTRA_INVITATION);
+                getTurnBasedMultiplayerClient().acceptInvitation(invitation.getInvitationId()).addOnSuccessListener(this::startGame);
+                return;
+            }
+
+           if (bundle.containsKey(Multiplayer.EXTRA_TURN_BASED_MATCH)) {
+               TurnBasedMatch match = bundle.getParcelable(Multiplayer.EXTRA_TURN_BASED_MATCH);
+               startGame(match);
+               return;
+           }
+        });
     }
 
     @Override
@@ -125,7 +144,7 @@ public abstract class NetActivity extends BaseGameActivity {
         startGame(match);
     }
 
-    private void startGame(TurnBasedMatch match) {
+    private void startGame(@NonNull TurnBasedMatch match) {
         PlayingEntity[] players = getPlayers(match);
 
         Game game;

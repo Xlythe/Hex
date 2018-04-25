@@ -1,7 +1,5 @@
 package com.sam.hex.compat;
 
-import android.util.Log;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -38,7 +36,6 @@ public class Game extends com.hex.core.Game {
     }
 
     public static Game load(String state, PlayingEntity player1, PlayingEntity player2) {
-        Log.d("TEST", "Game state: " + state);
         JsonObject object = new JsonParser().parse(state).getAsJsonObject();
 
         Gson gson = new Gson();

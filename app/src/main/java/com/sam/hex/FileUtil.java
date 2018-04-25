@@ -43,6 +43,7 @@ public class FileUtil {
         FileUtil.createDirIfNoneExists(PATH);
 
         File saveFile = new File(fileName);
+        Log.d(TAG, "Attempting to create file " + fileName);
         if (!saveFile.exists()) {
             if (!saveFile.createNewFile()) {
                 Log.w(TAG, "Failed to create file " + fileName);
@@ -52,6 +53,7 @@ public class FileUtil {
         BufferedWriter buf = new BufferedWriter(new FileWriter(saveFile, true));
         buf.append(gameState);
         buf.close();
+        Log.d(TAG, "Successfully created file " + fileName);
     }
 
     private static void createDirIfNoneExists(@NonNull String path) {

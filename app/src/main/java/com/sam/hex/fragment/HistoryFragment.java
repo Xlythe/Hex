@@ -1,11 +1,13 @@
 package com.sam.hex.fragment;
 
+import android.Manifest;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.UiThread;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,29 +17,29 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.JsonSyntaxException;
 import com.hex.core.Game;
-import com.hex.core.Game.GameListener;
-import com.hex.core.PlayingEntity;
 import com.sam.hex.FileUtil;
 import com.sam.hex.R;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
+import static com.sam.hex.PermissionUtils.hasPermissions;
 import static com.sam.hex.Settings.TAG;
 
 /**
  * @author Will Harmon
  **/
 public class HistoryFragment extends HexFragment {
-    private Item[] fileList;
-    @NonNull
-    public static final File path = new File(Environment.getExternalStorageDirectory() + File.separator + "Hex" + File.separator);
+    private static final File PATH = new File(Environment.getExternalStorageDirectory() + File.separator + "Hex");
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -45,52 +47,88 @@ public class HistoryFragment extends HexFragment {
         View view = inflater.inflate(R.layout.fragment_history, container, false);
 
         GridView games = view.findViewById(R.id.games);
-        try {
-            loadFileList();
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
+        Item[] fileList = loadFileList();
         games.setAdapter(new HistoryAdapter(getMainActivity(), fileList));
-        games.setOnItemClickListener((parent, v, position, id) -> openFile(path + File.separator + fileList[position].file));
+        games.setOnItemClickListener((parent, v, position, id) -> openFile(PATH + File.separator + fileList[position].file));
 
         return view;
     }
 
-    private void loadFileList() {
-        try {
-            if (path.mkdirs()) {
-                Log.d(TAG, "Successfully made the directory for history");
-            }
-        } catch (SecurityException e) {
-            e.printStackTrace();
+    @NonNull
+    private Item[] loadFileList() {
+        // We cannot look up the saved games without read permission.
+        if (!hasPermissions(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            return new Item[0];
         }
 
-        // Checks whether path exists
-        if (path.exists()) {
+        // Create the path if able.
+        if (hasPermissions(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            if (PATH.mkdirs()) {
+                Log.d(TAG, "Successfully made the directory for history");
+            }
+        }
+
+        Item[] items = new Item[0];
+        if (PATH.exists()) {
             FilenameFilter filter = (dir, filename) -> {
                 File sel = new File(dir, filename);
                 // Filters based on whether the file is hidden or not
                 return (sel.isFile() || sel.isDirectory()) && !sel.isHidden();
             };
 
-            String[] fList = path.list(filter);
-            fileList = new Item[fList.length];
-            for (int i = 0; i < fList.length; i++) {
-                fileList[i] = new Item(fList[i]);
+            String[] files = PATH.list(filter);
+            items = new Item[files.length];
+            for (int i = 0; i < files.length; i++) {
+                items[i] = new Item(files[i]);
             }
         }
 
-        Arrays.sort(fileList, (f1, f2) -> f2.file.compareTo(f1.file));
+        Arrays.sort(items, (f1, f2) -> f2.file.compareTo(f1.file));
+        return items;
     }
 
     private class Item {
-        public final String file;
-        public String title;
-        public String date;
-        public int team;
+        @NonNull
+        final String file;
 
-        Item(String file) {
+        @Nullable
+        String title;
+        @Nullable
+        String date;
+        int team;
+
+        @Nullable
+        Game game;
+
+        Item(@NonNull String file) {
             this.file = file;
+        }
+
+        @UiThread
+        void initialize(Context context, Runnable onLoadedCallback) {
+            final Handler h = new Handler();
+            new Thread(() -> {
+                Game game;
+                try {
+                    game = Game.load(FileUtil.loadGameAsString(PATH + File.separator + file));
+                } catch (IOException | JsonSyntaxException e) {
+                    e.printStackTrace();
+                    return;
+                }
+
+                // The last player to make the move is considered the winner.
+                int team = game.getMoveList().getMove().getTeam();
+                String title = context.getString(R.string.auto_saved_title, game.getPlayer1().getName(), game.getPlayer2().getName());
+                String date = DATE_FORMAT.format(new Date(game.getGameStart()));
+
+                h.post(() -> {
+                    this.game = game;
+                    this.team = team;
+                    this.title = title;
+                    this.date = date;
+                    onLoadedCallback.run();
+                });
+            }).start();
         }
     }
 
@@ -110,11 +148,10 @@ public class HistoryFragment extends HexFragment {
     }
 
     static class HistoryAdapter extends BaseAdapter {
-        private Context context;
+        private final Context context;
         private final Item[] files;
-        private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
 
-        HistoryAdapter(Context context, Item[] files) {
+        HistoryAdapter(Context context, @NonNull Item[] files) {
             this.context = context;
             this.files = files;
         }
@@ -126,68 +163,7 @@ public class HistoryFragment extends HexFragment {
 
             // Load up the game so we can get information
             if (i.title == null || i.date == null || i.team == 0) {
-                try {
-                    final Handler h = new Handler();
-                    Game g = Game.load(FileUtil.loadGameAsString(path + File.separator + i.file));
-                    g.setGameListener(new GameListener() {
-                        @Override
-                        public void startTimer() {
-                        }
-
-                        @Override
-                        public void onWin(@NonNull PlayingEntity player) {
-                            i.team = player.getTeam();
-                            h.post(() -> {
-                                if (i.team == 1) {
-                                    v.setBackgroundResource(R.drawable.history_background_red);
-                                } else if (i.team == 2) {
-                                    v.setBackgroundResource(R.drawable.history_background_blue);
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onUndo() {
-                        }
-
-                        @Override
-                        public void onTurn(PlayingEntity player) {
-                        }
-
-                        @Override
-                        public void onStop() {
-                        }
-
-                        @Override
-                        public void onStart() {
-                        }
-
-                        @Override
-                        public void onReplayStart() {
-                        }
-
-                        @Override
-                        public void onReplayEnd() {
-                        }
-
-                        @Override
-                        public void onClear() {
-                        }
-
-                        @Override
-                        public void displayTime(int minutes, int seconds) {
-                        }
-                    });
-                    g.replay(0);
-                    i.title = context.getString(R.string.auto_saved_title, g.getPlayer1().getName(), g.getPlayer2().getName());
-                    i.date = DATE_FORMAT.format(new Date(g.getGameStart()));
-                    i.team = -1;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    i.title = "";
-                    i.date = context.getString(R.string.game_toast_failed);
-                    i.team = -1;
-                }
+                i.initialize(context, this::notifyDataSetChanged);
             }
 
             TextView title = v.findViewById(R.id.title);
@@ -209,8 +185,7 @@ public class HistoryFragment extends HexFragment {
 
         @Override
         public int getCount() {
-            if (files != null) return files.length;
-            else return 0;
+            return files.length;
         }
 
         @Override
@@ -220,7 +195,7 @@ public class HistoryFragment extends HexFragment {
 
         @Override
         public long getItemId(int position) {
-            return 0;
+            return position;
         }
     }
 }

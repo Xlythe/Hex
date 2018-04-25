@@ -21,6 +21,7 @@ import com.sam.hex.fragment.MainFragment;
 import com.sam.hex.fragment.OnlineSelectionFragment;
 
 import static com.sam.hex.Settings.TAG;
+import static com.sam.hex.PermissionUtils.hasPermissions;
 
 /**
  * @author Will Harmon
@@ -29,6 +30,7 @@ public class MainActivity extends NetActivity {
     private static final String[] REQUIRED_PERMISSIONS = {
             Manifest.permission.INTERNET,
             Manifest.permission.ACCESS_NETWORK_STATE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
     private static final int REQUEST_CODE_REQUIRED_PERMISSIONS = 3;
@@ -155,18 +157,6 @@ public class MainActivity extends NetActivity {
         mGameFragment.setArguments(b);
 
         swapFragment(mGameFragment);
-    }
-
-    /**
-     * Returns true if all given permissions are available
-     */
-    public static boolean hasPermissions(Context context, String... permissions) {
-        for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public static class Stat {

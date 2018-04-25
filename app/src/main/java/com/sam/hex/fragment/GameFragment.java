@@ -48,7 +48,7 @@ public class GameFragment extends HexFragment {
     public static final String PLAYER2_TYPE = "player2_type";
     public static final String REPLAY = "replay";
     public static final String NET = "net";
-    private static final SimpleDateFormat SAVE_FORMAT = new SimpleDateFormat("yyyy/mm/dd hh:mm", Locale.getDefault());
+    private static final SimpleDateFormat SAVE_FORMAT = new SimpleDateFormat("yyyy-mm-dd hh:mm", Locale.getDefault());
 
     private Game game;
     private Player player1Type;
@@ -244,8 +244,6 @@ public class GameFragment extends HexFragment {
         return new GameListener() {
             @Override
             public void onWin(@NonNull final PlayingEntity player) {
-                // TODO There seems to be a bug with forfeiting. The person who did not forfeit is
-                // always declared the loser.
                 runOnUiThread(() -> {
                     board.invalidate();
 
@@ -293,8 +291,7 @@ public class GameFragment extends HexFragment {
                                     getAchievementsClient().unlock(getString(R.string.achievement_10_seconds));
                                 }
 
-                                // Unlock the fill the board
-                                // achievement!
+                                // Unlock the fill the board achievement!
                                 boolean boardFilled = true;
                                 for (int i = 0; i < game.getGridSize(); i++) {
                                     for (int j = 0; j < game.getGridSize(); j++) {
@@ -306,8 +303,7 @@ public class GameFragment extends HexFragment {
                                     getAchievementsClient().unlock(getString(R.string.achievement_fill_the_board));
                                 }
 
-                                // Unlock the monitor smasher
-                                // achievement!
+                                // Unlock the monitor smasher achievement!
                                 if (isVsAi() && player.getType().equals(Player.Human)) {
                                     getAchievementsClient().unlock(getString(R.string.achievement_monitor_smasher));
                                 }
@@ -362,11 +358,7 @@ public class GameFragment extends HexFragment {
 
             @Override
             public void onTurn(final PlayingEntity player) {
-                runOnUiThread(() -> {
-                    if (!game.isGameOver()) {
-                        board.postInvalidate();
-                    }
-                });
+                runOnUiThread(() -> board.postInvalidate());
             }
 
             @Override

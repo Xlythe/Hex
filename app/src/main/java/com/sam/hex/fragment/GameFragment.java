@@ -357,7 +357,7 @@ public class GameFragment extends HexFragment {
             }
 
             @Override
-            public void onTurn(final PlayingEntity player) {
+            public void onTurn(PlayingEntity player) {
                 runOnUiThread(() -> board.postInvalidate());
             }
 
@@ -470,11 +470,9 @@ public class GameFragment extends HexFragment {
         DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
             switch (which) {
                 case DialogInterface.BUTTON_POSITIVE:
-                    // Yes button clicked
                     startNewGame();
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:
-                    // No button clicked
                     // Do nothing
                     break;
             }

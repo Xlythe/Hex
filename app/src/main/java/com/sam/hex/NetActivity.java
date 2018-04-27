@@ -1,9 +1,11 @@
 package com.sam.hex;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -21,7 +23,6 @@ import com.sam.hex.compat.GameOptions;
 import com.sam.hex.compat.NetworkPlayer;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static com.sam.hex.Settings.TAG;
@@ -31,6 +32,7 @@ public abstract class NetActivity extends BaseGameActivity {
 
     private static final int REQUEST_CODE_SELECT_OPPONENT = 10001;
     private static final int REQUEST_CODE_INBOX = 10002;
+    private static final int REQUEST_CODE_ACHIEVEMENTS = 10003;
 
     // The local player id for ourselves. Null if not signed in.
     private String mPlayerId;
@@ -91,7 +93,8 @@ public abstract class NetActivity extends BaseGameActivity {
     @Override
     public void openAchievements() {
         getAchievementsClient().getAchievementsIntent().addOnSuccessListener(intent -> {
-            startActivity(intent);
+            // Note: Must call startActivityForResult or the activity won't launch.
+            startActivityForResult(intent, REQUEST_CODE_ACHIEVEMENTS);
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         });
     }
@@ -150,6 +153,7 @@ public abstract class NetActivity extends BaseGameActivity {
         Game game;
         if (match.getData() != null) {
             game = Game.load(new String(match.getData()), players[0], players[1]);
+            Log.d(TAG, String.format("Resuming match %s.", match.getMatchId()));
         } else {
             GameOptions gameOptions = new GameOptions.Builder()
                     .setGridSize(Settings.getGridSize(this))
@@ -158,15 +162,31 @@ public abstract class NetActivity extends BaseGameActivity {
                     .build();
 
             game = new Game(gameOptions, players[0], players[1]);
-            Log.d(TAG, "Starting a new game for match " + match.getMatchId());
+            Log.d(TAG, String.format("New match %s.", match.getMatchId()));
         }
+
+        // Set names / colors here. Note that loading a game from a remote side will flip the names,
+        // so this must occur after Game.load.
+        String localPlayerName = getLocalPlayerName(match, mPlayerId);
+        String remotePlayerName = getRemotePlayerName(this, match, mPlayerId);
+        if (isLocalPlayer1(match)) {
+            players[0].setName(localPlayerName);
+            players[1].setName(remotePlayerName);
+        } else {
+            players[0].setName(remotePlayerName);
+            players[1].setName(localPlayerName);
+        }
+        players[0].setColor(getResources().getInteger(R.integer.DEFAULT_P1_COLOR));
+        players[1].setColor(getResources().getInteger(R.integer.DEFAULT_P2_COLOR));
+
+        Log.d(TAG, String.format("%s vs %s in match %s.", players[0].getName(), players[1].getName(), match.getMatchId()));
 
         switch (match.getTurnStatus()) {
             case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
-                Log.d(TAG, "I'm going first");
+                Log.d(TAG, "It's my turn");
                 break;
             case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN:
-                Log.d(TAG, "They're going first");
+                Log.d(TAG, "It's their turn");
                 break;
         }
 
@@ -174,30 +194,15 @@ public abstract class NetActivity extends BaseGameActivity {
     }
 
     private PlayingEntity[] getPlayers(TurnBasedMatch match) {
-        List<Player> playerList = getPlayerList(mPlayerId, match);
-
-        String localParticipantId = match.getParticipantId(getLocalPlayer(mPlayerId, playerList).getPlayerId());
-
-        // In automatch games, the next participant doesn't exist yet.
-        String remoteParticipantId;
-        if (playerList.size() == 1) {
-            // Automatch game.
-            remoteParticipantId = null;
-        } else {
-            // Fully matched game.
-            remoteParticipantId = match.getParticipantId(getRemotePlayer(mPlayerId, playerList).getPlayerId());
-        }
-
-
-        Log.d(TAG, "Participants: " + playerList);
-        Log.d(TAG, "Local PlayerId: " + mPlayerId);
+        String localParticipantId = getLocalParticipantId(match, mPlayerId);
+        String remoteParticipantId = getRemoteParticipantId(match, mPlayerId);
+        Log.d(TAG, String.format("Local id %s, remote id %s in match %s.", localParticipantId, remoteParticipantId, match.getMatchId()));
 
         PlayingEntity[] players = new PlayingEntity[2];
-        if (playerList.get(0).getPlayerId().equals(mPlayerId)) {
+        if (isLocalPlayer1(match)) {
             players[0] = new PlayerObject(1);
             players[1] = new NetworkPlayer(
                     2,
-                    this,
                     localParticipantId,
                     remoteParticipantId,
                     match,
@@ -205,7 +210,6 @@ public abstract class NetActivity extends BaseGameActivity {
         } else {
             players[0] = new NetworkPlayer(
                     1,
-                    this,
                     localParticipantId,
                     remoteParticipantId,
                     match,
@@ -213,55 +217,67 @@ public abstract class NetActivity extends BaseGameActivity {
             players[1] = new PlayerObject(2);
         }
 
-        players[0].setColor(getResources().getInteger(R.integer.DEFAULT_P1_COLOR));
-        players[1].setColor(getResources().getInteger(R.integer.DEFAULT_P2_COLOR));
-
-        players[0].setName(getShortName(playerList.get(0)));
-
-        if (playerList.size() == 1) {
-            players[1].setName(getString(R.string.player_automatch));
-        } else {
-            players[1].setName(getShortName(playerList.get(1)));
-        }
-
         return players;
     }
 
-    private static List<Player> getPlayerList(String localPlayerId, TurnBasedMatch match) {
+    private static List<Player> getPlayerList(TurnBasedMatch match) {
         List<Player> players = new ArrayList<>(match.getParticipantIds().size());
         for (String participantId : match.getParticipantIds()) {
-            players.add(match.getParticipant(participantId).getPlayer());
-        }
-        Collections.sort(players, (lhs, rhs) -> {
-            if (lhs.getPlayerId().equals(localPlayerId)) {
-                if (isLocalPlayer1(match)) {
-                    return -1;
-                } else {
-                    return 1;
-                }
-            } else if (rhs.getPlayerId().equals(localPlayerId)) {
-                if (isLocalPlayer1(match)) {
-                    return 1;
-                } else {
-                    return -1;
-                }
+            @Nullable Player player = match.getParticipant(participantId).getPlayer();
+            if (player == null) {
+                continue;
             }
-            Log.w(TAG, "Neither player's turn");
-            return 0;
-        });
 
+            players.add(player);
+        }
         return players;
     }
 
+    private static String getLocalPlayerName(TurnBasedMatch match, String playerId) {
+        return getShortName(getLocalPlayer(playerId, getPlayerList(match)));
+    }
+
+    private static String getRemotePlayerName(Context context, TurnBasedMatch match, String playerId) {
+        @Nullable Player remotePlayer = getRemotePlayer(playerId, getPlayerList(match));
+        if (remotePlayer == null) {
+            Log.d(TAG, "Unable to get remote player name. No player found.");
+            return context.getString(R.string.player_automatch);
+        }
+        return getShortName(remotePlayer);
+    }
+
+    private static String getLocalParticipantId(TurnBasedMatch match, String playerId) {
+        return match.getParticipantId(getLocalPlayer(playerId, getPlayerList(match)).getPlayerId());
+    }
+
+    // May return null in automatched games.
+    @Nullable
+    private static String getRemoteParticipantId(TurnBasedMatch match, String playerId) {
+        // For automatch games, the remote player is null. Therefore, we need to look up our
+        // participant id, and then find out who the remote participant is.
+        String localParticipantId = getLocalParticipantId(match, playerId);
+        for (String participantId : match.getParticipantIds()) {
+            if (localParticipantId.equals(participantId)) {
+                continue;
+            }
+
+            return participantId;
+        }
+
+        return null;
+    }
+
+    @NonNull
     private static Player getLocalPlayer(String localPlayerId, List<Player> playerList) {
         for (Player player : playerList) {
             if (player.getPlayerId().equals(localPlayerId)) {
                 return player;
             }
         }
-        return null;
+        throw new IllegalStateException(String.format("Local player %s was not found within the list of players: %s", localPlayerId, playerList));
     }
 
+    @Nullable
     private static Player getRemotePlayer(String localPlayerId, List<Player> playerList) {
         for (Player player : playerList) {
             if (player.getPlayerId().equals(localPlayerId)) {

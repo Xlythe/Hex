@@ -47,7 +47,7 @@ public class GameFragment extends HexFragment {
     public static final String PLAYER1_TYPE = "player1_type";
     public static final String PLAYER2_TYPE = "player2_type";
     public static final String REPLAY = "replay";
-    public static final String NET = "net";
+    public static final String PRELOADED_GAME = "preloaded_game";
     private static final SimpleDateFormat SAVE_FORMAT = new SimpleDateFormat("yyyy-mm-dd hh:mm", Locale.getDefault());
 
     private Game game;
@@ -107,7 +107,7 @@ public class GameFragment extends HexFragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        if (game != null) {
+        if (game != null && game.getPlayer1().supportsSave() && game.getPlayer2().supportsSave()) {
             savedInstanceState.putString(GAME, game.save());
             savedInstanceState.putSerializable(PLAYER1, game.getPlayer1().getSaveState());
             savedInstanceState.putSerializable(PLAYER2, game.getPlayer2().getSaveState());
@@ -165,7 +165,7 @@ public class GameFragment extends HexFragment {
                 // Create a new game
                 initializeNewGame();
             }
-        } else if (getArguments() != null && getArguments().containsKey(NET) && getArguments().getBoolean(NET)) {
+        } else if (getArguments() != null && getArguments().containsKey(PRELOADED_GAME) && getArguments().getBoolean(PRELOADED_GAME)) {
             // Net game (game should have already been passed in)
             if (game == null) {
                 returnHome();

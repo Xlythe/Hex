@@ -1,8 +1,5 @@
 package com.sam.hex.compat;
 
-import android.app.Activity;
-import android.app.Application;
-import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -29,7 +26,6 @@ import static com.sam.hex.Settings.TAG;
 public class NetworkPlayer implements PlayingEntity {
     private static final Point END_MOVE = new Point(-1, -1);
 
-    private final Activity activity;
     private final String localParticipantId;
     private final String remoteParticipantId;
     private TurnBasedMatch match;
@@ -69,7 +65,13 @@ public class NetworkPlayer implements PlayingEntity {
             // Load the game state from the remote side and attempt to make the same move on this side.
             Game game = Game.load(new String(turnBasedMatch.getData()));
             Move lastMove = game.getMoveList().getMove();
+            if (lastMove.getTeam() != team) {
+                Log.w(TAG, "Ignoring match update because it wasn't my move");
+                return;
+            }
+
             currentMove.add(new Point(lastMove.getX(), lastMove.getY()));
+            Log.d(TAG, String.format("Received %d, %d  for %d from the remote side.", lastMove.getX(), lastMove.getY(), lastMove.getTeam()));
         }
 
         @Override
@@ -80,42 +82,13 @@ public class NetworkPlayer implements PlayingEntity {
         }
     };
 
-    private Application.ActivityLifecycleCallbacks activityLifecycleCallbacks = new Application.ActivityLifecycleCallbacks() {
-        @Override
-        public void onActivityCreated(Activity activity, Bundle savedInstanceState) {}
-
-        @Override
-        public void onActivityStarted(Activity activity) {
-            turnBasedMultiplayerClient.registerTurnBasedMatchUpdateCallback(turnBasedMatchUpdateCallback);
-        }
-
-        @Override
-        public void onActivityResumed(Activity activity) {}
-
-        @Override
-        public void onActivityPaused(Activity activity) {}
-
-        @Override
-        public void onActivityStopped(Activity activity) {
-            turnBasedMultiplayerClient.unregisterTurnBasedMatchUpdateCallback(turnBasedMatchUpdateCallback);
-        }
-
-        @Override
-        public void onActivitySaveInstanceState(Activity activity, Bundle outState) {}
-
-        @Override
-        public void onActivityDestroyed(Activity activity) {}
-    };
-
     public NetworkPlayer(
             int team,
-            Activity activity,
             String localParticipantId,
             String remoteParticipantId,
             TurnBasedMatch match,
             TurnBasedMultiplayerClient turnBasedMultiplayerClient) {
         this.team = team;
-        this.activity = activity;
         this.localParticipantId = localParticipantId;
         this.remoteParticipantId = remoteParticipantId;
         this.match = match;
@@ -125,7 +98,6 @@ public class NetworkPlayer implements PlayingEntity {
     /** The game has now started. State can be initialized here. */
     @Override
     public void startGame() {
-        activity.getApplication().registerActivityLifecycleCallbacks(activityLifecycleCallbacks);
         turnBasedMultiplayerClient.registerTurnBasedMatchUpdateCallback(turnBasedMatchUpdateCallback);
     }
 
@@ -144,7 +116,7 @@ public class NetworkPlayer implements PlayingEntity {
 
         // As long as this wasn't the very first move, send the local move to the remote side before waiting for their response.
         MoveList moveList = game.getMoveList();
-        if (moveList.size() > 0) {
+        if (moveList.size() > 0 && match.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
             try {
                 match = Tasks.await(turnBasedMultiplayerClient.takeTurn(match.getMatchId(), game.save().getBytes(), remoteParticipantId));
                 Log.d(TAG, "Successfully told the remote side what move I made.");
@@ -183,7 +155,6 @@ public class NetworkPlayer implements PlayingEntity {
     @Override
     public void quit() {
         endMove();
-        activity.getApplication().unregisterActivityLifecycleCallbacks(activityLifecycleCallbacks);
         turnBasedMultiplayerClient.unregisterTurnBasedMatchUpdateCallback(turnBasedMatchUpdateCallback);
     }
 
@@ -247,9 +218,7 @@ public class NetworkPlayer implements PlayingEntity {
     /** Sets the player's name. Only allowed to be called once. */
     @Override
     public synchronized void setName(String name) {
-        if (this.name == null) {
-            this.name = name;
-        }
+        this.name = name;
     }
 
     /** Returns the player's name. */

@@ -79,11 +79,7 @@ public class GameFragment extends HexFragment {
         keepScreenOn(true);
 
         loadGame(savedInstanceState);
-        try {
-            return applyBoard(inflater, container);
-        } finally {
-            startGame();
-        }
+        return applyBoard(inflater, container);
     }
 
     @Override
@@ -96,12 +92,6 @@ public class GameFragment extends HexFragment {
     public void onDetach() {
         super.onDetach();
         stopGame(game);
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        game.start();
     }
 
     @Override
@@ -185,6 +175,7 @@ public class GameFragment extends HexFragment {
         if (game.hasTimer()) {
             game.startTimer();
         }
+        game.start();
     }
 
     private View applyBoard(@NonNull LayoutInflater inflater, ViewGroup container) {
@@ -401,15 +392,16 @@ public class GameFragment extends HexFragment {
             return;
         }
 
-        // Check if settings were changed and we need to run a new game
-        if (game != null && game.replayRunning) {
-            // Do nothing
-            return;
-        }
-
+        // Note: Calling replay will start the game for us.
         if (replay) {
             replay = false;
             replay(replayDuration);
+            return;
+        }
+
+        if (!game.hasStarted()) {
+            startGame();
+            return;
         }
     }
 

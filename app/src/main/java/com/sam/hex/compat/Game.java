@@ -11,6 +11,8 @@ import com.hex.core.Timer;
 import java.lang.reflect.Field;
 
 public class Game extends com.hex.core.Game {
+    private boolean hasStarted = false;
+
     public Game(GameOptions gameOptions, PlayingEntity player1, PlayingEntity player2) {
         super(gameOptions, player1, player2);
     }
@@ -29,6 +31,30 @@ public class Game extends com.hex.core.Game {
 
     public void startTimer() {
         gameOptions.timer.start(this);
+    }
+
+    public synchronized boolean hasStarted() {
+        return hasStarted;
+    }
+
+    @Override
+    public synchronized void start() {
+        if (hasStarted) {
+            return;
+        }
+
+        hasStarted = true;
+        super.start();
+    }
+
+    @Override
+    public synchronized void stop() {
+        if (!hasStarted) {
+            return;
+        }
+
+        super.stop();
+        hasStarted = false;
     }
 
     public static Game load(String state) {

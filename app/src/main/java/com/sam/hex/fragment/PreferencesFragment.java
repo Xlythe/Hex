@@ -15,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.EditText;
@@ -135,6 +136,7 @@ public class PreferencesFragment extends PreferenceFragment {
      */
     private void showInputDialog(String message) {
         final EditText editText = new EditText(getActivity());
+        editText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
         editText.setInputType(InputType.TYPE_CLASS_NUMBER);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(message).setView(editText).setPositiveButton(getString(R.string.okay), (dialog, which) -> {

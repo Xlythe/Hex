@@ -206,6 +206,7 @@ public abstract class NetActivity extends BaseGameActivity {
                     localParticipantId,
                     remoteParticipantId,
                     match,
+                    () -> getTurnBasedMultiplayerClient().rematch(match.getMatchId()).addOnSuccessListener(this::startGame),
                     getTurnBasedMultiplayerClient());
         } else {
             players[0] = new NetworkPlayer(
@@ -213,6 +214,7 @@ public abstract class NetActivity extends BaseGameActivity {
                     localParticipantId,
                     remoteParticipantId,
                     match,
+                    () -> getTurnBasedMultiplayerClient().rematch(match.getMatchId()).addOnSuccessListener(this::startGame),
                     getTurnBasedMultiplayerClient());
             players[1] = new PlayerObject(2);
         }

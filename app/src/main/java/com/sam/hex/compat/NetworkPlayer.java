@@ -2,6 +2,7 @@ package com.sam.hex.compat;
 
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.games.TurnBasedMultiplayerClient;
@@ -27,9 +28,10 @@ public class NetworkPlayer implements PlayingEntity {
     private static final Point END_MOVE = new Point(-1, -1);
 
     private final String localParticipantId;
-    private final String remoteParticipantId;
+    @Nullable private String remoteParticipantId;
     private TurnBasedMatch match;
     private final TurnBasedMultiplayerClient turnBasedMultiplayerClient;
+    private final Runnable rematcher;
 
     // The team we're on. Either 1 or 2.
     private final int team;
@@ -45,7 +47,7 @@ public class NetworkPlayer implements PlayingEntity {
     private boolean hasForfeited = false;
 
     // Update this queue with the current move when the remote side has reported where they want to place their piece.
-    private final transient LinkedBlockingQueue<Point> currentMove = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<Point> currentMove = new LinkedBlockingQueue<>();
 
     private TurnBasedMatchUpdateCallback turnBasedMatchUpdateCallback = new TurnBasedMatchUpdateCallback() {
         @Override
@@ -62,6 +64,9 @@ public class NetworkPlayer implements PlayingEntity {
                 return;
             }
 
+            // Invalidate our match state.
+            setMatch(turnBasedMatch);
+
             // Load the game state from the remote side and attempt to make the same move on this side.
             Game game = Game.load(new String(turnBasedMatch.getData()));
             Move lastMove = game.getMoveList().getMove();
@@ -76,6 +81,12 @@ public class NetworkPlayer implements PlayingEntity {
 
         @Override
         public void onTurnBasedMatchRemoved(@NonNull String matchId) {
+            // Ignore data from matches other than the one we're currently in.
+            if (!match.getMatchId().equals(matchId)) {
+                Log.w(TAG, String.format("Ignoring match because it's for a different match id. Got %s when expecting %s.", matchId, match.getMatchId()));
+                return;
+            }
+
             Log.w(TAG, String.format("Match %s has been removed. Considering it forfeited.", matchId));
             hasForfeited = true;
             endMove();
@@ -85,14 +96,33 @@ public class NetworkPlayer implements PlayingEntity {
     public NetworkPlayer(
             int team,
             String localParticipantId,
-            String remoteParticipantId,
+            @Nullable String remoteParticipantId,
             TurnBasedMatch match,
+            Runnable rematcher,
             TurnBasedMultiplayerClient turnBasedMultiplayerClient) {
         this.team = team;
         this.localParticipantId = localParticipantId;
         this.remoteParticipantId = remoteParticipantId;
         this.match = match;
+        this.rematcher = rematcher;
         this.turnBasedMultiplayerClient = turnBasedMultiplayerClient;
+    }
+
+    private void setMatch(TurnBasedMatch match) {
+        this.match = match;
+
+        // Attempt to find the remote participant. Can be null in automatch games.
+        if (remoteParticipantId == null) {
+            for (String participantId : match.getParticipantIds()) {
+                if (localParticipantId.equals(participantId)) {
+                    continue;
+                }
+
+                remoteParticipantId = participantId;
+                Log.d(TAG, "Remote participant id updated to " + participantId);
+                break;
+            }
+        }
     }
 
     /** The game has now started. State can be initialized here. */
@@ -167,7 +197,7 @@ public class NetworkPlayer implements PlayingEntity {
     /** Called if this player has won the game. */
     @Override
     public void win() {
-        turnBasedMultiplayerClient.finishMatch(match.getMatchId());
+        // The remote side will report this match as finished.
     }
 
     /** Called if this player has lost the game. */
@@ -177,19 +207,21 @@ public class NetworkPlayer implements PlayingEntity {
                 match.getMatchId(),
                 game.save().getBytes(),
                 new ParticipantResult(localParticipantId, ParticipantResult.MATCH_RESULT_WIN, 1),
-                new ParticipantResult(remoteParticipantId, ParticipantResult.MATCH_RESULT_LOSS, 2));
+                new ParticipantResult(remoteParticipantId, ParticipantResult.MATCH_RESULT_LOSS, 2))
+        .addOnSuccessListener(match -> Log.d(TAG, "Informed the remote side that they lost the match."));
     }
 
     /** True if rematches are allowed in this game. */
     @Override
     public boolean supportsNewgame() {
-        return false;
+        return true;
     }
 
     /** 'New Game' was called. Update local state. This should break out of getPlayerTurn(). */
     @Override
     public void newgameCalled() {
         endMove();
+        rematcher.run();
     }
 
     /** True if undo is allowed in this game. */

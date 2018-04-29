@@ -91,7 +91,7 @@ public class GameFragment extends HexFragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        stopGame(game);
+        stopGame();
     }
 
     @Override
@@ -120,7 +120,7 @@ public class GameFragment extends HexFragment {
                 int gridSize = Settings.getGridSize(getMainActivity());
                 player1Type = (Player) savedInstanceState.getSerializable(PLAYER1_TYPE);
                 player2Type = (Player) savedInstanceState.getSerializable(PLAYER2_TYPE);
-                game = Game.load(gameState, getPlayer(1, gridSize), getPlayer(2, gridSize));
+                game = Game.load(gameState, createPlayer(1, gridSize), createPlayer(2, gridSize));
                 game.getPlayer1().setSaveState(savedInstanceState.getSerializable(PLAYER1));
                 game.getPlayer2().setSaveState(savedInstanceState.getSerializable(PLAYER2));
             } else {
@@ -208,7 +208,7 @@ public class GameFragment extends HexFragment {
 
     protected void initializeNewGame() {
         // Stop the old game
-        stopGame(game);
+        stopGame();
         timeGamePaused = 0;
         gameHasEnded = false;
 
@@ -221,7 +221,7 @@ public class GameFragment extends HexFragment {
 
         GameListener gameListener = createGameListener();
 
-        game = new Game(gameOptions, getPlayer(1, gameOptions.gridSize), getPlayer(2, gameOptions.gridSize));
+        game = new Game(gameOptions, createPlayer(1, gameOptions.gridSize), createPlayer(2, gameOptions.gridSize));
         game.setGameListener(gameListener);
 
         setName(game.getPlayer1());
@@ -408,7 +408,7 @@ public class GameFragment extends HexFragment {
     /**
      * Terminates the game
      */
-    public void stopGame(@Nullable Game game) {
+    private void stopGame() {
         if (game != null) {
             game.stop();
         }
@@ -440,7 +440,7 @@ public class GameFragment extends HexFragment {
         }
     }
 
-    public PlayingEntity getPlayer(int team, int gridSize) {
+    private PlayingEntity createPlayer(int team, int gridSize) {
         Player p = (team == 1) ? player1Type : player2Type;
         switch (p) {
             case AI:
@@ -475,22 +475,24 @@ public class GameFragment extends HexFragment {
     }
 
     public void startNewGame() {
-        new Thread(() -> {
-            if (game.getPlayer1().supportsNewgame() && game.getPlayer2().supportsNewgame()) {
-                runOnUiThread(() -> {
-                    stopGame(game);
+        stopGame();
 
-                    PlayingEntity p1 = getPlayer(1, game.getGridSize());
-                    p1.setName(game.getPlayer1().getName());
-                    p1.setColor(game.getPlayer1().getColor());
-                    PlayingEntity p2 = getPlayer(2, game.getGridSize());
-                    p2.setName(game.getPlayer2().getName());
-                    p2.setColor(game.getPlayer2().getColor());
+        // Net games are handled differently, because we need to inform the remote device.
+        if (isNetGame()) {
+            getNetPlayer().newgameCalled();
+            return;
+        }
 
-                    switchToGame(new Game(game.gameOptions, p1, p2));
-                });
-            }
-        }).start();
+        // Local games can just recreate both players (to get them into a clean state) before
+        // starting a new game.
+        PlayingEntity p1 = createPlayer(1, game.getGridSize());
+        p1.setName(game.getPlayer1().getName());
+        p1.setColor(game.getPlayer1().getColor());
+        PlayingEntity p2 = createPlayer(2, game.getGridSize());
+        p2.setName(game.getPlayer2().getName());
+        p2.setColor(game.getPlayer2().getColor());
+
+        switchToGame(new Game(game.gameOptions, p1, p2));
     }
 
     private void replay(int time) {
@@ -502,7 +504,7 @@ public class GameFragment extends HexFragment {
             switch (which) {
                 case DialogInterface.BUTTON_POSITIVE:
                     // Yes button clicked
-                    stopGame(game);
+                    stopGame();
                     returnHome();
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:
@@ -568,5 +570,17 @@ public class GameFragment extends HexFragment {
 
     private boolean isNetGame() {
         return player1Type.equals(Player.Net) || player2Type.equals(Player.Net);
+    }
+
+    private PlayingEntity getNetPlayer() {
+        if (player1Type.equals(Player.Net)) {
+            return game.getPlayer1();
+        }
+
+        if (player2Type.equals(Player.Net)) {
+            return game.getPlayer2();
+        }
+
+        throw new IllegalStateException("Cannot get a net player in a non-net game");
     }
 }

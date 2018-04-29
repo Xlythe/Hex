@@ -27,11 +27,26 @@ import static com.sam.hex.Settings.TAG;
 public class NetworkPlayer implements PlayingEntity {
     private static final Point END_MOVE = new Point(-1, -1);
 
+    // Our local participant id. Looks like p_1 or p_2. Never null because we only hear about the
+    // match once we're inside it.
     private final String localParticipantId;
+
+    // The remote participant id. Also looks like p_1 or p_2. This may be null for the first turn
+    // of a automatched game. Otherwise, once there are 2 players in the room, it's no longer null.
+    // Note that a Google Play Games Player object is not necessarily available even if the remote
+    // participant id is.
     @Nullable private String remoteParticipantId;
+
+    // The most recent match state given from the server. By listening to this, we can know when
+    // players join the game, make a move, or request a rematch.
     private TurnBasedMatch match;
+
+    // A callback for handling rematches. Shows the user a dialog, starts a new game, etc.
+    // Things that are out of scope for a PlayingEntity inside a game.
+    private final Rematcher rematcher;
+
+    // The Play Services client, that allows us to listen to and send updates to the remote device.
     private final TurnBasedMultiplayerClient turnBasedMultiplayerClient;
-    private final Runnable rematcher;
 
     // The team we're on. Either 1 or 2.
     private final int team;
@@ -49,6 +64,7 @@ public class NetworkPlayer implements PlayingEntity {
     // Update this queue with the current move when the remote side has reported where they want to place their piece.
     private final LinkedBlockingQueue<Point> currentMove = new LinkedBlockingQueue<>();
 
+    // A listener that's called whenever the TurnBasedMatch is updated.
     private TurnBasedMatchUpdateCallback turnBasedMatchUpdateCallback = new TurnBasedMatchUpdateCallback() {
         @Override
         public void onTurnBasedMatchReceived(@NonNull TurnBasedMatch turnBasedMatch) {
@@ -67,6 +83,11 @@ public class NetworkPlayer implements PlayingEntity {
             // Invalidate our match state.
             setMatch(turnBasedMatch);
 
+            // Check to see if the remote side has challenged us to a rematch. Note that this means the game is over.
+            if (turnBasedMatch.getRematchId() != null) {
+                Log.d(TAG, "A rematch was requested. Players can use the Play Games notification to join it.");
+            }
+
             // Load the game state from the remote side and attempt to make the same move on this side.
             Game game = Game.load(new String(turnBasedMatch.getData()));
             Move lastMove = game.getMoveList().getMove();
@@ -76,7 +97,7 @@ public class NetworkPlayer implements PlayingEntity {
             }
 
             currentMove.add(new Point(lastMove.getX(), lastMove.getY()));
-            Log.d(TAG, String.format("Received %d, %d  for %d from the remote side.", lastMove.getX(), lastMove.getY(), lastMove.getTeam()));
+            Log.d(TAG, String.format("Received (%d,%d) from the remote side.", lastMove.getX(), lastMove.getY()));
         }
 
         @Override
@@ -98,7 +119,7 @@ public class NetworkPlayer implements PlayingEntity {
             String localParticipantId,
             @Nullable String remoteParticipantId,
             TurnBasedMatch match,
-            Runnable rematcher,
+            Rematcher rematcher,
             TurnBasedMultiplayerClient turnBasedMultiplayerClient) {
         this.team = team;
         this.localParticipantId = localParticipantId;
@@ -149,9 +170,9 @@ public class NetworkPlayer implements PlayingEntity {
         if (moveList.size() > 0 && match.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
             try {
                 match = Tasks.await(turnBasedMultiplayerClient.takeTurn(match.getMatchId(), game.save().getBytes(), remoteParticipantId));
-                Log.d(TAG, "Successfully told the remote side what move I made.");
+                Log.d(TAG, String.format("Successfully told the remote side my move (%d,%d).", moveList.getMove().getX(), moveList.getMove().getY()));
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "Failed to tell the remote side my move", e);
             }
         }
 
@@ -214,14 +235,13 @@ public class NetworkPlayer implements PlayingEntity {
     /** True if rematches are allowed in this game. */
     @Override
     public boolean supportsNewgame() {
-        return true;
+        return false;
     }
 
-    /** 'New Game' was called. Update local state. This should break out of getPlayerTurn(). */
+    /** 'New Game' was called. */
     @Override
     public void newgameCalled() {
-        endMove();
-        rematcher.run();
+        rematcher.requestRematch(match.getMatchId());
     }
 
     /** True if undo is allowed in this game. */
@@ -289,5 +309,10 @@ public class NetworkPlayer implements PlayingEntity {
     @Override
     public Player getType() {
         return Player.Net;
+    }
+
+    public interface Rematcher {
+        // The local side would like to request a rematch to the remote side.
+        void requestRematch(String matchId);
     }
 }

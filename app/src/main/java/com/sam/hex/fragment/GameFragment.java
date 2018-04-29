@@ -399,7 +399,7 @@ public class GameFragment extends HexFragment {
             return;
         }
 
-        if (!game.hasStarted()) {
+        if (!game.hasStarted() && !game.isGameOver()) {
             startGame();
             return;
         }

@@ -37,6 +37,16 @@ public abstract class NetActivity extends BaseGameActivity {
     // The local player id for ourselves. Null if not signed in.
     private String mPlayerId;
 
+    // Switches to a new game for a rematch.
+    private NetworkPlayer.Rematcher rematcher = matchId -> {
+            getTurnBasedMultiplayerClient().rematch(matchId)
+                    .addOnSuccessListener(this::startGame)
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Failed to request rematch", e);
+                        checkInvites();
+                    });
+    };
+
     public abstract void switchToGame(Game game);
 
     @Override
@@ -50,8 +60,10 @@ public abstract class NetActivity extends BaseGameActivity {
 
             if (bundle.containsKey(Multiplayer.EXTRA_INVITATION)) {
                 Invitation invitation = bundle.getParcelable(Multiplayer.EXTRA_INVITATION);
-                getTurnBasedMultiplayerClient().acceptInvitation(invitation.getInvitationId()).addOnSuccessListener(this::startGame);
-                return;
+                if (invitation.getInvitationType() == Invitation.INVITATION_TYPE_TURN_BASED) {
+                    getTurnBasedMultiplayerClient().acceptInvitation(invitation.getInvitationId()).addOnSuccessListener(this::startGame);
+                    return;
+                }
             }
 
            if (bundle.containsKey(Multiplayer.EXTRA_TURN_BASED_MATCH)) {
@@ -206,7 +218,7 @@ public abstract class NetActivity extends BaseGameActivity {
                     localParticipantId,
                     remoteParticipantId,
                     match,
-                    () -> getTurnBasedMultiplayerClient().rematch(match.getMatchId()).addOnSuccessListener(this::startGame),
+                    rematcher,
                     getTurnBasedMultiplayerClient());
         } else {
             players[0] = new NetworkPlayer(
@@ -214,7 +226,7 @@ public abstract class NetActivity extends BaseGameActivity {
                     localParticipantId,
                     remoteParticipantId,
                     match,
-                    () -> getTurnBasedMultiplayerClient().rematch(match.getMatchId()).addOnSuccessListener(this::startGame),
+                    rematcher,
                     getTurnBasedMultiplayerClient());
             players[1] = new PlayerObject(2);
         }

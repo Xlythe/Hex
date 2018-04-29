@@ -105,6 +105,12 @@ public class MainActivity extends NetActivity {
     }
 
     public void swapFragment(Fragment newFragment) {
+        // Bugfix for starting a new game on top of an existing game. Remove the existing fragment from
+        // the backstack by popping it.
+        if (getSupportFragmentManager().findFragmentById(R.id.content).getClass() == newFragment.getClass()) {
+            getSupportFragmentManager().popBackStack();
+        }
+
         invalidateFragmentState(newFragment);
         getSupportFragmentManager()
                 .beginTransaction()

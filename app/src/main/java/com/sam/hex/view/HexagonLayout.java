@@ -76,6 +76,7 @@ public class HexagonLayout extends View implements OnTouchListener {
     private int mPressedColor;
     private int mDisabledColor;
     private int mFocusedButton = -1;
+    private boolean mIsLaidOut = false;
 
     public HexagonLayout(Context context) {
         super(context);
@@ -261,7 +262,19 @@ public class HexagonLayout extends View implements OnTouchListener {
     }
 
     @Override
+    public boolean isLaidOut() {
+        if (Build.VERSION.SDK_INT < 19) {
+            return mIsLaidOut;
+        }
+        return super.isLaidOut();
+    }
+
+    @Override
     protected void onDraw(@NonNull Canvas canvas) {
+        if (!isLaidOut()) {
+            return;
+        }
+
         canvas.save();
         if (mAllowRotation) {
             canvas.rotate(mRotation, center.x, center.y);
@@ -446,6 +459,8 @@ public class HexagonLayout extends View implements OnTouchListener {
         }
 
         layoutText();
+
+        mIsLaidOut = true;
     }
 
     @Override

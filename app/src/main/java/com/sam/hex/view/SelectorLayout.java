@@ -11,6 +11,7 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.PathShape;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -38,6 +39,7 @@ public class SelectorLayout extends View implements OnTouchListener {
     private Rect[] mOldRect;
     private Rect[] mOldMirrorRect;
     private Point[] mOldTextPos;
+    private boolean mIsLaidOut = false;
 
     public SelectorLayout(Context context) {
         super(context);
@@ -171,7 +173,19 @@ public class SelectorLayout extends View implements OnTouchListener {
     }
 
     @Override
+    public boolean isLaidOut() {
+        if (Build.VERSION.SDK_INT < 19) {
+            return mIsLaidOut;
+        }
+        return super.isLaidOut();
+    }
+
+    @Override
     protected void onDraw(@NonNull Canvas canvas) {
+        if (!isLaidOut()) {
+            return;
+        }
+
         canvas.rotate(mRotation);
         for (int i = 0; i < mButtons.length; i++) {
             if (!mButtons[i].isEnabled()) {
@@ -254,6 +268,8 @@ public class SelectorLayout extends View implements OnTouchListener {
 
             offset += margin + mWidth;
         }
+
+        mIsLaidOut = true;
     }
 
     @Override

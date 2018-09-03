@@ -1,7 +1,6 @@
 package com.sam.hex.fragment;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.sam.hex.R;
+
+import androidx.annotation.NonNull;
 
 /**
  * @author Will Harmon

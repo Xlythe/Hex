@@ -2,7 +2,6 @@ package com.sam.hex.view;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -12,6 +11,8 @@ import com.android.vending.billing.util.Purchase;
 import com.sam.hex.R;
 import com.sam.hex.Stats;
 import com.sam.hex.view.HexDialogView.Button.OnClickListener;
+
+import androidx.annotation.NonNull;
 
 /**
  * @author Will Harmon

@@ -2,8 +2,6 @@ package com.sam.hex.view;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -14,6 +12,9 @@ import com.hex.core.PlayingEntity;
 import com.sam.hex.R;
 import com.sam.hex.fragment.GameFragment;
 import com.sam.hex.view.HexDialogView.Button.OnClickListener;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * @author Will Harmon

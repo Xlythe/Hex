@@ -1,7 +1,6 @@
 package com.sam.hex.fragment;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +8,8 @@ import android.view.ViewGroup;
 import com.hex.core.Player;
 import com.sam.hex.R;
 import com.sam.hex.view.SelectorLayout;
+
+import androidx.annotation.NonNull;
 
 /**
  * @author Will Harmon

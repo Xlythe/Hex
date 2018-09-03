@@ -2,10 +2,6 @@ package com.sam.hex;
 
 import android.Manifest;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -16,6 +12,11 @@ import com.sam.hex.fragment.HistoryFragment;
 import com.sam.hex.fragment.InstructionsFragment;
 import com.sam.hex.fragment.MainFragment;
 import com.sam.hex.fragment.OnlineSelectionFragment;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import static com.sam.hex.Settings.TAG;
 import static com.sam.hex.PermissionUtils.hasPermissions;

@@ -2,9 +2,6 @@ package com.sam.hex.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +16,10 @@ import com.sam.hex.Settings;
 import com.sam.hex.Stats;
 import com.sam.hex.view.DonateDialog;
 import com.sam.hex.view.HexagonLayout;
+
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * @author Will Harmon

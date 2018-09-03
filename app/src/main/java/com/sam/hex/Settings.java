@@ -3,12 +3,13 @@ package com.sam.hex;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.hex.core.Timer;
+
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * @author Will Harmon

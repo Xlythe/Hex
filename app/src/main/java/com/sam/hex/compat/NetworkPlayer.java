@@ -1,8 +1,5 @@
 package com.sam.hex.compat;
 
-import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.games.TurnBasedMultiplayerClient;
@@ -21,6 +18,10 @@ import com.hex.core.Point;
 import java.io.Serializable;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import static com.sam.hex.Settings.TAG;
 
 /** A NetworkPlayer that relies on Google Play Games. */
@@ -35,7 +36,8 @@ public class NetworkPlayer implements PlayingEntity {
     // of a automatched game. Otherwise, once there are 2 players in the room, it's no longer null.
     // Note that a Google Play Games Player object is not necessarily available even if the remote
     // participant id is.
-    @Nullable private String remoteParticipantId;
+    @Nullable
+    private String remoteParticipantId;
 
     // The most recent match state given from the server. By listening to this, we can know when
     // players join the game, make a move, or request a rematch.
@@ -53,7 +55,8 @@ public class NetworkPlayer implements PlayingEntity {
     // The name of this player.
     private String name;
     // The color of this player.
-    @ColorInt private int color;
+    @ColorInt
+    private int color;
 
     // How much time this player has left to make their move.
     private long timeLeft;

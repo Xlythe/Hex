@@ -4,12 +4,11 @@ Properties local = new Properties()
 local.load(project.rootProject.file('local.properties').newDataInputStream())
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion '27.0.3'
+    compileSdkVersion 28
     defaultConfig {
         applicationId "com.sam.hex"
         minSdkVersion 14
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode 28
         versionName "5.0.0"
     }
@@ -40,10 +39,10 @@ android {
 dependencies {
     def withoutSupportLib = { exclude group: 'com.android.support' }
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:27.+'
-    implementation 'com.android.support:design:27.+'
-    implementation 'com.google.android.gms:play-services-auth:+'
-    implementation 'com.google.android.gms:play-services-games:+'
-    implementation 'com.xlythe:play-billing:1.0.1', withoutSupportLib
+    implementation 'androidx.appcompat:appcompat:+'
+    implementation 'com.google.android.material:material:+'
+    implementation 'com.google.android.gms:play-services-auth:+', withoutSupportLib
+    implementation 'com.google.android.gms:play-services-games:+', withoutSupportLib
+    implementation 'com.xlythe:play-billing:1.0.3', withoutSupportLib
     testImplementation 'junit:junit:4.12'
 }

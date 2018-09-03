@@ -1,8 +1,6 @@
 package com.sam.hex.view;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.Window;
 
@@ -10,6 +8,9 @@ import com.android.vending.billing.util.PurchaseActivity;
 
 import java.util.Arrays;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * @author Will Harmon

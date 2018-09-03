@@ -8,8 +8,6 @@ import android.graphics.Path;
 import android.graphics.Typeface;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.PathShape;
-import android.support.annotation.NonNull;
-import android.support.annotation.UiThread;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -24,6 +22,9 @@ import com.sam.hex.compat.Game;
 
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.UiThread;
 
 /**
  * @author Will Harmon

@@ -12,7 +12,6 @@ import android.graphics.Rect;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.PathShape;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -22,6 +21,8 @@ import android.view.View.OnTouchListener;
 import android.view.animation.AccelerateInterpolator;
 
 import com.hex.core.Point;
+
+import androidx.annotation.NonNull;
 
 /**
  * @author Will Harmon

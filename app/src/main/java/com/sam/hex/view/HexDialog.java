@@ -3,6 +3,7 @@ package com.sam.hex.view;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 
 import com.android.vending.billing.util.PurchaseActivity;
 
@@ -54,6 +55,7 @@ public abstract class HexDialog extends PurchaseActivity {
         }
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
 
         view = new HexDialogView(this, this);
         view.setBackgroundResource(android.R.color.transparent);

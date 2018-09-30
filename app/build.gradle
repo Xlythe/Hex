@@ -37,12 +37,16 @@ android {
 }
 
 dependencies {
-    def withoutSupportLib = { exclude group: 'com.android.support' }
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:+'
     implementation 'com.google.android.material:material:+'
-    implementation 'com.google.android.gms:play-services-auth:+', withoutSupportLib
-    implementation 'com.google.android.gms:play-services-games:+', withoutSupportLib
-    implementation 'com.xlythe:play-billing:1.0.3', withoutSupportLib
+    implementation 'com.google.android.gms:play-services-auth:+'
+    implementation 'com.google.android.gms:play-services-games:+'
+    implementation 'com.android.billingclient:billing:+'
+    implementation 'com.xlythe:play-billing:2.2'
     testImplementation 'junit:junit:4.12'
+}
+
+configurations.all {
+    exclude group: 'com.android.support'
 }

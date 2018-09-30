@@ -6,8 +6,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.vending.billing.util.IabResult;
-import com.android.vending.billing.util.Purchase;
+import com.android.billingclient.api.Purchase;
 import com.sam.hex.R;
 import com.sam.hex.Stats;
 import com.sam.hex.view.HexDialogView.Button.OnClickListener;
@@ -107,9 +106,7 @@ public class DonateDialog extends HexDialog {
     }
 
     @Override
-    protected void onPurchaseSuccess(IabResult result, @NonNull Purchase info) {
-        String sku = info.getSku();
-
+    public void onPurchaseFound(String sku, Purchase purchase) {
         int amount = 0;
         switch (sku) {
             case ITEM_SKU_BASIC:

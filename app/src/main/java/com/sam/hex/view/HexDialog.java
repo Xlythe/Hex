@@ -41,11 +41,6 @@ public abstract class HexDialog extends PurchaseActivity {
     }
 
     @Override
-    protected void skuFound(String sku, boolean found) {
-        // Do nothing
-    }
-
-    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 

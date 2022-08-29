@@ -36,7 +36,7 @@ public abstract class HexDialog extends PurchaseActivity {
 
     @NonNull
     @Override
-    protected List<String> getSkus() {
+    protected List<String> getProductIds() {
         return Arrays.asList(ITEM_SKU_BASIC, ITEM_SKU_INTERMEDIATE, ITEM_SKU_ADVANCED);
     }
 

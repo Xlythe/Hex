@@ -50,7 +50,7 @@ public class PreferencesFragment extends PreferenceFragment {
     private class DifficultyListener implements OnPreferenceChangeListener {
         @Override
         public boolean onPreferenceChange(@NonNull Preference preference, @NonNull Object newValue) {
-            preference.setSummary(getResources().getStringArray(R.array.comDifficultyArray)[Integer.valueOf(newValue.toString())]);
+            preference.setSummary(getResources().getStringArray(R.array.comDifficultyArray)[Integer.parseInt(newValue.toString())]);
             return true;
         }
     }

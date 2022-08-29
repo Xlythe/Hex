@@ -11,6 +11,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.games.AchievementsClient;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesClient;
+import com.google.android.gms.games.GamesCompat;
 import com.google.android.gms.games.InvitationsClient;
 import com.google.android.gms.games.PlayersClient;
 import com.google.android.gms.games.TurnBasedMultiplayerClient;
@@ -105,10 +106,10 @@ public abstract class BaseGameActivity extends AppCompatActivity {
         Log.d(TAG, "User successfully signed in: " + googleSignInAccount.getDisplayName());
         mGoogleSignInAccount = googleSignInAccount;
         mGamesClient = Games.getGamesClient(this, googleSignInAccount);
-        mTurnBasedMultiplayerClient = Games.getTurnBasedMultiplayerClient(this, googleSignInAccount);
+        mTurnBasedMultiplayerClient = GamesCompat.getTurnBasedMultiplayerClient(this, googleSignInAccount);
         mPlayersClient = Games.getPlayersClient(this, googleSignInAccount);
         mAchievementsClient = Games.getAchievementsClient(this, googleSignInAccount);
-        mInvitationsClient = Games.getInvitationsClient(this, googleSignInAccount);
+        mInvitationsClient = GamesCompat.getInvitationsClient(this, googleSignInAccount);
     }
 
     public void onSignInFailed() {

@@ -4,11 +4,11 @@ Properties local = new Properties()
 local.load(project.rootProject.file('local.properties').newDataInputStream())
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 33
     defaultConfig {
         applicationId "com.sam.hex"
         minSdkVersion 14
-        targetSdkVersion 28
+        targetSdkVersion 33
         versionCode 28
         versionName "5.0.0"
     }
@@ -42,8 +42,7 @@ dependencies {
     implementation 'com.google.android.material:material:+'
     implementation 'com.google.android.gms:play-services-auth:+'
     implementation 'com.google.android.gms:play-services-games:+'
-    implementation 'com.android.billingclient:billing:+'
-    implementation 'com.xlythe:play-billing:2.2'
+    implementation 'com.xlythe:play-billing:3.1'
     testImplementation 'junit:junit:4.12'
 }
 

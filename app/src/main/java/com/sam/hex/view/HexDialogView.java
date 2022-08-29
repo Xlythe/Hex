@@ -309,8 +309,7 @@ public class HexDialogView extends View implements OnTouchListener {
             }
         } else if (event.getAction() == MotionEvent.ACTION_UP) {
             boolean dismiss = !wasPressed;
-            for (int i = 0; i < mButtons.length; i++) {
-                Button b = mButtons[i];
+            for (Button b : mButtons) {
                 if (b.isPressed()) {
                     performClick();
                     b.setPressed(false);
@@ -390,7 +389,7 @@ public class HexDialogView extends View implements OnTouchListener {
         return sorted;
     }
 
-    private class Hexagon {
+    private static class Hexagon {
         private final Button button;
         private final Point a, b, c, d, e, f;
         @NonNull
@@ -414,7 +413,7 @@ public class HexDialogView extends View implements OnTouchListener {
             points[0] = p.x;
             points[1] = p.y;
             m.reset();
-            m.postRotate(-button.getRoation(), a.x + (b.x - a.x) / 2, a.y + (e.y - a.y) / 2);
+            m.postRotate(-button.getRoation(), a.x + (b.x - a.x) / 2f, a.y + (e.y - a.y) / 2f);
             m.mapPoints(points);
             p.x = (int) points[0];
             p.y = (int) points[1];

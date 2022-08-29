@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.games.Games;
-import com.google.android.gms.games.Player;
+import com.google.android.gms.games.PlayerCompat;
 import com.google.android.gms.games.multiplayer.Invitation;
 import com.google.android.gms.games.multiplayer.Multiplayer;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
@@ -235,10 +235,10 @@ public abstract class NetActivity extends BaseGameActivity {
         return players;
     }
 
-    private static List<Player> getPlayerList(TurnBasedMatch match) {
-        List<Player> players = new ArrayList<>(match.getParticipantIds().size());
+    private static List<PlayerCompat> getPlayerList(TurnBasedMatch match) {
+        List<PlayerCompat> players = new ArrayList<>(match.getParticipantIds().size());
         for (String participantId : match.getParticipantIds()) {
-            @Nullable Player player = match.getParticipant(participantId).getPlayer();
+            @Nullable PlayerCompat player = match.getParticipant(participantId).getPlayer();
             if (player == null) {
                 continue;
             }
@@ -253,7 +253,7 @@ public abstract class NetActivity extends BaseGameActivity {
     }
 
     private static String getRemotePlayerName(Context context, TurnBasedMatch match, String playerId) {
-        @Nullable Player remotePlayer = getRemotePlayer(playerId, getPlayerList(match));
+        @Nullable PlayerCompat remotePlayer = getRemotePlayer(playerId, getPlayerList(match));
         if (remotePlayer == null) {
             Log.d(TAG, "Unable to get remote player name. No player found.");
             return context.getString(R.string.player_automatch);
@@ -283,8 +283,8 @@ public abstract class NetActivity extends BaseGameActivity {
     }
 
     @NonNull
-    private static Player getLocalPlayer(String localPlayerId, List<Player> playerList) {
-        for (Player player : playerList) {
+    private static PlayerCompat getLocalPlayer(String localPlayerId, List<PlayerCompat> playerList) {
+        for (PlayerCompat player : playerList) {
             if (player.getPlayerId().equals(localPlayerId)) {
                 return player;
             }
@@ -293,8 +293,8 @@ public abstract class NetActivity extends BaseGameActivity {
     }
 
     @Nullable
-    private static Player getRemotePlayer(String localPlayerId, List<Player> playerList) {
-        for (Player player : playerList) {
+    private static PlayerCompat getRemotePlayer(String localPlayerId, List<PlayerCompat> playerList) {
+        for (PlayerCompat player : playerList) {
             if (player.getPlayerId().equals(localPlayerId)) {
                 continue;
             }
@@ -304,7 +304,7 @@ public abstract class NetActivity extends BaseGameActivity {
         return null;
     }
 
-    private static String getShortName(Player player) {
+    private static String getShortName(PlayerCompat player) {
         String name = player.getDisplayName().split(" ")[0];
         if (name.length() > 10) {
             return name.substring(0, 10);

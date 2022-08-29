@@ -68,7 +68,7 @@ public class NetworkPlayer implements PlayingEntity {
     private final LinkedBlockingQueue<Point> currentMove = new LinkedBlockingQueue<>();
 
     // A listener that's called whenever the TurnBasedMatch is updated.
-    private TurnBasedMatchUpdateCallback turnBasedMatchUpdateCallback = new TurnBasedMatchUpdateCallback() {
+    private final TurnBasedMatchUpdateCallback turnBasedMatchUpdateCallback = new TurnBasedMatchUpdateCallback() {
         @Override
         public void onTurnBasedMatchReceived(@NonNull TurnBasedMatch turnBasedMatch) {
             // Ignore matches without any data. That means no moves have been made yet.

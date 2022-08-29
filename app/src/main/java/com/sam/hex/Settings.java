@@ -49,9 +49,9 @@ public class Settings {
     public static int getGridSize(@NonNull Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        int gridSize = Integer.valueOf(prefs.getString(GAME_SIZE, Integer.toString(context.getResources().getInteger(R.integer.DEFAULT_BOARD_SIZE))));
+        int gridSize = Integer.parseInt(prefs.getString(GAME_SIZE, Integer.toString(context.getResources().getInteger(R.integer.DEFAULT_BOARD_SIZE))));
         if (gridSize == 0) {
-            gridSize = Integer.valueOf(prefs.getString(CUSTOM_GAME_SIZE, Integer.toString(context.getResources().getInteger(R.integer.DEFAULT_BOARD_SIZE))));
+            gridSize = Integer.parseInt(prefs.getString(CUSTOM_GAME_SIZE, Integer.toString(context.getResources().getInteger(R.integer.DEFAULT_BOARD_SIZE))));
         }
 
         // We don't want 0x0 games

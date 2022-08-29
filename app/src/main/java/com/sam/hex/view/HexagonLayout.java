@@ -30,6 +30,7 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
+import androidx.core.content.res.ResourcesCompat;
 
 import static com.sam.hex.Settings.TAG;
 
@@ -379,7 +380,7 @@ public class HexagonLayout extends View implements OnTouchListener {
             h = (int) (h * 1.2);
         }
         w = (int) (h * 1.1547);
-        mBorderShadowWidth = h / 2 * 0.1828f;
+        mBorderShadowWidth = h / 2f * 0.1828f;
         mBorderWidth = mBorderShadowWidth * 0.882f;
         mBorderShadowWidth -= mBorderWidth;
 
@@ -712,7 +713,7 @@ public class HexagonLayout extends View implements OnTouchListener {
         }
 
         public void setDrawableResource(@DrawableRes int id) {
-            setDrawable(context.getResources().getDrawable(id));
+            setDrawable(ResourcesCompat.getDrawable(context.getResources(), id, null));
         }
 
         public Drawable getDrawable() {

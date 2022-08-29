@@ -78,9 +78,11 @@ public class HistoryFragment extends HexFragment {
             };
 
             String[] files = PATH.list(filter);
-            items = new Item[files.length];
-            for (int i = 0; i < files.length; i++) {
-                items[i] = new Item(files[i]);
+            if (files != null) {
+                items = new Item[files.length];
+                for (int i = 0; i < files.length; i++) {
+                    items[i] = new Item(files[i]);
+                }
             }
         }
 
@@ -88,7 +90,7 @@ public class HistoryFragment extends HexFragment {
         return items;
     }
 
-    private class Item {
+    private static class Item {
         @NonNull
         final String file;
 

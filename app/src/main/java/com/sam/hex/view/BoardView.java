@@ -195,7 +195,7 @@ public class BoardView extends View {
                 String titleText = String.format(mTitleText, player.getName());
                 int textLength = (int) Math.max(mTextPaint.measureText(titleText), mLargeTextPaint.measureText(mActionText));
                 float posX = player.getTeam() == 1 ? mTextMargin + textLength : getWidth() - mTextMargin;
-                float posY = player.getTeam() == 1 ? getHeight() / 2 : mTextMargin + mTextPaint.getTextSize();
+                float posY = player.getTeam() == 1 ? getHeight() / 2f : mTextMargin + mTextPaint.getTextSize();
                 canvas.drawText(titleText, posX - mTextPaint.measureText(titleText), posY, mTextPaint);
                 canvas.drawText(mActionText, posX - mLargeTextPaint.measureText(mActionText), posY + mLargeTextPaint.getTextSize(), mLargeTextPaint);
             }
@@ -211,7 +211,7 @@ public class BoardView extends View {
                 String p2TitleText = mGame.getPlayer2().getName();
                 int p1TextLength = (int) mTextPaint.measureText(p1TitleText);
                 float p1PosX = mTextMargin + p1TextLength;
-                float p1PosY = getHeight() / 2;
+                float p1PosY = getHeight() / 2f;
                 float p2PosX = getWidth() - mTextMargin;
                 float p2PosY = mTextMargin + mTextPaint.getTextSize();
                 canvas.drawText(p1TitleText, p1PosX - mTextPaint.measureText(p1TitleText), p1PosY, mTextPaint);
@@ -221,7 +221,7 @@ public class BoardView extends View {
 
         if (mGame.hasTimer() && !mGame.replayRunning && !mGame.isGameOver()) {
             float posX = getWidth() - mTextMargin;
-            float posY = getHeight() / 2;
+            float posY = getHeight() / 2f;
             long minutesLeft = TimeUnit.MILLISECONDS.toMinutes(mGame.getCurrentPlayer().getTime());
             long secondsLeft = TimeUnit.MILLISECONDS.toSeconds(mGame.getCurrentPlayer().getTime()) - TimeUnit.MINUTES.toSeconds(minutesLeft);
             String time = String.format(Locale.getDefault(), "%d:%02d", minutesLeft, secondsLeft);
@@ -311,22 +311,22 @@ public class BoardView extends View {
 
         // Shape of a rectangle
         Path p1Path = new Path();
-        p1Path.moveTo(0, h / 3);
-        p1Path.lineTo(w, h / 3);
-        p1Path.lineTo(w, 2 * h / 3);
-        p1Path.lineTo(0, 2 * h / 3);
+        p1Path.moveTo(0, h / 3f);
+        p1Path.lineTo(w, h / 3f);
+        p1Path.lineTo(w, 2 * h / 3f);
+        p1Path.lineTo(0, 2 * h / 3f);
         p1Path.close();
         mPlayer1Background = new ShapeDrawable(new PathShape(p1Path, w, h));
         mPlayer1Background.setBounds(0, 0, w, h);
 
         // Shape of a rectangle
-        float centerTop = (xOffset + h / 3);
+        float centerTop = (xOffset + h / 3f);
         float centerBottom = windowWidth - centerTop;
         Path p2Path = new Path();
-        p2Path.moveTo(centerTop - h / 6, 0);
-        p2Path.lineTo(centerTop + h / 6, 0);
-        p2Path.lineTo(centerBottom + h / 6, h);
-        p2Path.lineTo(centerBottom - h / 6, h);
+        p2Path.moveTo(centerTop - h / 6f, 0);
+        p2Path.lineTo(centerTop + h / 6f, 0);
+        p2Path.lineTo(centerBottom + h / 6f, h);
+        p2Path.lineTo(centerBottom - h / 6f, h);
         p2Path.close();
         mPlayer2Background = new ShapeDrawable(new PathShape(p2Path, w, h));
         mPlayer2Background.setBounds(0, 0, w, h);
@@ -452,7 +452,7 @@ public class BoardView extends View {
         }
     }
 
-    private class Hexagon {
+    private static class Hexagon {
         // Polygon coodinates.
         @NonNull
         private final int[] polyY, polyX;
@@ -478,7 +478,7 @@ public class BoardView extends View {
 
         @NonNull
         int[] getXCoordinates(double x, double y, double r, int vertexCount, double startAngle) {
-            int res[] = new int[vertexCount];
+            int[] res = new int[vertexCount];
             double addAngle = 2 * Math.PI / vertexCount;
             double angle = startAngle;
             for (int i = 0; i < vertexCount; i++) {
@@ -490,7 +490,7 @@ public class BoardView extends View {
 
         @NonNull
         int[] getYCoordinates(double x, double y, double r, int vertexCount, double startAngle) {
-            int res[] = new int[vertexCount];
+            int[] res = new int[vertexCount];
             double addAngle = 2 * Math.PI / vertexCount;
             double angle = startAngle;
             for (int i = 0; i < vertexCount; i++) {

@@ -26,7 +26,8 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:screenOrientation="sensorLandscape" >
+            android:screenOrientation="sensorLandscape"
+            android:exported="true">
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -52,7 +53,8 @@
         <activity
             android:name=".PreferencesActivity"
             android:label="@string/activity_title_preferences"
-            android:screenOrientation="sensorLandscape" />
+            android:screenOrientation="sensorLandscape"
+            android:exported="false" />
         <activity
             android:name=".view.DonateDialog"
             android:screenOrientation="sensorLandscape"
@@ -64,7 +66,8 @@
             android:relinquishTaskIdentity="true"
             android:documentLaunchMode="never"
             android:finishOnCloseSystemDialogs="true"
-            android:theme="@style/HexDialog" />
+            android:theme="@style/HexDialog"
+            android:exported="false" />
         <activity
             android:name=".view.GameOverDialog"
             android:screenOrientation="sensorLandscape"
@@ -76,7 +79,8 @@
             android:relinquishTaskIdentity="true"
             android:documentLaunchMode="never"
             android:finishOnCloseSystemDialogs="true"
-            android:theme="@style/HexDialog" />
+            android:theme="@style/HexDialog"
+            android:exported="false" />
     </application>
 
 </manifest>

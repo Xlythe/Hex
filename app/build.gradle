@@ -9,8 +9,9 @@ android {
         applicationId "com.sam.hex"
         minSdkVersion 14
         targetSdkVersion 33
-        versionCode 28
-        versionName "5.0.0"
+        versionCode 29
+        versionName "5.1"
+        multiDexEnabled true
     }
     signingConfigs {
         release {
@@ -42,8 +43,9 @@ dependencies {
     implementation 'com.google.android.material:material:+'
     implementation 'com.google.android.gms:play-services-auth:+'
     implementation 'com.google.android.gms:play-services-games:+'
+    implementation 'androidx.multidex:multidex:+'
     implementation 'com.xlythe:play-billing:3.1'
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
 }
 
 configurations.all {

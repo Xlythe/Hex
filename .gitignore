@@ -46,3 +46,4 @@ gradlew.bat
 .gradle/
 .idea/
 gradle/
+app/release/output-metadata.json

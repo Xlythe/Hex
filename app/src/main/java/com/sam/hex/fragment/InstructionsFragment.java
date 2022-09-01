@@ -26,6 +26,9 @@ public class InstructionsFragment extends HexFragment {
         TextView rules = v.findViewById(R.id.rules);
         rules.setMovementMethod(LinkMovementMethod.getInstance());
 
+        TextView privacy = v.findViewById(R.id.privacy);
+        privacy.setMovementMethod(LinkMovementMethod.getInstance());
+
         return v;
     }
 }

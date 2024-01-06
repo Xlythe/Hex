@@ -1,25 +1,25 @@
-package com.sam.hex;
+package com.xlythe.hex;
 
 import android.Manifest;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.sam.hex.compat.Game;
-import com.sam.hex.fragment.GameFragment;
-import com.sam.hex.fragment.GameSelectionFragment;
-import com.sam.hex.fragment.HistoryFragment;
-import com.sam.hex.fragment.InstructionsFragment;
-import com.sam.hex.fragment.MainFragment;
-import com.sam.hex.fragment.OnlineSelectionFragment;
+import com.xlythe.hex.compat.Game;
+import com.xlythe.hex.fragment.GameFragment;
+import com.xlythe.hex.fragment.GameSelectionFragment;
+import com.xlythe.hex.fragment.HistoryFragment;
+import com.xlythe.hex.fragment.InstructionsFragment;
+import com.xlythe.hex.fragment.MainFragment;
+import com.xlythe.hex.fragment.OnlineSelectionFragment;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import static com.sam.hex.Settings.TAG;
-import static com.sam.hex.PermissionUtils.hasPermissions;
+import static com.xlythe.hex.Settings.TAG;
+import static com.xlythe.hex.PermissionUtils.hasPermissions;
 
 /**
  * @author Will Harmon

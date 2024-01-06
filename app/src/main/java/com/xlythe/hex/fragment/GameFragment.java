@@ -1,4 +1,4 @@
-package com.sam.hex.fragment;
+package com.xlythe.hex.fragment;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -18,15 +18,15 @@ import com.hex.core.Player;
 import com.hex.core.PlayerObject;
 import com.hex.core.PlayingEntity;
 import com.hex.core.Timer;
-import com.sam.hex.FileUtil;
-import com.sam.hex.MainActivity.Stat;
-import com.sam.hex.R;
-import com.sam.hex.Settings;
-import com.sam.hex.Stats;
-import com.sam.hex.compat.Game;
-import com.sam.hex.compat.GameOptions;
-import com.sam.hex.view.BoardView;
-import com.sam.hex.view.GameOverDialog;
+import com.xlythe.hex.FileUtil;
+import com.xlythe.hex.MainActivity.Stat;
+import com.xlythe.hex.R;
+import com.xlythe.hex.Settings;
+import com.xlythe.hex.Stats;
+import com.xlythe.hex.compat.Game;
+import com.xlythe.hex.compat.GameOptions;
+import com.xlythe.hex.view.BoardView;
+import com.xlythe.hex.view.GameOverDialog;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -36,7 +36,7 @@ import java.util.Locale;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import static com.sam.hex.Settings.TAG;
+import static com.xlythe.hex.Settings.TAG;
 
 /**
  * @author Will Harmon

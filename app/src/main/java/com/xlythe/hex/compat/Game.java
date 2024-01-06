@@ -1,4 +1,4 @@
-package com.sam.hex.compat;
+package com.xlythe.hex.compat;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;

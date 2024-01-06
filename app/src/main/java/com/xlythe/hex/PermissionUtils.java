@@ -1,4 +1,4 @@
-package com.sam.hex;
+package com.xlythe.hex;
 
 import android.content.Context;
 import android.content.pm.PackageManager;

@@ -1,4 +1,4 @@
-package com.sam.hex;
+package com.xlythe.hex;
 
 import android.app.Activity;
 import android.content.Context;
@@ -16,9 +16,9 @@ import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig;
 import com.hex.core.PlayerObject;
 import com.hex.core.PlayingEntity;
-import com.sam.hex.compat.Game;
-import com.sam.hex.compat.GameOptions;
-import com.sam.hex.compat.NetworkPlayer;
+import com.xlythe.hex.compat.Game;
+import com.xlythe.hex.compat.GameOptions;
+import com.xlythe.hex.compat.NetworkPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import static com.sam.hex.Settings.TAG;
+import static com.xlythe.hex.Settings.TAG;
 
 public abstract class NetActivity extends BaseGameActivity {
     private final static int MIN_OPPONENTS = 1, MAX_OPPONENTS = 1;

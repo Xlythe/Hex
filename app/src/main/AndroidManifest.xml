@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.sam.hex"
+    package="com.xlythe.hex"
     android:installLocation="auto" >
 
     <!-- For net play -->
@@ -28,7 +28,7 @@
         <meta-data android:name="com.google.android.gms.appstate.APP_ID" android:value="@string/app_id" />
         <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/>
         <activity
-            android:name=".MainActivity"
+            android:name="com.xlythe.hex.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="sensorLandscape"
             android:exported="true">
@@ -55,12 +55,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PreferencesActivity"
+            android:name="com.xlythe.hex.PreferencesActivity"
             android:label="@string/activity_title_preferences"
             android:screenOrientation="sensorLandscape"
             android:exported="false" />
         <activity
-            android:name=".view.DonateDialog"
+            android:name="com.xlythe.hex.view.DonateDialog"
             android:screenOrientation="sensorLandscape"
             android:launchMode="singleInstance"
             android:noHistory="true"
@@ -73,7 +73,7 @@
             android:theme="@style/HexDialog"
             android:exported="false" />
         <activity
-            android:name=".view.GameOverDialog"
+            android:name="com.xlythe.hex.view.GameOverDialog"
             android:screenOrientation="sensorLandscape"
             android:launchMode="singleInstance"
             android:noHistory="true"

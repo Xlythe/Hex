@@ -1,4 +1,4 @@
-package com.sam.hex;
+package com.xlythe.hex;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,7 +20,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import static android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
-import static com.sam.hex.Settings.TAG;
+import static com.xlythe.hex.Settings.TAG;
 
 public abstract class BaseGameActivity extends AppCompatActivity {
 

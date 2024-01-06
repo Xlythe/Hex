@@ -1,4 +1,4 @@
-package com.sam.hex.view;
+package com.xlythe.hex.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -18,7 +18,7 @@ import com.hex.core.GameAction;
 import com.hex.core.Player;
 import com.hex.core.PlayingEntity;
 import com.hex.core.Point;
-import com.sam.hex.compat.Game;
+import com.xlythe.hex.compat.Game;
 
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;

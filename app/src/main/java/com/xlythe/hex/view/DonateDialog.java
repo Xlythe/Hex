@@ -1,4 +1,4 @@
-package com.sam.hex.view;
+package com.xlythe.hex.view;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,9 +7,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.billingclient.api.Purchase;
-import com.sam.hex.R;
-import com.sam.hex.Stats;
-import com.sam.hex.view.HexDialogView.Button.OnClickListener;
+import com.xlythe.hex.R;
+import com.xlythe.hex.Stats;
+import com.xlythe.hex.view.HexDialogView.Button.OnClickListener;
 
 import androidx.annotation.NonNull;
 

@@ -1,4 +1,4 @@
-package com.sam.hex.fragment;
+package com.xlythe.hex.fragment;
 
 import android.Manifest;
 import android.content.Context;
@@ -16,8 +16,8 @@ import android.widget.Toast;
 
 import com.google.gson.JsonSyntaxException;
 import com.hex.core.Game;
-import com.sam.hex.FileUtil;
-import com.sam.hex.R;
+import com.xlythe.hex.FileUtil;
+import com.xlythe.hex.R;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -32,8 +32,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.UiThread;
 
-import static com.sam.hex.PermissionUtils.hasPermissions;
-import static com.sam.hex.Settings.TAG;
+import static com.xlythe.hex.PermissionUtils.hasPermissions;
+import static com.xlythe.hex.Settings.TAG;
 
 /**
  * @author Will Harmon

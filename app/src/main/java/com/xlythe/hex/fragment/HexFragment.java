@@ -1,4 +1,4 @@
-package com.sam.hex.fragment;
+package com.xlythe.hex.fragment;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -11,15 +11,15 @@ import com.google.android.gms.games.AchievementsClient;
 import com.google.android.gms.games.GamesClient;
 import com.google.android.gms.games.PlayersClient;
 import com.google.android.gms.games.TurnBasedMultiplayerClient;
-import com.sam.hex.compat.Game;
-import com.sam.hex.MainActivity;
+import com.xlythe.hex.compat.Game;
+import com.xlythe.hex.MainActivity;
 
 import androidx.annotation.AnimRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import static com.sam.hex.Settings.TAG;
+import static com.xlythe.hex.Settings.TAG;
 
 /**
  * @author Will Harmon

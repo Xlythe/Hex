@@ -1,4 +1,4 @@
-package com.sam.hex.view;
+package com.xlythe.hex.view;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,9 +9,9 @@ import android.widget.TextView;
 import com.hex.core.Game;
 import com.hex.core.Player;
 import com.hex.core.PlayingEntity;
-import com.sam.hex.R;
-import com.sam.hex.fragment.GameFragment;
-import com.sam.hex.view.HexDialogView.Button.OnClickListener;
+import com.xlythe.hex.R;
+import com.xlythe.hex.fragment.GameFragment;
+import com.xlythe.hex.view.HexDialogView.Button.OnClickListener;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

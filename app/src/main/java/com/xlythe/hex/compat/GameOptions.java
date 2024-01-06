@@ -1,4 +1,4 @@
-package com.sam.hex.compat;
+package com.xlythe.hex.compat;
 
 import com.hex.core.Timer;
 

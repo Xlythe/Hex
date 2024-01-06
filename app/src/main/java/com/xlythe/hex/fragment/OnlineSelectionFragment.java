@@ -1,12 +1,12 @@
-package com.sam.hex.fragment;
+package com.xlythe.hex.fragment;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.sam.hex.R;
-import com.sam.hex.view.SelectorLayout;
+import com.xlythe.hex.R;
+import com.xlythe.hex.view.SelectorLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

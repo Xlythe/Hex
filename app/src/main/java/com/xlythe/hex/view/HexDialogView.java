@@ -1,4 +1,4 @@
-package com.sam.hex.view;
+package com.xlythe.hex.view;
 
 import android.content.Context;
 import android.graphics.Canvas;

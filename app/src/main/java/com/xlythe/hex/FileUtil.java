@@ -1,4 +1,4 @@
-package com.sam.hex;
+package com.xlythe.hex;
 
 import android.os.Environment;
 import android.util.Log;
@@ -13,7 +13,7 @@ import java.util.Locale;
 
 import androidx.annotation.NonNull;
 
-import static com.sam.hex.Settings.TAG;
+import static com.xlythe.hex.Settings.TAG;
 
 /**
  * @author Will Harmon

@@ -1,4 +1,4 @@
-package com.sam.hex.view;
+package com.xlythe.hex.view;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
@@ -32,7 +32,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.core.content.res.ResourcesCompat;
 
-import static com.sam.hex.Settings.TAG;
+import static com.xlythe.hex.Settings.TAG;
 
 /**
  * @author Will Harmon

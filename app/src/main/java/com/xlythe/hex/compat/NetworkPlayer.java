@@ -1,4 +1,4 @@
-package com.sam.hex.compat;
+package com.xlythe.hex.compat;
 
 import android.util.Log;
 
@@ -22,7 +22,7 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import static com.sam.hex.Settings.TAG;
+import static com.xlythe.hex.Settings.TAG;
 
 /** A NetworkPlayer that relies on Google Play Games. */
 public class NetworkPlayer implements PlayingEntity {

@@ -3,7 +3,7 @@
     android:layout_height="match_parent"
     android:background="@color/background" >
 
-    <com.sam.hex.view.BoardView
+    <com.xlythe.hex.view.BoardView
         android:id="@+id/board"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

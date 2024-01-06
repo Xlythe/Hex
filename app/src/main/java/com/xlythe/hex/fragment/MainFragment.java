@@ -1,4 +1,4 @@
-package com.sam.hex.fragment;
+package com.xlythe.hex.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,12 +10,12 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.common.SignInButton;
-import com.sam.hex.PreferencesActivity;
-import com.sam.hex.R;
-import com.sam.hex.Settings;
-import com.sam.hex.Stats;
-import com.sam.hex.view.DonateDialog;
-import com.sam.hex.view.HexagonLayout;
+import com.xlythe.hex.PreferencesActivity;
+import com.xlythe.hex.R;
+import com.xlythe.hex.Settings;
+import com.xlythe.hex.Stats;
+import com.xlythe.hex.view.DonateDialog;
+import com.xlythe.hex.view.HexagonLayout;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;

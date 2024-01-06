@@ -93,18 +93,18 @@ public class SelectorLayout extends View implements OnTouchListener {
                     });
                     animator.addListener(new Animator.AnimatorListener() {
                         @Override
-                        public void onAnimationStart(Animator animator) {}
+                        public void onAnimationStart(@NonNull Animator animator) {}
 
                         @Override
-                        public void onAnimationEnd(Animator animator) {
+                        public void onAnimationEnd(@NonNull Animator animator) {
                             b.performClick();
                         }
 
                         @Override
-                        public void onAnimationCancel(Animator animator) {}
+                        public void onAnimationCancel(@NonNull Animator animator) {}
 
                         @Override
-                        public void onAnimationRepeat(Animator animator) {}
+                        public void onAnimationRepeat(@NonNull Animator animator) {}
                     });
                     animator.start();
                 }

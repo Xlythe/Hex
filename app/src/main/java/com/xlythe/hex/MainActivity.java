@@ -1,6 +1,7 @@
 package com.xlythe.hex;
 
 import android.Manifest;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -25,12 +26,24 @@ import static com.xlythe.hex.PermissionUtils.hasPermissions;
  * @author Will Harmon
  **/
 public class MainActivity extends NetActivity {
-    private static final String[] REQUIRED_PERMISSIONS = {
-            Manifest.permission.INTERNET,
-            Manifest.permission.ACCESS_NETWORK_STATE,
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-    };
+    private static final String[] REQUIRED_PERMISSIONS;
+
+    static {
+        if (Build.VERSION.SDK_INT >= 30) {
+            REQUIRED_PERMISSIONS = new String[] {
+                    Manifest.permission.INTERNET,
+                    Manifest.permission.ACCESS_NETWORK_STATE
+            };
+        } else {
+            REQUIRED_PERMISSIONS = new String[] {
+                    Manifest.permission.INTERNET,
+                    Manifest.permission.ACCESS_NETWORK_STATE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+            };
+        }
+    }
+
     private static final int REQUEST_CODE_REQUIRED_PERMISSIONS = 3;
 
     // Play variables

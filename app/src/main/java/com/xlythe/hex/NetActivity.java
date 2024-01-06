@@ -39,7 +39,7 @@ public abstract class NetActivity extends BaseGameActivity {
     private String mPlayerId;
 
     // Switches to a new game for a rematch.
-    private NetworkPlayer.Rematcher rematcher = matchId -> {
+    private final NetworkPlayer.Rematcher rematcher = matchId -> {
             getTurnBasedMultiplayerClient().rematch(matchId)
                     .addOnSuccessListener(this::startGame)
                     .addOnFailureListener(e -> {

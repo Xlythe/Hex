@@ -39,7 +39,6 @@ import static com.xlythe.hex.Settings.TAG;
  * @author Will Harmon
  **/
 public class HistoryFragment extends HexFragment {
-    private static final File PATH = new File(Environment.getExternalStorageDirectory() + File.separator + "Hex");
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
 
     @Override
@@ -50,34 +49,29 @@ public class HistoryFragment extends HexFragment {
         GridView games = view.findViewById(R.id.games);
         Item[] fileList = loadFileList();
         games.setAdapter(new HistoryAdapter(getMainActivity(), fileList));
-        games.setOnItemClickListener((parent, v, position, id) -> openFile(PATH + File.separator + fileList[position].file));
+        games.setOnItemClickListener((parent, v, position, id) -> openFile(fileList[position].file));
 
         return view;
     }
 
     @NonNull
     private Item[] loadFileList() {
-        // We cannot look up the saved games without read permission.
-        if (!hasPermissions(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            return new Item[0];
-        }
+        File folder = new File(requireContext().getFilesDir() + File.separator + "Hex" + File.separator);
 
         // Create the path if able.
-        if (hasPermissions(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            if (PATH.mkdirs()) {
-                Log.d(TAG, "Successfully made the directory for history");
-            }
+        if (folder.mkdirs()) {
+            Log.d(TAG, "Successfully made the directory for history");
         }
 
         Item[] items = new Item[0];
-        if (PATH.exists()) {
+        if (folder.exists()) {
             FilenameFilter filter = (dir, filename) -> {
                 File sel = new File(dir, filename);
                 // Filters based on whether the file is hidden or not
                 return (sel.isFile() || sel.isDirectory()) && !sel.isHidden();
             };
 
-            String[] files = PATH.list(filter);
+            String[] files = folder.list(filter);
             if (files != null) {
                 items = new Item[files.length];
                 for (int i = 0; i < files.length; i++) {
@@ -113,7 +107,7 @@ public class HistoryFragment extends HexFragment {
             new Thread(() -> {
                 Game game;
                 try {
-                    game = Game.load(FileUtil.loadGameAsString(PATH + File.separator + file));
+                    game = Game.load(FileUtil.loadGameAsString(context, file));
                 } catch (IOException | JsonSyntaxException e) {
                     e.printStackTrace();
                     return;
@@ -138,7 +132,7 @@ public class HistoryFragment extends HexFragment {
     private void openFile(String fileName) {
         try {
             Bundle b = new Bundle();
-            b.putString(GameFragment.GAME, FileUtil.loadGameAsString(fileName));
+            b.putString(GameFragment.GAME, FileUtil.loadGameAsString(requireContext(), fileName));
             b.putBoolean(GameFragment.REPLAY, true);
 
             GameFragment gameFragment = new GameFragment();

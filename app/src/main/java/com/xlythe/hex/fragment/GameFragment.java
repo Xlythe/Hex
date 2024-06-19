@@ -254,7 +254,7 @@ public class GameFragment extends HexFragment {
                         if (Settings.getAutosave(getMainActivity())) {
                             try {
                                 String fileName = String.format(getString(R.string.auto_saved_file_name), SAVE_FORMAT.format(new Date()), game.getPlayer1().getName(), game.getPlayer2().getName());
-                                FileUtil.autoSaveGame(fileName, game.save());
+                                FileUtil.autoSaveGame(getContext(), fileName, game.save());
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }

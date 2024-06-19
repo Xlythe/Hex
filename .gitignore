@@ -47,3 +47,4 @@ gradlew.bat
 .idea/
 gradle/
 app/release/output-metadata.json
+*.dm

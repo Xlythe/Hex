@@ -4,11 +4,11 @@ Properties local = new Properties()
 local.load(project.rootProject.file('local.properties').newDataInputStream())
 
 android {
-    compileSdkVersion 35
+    compileSdkVersion 36
     defaultConfig {
         applicationId "com.sam.hex"
         minSdkVersion 21
-        targetSdkVersion 35
+        targetSdkVersion 36
         versionCode 31
         versionName "5.1.2"
         multiDexEnabled true

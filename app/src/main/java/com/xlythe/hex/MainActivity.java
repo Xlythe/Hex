@@ -168,6 +168,10 @@ public class MainActivity extends NetActivity {
         swapFragment(mGameFragment);
     }
 
+    public void applyServerUndo() {
+        if (mGameFragment != null) mGameFragment.applyServerUndo();
+    }
+
     public static class Stat {
         private long timePlayed;
         private long gamesWon;

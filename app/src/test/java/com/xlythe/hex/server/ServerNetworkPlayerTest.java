@@ -19,6 +19,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class ServerNetworkPlayerTest {
     @Test
@@ -68,7 +70,7 @@ public class ServerNetworkPlayerTest {
     }
 
     @Test
-    public void doesNotAdvertiseCoreUndoThatWouldDesynchronizeBoards() {
+    public void advertisesUndoWithoutSendingDuringCapabilityChecks() {
         QueueTransport transport = new QueueTransport();
         IgGameCenterClient client = new IgGameCenterClient(transport, "device");
         ServerNetworkPlayer remote = player(client, 2, Runnable::run);
@@ -77,7 +79,36 @@ public class ServerNetworkPlayerTest {
                 new PlayerObject(1),
                 remote);
 
-        assertFalse(remote.supportsUndo(game));
+        assertTrue(remote.supportsUndo(game));
+        assertTrue(transport.requests.isEmpty());
+        remote.quit();
+    }
+
+    @Test
+    public void sendsLegacyUndoIndexAndWaitsForServerCompletion() throws Exception {
+        QueueTransport transport = new QueueTransport();
+        transport.responses.add(handler(
+                "<event eid=\"2\" uid=\"7\" type=\"UNDODONE\" data=\"4\"/>"));
+        RecordingListener listener = new RecordingListener();
+        IgGameCenterClient client = new IgGameCenterClient(transport, "device");
+        ServerNetworkPlayer remote = new ServerNetworkPlayer(
+                2,
+                client,
+                new UserSession("7", "Alice", "token"),
+                new BoardRef("42", "gc1"),
+                "9",
+                11,
+                1,
+                listener,
+                Runnable::run);
+
+        remote.requestUndo(4);
+
+        assertTrue(listener.undoCompleted.await(1, TimeUnit.SECONDS));
+        assertEquals("UNDO", transport.requests.get(0).get("cmd"));
+        assertEquals("ASK", transport.requests.get(0).get("type"));
+        assertEquals("4", transport.requests.get(0).get("move_ind"));
+        assertEquals(4, listener.completedMoveIndex);
         remote.quit();
     }
 
@@ -112,10 +143,22 @@ public class ServerNetworkPlayerTest {
         }
     }
 
-    private static final class NoOpListener implements ServerNetworkPlayer.Listener {
+    private static class NoOpListener implements ServerNetworkPlayer.Listener {
         @Override public void onNetworkError(String message) {}
         @Override public void onRestartCreated(BoardRef board) {}
         @Override public void onRestartOffered(BoardRef board) {}
-        @Override public void onUndoUnavailable() {}
+        @Override public void onUndoRequested(int moveIndex) {}
+        @Override public void onUndoCompleted(int moveIndex) {}
+    }
+
+    private static final class RecordingListener extends NoOpListener {
+        final CountDownLatch undoCompleted = new CountDownLatch(1);
+        int completedMoveIndex = -1;
+
+        @Override
+        public void onUndoCompleted(int moveIndex) {
+            completedMoveIndex = moveIndex;
+            undoCompleted.countDown();
+        }
     }
 }

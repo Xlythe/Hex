@@ -457,7 +457,17 @@ public class GameFragment extends HexFragment {
     }
 
     protected void undo() {
+        if (isNetGame() && getNetPlayer() instanceof ServerNetworkPlayer) {
+            ((ServerNetworkPlayer) getNetPlayer()).requestUndo(game.getMoveNumber() - 1);
+            return;
+        }
         GameAction.undo(GameAction.LOCAL_GAME, game);
+    }
+
+    public void applyServerUndo() {
+        if (game != null && game.getMoveList().size() > 0) {
+            GameAction.undo(GameAction.LOCAL_GAME, game);
+        }
     }
 
     protected void newGame() {

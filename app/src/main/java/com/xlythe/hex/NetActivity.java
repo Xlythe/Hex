@@ -53,6 +53,7 @@ public abstract class NetActivity extends BaseGameActivity {
     private BoardRef waitingBoard;
     private UserSession waitingUser;
     private long waitingEventId;
+    private ServerNetworkPlayer activeServerPlayer;
     private boolean destroyed;
 
     public abstract void switchToGame(Game game);
@@ -258,6 +259,7 @@ public abstract class NetActivity extends BaseGameActivity {
                 response.latestEventId(waitingEventId),
                 serverPlayerListener(user),
                 serverExecutor);
+        activeServerPlayer = remotePlayer;
 
         localPlayer.setName(local.name);
         remotePlayer.setName(remote.name);
@@ -312,9 +314,31 @@ public abstract class NetActivity extends BaseGameActivity {
             }
 
             @Override
-            public void onUndoUnavailable() {
-                mainHandler.post(() -> toast(
-                        "This Android game engine cannot safely apply asynchronous undo."));
+            public void onUndoRequested(int moveIndex) {
+                mainHandler.post(() -> new AlertDialog.Builder(NetActivity.this)
+                        .setTitle("Undo Request")
+                        .setMessage("Your opponent would like to undo the last move.")
+                        .setPositiveButton("Accept", (dialog, which) -> {
+                            if (activeServerPlayer != null) {
+                                activeServerPlayer.respondToUndo(true);
+                            }
+                        })
+                        .setNegativeButton("Decline", (dialog, which) -> {
+                            if (activeServerPlayer != null) {
+                                activeServerPlayer.respondToUndo(false);
+                            }
+                        })
+                        .setCancelable(false)
+                        .show());
+            }
+
+            @Override
+            public void onUndoCompleted(int moveIndex) {
+                mainHandler.post(() -> {
+                    if (NetActivity.this instanceof MainActivity) {
+                        ((MainActivity) NetActivity.this).applyServerUndo();
+                    }
+                });
             }
         };
     }

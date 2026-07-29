@@ -17,6 +17,7 @@ import com.xlythe.hex.server.IgGameCenterModels.UserSession;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.concurrent.Executor;
@@ -57,6 +58,7 @@ public final class ServerNetworkPlayer implements PlayingEntity {
     private volatile int color;
     private volatile int sentMoveCount;
     private volatile Point openingMove;
+    private volatile Game activeGame;
     private volatile ScheduledFuture<?> refreshFuture;
     private boolean errorReported;
 
@@ -119,6 +121,7 @@ public final class ServerNetworkPlayer implements PlayingEntity {
     @Override
     public void getPlayerTurn(Game game) {
         if (game.replayRunning || closed.get()) return;
+        activeGame = game;
 
         submitLatestLocalMove(game);
         while (!closed.get()) {
@@ -221,7 +224,16 @@ public final class ServerNetworkPlayer implements PlayingEntity {
                     && !event.data.trim().isEmpty()) {
                 listener.onRestartOffered(new BoardRef(event.data.trim(), board.server));
             } else if ("UNDOASK".equals(event.type) && !user.uid.equals(event.uid)) {
-                listener.onUndoUnavailable();
+                listener.onUndoRequested(parseMoveIndex(event.data));
+            } else if ("UNDODONE".equals(event.type)) {
+                Game current = activeGame;
+                if (current != null && current.getMoveList().size() > 0) {
+                    Move undone = current.getMoveList().getMove();
+                    if (undone != null && undone.getTeam() != team) {
+                        sentMoveCount = Math.max(0, sentMoveCount - 1);
+                    }
+                }
+                listener.onUndoCompleted(parseMoveIndex(event.data));
             }
         }
 
@@ -253,6 +265,28 @@ public final class ServerNetworkPlayer implements PlayingEntity {
                 listener.onNetworkError(safeMessage(e));
             }
         });
+    }
+
+    public void requestUndo(int moveIndex) {
+        if (moveIndex < 0) return;
+        LinkedHashMap<String, String> parameters = new LinkedHashMap<>();
+        parameters.put("type", "ASK");
+        parameters.put("move_ind", Integer.toString(moveIndex));
+        executeGameplayRequest(() -> process(
+                client.handle(board, user, lastEventId, "UNDO", parameters),
+                activeGame));
+    }
+
+    public void respondToUndo(boolean accept) {
+        executeGameplayRequest(() -> process(
+                client.command(
+                        board,
+                        user,
+                        lastEventId,
+                        "UNDO",
+                        "type",
+                        accept ? "ACCEPT" : "DENY"),
+                activeGame));
     }
 
     @Override
@@ -319,14 +353,10 @@ public final class ServerNetworkPlayer implements PlayingEntity {
         return true;
     }
 
-    /**
-     * The bundled core applies undo before an asynchronous server decision.
-     * Advertising it would desynchronize the two boards, so Android declines
-     * requests while the web client (whose state model supports it) handles them.
-     */
     @Override
     public boolean supportsUndo(Game game) {
-        return false;
+        activeGame = game;
+        return !closed.get();
     }
 
     @Override
@@ -403,6 +433,14 @@ public final class ServerNetworkPlayer implements PlayingEntity {
                 : message;
     }
 
+    private static int parseMoveIndex(String value) {
+        try {
+            return value == null ? -1 : Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
     /**
      * MoveList.getPastMove() is broken in the bundled 2012 core. Reflection is
      * isolated here as a resume-game fallback; normal live games track their
@@ -432,6 +470,7 @@ public final class ServerNetworkPlayer implements PlayingEntity {
         void onNetworkError(String message);
         void onRestartCreated(BoardRef board);
         void onRestartOffered(BoardRef board);
-        void onUndoUnavailable();
+        void onUndoRequested(int moveIndex);
+        void onUndoCompleted(int moveIndex);
     }
 }

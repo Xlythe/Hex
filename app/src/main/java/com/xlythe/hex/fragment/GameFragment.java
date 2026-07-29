@@ -12,8 +12,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.google.gson.JsonSyntaxException;
-import com.hex.ai.AiTypes;
-import com.hex.ai.GameAI;
 import com.hex.core.Game.GameListener;
 import com.hex.core.GameAction;
 import com.hex.core.Player;
@@ -27,6 +25,7 @@ import com.xlythe.hex.R;
 import com.xlythe.hex.Settings;
 import com.xlythe.hex.Stats;
 import com.xlythe.hex.compat.Game;
+import com.xlythe.hex.compat.AndroidBotFactory;
 import com.xlythe.hex.server.ServerNetworkPlayer;
 import com.xlythe.hex.compat.GameOptions;
 import com.xlythe.hex.view.BoardView;
@@ -511,8 +510,7 @@ public class GameFragment extends HexFragment {
         switch (p) {
             case AI:
                 int difficulty = Settings.getComputerDifficulty(getMainActivity());
-                if (difficulty == 0) return new GameAI(team);
-                return AiTypes.newAI(AiTypes.BeeAI, team, gridSize, difficulty + 1);
+                return AndroidBotFactory.create(difficulty, team, gridSize);
             case Human:
                 return new PlayerObject(team);
             default:

@@ -16,7 +16,7 @@ public class Stats {
         return PreferenceManager.getDefaultSharedPreferences(context).getLong(KEY_TIME_PLAYED, 0);
     }
 
-    public static void incrementTimePlayed(Context context, long time) {
+    public static synchronized void incrementTimePlayed(Context context, long time) {
         time = Math.max(time, 0);
         PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(KEY_TIME_PLAYED, getTimePlayed(context) + time).apply();
     }
@@ -29,7 +29,7 @@ public class Stats {
         return PreferenceManager.getDefaultSharedPreferences(context).getLong(KEY_GAMES_PLAYED, 0);
     }
 
-    public static void incrementGamesPlayed(Context context) {
+    public static synchronized void incrementGamesPlayed(Context context) {
         PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(KEY_GAMES_PLAYED, getGamesPlayed(context) + 1).apply();
     }
 
@@ -41,7 +41,7 @@ public class Stats {
         return PreferenceManager.getDefaultSharedPreferences(context).getLong(KEY_GAMES_WON, 0);
     }
 
-    public static void incrementGamesWon(Context context) {
+    public static synchronized void incrementGamesWon(Context context) {
         PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(KEY_GAMES_WON, getGamesWon(context) + 1).apply();
     }
 
@@ -53,7 +53,7 @@ public class Stats {
         return PreferenceManager.getDefaultSharedPreferences(context).getInt(KEY_DONATION_AMOUNT, 0);
     }
 
-    public static void incrementDonationRank(Context context, int amount) {
+    public static synchronized void incrementDonationRank(Context context, int amount) {
         PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(KEY_DONATION_AMOUNT, getDonationRank(context) + amount).apply();
     }
 

@@ -22,6 +22,7 @@ import android.view.animation.AccelerateInterpolator;
 import com.hex.core.Point;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * @author Will Harmon
@@ -39,6 +40,8 @@ public class SelectorLayout extends View implements OnTouchListener {
     private Rect[] mOldRect;
     private Rect[] mOldMirrorRect;
     private Point[] mOldTextPos;
+    @Nullable
+    private ValueAnimator mSelectionAnimator;
 
     public SelectorLayout(Context context) {
         super(context);
@@ -72,6 +75,9 @@ public class SelectorLayout extends View implements OnTouchListener {
         mMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, dm);
         mRotation = 45f;
         setOnClickListener(v -> {
+            if (mSelectionAnimator != null) {
+                return;
+            }
             for (final Button b : mButtons) {
                 if (b.isSelected() || b.isPressed()) {
                     final float initialTextX = b.textX;
@@ -79,6 +85,8 @@ public class SelectorLayout extends View implements OnTouchListener {
                     final Rect initialMirrorButtonBounds = b.mirrorButtonDrawable.copyBounds();
 
                     ValueAnimator animator = ValueAnimator.ofInt(0, 3 * getHeight() / 2);
+                    mSelectionAnimator = animator;
+                    animator.setDuration(300);
                     animator.setInterpolator(new AccelerateInterpolator());
                     animator.addUpdateListener((valueAnimator) -> {
                         int value = (Integer) valueAnimator.getAnimatedValue();
@@ -87,24 +95,32 @@ public class SelectorLayout extends View implements OnTouchListener {
                         b.mirrorButtonDrawable.setBounds(initialMirrorButtonBounds.left, initialMirrorButtonBounds.top + value,
                                 initialMirrorButtonBounds.right, initialMirrorButtonBounds.bottom + value);
                         b.textX = initialTextX + value;
-                        invalidate();
+                        postInvalidateOnAnimation();
                     });
                     animator.addListener(new Animator.AnimatorListener() {
+                        private boolean canceled;
+
                         @Override
                         public void onAnimationStart(@NonNull Animator animator) {}
 
                         @Override
                         public void onAnimationEnd(@NonNull Animator animator) {
-                            b.performClick();
+                            if (!canceled) {
+                                b.performClick();
+                            }
+                            mSelectionAnimator = null;
                         }
 
                         @Override
-                        public void onAnimationCancel(@NonNull Animator animator) {}
+                        public void onAnimationCancel(@NonNull Animator animator) {
+                            canceled = true;
+                        }
 
                         @Override
                         public void onAnimationRepeat(@NonNull Animator animator) {}
                     });
                     animator.start();
+                    break;
                 }
             }
             invalidate();
@@ -126,6 +142,9 @@ public class SelectorLayout extends View implements OnTouchListener {
 
     @Override
     public View focusSearch(int direction) {
+        if (mFocusedButton < 0) {
+            return super.focusSearch(direction);
+        }
         mButtons[mFocusedButton].setSelected(false);
         switch (direction) {
             case View.FOCUS_RIGHT:
@@ -303,6 +322,10 @@ public class SelectorLayout extends View implements OnTouchListener {
     }
 
     public void reset() {
+        if (mSelectionAnimator != null) {
+            mSelectionAnimator.cancel();
+            mSelectionAnimator = null;
+        }
         if (mOldRect != null) {
             for (int i = 0; i < mButtons.length; i++) {
                 mButtons[i].buttonDrawable.setBounds(mOldRect[i]);
@@ -312,6 +335,15 @@ public class SelectorLayout extends View implements OnTouchListener {
             }
             invalidate();
         }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        if (mSelectionAnimator != null) {
+            mSelectionAnimator.cancel();
+            mSelectionAnimator = null;
+        }
+        super.onDetachedFromWindow();
     }
 
     private class Hexagon {

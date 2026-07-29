@@ -547,14 +547,19 @@ public class HexagonLayout extends View implements OnTouchListener {
         mAnimator.addUpdateListener(animator -> {
                 float value = (Float) animator.getAnimatedValue();
                 mRotation = initialRotation + value;
-                invalidate();
+                postInvalidateOnAnimation();
         });
         mAnimator.addListener(new Animator.AnimatorListener() {
+            private boolean canceled;
+
             @Override
             public void onAnimationStart(Animator animator) {}
 
             @Override
             public void onAnimationEnd(Animator animator) {
+                if (canceled) {
+                    return;
+                }
                 // We're done rotating. Snap to whatever side we landed on.
                 float offset = Math.abs(mRotation % 60);
                 if (offset > 30) {
@@ -572,12 +577,23 @@ public class HexagonLayout extends View implements OnTouchListener {
             }
 
             @Override
-            public void onAnimationCancel(Animator animator) {}
+            public void onAnimationCancel(Animator animator) {
+                canceled = true;
+            }
 
             @Override
             public void onAnimationRepeat(Animator animator) {}
         });
         mAnimator.start();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        if (mAnimator != null) {
+            mAnimator.cancel();
+            mAnimator = null;
+        }
+        super.onDetachedFromWindow();
     }
 
     private float cosineInverse(@NonNull Point a, @NonNull Point b, @NonNull Point c) {

@@ -1,5 +1,8 @@
 package com.xlythe.hex.view;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -15,6 +18,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.LinearInterpolator;
 
 import com.hex.core.Point;
 
@@ -36,11 +41,15 @@ public class HexDialogView extends View implements OnTouchListener {
 
     private HexDialog mDialog;
 
-    private int mAnimationTick;
     private float mOpeningAnimationScaleSize;
     private float mClosingAnimationScaleSize;
     private int mClosingButton;
-    private boolean mClosingButtonClicked;
+    @Nullable
+    private ValueAnimator mOpeningAnimator;
+    @Nullable
+    private ValueAnimator mClosingAnimator;
+    @Nullable
+    private ValueAnimator mRotationAnimator;
 
     public HexDialogView(Context context) {
         super(context);
@@ -78,7 +87,6 @@ public class HexDialogView extends View implements OnTouchListener {
         mButtonTextPaint.setColor(Color.WHITE);
         mButtonTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, dm));
         mBorderColor = Color.LTGRAY;
-        mAnimationTick = 40;
         mOpeningAnimationScaleSize = 0.5f;
         mClosingAnimationScaleSize = 1.0f;
         mClosingButton = -1;
@@ -86,8 +94,8 @@ public class HexDialogView extends View implements OnTouchListener {
             for (int i = 0; i < mButtons.length; i++) {
                 Button b = mButtons[i];
                 if (b.isSelected() || b.isPressed()) {
-                    mClosingButton = i;
-                    invalidate();
+                    startClosingAnimation(i);
+                    break;
                 }
             }
         });
@@ -107,6 +115,93 @@ public class HexDialogView extends View implements OnTouchListener {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        startAnimations();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        cancelAnimations();
+        super.onDetachedFromWindow();
+    }
+
+    private void startAnimations() {
+        cancelAnimations();
+        mOpeningAnimationScaleSize = 0.5f;
+        mClosingAnimationScaleSize = 1f;
+        mClosingButton = -1;
+
+        mOpeningAnimator = ValueAnimator.ofFloat(0.5f, 1f);
+        mOpeningAnimator.setDuration(300);
+        mOpeningAnimator.setInterpolator(new DecelerateInterpolator());
+        mOpeningAnimator.addUpdateListener(animator -> {
+            mOpeningAnimationScaleSize = (Float) animator.getAnimatedValue();
+            postInvalidateOnAnimation();
+        });
+        mOpeningAnimator.start();
+
+        mRotationAnimator = ValueAnimator.ofFloat(0f, 360f);
+        mRotationAnimator.setDuration(12_000);
+        mRotationAnimator.setInterpolator(new LinearInterpolator());
+        mRotationAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        mRotationAnimator.addUpdateListener(animator -> {
+            float angle = (Float) animator.getAnimatedValue();
+            mButtons[0].setRotation(-2f * angle);
+            mButtons[1].setRotation(4f * angle / 3f);
+            mButtons[2].setRotation(-2f * angle);
+            postInvalidateOnAnimation();
+        });
+        mRotationAnimator.start();
+    }
+
+    private void startClosingAnimation(int buttonIndex) {
+        if (mClosingAnimator != null) {
+            return;
+        }
+        mClosingButton = buttonIndex;
+        mClosingAnimator = ValueAnimator.ofFloat(1f, 0.85f);
+        mClosingAnimator.setDuration(180);
+        mClosingAnimator.setInterpolator(new DecelerateInterpolator());
+        mClosingAnimator.addUpdateListener(animator -> {
+            mClosingAnimationScaleSize = (Float) animator.getAnimatedValue();
+            postInvalidateOnAnimation();
+        });
+        mClosingAnimator.addListener(new AnimatorListenerAdapter() {
+            private boolean canceled;
+
+            @Override
+            public void onAnimationCancel(@NonNull Animator animation) {
+                canceled = true;
+            }
+
+            @Override
+            public void onAnimationEnd(@NonNull Animator animation) {
+                if (!canceled) {
+                    mButtons[buttonIndex].performClick();
+                }
+                mClosingAnimator = null;
+            }
+        });
+        mClosingAnimator.start();
+    }
+
+    private void cancelAnimations() {
+        if (mOpeningAnimator != null) {
+            mOpeningAnimator.cancel();
+            mOpeningAnimator = null;
+        }
+        if (mClosingAnimator != null) {
+            mClosingAnimator.cancel();
+            mClosingAnimator = null;
+        }
+        if (mRotationAnimator != null) {
+            mRotationAnimator.cancel();
+            mRotationAnimator = null;
+        }
     }
 
     @Override
@@ -169,19 +264,10 @@ public class HexDialogView extends View implements OnTouchListener {
 
             canvas.save();
             if (mOpeningAnimationScaleSize < 1) {
-                mOpeningAnimationScaleSize += 0.01f;
                 canvas.scale(mOpeningAnimationScaleSize, mOpeningAnimationScaleSize, b.getCenter().x, b.getCenter().y);
-                postInvalidateDelayed(mAnimationTick);
             }
             if (mClosingButton == i) {
                 canvas.scale(mClosingAnimationScaleSize, mClosingAnimationScaleSize, b.getCenter().x, b.getCenter().y);
-                if (mClosingAnimationScaleSize > 0.85f) {
-                    mClosingAnimationScaleSize -= 0.01f;
-                    postInvalidateDelayed(mAnimationTick);
-                } else if (!mClosingButtonClicked) {
-                    mClosingButtonClicked = true;
-                    b.performClick();
-                }
             }
 
             canvas.save();
@@ -208,11 +294,6 @@ public class HexDialogView extends View implements OnTouchListener {
 
             canvas.restore();
         }
-
-        mButtons[0].incrementRotation(-3f);
-        mButtons[1].incrementRotation(2f);
-        mButtons[2].incrementRotation(-3f);
-        postInvalidateDelayed(50);
     }
 
     @Override
@@ -526,10 +607,6 @@ public class HexDialogView extends View implements OnTouchListener {
 
         private void setRotation(float rotation) {
             this.rotation = rotation;
-        }
-
-        private void incrementRotation(float rotation) {
-            setRotation(this.rotation + rotation);
         }
 
         private ShapeDrawable getBackgroundDrawable() {

@@ -6,6 +6,7 @@ import app.cash.paparazzi.DeviceConfig;
 
 /** Device configurations shared by golden and responsive layout tests. */
 final class TestDeviceConfigs {
+    static final DeviceConfig COMPACT_LANDSCAPE = landscape(DeviceConfig.NEXUS_4);
     static final DeviceConfig PHONE_LANDSCAPE = landscape(DeviceConfig.PIXEL_5);
     static final DeviceConfig TABLET_LANDSCAPE = landscape(DeviceConfig.PIXEL_TABLET);
 

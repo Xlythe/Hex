@@ -1,11 +1,14 @@
 package com.xlythe.hex;
 
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.lang.reflect.Field;
 
 import app.cash.paparazzi.Paparazzi;
 import app.cash.paparazzi.EnvironmentKt;
@@ -20,9 +23,15 @@ import androidx.preference.PreferenceScreen;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.hex.core.PlayerObject;
+import com.hex.core.Timer;
+import com.xlythe.hex.compat.Game;
+import com.xlythe.hex.view.BoardView;
 import com.xlythe.hex.view.HexDialogView;
 import com.xlythe.hex.view.HexagonLayout;
 import com.xlythe.hex.view.SelectorLayout;
+
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * Golden-image coverage for every XML-backed screen in the application.
@@ -31,11 +40,17 @@ import com.xlythe.hex.view.SelectorLayout;
  * used by the real application. Programmatic dialogs are covered by their content
  * layouts; interaction behavior remains in the regular JVM tests.</p>
  */
-public final class ScreenshotTest {
+public class ScreenshotTest {
     @Rule
-    public final Paparazzi paparazzi = new Paparazzi(
-            EnvironmentKt.detectEnvironment(),
-            TestDeviceConfigs.PHONE_LANDSCAPE);
+    public final Paparazzi paparazzi;
+
+    public ScreenshotTest() {
+        this(TestDeviceConfigs.PHONE_LANDSCAPE);
+    }
+
+    protected ScreenshotTest(app.cash.paparazzi.DeviceConfig deviceConfig) {
+        paparazzi = new Paparazzi(EnvironmentKt.detectEnvironment(), deviceConfig);
+    }
 
     @Test
     public void mainMenu() {
@@ -60,6 +75,31 @@ public final class ScreenshotTest {
     }
 
     @Test
+    public void mainMenuCarouselRotatesWhenSwiped() throws ReflectiveOperationException {
+        View view = inflate(R.layout.fragment_main);
+        HexagonLayout menu = view.findViewById(R.id.hexagonButtons);
+        menu.setText(R.string.app_name);
+        for (int index = 0; index < menu.getButtons().length; index++) {
+            configure(menu.getButtons()[index], R.string.main_button_play,
+                    R.color.main_play, R.drawable.play);
+        }
+        snapshot(view, "carousel_before_swipe");
+
+        float originalRotation = rotationOf(menu);
+        long downTime = 1_000L;
+        dispatch(menu, downTime, downTime, MotionEvent.ACTION_DOWN,
+                menu.getWidth() * 0.75f, menu.getHeight() * 0.25f);
+        dispatch(menu, downTime, downTime + 16L, MotionEvent.ACTION_MOVE,
+                menu.getWidth() * 0.55f, menu.getHeight() * 0.08f);
+
+        assertNotEquals(
+                "The deliberately oversized menu must remain swipe-rotatable",
+                originalRotation,
+                rotationOf(menu),
+                0.01f);
+    }
+
+    @Test
     public void gameSelection() {
         View view = inflate(R.layout.fragment_game_selection);
         SelectorLayout selector = view.findViewById(R.id.buttons);
@@ -74,7 +114,10 @@ public final class ScreenshotTest {
 
     @Test
     public void instructions() {
-        snapshot(R.layout.fragment_instructions);
+        View view = inflate(R.layout.fragment_instructions);
+        ((TextView) view.findViewById(R.id.title))
+                .setText(R.string.main_button_instructions);
+        snapshot(view);
     }
 
     @Test
@@ -97,7 +140,25 @@ public final class ScreenshotTest {
 
     @Test
     public void gameBoard() {
-        snapshot(R.layout.fragment_game);
+        View view = inflate(R.layout.fragment_game);
+        BoardView board = view.findViewById(R.id.board);
+        PlayerObject player1 = new PlayerObject(1);
+        player1.setName("Player 1");
+        player1.setColor(ContextCompat.getColor(
+                paparazzi.getContext(), R.color.main_settings));
+        PlayerObject player2 = new PlayerObject(2);
+        player2.setName("Player 2");
+        player2.setColor(ContextCompat.getColor(
+                paparazzi.getContext(), R.color.main_play));
+        Game.GameOptions options = new Game.GameOptions();
+        options.gridSize = 11;
+        options.swap = true;
+        options.timer = new Timer(0, 0, Timer.NO_TIMER);
+        board.setTitleText("%s");
+        board.setActionText("Your turn");
+        board.setTimerText("Time left");
+        board.setGame(new Game(options, player1, player2));
+        snapshot(view);
     }
 
     @Test
@@ -126,6 +187,8 @@ public final class ScreenshotTest {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
         snapshot(view);
+        list.scrollToPosition(list.getAdapter().getItemCount() - 1);
+        snapshot(view, "bottom");
     }
 
     @Test
@@ -172,6 +235,33 @@ public final class ScreenshotTest {
 
     private void snapshot(View view) {
         paparazzi.snapshot(view);
+    }
+
+    private void snapshot(View view, String name) {
+        paparazzi.snapshot(view, name);
+    }
+
+    private void dispatch(
+            View view,
+            long downTime,
+            long eventTime,
+            int action,
+            float x,
+            float y) {
+        MotionEvent event = MotionEvent.obtain(
+                downTime, eventTime, action, x, y, 0);
+        try {
+            view.dispatchTouchEvent(event);
+        } finally {
+            event.recycle();
+        }
+    }
+
+    private float rotationOf(HexagonLayout menu)
+            throws ReflectiveOperationException {
+        Field rotation = HexagonLayout.class.getDeclaredField("mRotation");
+        rotation.setAccessible(true);
+        return rotation.getFloat(menu);
     }
 
     private void configure(

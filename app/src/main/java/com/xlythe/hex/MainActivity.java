@@ -1,7 +1,5 @@
 package com.xlythe.hex;
 
-import android.Manifest;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -19,19 +17,11 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import static com.xlythe.hex.Settings.TAG;
-import static com.xlythe.hex.PermissionUtils.hasPermissions;
 
 /**
  * @author Will Harmon
  **/
 public class MainActivity extends NetActivity {
-    private static final String[] REQUIRED_PERMISSIONS = new String[] {
-            Manifest.permission.INTERNET,
-            Manifest.permission.ACCESS_NETWORK_STATE
-    };
-
-    private static final int REQUEST_CODE_REQUIRED_PERMISSIONS = 3;
-
     // Play variables
     private boolean mOpenAchievements = false;
     private boolean mOpenOnlineSelectionFragment = false;
@@ -60,20 +50,6 @@ public class MainActivity extends NetActivity {
         } else {
             Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.content);
             invalidateFragmentState(fragment);
-        }
-
-        if (!hasPermissions(this, REQUIRED_PERMISSIONS)) {
-            requestPermissions(REQUIRED_PERMISSIONS, REQUEST_CODE_REQUIRED_PERMISSIONS);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CODE_REQUIRED_PERMISSIONS) {
-            if (!hasPermissions(this, REQUIRED_PERMISSIONS)) {
-                finish();
-            }
         }
     }
 

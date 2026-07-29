@@ -70,6 +70,7 @@ public class MainActivity extends NetActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CODE_REQUIRED_PERMISSIONS) {
             if (!hasPermissions(this, REQUIRED_PERMISSIONS)) {
                 finish();

@@ -2,6 +2,8 @@ package com.xlythe.hex.server;
 
 import com.xlythe.hex.server.IgGameCenterModels.UserSession;
 
+import java.util.Locale;
+
 /** Password-equivalent login digest and its last valid server session. */
 public final class ServerCredentials {
     public final String username;
@@ -18,7 +20,7 @@ public final class ServerCredentials {
         }
         if (session == null) throw new NullPointerException("session");
         this.username = username;
-        this.passwordDigest = passwordDigest.toLowerCase();
+        this.passwordDigest = passwordDigest.toLowerCase(Locale.ROOT);
         this.session = session;
     }
 }

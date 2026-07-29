@@ -41,8 +41,8 @@
 
     <!-- Online selection page -->
     <string name="online_selection_button_quick">snel spel</string>
-    <string name="online_selection_button_invite">vrienden uitnodigen</string>
-    <string name="online_selection_button_pending">openstaande uitnodigingen</string>
+    <string name="online_selection_button_invite">spel maken</string>
+    <string name="online_selection_button_pending">spellen bekijken</string>
 
     <!-- Preferences -->
     <string name="preferences_title_game_size">Speelbord grootte</string>

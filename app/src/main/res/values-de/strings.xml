@@ -37,8 +37,8 @@
     <string name="game_selection_button_net">Online</string>
     <!-- Online selection page -->
     <string name="online_selection_button_quick">Schnelles Spiel</string>
-    <string name="online_selection_button_invite">Freunde einladen</string>
-    <string name="online_selection_button_pending">Ausstehende Einladungen</string>
+    <string name="online_selection_button_invite">Spiel erstellen</string>
+    <string name="online_selection_button_pending">Spiele durchsuchen</string>
     <!-- Preferences -->
     <string name="preferences_title_game_size">Feldgröße</string>
     <string name="preferences_summary_game_size" formatted="false">Eine Spielfeldgröße wählen (Aktuell: %sx%s)</string>

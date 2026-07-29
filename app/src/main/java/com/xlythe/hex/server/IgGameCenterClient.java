@@ -10,6 +10,7 @@ import com.xlythe.hex.server.IgGameCenterModels.UserSession;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /** Typed client for the POST/XML igGameCenter API used by the original Android app. */
@@ -100,7 +101,7 @@ public final class IgGameCenterClient {
         parameters.put("sid", board.sid);
         parameters.put("lasteid", Long.toString(Math.max(0, lastEventId)));
         if (command != null && !command.trim().isEmpty()) {
-            parameters.put("cmd", command.toUpperCase());
+            parameters.put("cmd", command.toUpperCase(Locale.ROOT));
         }
         if (commandParameters != null) parameters.putAll(commandParameters);
         return IgGameCenterXml.parseHandler(transport.post(

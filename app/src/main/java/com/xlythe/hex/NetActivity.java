@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.provider.Settings.Secure;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -438,8 +437,6 @@ public abstract class NetActivity extends BaseGameActivity {
     }
 
     private String getStableNetworkUid() {
-        String androidId = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
-        if (androidId != null && !androidId.trim().isEmpty()) return androidId;
         android.content.SharedPreferences prefs =
                 getSharedPreferences("iggamecenter_device", MODE_PRIVATE);
         String generated = prefs.getString("network_uid", null);

@@ -76,7 +76,7 @@ public final class ServerCredentialStore {
     }
 
     public void clear() {
-        preferences.edit().clear().commit();
+        preferences.edit().clear().apply();
     }
 
     private static SecretKey getOrCreateKey() throws GeneralSecurityException {

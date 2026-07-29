@@ -10,7 +10,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.games.AchievementsClient;
 import com.google.android.gms.games.GamesClient;
 import com.google.android.gms.games.PlayersClient;
-import com.google.android.gms.games.TurnBasedMultiplayerClient;
 import com.xlythe.hex.compat.Game;
 import com.xlythe.hex.MainActivity;
 
@@ -82,10 +81,6 @@ public class HexFragment extends Fragment {
 
     protected GamesClient getGamesClient() {
         return getMainActivity().getGamesClient();
-    }
-
-    protected TurnBasedMultiplayerClient getTurnBasedMultiplayerClient() {
-        return getMainActivity().getTurnBasedMultiplayerClient();
     }
 
     protected PlayersClient getPlayersClient() {

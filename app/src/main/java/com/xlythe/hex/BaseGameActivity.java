@@ -11,10 +11,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.games.AchievementsClient;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesClient;
-import com.google.android.gms.games.GamesCompat;
-import com.google.android.gms.games.InvitationsClient;
 import com.google.android.gms.games.PlayersClient;
-import com.google.android.gms.games.TurnBasedMultiplayerClient;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,10 +28,8 @@ public abstract class BaseGameActivity extends AppCompatActivity {
     private GoogleSignInAccount mGoogleSignInAccount;
 
     private GamesClient mGamesClient;
-    private TurnBasedMultiplayerClient mTurnBasedMultiplayerClient;
     private PlayersClient mPlayersClient;
     private AchievementsClient mAchievementsClient;
-    private InvitationsClient mInvitationsClient;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -67,20 +62,12 @@ public abstract class BaseGameActivity extends AppCompatActivity {
         return mGamesClient;
     }
 
-    public TurnBasedMultiplayerClient getTurnBasedMultiplayerClient() {
-        return mTurnBasedMultiplayerClient;
-    }
-
     public PlayersClient getPlayersClient() {
         return mPlayersClient;
     }
 
     public AchievementsClient getAchievementsClient() {
         return mAchievementsClient;
-    }
-
-    public InvitationsClient getInvitationsClient() {
-        return mInvitationsClient;
     }
 
     public boolean isSignedIn() {
@@ -106,10 +93,8 @@ public abstract class BaseGameActivity extends AppCompatActivity {
         Log.d(TAG, "User successfully signed in: " + googleSignInAccount.getDisplayName());
         mGoogleSignInAccount = googleSignInAccount;
         mGamesClient = Games.getGamesClient(this, googleSignInAccount);
-        mTurnBasedMultiplayerClient = GamesCompat.getTurnBasedMultiplayerClient(this, googleSignInAccount);
         mPlayersClient = Games.getPlayersClient(this, googleSignInAccount);
         mAchievementsClient = Games.getAchievementsClient(this, googleSignInAccount);
-        mInvitationsClient = GamesCompat.getInvitationsClient(this, googleSignInAccount);
     }
 
     public void onSignInFailed() {

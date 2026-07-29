@@ -87,6 +87,26 @@ public final class AndroidBotContractTest {
                 new int[][] {{0, 3}, {3, 2}, {3, 1}, {2, 4}});
     }
 
+    @Test
+    public void easyBotExposesItsDeterministicLegacyBranches() throws Exception {
+        PlayerObject human = new PlayerObject(1);
+        GameAI bot = (GameAI) AndroidBotFactory.create(
+                AndroidBotFactory.EASY, 2, BOARD_SIZE);
+        setInt(bot, "rand_a", 1);
+        setInt(bot, "rand_b", 0);
+        Game game = game(human, bot);
+
+        assertTrue(GameAction.makeMove(human, new Point(2, 2), game));
+        bot.getPlayerTurn(game);
+        assertEquals(3, game.getMoveList().getMove().getX());
+        assertEquals(2, game.getMoveList().getMove().getY());
+
+        assertTrue(GameAction.makeMove(human, new Point(4, 4), game));
+        bot.getPlayerTurn(game);
+        assertEquals(3, game.getMoveList().getMove().getX());
+        assertEquals(1, game.getMoveList().getMove().getY());
+    }
+
     private static void assertSearchParameters(
             int difficulty,
             int expectedDepth,
@@ -100,6 +120,12 @@ public final class AndroidBotContractTest {
         Field field = BeeGameAI.class.getDeclaredField(fieldName);
         field.setAccessible(true);
         return field.getInt(bot);
+    }
+
+    private static void setInt(GameAI bot, String fieldName, int value) throws Exception {
+        Field field = GameAI.class.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.setInt(bot, value);
     }
 
     private static Move openingMove(int difficulty) {

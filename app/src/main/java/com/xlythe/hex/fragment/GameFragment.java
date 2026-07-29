@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +32,7 @@ import com.xlythe.hex.compat.GameOptions;
 import com.xlythe.hex.view.BoardView;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -148,11 +150,13 @@ public class GameFragment extends HexFragment {
             if (keys) {
                 // We have additional information about the player's state
                 int gridSize = Settings.getGridSize(getMainActivity());
-                player1Type = (Player) savedInstanceState.getSerializable(PLAYER1_TYPE);
-                player2Type = (Player) savedInstanceState.getSerializable(PLAYER2_TYPE);
+                player1Type = getSerializable(savedInstanceState, PLAYER1_TYPE, Player.class);
+                player2Type = getSerializable(savedInstanceState, PLAYER2_TYPE, Player.class);
                 game = Game.load(gameState, createPlayer(1, gridSize), createPlayer(2, gridSize));
-                game.getPlayer1().setSaveState(savedInstanceState.getSerializable(PLAYER1));
-                game.getPlayer2().setSaveState(savedInstanceState.getSerializable(PLAYER2));
+                game.getPlayer1().setSaveState(
+                        getSerializable(savedInstanceState, PLAYER1, Serializable.class));
+                game.getPlayer2().setSaveState(
+                        getSerializable(savedInstanceState, PLAYER2, Serializable.class));
             } else {
                 // Load a game with 2 humans
                 game = Game.load(gameState);
@@ -241,6 +245,27 @@ public class GameFragment extends HexFragment {
         undo.setVisibility(supportsUndo() ? View.VISIBLE : View.GONE);
 
         return view;
+    }
+
+    @Nullable
+    private static <T extends Serializable> T getSerializable(
+            Bundle bundle,
+            String key,
+            Class<T> type) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return bundle.getSerializable(key, type);
+        }
+        return getLegacySerializable(bundle, key, type);
+    }
+
+    @Nullable
+    @SuppressWarnings("deprecation")
+    private static <T extends Serializable> T getLegacySerializable(
+            Bundle bundle,
+            String key,
+            Class<T> type) {
+        Serializable value = bundle.getSerializable(key);
+        return type.isInstance(value) ? type.cast(value) : null;
     }
 
     private void updateChatButton() {

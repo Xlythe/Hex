@@ -10,6 +10,7 @@ import com.xlythe.hex.view.SelectorLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 /**
  * @author Will Harmon
@@ -25,17 +26,17 @@ public class OnlineSelectionFragment extends HexFragment {
         mSelectorLayout = v.findViewById(R.id.buttons);
 
         SelectorLayout.Button quickGameButton = mSelectorLayout.getButtons()[0];
-        quickGameButton.setColor(getResources().getColor(R.color.select_quick_game));
+        quickGameButton.setColor(ContextCompat.getColor(requireContext(), R.color.select_quick_game));
         quickGameButton.setText(R.string.online_selection_button_quick);
         quickGameButton.setOnClickListener(this::startQuickGame);
 
         SelectorLayout.Button inviteButton = mSelectorLayout.getButtons()[1];
-        inviteButton.setColor(getResources().getColor(R.color.select_friends));
+        inviteButton.setColor(ContextCompat.getColor(requireContext(), R.color.select_friends));
         inviteButton.setText(R.string.online_selection_button_invite);
         inviteButton.setOnClickListener(this::inviteFriends);
 
         SelectorLayout.Button pendingButton = mSelectorLayout.getButtons()[2];
-        pendingButton.setColor(getResources().getColor(R.color.select_pending_invites));
+        pendingButton.setColor(ContextCompat.getColor(requireContext(), R.color.select_pending_invites));
         pendingButton.setText(R.string.online_selection_button_pending);
         pendingButton.setOnClickListener(this::checkInvites);
 

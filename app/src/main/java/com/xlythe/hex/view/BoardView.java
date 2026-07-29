@@ -138,12 +138,14 @@ public class BoardView extends View {
                     return this;
                 }
                 break;
-            case View.FOCUS_FORWARD:
-                break;
-            case View.FOCUS_BACKWARD:
-                break;
         }
         return super.focusSearch(direction);
+    }
+
+    @Override
+    public boolean performClick() {
+        super.performClick();
+        return true;
     }
 
     @UiThread

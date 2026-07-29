@@ -42,7 +42,7 @@ public final class GameChatDialogFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        View content = LayoutInflater.from(requireContext())
+        View content = getLayoutInflater()
                 .inflate(R.layout.dialog_game_chat, null, false);
         messageList = content.findViewById(R.id.chat_messages);
         messageInput = content.findViewById(R.id.chat_input);

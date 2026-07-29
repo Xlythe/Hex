@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+    <!-- Legacy bitmap art intentionally relies on Android density scaling. -->
+    <issue id="IconDensities" severity="ignore" />
+    <issue id="IconMissingDensityFolder" severity="ignore" />
+
+    <!-- 3.1.3 requires API 37; this app deliberately remains on stable API 36. -->
+    <issue id="NewerVersionAvailable">
+        <ignore regexp="com\.xlythe:play-billing" />
+    </issue>
+</lint>

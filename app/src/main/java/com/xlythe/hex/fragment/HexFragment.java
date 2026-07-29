@@ -52,8 +52,8 @@ public class HexFragment extends Fragment {
         activity.keepScreenOn(screenOn);
     }
 
-    protected void overridePendingTransition(@AnimRes int enterAnim, @AnimRes int exitAnim) {
-        getMainActivity().overridePendingTransition(enterAnim, exitAnim);
+    protected void applyOpenTransition(@AnimRes int enterAnim, @AnimRes int exitAnim) {
+        getMainActivity().applyOpenTransition(enterAnim, exitAnim);
     }
 
     protected void runOnUiThread(Runnable r) {

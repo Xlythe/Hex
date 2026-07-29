@@ -3,17 +3,6 @@
     <!-- Please note, %s represents a variable. For example, %s wins will write out Alex wins (or whatever their name is) -->
     <!-- Application name and constants -->
     <string name="app_name">Hex</string>
-    <string name="app_id">307536683764</string>
-    <string name="achievement_30_seconds">CgkI9MX11PkIEAIQCg</string>
-    <string name="achievement_10_seconds">CgkI9MX11PkIEAIQEw</string>
-    <string name="achievement_fill_the_board">CgkI9MX11PkIEAIQCw</string>
-    <string name="achievement_monitor_smasher">CgkI9MX11PkIEAIQFQ</string>
-    <string name="achievement_speed_demon">CgkI9MX11PkIEAIQFg</string>
-    <string name="achievement_novice">CgkI9MX11PkIEAIQDA</string>
-    <string name="achievement_intermediate">CgkI9MX11PkIEAIQDQ</string>
-    <string name="achievement_expert">CgkI9MX11PkIEAIQDg</string>
-    <string name="achievement_insane">CgkI9MX11PkIEAIQFA</string>
-    <string name="achievement_net">CgkI9MX11PkIEAIQGQ</string>
     
     <!-- Page titles -->
     <string name="activity_title_instructions">Anleitung</string>
@@ -53,30 +42,18 @@
     <!-- Menu choices -->
     <string name="game_undo">Rückgängig</string>
     <string name="game_reload">Neustarten</string>
-    <string name="game_replay">Wiedergeben</string>
-    <string name="game_save_replay">Speichern</string>
-    <string name="game_settings">Einstellungen</string>
     <string name="game_quit">Verlassen</string>
     <!-- In game notifications -->
     <string name="game_turn_title">%s\s</string>
     <string name="game_turn_msg">ZUG</string>
     <string name="game_timer_msg">Zeit verbleibend</string>
-    <string name="game_toast_saved">Gespeichert!</string>
     <string name="game_toast_failed">Fehlgeschlagen</string>
-    <string name="game_button_claim_victory">Sieg beanspruchen</string>
     <string name="auto_saved_file_name" formatted="false">%s %s vs %s</string>
     <string name="auto_saved_title" formatted="false">%s vs %s</string>
-    <string name="game_over_you">Sie</string>
     <string name="game_over_action">%s!</string>
     <string name="game_over_won">Gewonnen</string>
     <string name="game_over_lose">Verloren</string>
-    <string name="game_over_time">Zeit</string>
     <string name="game_over_length" formatted="false">%02d:%02d:%02d</string>
-    <string name="net_challeneger_approaches" formatted="false">%s fordert dich heraus.</string>
-    <string name="net_challeneger_requests_new_game" formatted="false">%s bietet ein neues Spiel an.</string>
-    <string name="net_challeneger_requests_undo" formatted="false">%s bittet darum, Zug %d rückgängig zu machen.</string>
-    <string name="net_accept">Akzeptieren</string>
-    <string name="net_decline">Ablehnen</string>
     <!-- Game instructions -->
     <string name="instructions">Hex wird von zwei Spielern gespielt, die rundenweise Felder auf dem Spielfeld besetzen. Die Spieler haben unterschiedliche Farben, und zwar rot und blau. Die vier Kanten des Spielfelds besitzen ebenfalls diese Farben, und zwar so, dass jeweils die gegenüberliegenden Kanten die gleiche Farbe haben. Ein Spieler gewinnt, falls er einen durchgängigen Weg zwischen den beiden Kanten seiner Farbe erzeugen kann.\n\n
         (Nach <a href="http://www.hexwiki.org/index.php?title=Rules">hexwiki.org</a>)</string>
@@ -86,18 +63,8 @@
     <!-- Dialog Options -->
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
-    <string name="enter">Enter</string>
     <string name="okay">OK</string>
     <string name="cancel">Abbrechen</string>
-    <string name="submit">Absenden</string>
-    <string name="rename">Umbenennen</string>
-    <string name="delete">Löschen</string>
-    <string name="enterFilename">Einen Dateinamen eingeben</string>
-    <!-- Review -->
-    <string name="review_popup_title">Wie die App?</string>
-    <string name="review_popup_message">Hex im Play Store bewerten</string>
-    <string name="review_popup_never">Nein, danke</string>
-    <string name="review_popup_ok">Sicher</string>
     <!-- Donate -->
     <string name="donate_bronze">Bronze</string>
     <string name="donate_bronze_price">$0,99</string>
@@ -105,6 +72,18 @@
     <string name="donate_silver_price">$2,99</string>
     <string name="donate_gold">Gold</string>
     <string name="donate_gold_price">$4,99</string>
-    <!--  Error  Dialogues-->
-    <string name="error_version">Fehler der Spielversion. Einer der Spieler hat eine veraltete Spielversion. Das Spiel wurde abgebrochen!</string>
+    <string name="game_chat_button">Chat</string>
+    <string name="game_chat_unread">Chat (%1$d)</string>
+    <string name="game_chat_title">Spielchat</string>
+    <string name="game_chat_empty">Noch keine Nachrichten. Begrüße deinen Gegner oder wünsche viel Glück.</string>
+    <string name="game_chat_hint">Nachricht an den Gegner</string>
+    <string name="game_chat_send">Senden</string>
+    <string name="game_chat_you">Du</string>
+    <string name="game_chat_sending">%1$s · Wird gesendet…</string>
+    <string name="game_chat_failed">%1$s · Nicht gesendet</string>
+    <string name="game_over_duration">Zeit: %1$s</string>
+    <string name="game_over_play_again">Noch einmal</string>
+    <string name="game_over_home">Startseite</string>
+    <string name="privacy_policy"><a href="https://xlythe.com/privacy.html">Datenschutzerklärung</a></string>
+    <string name="preferences_summary_custom_timer">Zeit in Minuten</string>
 </resources>

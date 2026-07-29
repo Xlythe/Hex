@@ -1,7 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/background" >
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/title"
@@ -13,7 +12,8 @@
         android:layout_height="wrap_content"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        android:paddingLeft="40dp"
+        android:paddingStart="40dp"
+        android:paddingEnd="40dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp" />
 
@@ -21,7 +21,8 @@
         android:layout_below="@id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="10dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         android:orientation="vertical" >
 
         <TextView
@@ -69,7 +70,7 @@
 
     <com.xlythe.hex.view.HexagonLayout
         android:id="@+id/hexagonButtons"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_width="wrap_content"
         android:layout_height="match_parent" />
 

@@ -158,10 +158,6 @@ public class HexDialogView extends View implements OnTouchListener {
                 break;
             case View.FOCUS_DOWN:
                 break;
-            case View.FOCUS_FORWARD:
-                break;
-            case View.FOCUS_BACKWARD:
-                break;
         }
         return super.focusSearch(direction);
     }

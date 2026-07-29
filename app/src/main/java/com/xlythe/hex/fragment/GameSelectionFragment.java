@@ -10,6 +10,7 @@ import com.xlythe.hex.R;
 import com.xlythe.hex.view.SelectorLayout;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 /**
  * @author Will Harmon
@@ -25,7 +26,7 @@ public class GameSelectionFragment extends HexFragment {
         mSelectorLayout = v.findViewById(R.id.buttons);
 
         SelectorLayout.Button computerButton = mSelectorLayout.getButtons()[0];
-        computerButton.setColor(getResources().getColor(R.color.select_computer));
+        computerButton.setColor(ContextCompat.getColor(requireContext(), R.color.select_computer));
         computerButton.setText(R.string.game_selection_button_computer);
         computerButton.setOnClickListener(() -> {
             GameFragment gameFragment = new GameFragment();
@@ -40,7 +41,7 @@ public class GameSelectionFragment extends HexFragment {
         });
 
         SelectorLayout.Button hotseatButton = mSelectorLayout.getButtons()[1];
-        hotseatButton.setColor(getResources().getColor(R.color.select_pass_to_play));
+        hotseatButton.setColor(ContextCompat.getColor(requireContext(), R.color.select_pass_to_play));
         hotseatButton.setText(R.string.game_selection_button_pass);
         hotseatButton.setOnClickListener(() -> {
             GameFragment gameFragment = new GameFragment();
@@ -50,7 +51,7 @@ public class GameSelectionFragment extends HexFragment {
         });
 
         SelectorLayout.Button netButton = mSelectorLayout.getButtons()[2];
-        netButton.setColor(getResources().getColor(R.color.select_online));
+        netButton.setColor(ContextCompat.getColor(requireContext(), R.color.select_online));
         netButton.setText(R.string.game_selection_button_net);
         netButton.setOnClickListener(() -> swapFragment(new OnlineSelectionFragment()));
 

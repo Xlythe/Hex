@@ -20,6 +20,7 @@ import com.xlythe.hex.view.HexagonLayout;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 /**
  * @author Will Harmon
@@ -73,30 +74,30 @@ public class MainFragment extends HexFragment {
         mSignOutButton = view.findViewById(R.id.signOutButton);
 
         settingsButton.setText(R.string.main_button_settings);
-        settingsButton.setColor(getResources().getColor(R.color.main_settings));
+        settingsButton.setColor(ContextCompat.getColor(requireContext(), R.color.main_settings));
         settingsButton.setDrawableResource(R.drawable.settings);
         settingsButton.setOnClickListener(() -> {
             startActivity(new Intent(getMainActivity(), PreferencesActivity.class));
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            applyOpenTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         });
 
         donateButton.setText(R.string.main_button_donate);
-        donateButton.setColor(getResources().getColor(R.color.main_donate));
+        donateButton.setColor(ContextCompat.getColor(requireContext(), R.color.main_donate));
         donateButton.setDrawableResource(R.drawable.store);
         donateButton.setOnClickListener(() -> new DonateDialog.Builder(getMainActivity()).show());
 
         historyButton.setText(R.string.main_button_history);
-        historyButton.setColor(getResources().getColor(R.color.main_history));
+        historyButton.setColor(ContextCompat.getColor(requireContext(), R.color.main_history));
         historyButton.setDrawableResource(R.drawable.history);
         historyButton.setOnClickListener(() -> swapFragment(new HistoryFragment()));
 
         instructionsButton.setText(R.string.main_button_instructions);
-        instructionsButton.setColor(getResources().getColor(R.color.main_instructions));
+        instructionsButton.setColor(ContextCompat.getColor(requireContext(), R.color.main_instructions));
         instructionsButton.setDrawableResource(R.drawable.howtoplay);
         instructionsButton.setOnClickListener(() -> swapFragment(new InstructionsFragment()));
 
         achievementsButton.setText(R.string.main_button_achievements);
-        achievementsButton.setColor(getResources().getColor(R.color.main_achievements));
+        achievementsButton.setColor(ContextCompat.getColor(requireContext(), R.color.main_achievements));
         achievementsButton.setDrawableResource(R.drawable.achievements);
         achievementsButton.setOnClickListener(() -> {
             if (isSignedIn()) {
@@ -108,7 +109,7 @@ public class MainFragment extends HexFragment {
         });
 
         playButton.setText(R.string.main_button_play);
-        playButton.setColor(getResources().getColor(R.color.main_play));
+        playButton.setColor(ContextCompat.getColor(requireContext(), R.color.main_play));
         playButton.setDrawableResource(R.drawable.play);
         playButton.setOnClickListener(() -> swapFragment(new GameSelectionFragment()));
 

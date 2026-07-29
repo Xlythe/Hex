@@ -1,6 +1,7 @@
 package com.xlythe.hex;
 
 import android.os.Bundle;
+import android.os.Build;
 import android.util.Log;
 
 import com.google.android.gms.games.AchievementsClient;
@@ -9,6 +10,7 @@ import com.google.android.gms.games.PlayGames;
 import com.google.android.gms.games.PlayGamesSdk;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.AnimRes;
 import androidx.appcompat.app.AppCompatActivity;
 
 import static android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
@@ -92,6 +94,19 @@ public abstract class BaseGameActivity extends AppCompatActivity {
         } else {
             getWindow().clearFlags(FLAG_KEEP_SCREEN_ON);
         }
+    }
+
+    public void applyOpenTransition(@AnimRes int enterAnim, @AnimRes int exitAnim) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, enterAnim, exitAnim);
+        } else {
+            applyLegacyOpenTransition(enterAnim, exitAnim);
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private void applyLegacyOpenTransition(int enterAnim, int exitAnim) {
+        overridePendingTransition(enterAnim, exitAnim);
     }
 
     public abstract void startQuickGame();

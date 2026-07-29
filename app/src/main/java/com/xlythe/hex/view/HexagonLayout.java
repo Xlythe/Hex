@@ -12,7 +12,6 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.graphics.drawable.shapes.PathShape;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -78,7 +77,6 @@ public class HexagonLayout extends View implements OnTouchListener {
     private int mPressedColor;
     private int mDisabledColor;
     private int mFocusedButton = -1;
-    private boolean mIsLaidOut = false;
 
     public HexagonLayout(Context context) {
         super(context);
@@ -231,10 +229,6 @@ public class HexagonLayout extends View implements OnTouchListener {
                         return this;
                 }
                 break;
-            case View.FOCUS_FORWARD:
-                break;
-            case View.FOCUS_BACKWARD:
-                break;
         }
         return super.focusSearch(direction);
     }
@@ -265,9 +259,6 @@ public class HexagonLayout extends View implements OnTouchListener {
 
     @Override
     public boolean isLaidOut() {
-        if (Build.VERSION.SDK_INT < 19) {
-            return mIsLaidOut;
-        }
         return super.isLaidOut();
     }
 
@@ -462,7 +453,6 @@ public class HexagonLayout extends View implements OnTouchListener {
 
         layoutText();
 
-        mIsLaidOut = true;
     }
 
     @Override
@@ -538,11 +528,7 @@ public class HexagonLayout extends View implements OnTouchListener {
             getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
-                    if (Build.VERSION.SDK_INT <= 16) {
-                        getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                    } else {
-                        getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    }
+                    getViewTreeObserver().removeOnGlobalLayoutListener(this);
                     spinExactly(rotation, constantDuration);
                 }
             });

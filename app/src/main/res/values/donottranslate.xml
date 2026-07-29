@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_id" translatable="false">307536683764</string>
+    <string name="achievement_30_seconds" translatable="false">CgkI9MX11PkIEAIQCg</string>
+    <string name="achievement_10_seconds" translatable="false">CgkI9MX11PkIEAIQEw</string>
+    <string name="achievement_fill_the_board" translatable="false">CgkI9MX11PkIEAIQCw</string>
+    <string name="achievement_monitor_smasher" translatable="false">CgkI9MX11PkIEAIQFQ</string>
+    <string name="achievement_speed_demon" translatable="false">CgkI9MX11PkIEAIQFg</string>
+    <string name="achievement_novice" translatable="false">CgkI9MX11PkIEAIQDA</string>
+    <string name="achievement_intermediate" translatable="false">CgkI9MX11PkIEAIQDQ</string>
+    <string name="achievement_expert" translatable="false">CgkI9MX11PkIEAIQDg</string>
+    <string name="achievement_insane" translatable="false">CgkI9MX11PkIEAIQFA</string>
+    <string name="achievement_net" translatable="false">CgkI9MX11PkIEAIQGQ</string>
+</resources>

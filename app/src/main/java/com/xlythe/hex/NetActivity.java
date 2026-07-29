@@ -134,7 +134,7 @@ public abstract class NetActivity extends BaseGameActivity {
         if (getAchievementsClient() != null) {
             getAchievementsClient().getAchievementsIntent().addOnSuccessListener(intent -> {
                 startActivity(intent);
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                applyOpenTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             });
         }
     }

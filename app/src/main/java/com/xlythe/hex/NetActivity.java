@@ -73,6 +73,7 @@ public abstract class NetActivity extends BaseGameActivity {
     protected void onDestroy() {
         destroyed = true;
         cancelWaiting(false);
+        if (activeServerPlayer != null) activeServerPlayer.quit();
         serverExecutor.shutdownNow();
         super.onDestroy();
     }

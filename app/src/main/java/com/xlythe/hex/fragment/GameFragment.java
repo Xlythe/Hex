@@ -1,6 +1,7 @@
 package com.xlythe.hex.fragment;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,7 +21,7 @@ import com.hex.core.PlayingEntity;
 import com.hex.core.Timer;
 import com.xlythe.hex.FileUtil;
 import com.xlythe.hex.MainActivity;
-import com.xlythe.hex.MainActivity.Stat;
+import com.xlythe.hex.AppExecutors;
 import com.xlythe.hex.R;
 import com.xlythe.hex.Settings;
 import com.xlythe.hex.Stats;
@@ -50,8 +51,6 @@ public class GameFragment extends HexFragment {
     public static final String PLAYER2_TYPE = "player2_type";
     public static final String REPLAY = "replay";
     public static final String PRELOADED_GAME = "preloaded_game";
-    private static final SimpleDateFormat SAVE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm", Locale.getDefault());
-
     private Game game;
     private Player player1Type;
     private Player player2Type;
@@ -252,6 +251,81 @@ public class GameFragment extends HexFragment {
                 : getString(R.string.game_chat_unread, unread));
     }
 
+    private void recordCompletedGame(PlayingEntity winner) {
+        Context applicationContext = requireContext().getApplicationContext();
+        boolean autosave = Settings.getAutosave(applicationContext);
+        long playedMillis = Math.max(0, game.getGameLength() - timeGamePaused);
+        boolean humanWin = winner.getType() == Player.Human;
+        String replayState = autosave ? game.save() : null;
+        String replayName = autosave
+                ? getString(
+                        R.string.auto_saved_file_name,
+                        new SimpleDateFormat("yyyy-MM-dd HH-mm", Locale.getDefault())
+                                .format(new Date()),
+                        safeFileComponent(game.getPlayer1().getName()),
+                        safeFileComponent(game.getPlayer2().getName()))
+                : null;
+
+        AppExecutors.io().execute(() -> {
+            if (replayState != null) {
+                try {
+                    FileUtil.autoSaveGame(applicationContext, replayName, replayState);
+                } catch (IOException error) {
+                    Log.w(TAG, "Could not autosave completed game", error);
+                }
+            }
+            Stats.incrementTimePlayed(applicationContext, playedMillis);
+            Stats.incrementGamesPlayed(applicationContext);
+            if (humanWin) Stats.incrementGamesWon(applicationContext);
+        });
+
+        recordAchievements(winner);
+    }
+
+    private void recordAchievements(PlayingEntity winner) {
+        if (!isSignedIn() || getAchievementsClient() == null) return;
+
+        if (game.getGameLength() < 30 * 1000) {
+            getAchievementsClient().unlock(getString(R.string.achievement_30_seconds));
+        }
+        if (game.getGameLength() < 10 * 1000) {
+            getAchievementsClient().unlock(getString(R.string.achievement_10_seconds));
+        }
+
+        boolean boardFilled = true;
+        for (int x = 0; x < game.getGridSize() && boardFilled; x++) {
+            for (int y = 0; y < game.getGridSize(); y++) {
+                if (game.gamePieces[x][y].getTeam() == 0) {
+                    boardFilled = false;
+                    break;
+                }
+            }
+        }
+        if (boardFilled) {
+            getAchievementsClient().unlock(getString(R.string.achievement_fill_the_board));
+        }
+        if (isVsAi() && winner.getType() == Player.Human) {
+            getAchievementsClient().unlock(getString(R.string.achievement_monitor_smasher));
+        }
+        if (game.hasTimer()) {
+            getAchievementsClient().unlock(getString(R.string.achievement_speed_demon));
+        }
+        getAchievementsClient().increment(getString(R.string.achievement_novice), 1);
+        getAchievementsClient().increment(getString(R.string.achievement_intermediate), 1);
+        if (winner.getType() == Player.Human) {
+            getAchievementsClient().increment(getString(R.string.achievement_expert), 1);
+            getAchievementsClient().increment(getString(R.string.achievement_insane), 1);
+        }
+        if (isNetGame()) {
+            getAchievementsClient().unlock(getString(R.string.achievement_net));
+        }
+    }
+
+    private static String safeFileComponent(String value) {
+        if (value == null) return "";
+        return value.replaceAll("[\\\\/:*?\"<>|]", "_").trim();
+    }
+
     protected void initializeNewGame() {
         // Stop the old game
         stopGame();
@@ -295,87 +369,7 @@ public class GameFragment extends HexFragment {
                     if (gameHasEnded) return;
                     else gameHasEnded = true;
 
-                    new Thread(() -> {
-                        // Auto save completed game
-                        if (Settings.getAutosave(getMainActivity())) {
-                            try {
-                                String fileName = String.format(getString(R.string.auto_saved_file_name), SAVE_FORMAT.format(new Date()), game.getPlayer1().getName(), game.getPlayer2().getName());
-                                FileUtil.autoSaveGame(getContext(), fileName, game.save());
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        Stats.incrementTimePlayed(getMainActivity(), game.getGameLength() - timeGamePaused);
-                        Stats.incrementGamesPlayed(getMainActivity());
-                        if (player.getType().equals(Player.Human))
-                            Stats.incrementGamesWon(getMainActivity());
-
-                        if (isSignedIn()) {
-                            // Net is async and can disconnect at any time
-                            try {
-                                // Backup stats
-                                Stat stat = new Stat();
-                                stat.setTimePlayed(Stats.getTimePlayed(getMainActivity()));
-                                stat.setGamesWon(Stats.getGamesWon(getMainActivity()));
-                                stat.setGamesPlayed(Stats.getGamesPlayed(getMainActivity()));
-                                stat.setDonationRank(Stats.getDonationRank(getMainActivity()));
-
-                                // Unlock the quick play achievements!
-                                if (game.getGameLength() < 30 * 1000) {
-                                    getAchievementsClient().unlock(getString(R.string.achievement_30_seconds));
-                                }
-                                if (game.getGameLength() < 10 * 1000) {
-                                    getAchievementsClient().unlock(getString(R.string.achievement_10_seconds));
-                                }
-
-                                // Unlock the fill the board achievement!
-                                boolean boardFilled = true;
-                                for (int i = 0; i < game.getGridSize(); i++) {
-                                    for (int j = 0; j < game.getGridSize(); j++) {
-                                        if (game.gamePieces[i][j].getTeam() == 0)
-                                            boardFilled = false;
-                                    }
-                                }
-                                if (boardFilled) {
-                                    getAchievementsClient().unlock(getString(R.string.achievement_fill_the_board));
-                                }
-
-                                // Unlock the monitor smasher achievement!
-                                if (isVsAi() && player.getType().equals(Player.Human)) {
-                                    getAchievementsClient().unlock(getString(R.string.achievement_monitor_smasher));
-                                }
-
-                                // Unlock the speed demon achievement!
-                                if (game.hasTimer()) {
-                                    getAchievementsClient().unlock(getString(R.string.achievement_speed_demon));
-                                }
-
-                                // Unlock the Novice achievement!
-                                getAchievementsClient().increment(getString(R.string.achievement_novice), 1);
-
-                                // Unlock the Intermediate achievement!
-                                getAchievementsClient().increment(getString(R.string.achievement_intermediate), 1);
-
-                                // Unlock the Expert achievement!
-                                if (player.getType().equals(Player.Human)) {
-                                    getAchievementsClient().increment(getString(R.string.achievement_expert), 1);
-                                }
-
-                                // Unlock the Insane achievement!
-                                if (player.getType().equals(Player.Human)) {
-                                    getAchievementsClient().increment(getString(R.string.achievement_insane), 1);
-                                }
-
-                                // Unlock the Net achievement
-                                if (isNetGame()) {
-                                    getAchievementsClient().unlock(getString(R.string.achievement_net));
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }).start();
+                    recordCompletedGame(player);
                 });
             }
 

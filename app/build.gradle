@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'app.cash.paparazzi'
 
 Properties local = new Properties()
 local.load(project.rootProject.file('local.properties').newDataInputStream())

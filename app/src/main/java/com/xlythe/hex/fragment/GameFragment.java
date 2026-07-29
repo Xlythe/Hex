@@ -28,7 +28,6 @@ import com.xlythe.hex.compat.Game;
 import com.xlythe.hex.server.ServerNetworkPlayer;
 import com.xlythe.hex.compat.GameOptions;
 import com.xlythe.hex.view.BoardView;
-import com.xlythe.hex.view.GameOverDialog;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -82,6 +81,17 @@ public class GameFragment extends HexFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         keepScreenOn(true);
+        getParentFragmentManager().setFragmentResultListener(
+                GameOverDialogFragment.REQUEST_KEY,
+                this,
+                (requestKey, result) -> {
+                    String action = result.getString(GameOverDialogFragment.RESULT_ACTION);
+                    if (GameOverDialogFragment.ACTION_PLAY_AGAIN.equals(action)) {
+                        startNewGame();
+                    } else if (GameOverDialogFragment.ACTION_HOME.equals(action)) {
+                        setGoHome(true);
+                    }
+                });
 
         loadGame(savedInstanceState);
         return applyBoard(inflater, container);
@@ -276,10 +286,11 @@ public class GameFragment extends HexFragment {
 
                     Log.v(TAG, player.getName() + " won!");
 
-                    new GameOverDialog.Builder(getContext())
-                            .setGameFragment(GameFragment.this)
-                            .setWinner(player)
-                            .show();
+                    if (isAdded() && getParentFragmentManager()
+                            .findFragmentByTag("game-over") == null) {
+                        GameOverDialogFragment.create(game, player)
+                                .show(getParentFragmentManager(), "game-over");
+                    }
 
                     if (gameHasEnded) return;
                     else gameHasEnded = true;

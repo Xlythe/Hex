@@ -71,19 +71,6 @@
             android:finishOnCloseSystemDialogs="true"
             android:theme="@style/HexDialog"
             android:exported="false" />
-        <activity
-            android:name="com.xlythe.hex.view.GameOverDialog"
-            android:screenOrientation="sensorLandscape"
-            android:launchMode="singleInstance"
-            android:noHistory="true"
-            android:finishOnTaskLaunch="true"
-            android:clearTaskOnLaunch="true"
-            android:excludeFromRecents="true"
-            android:relinquishTaskIdentity="true"
-            android:documentLaunchMode="never"
-            android:finishOnCloseSystemDialogs="true"
-            android:theme="@style/HexDialog"
-            android:exported="false" />
     </application>
 
 </manifest>

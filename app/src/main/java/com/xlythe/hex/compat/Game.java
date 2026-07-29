@@ -57,6 +57,17 @@ public class Game extends com.hex.core.Game {
         hasStarted = false;
     }
 
+    /**
+     * Produces the replay format consumed by {@link #load(String)}.
+     *
+     * <p>The current core library exposes the historical JSON representation
+     * through {@link #save()} rather than {@code toString()}.</p>
+     */
+    @Override
+    public String toString() {
+        return save();
+    }
+
     public static Game load(String state) {
         return load(state, new PlayerObject(1), new PlayerObject(2));
     }

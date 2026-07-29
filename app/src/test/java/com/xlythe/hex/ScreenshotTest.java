@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import app.cash.paparazzi.Paparazzi;
+import app.cash.paparazzi.EnvironmentKt;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,13 +27,15 @@ import com.xlythe.hex.view.SelectorLayout;
 /**
  * Golden-image coverage for every XML-backed screen in the application.
  *
- * <p>The fixed Pixel 5 configuration and application theme make these snapshots
- * deterministic without an emulator. Programmatic dialogs are covered by their
- * content layouts; interaction behavior remains in the regular JVM tests.</p>
+ * <p>The fixed landscape Pixel 5 configuration matches the orientation contract
+ * used by the real application. Programmatic dialogs are covered by their content
+ * layouts; interaction behavior remains in the regular JVM tests.</p>
  */
 public final class ScreenshotTest {
     @Rule
-    public final Paparazzi paparazzi = new Paparazzi();
+    public final Paparazzi paparazzi = new Paparazzi(
+            EnvironmentKt.detectEnvironment(),
+            TestDeviceConfigs.PHONE_LANDSCAPE);
 
     @Test
     public void mainMenu() {

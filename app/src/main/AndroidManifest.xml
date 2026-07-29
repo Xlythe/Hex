@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="auto" >
 
     <!-- For net play -->
@@ -17,12 +18,16 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/backup_rules"
         android:fullBackupContent="@xml/full_backup_rules"
+        android:appCategory="game"
         android:supportsRtl="true"
+        tools:ignore="UnusedAttribute"
         android:theme="@style/LightTheme">
         <meta-data android:name="com.google.android.gms.games.APP_ID" android:value="@string/app_id" />
         <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/>
         <activity
             android:name="com.xlythe.hex.MainActivity"
+            android:screenOrientation="landscape"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity"
             android:exported="true">
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
@@ -32,6 +37,8 @@
         <activity
             android:name="com.xlythe.hex.PreferencesActivity"
             android:label="@string/activity_title_preferences"
+            android:screenOrientation="landscape"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity"
             android:exported="false" />
         <activity
             android:name="com.xlythe.hex.view.DonateDialog"
@@ -43,6 +50,8 @@
             android:relinquishTaskIdentity="true"
             android:documentLaunchMode="never"
             android:finishOnCloseSystemDialogs="true"
+            android:screenOrientation="landscape"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity"
             android:theme="@style/HexDialog"
             android:exported="false" />
     </application>

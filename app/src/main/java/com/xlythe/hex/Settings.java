@@ -47,15 +47,14 @@ public class Settings {
 
     public static int getGridSize(@NonNull Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-
-        int gridSize = Integer.parseInt(prefs.getString(GAME_SIZE, Integer.toString(context.getResources().getInteger(R.integer.DEFAULT_BOARD_SIZE))));
+        int defaultSize = context.getResources().getInteger(R.integer.DEFAULT_BOARD_SIZE);
+        int gridSize = parseInt(prefs.getString(
+                GAME_SIZE, Integer.toString(defaultSize)), defaultSize);
         if (gridSize == 0) {
-            gridSize = Integer.parseInt(prefs.getString(CUSTOM_GAME_SIZE, Integer.toString(context.getResources().getInteger(R.integer.DEFAULT_BOARD_SIZE))));
+            gridSize = parseInt(prefs.getString(
+                    CUSTOM_GAME_SIZE, Integer.toString(defaultSize)), defaultSize);
         }
-
-        // We don't want 0x0 games
-        if (gridSize <= 0) gridSize = 1;
-        return gridSize;
+        return clamp(gridSize, MIN_BOARD_SIZE, MAX_BOARD_SIZE);
     }
 
     public static boolean getSwap(@NonNull Context context) {
@@ -68,11 +67,14 @@ public class Settings {
     }
 
     public static int getTimerType(Context context) {
-        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString(TIMER_TYPE, String.valueOf(Timer.NO_TIMER)));
+        int timerType = parseInt(PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(TIMER_TYPE, String.valueOf(Timer.NO_TIMER)), Timer.NO_TIMER);
+        return clamp(timerType, Timer.NO_TIMER, Timer.ENTIRE_MATCH);
     }
 
     public static int getTimeAmount(Context context) {
-        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString(TIMER, "0"));
+        return Math.max(0, parseInt(PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(TIMER, "0"), 0));
     }
 
     public static String getPlayer1Name(@NonNull Context context, @Nullable String playGamesName) {
@@ -97,7 +99,26 @@ public class Settings {
     }
 
     public static int getComputerDifficulty(@NonNull Context context) {
-        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString(DIFFICULTY,
-                String.valueOf(context.getResources().getInteger(R.integer.DEFAULT_AI_DIFFICULTY))));
+        int defaultDifficulty =
+                context.getResources().getInteger(R.integer.DEFAULT_AI_DIFFICULTY);
+        int difficulty = parseInt(PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(DIFFICULTY, String.valueOf(defaultDifficulty)),
+                defaultDifficulty);
+        return clamp(difficulty, 0, 2);
+    }
+
+    private static int parseInt(@Nullable String value, int fallback) {
+        if (value == null) {
+            return fallback;
+        }
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException ignored) {
+            return fallback;
+        }
+    }
+
+    private static int clamp(int value, int minimum, int maximum) {
+        return Math.max(minimum, Math.min(value, maximum));
     }
 }

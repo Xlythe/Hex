@@ -75,8 +75,8 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
             View dialoglayout = inflater.inflate(R.layout.preferences_timer, null);
             final Spinner timerType = dialoglayout.findViewById(R.id.timerType);
             final EditText timer = dialoglayout.findViewById(R.id.timer);
-            timer.setText(settings.getString(Settings.TIMER, Integer.toString(getResources().getInteger(R.integer.DEFAULT_TIMER_TIME))));
-            timerType.setSelection(Integer.valueOf(settings.getString(Settings.TIMER_TYPE, Integer.toString(getResources().getInteger(R.integer.DEFAULT_TIMER_TYPE)))));
+            timer.setText(String.valueOf(Settings.getTimeAmount(requireContext())));
+            timerType.setSelection(Settings.getTimerType(requireContext()));
             timerType.setOnItemSelectedListener(new OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int arg2, long arg3) {

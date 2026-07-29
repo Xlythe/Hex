@@ -7,7 +7,7 @@ android {
     compileSdkVersion 36
     defaultConfig {
         applicationId "com.sam.hex"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 36
         versionCode 31
         versionName "5.1.2"
@@ -40,11 +40,11 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:+'
-    implementation 'com.google.android.material:material:+'
-    implementation 'com.google.android.gms:play-services-auth:+'
-    implementation 'com.google.android.gms:play-services-games:+'
-    implementation 'androidx.multidex:multidex:+'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'com.google.android.material:material:1.14.0'
+    implementation 'com.google.android.gms:play-services-auth:21.4.0'
+    implementation 'com.google.android.gms:play-services-games:23.2.0'
+    implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'com.xlythe:play-billing:3.1.2'
     testImplementation 'junit:junit:4.13.2'
 }

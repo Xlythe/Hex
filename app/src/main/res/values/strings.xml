@@ -42,8 +42,8 @@
 
     <!-- Online selection page -->
     <string name="online_selection_button_quick">Quick Game</string>
-    <string name="online_selection_button_invite">Invite Friends</string>
-    <string name="online_selection_button_pending">Pending Invites</string>
+    <string name="online_selection_button_invite">Create Game</string>
+    <string name="online_selection_button_pending">Browse Games</string>
 
     <!-- Preferences -->
     <string name="preferences_title_game_size">Board Size</string>

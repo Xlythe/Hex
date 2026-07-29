@@ -24,6 +24,7 @@ import com.xlythe.hex.R;
 import com.xlythe.hex.Settings;
 import com.xlythe.hex.Stats;
 import com.xlythe.hex.compat.Game;
+import com.xlythe.hex.server.ServerNetworkPlayer;
 import com.xlythe.hex.compat.GameOptions;
 import com.xlythe.hex.view.BoardView;
 import com.xlythe.hex.view.GameOverDialog;
@@ -505,6 +506,9 @@ public class GameFragment extends HexFragment {
             switch (which) {
                 case DialogInterface.BUTTON_POSITIVE:
                     // Yes button clicked
+                    if (isNetGame() && getNetPlayer() instanceof ServerNetworkPlayer) {
+                        ((ServerNetworkPlayer) getNetPlayer()).forfeit();
+                    }
                     stopGame();
                     returnHome();
                     break;

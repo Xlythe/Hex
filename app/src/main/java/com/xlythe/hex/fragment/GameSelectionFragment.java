@@ -52,14 +52,7 @@ public class GameSelectionFragment extends HexFragment {
         SelectorLayout.Button netButton = mSelectorLayout.getButtons()[2];
         netButton.setColor(getResources().getColor(R.color.select_online));
         netButton.setText(R.string.game_selection_button_net);
-        netButton.setOnClickListener(() -> {
-            if (getMainActivity().isSignedIn()) {
-                swapFragment(new OnlineSelectionFragment());
-            } else {
-                getMainActivity().setOpenOnlineSelectionFragment(true);
-                signIn();
-            }
-        });
+        netButton.setOnClickListener(() -> swapFragment(new OnlineSelectionFragment()));
 
         return v;
     }

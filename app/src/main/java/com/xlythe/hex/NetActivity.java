@@ -1,339 +1,502 @@
 package com.xlythe.hex;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
+import android.app.Dialog;
 import android.os.Bundle;
-import android.util.Log;
-
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.games.Games;
-import com.google.android.gms.games.PlayerCompat;
-import com.google.android.gms.games.multiplayer.Invitation;
-import com.google.android.gms.games.multiplayer.Multiplayer;
-import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
-import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
-import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig;
-import com.hex.core.PlayerObject;
-import com.hex.core.PlayingEntity;
-import com.xlythe.hex.compat.Game;
-import com.xlythe.hex.compat.GameOptions;
-import com.xlythe.hex.compat.NetworkPlayer;
-
-import java.util.ArrayList;
-import java.util.List;
+import android.os.Handler;
+import android.os.Looper;
+import android.provider.Settings.Secure;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 
-import static com.xlythe.hex.Settings.TAG;
+import com.hex.core.PlayerObject;
+import com.hex.core.PlayingEntity;
+import com.hex.core.Timer;
+import com.xlythe.hex.compat.Game;
+import com.xlythe.hex.compat.GameOptions;
+import com.xlythe.hex.server.IgGameCenterClient;
+import com.xlythe.hex.server.IgGameCenterModels.BoardRef;
+import com.xlythe.hex.server.IgGameCenterModels.HandlerResponse;
+import com.xlythe.hex.server.IgGameCenterModels.LobbyBoard;
+import com.xlythe.hex.server.IgGameCenterModels.Member;
+import com.xlythe.hex.server.IgGameCenterModels.UserSession;
+import com.xlythe.hex.server.IgGameCenterProtocol;
+import com.xlythe.hex.server.ServerAuthDialog;
+import com.xlythe.hex.server.ServerCredentialStore;
+import com.xlythe.hex.server.ServerCredentials;
+import com.xlythe.hex.server.ServerNetworkPlayer;
 
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+/** Activity-level account, lobby, matchmaking, and rematch orchestration. */
 public abstract class NetActivity extends BaseGameActivity {
-    private final static int MIN_OPPONENTS = 1, MAX_OPPONENTS = 1;
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final ScheduledExecutorService serverExecutor =
+            Executors.newSingleThreadScheduledExecutor(runnable -> {
+                Thread thread = new Thread(runnable, "Hex-server-session");
+                thread.setDaemon(true);
+                return thread;
+            });
 
-    private static final int REQUEST_CODE_SELECT_OPPONENT = 10001;
-    private static final int REQUEST_CODE_INBOX = 10002;
-    private static final int REQUEST_CODE_ACHIEVEMENTS = 10003;
-
-    // The local player id for ourselves. Null if not signed in.
-    private String mPlayerId;
-
-    // Switches to a new game for a rematch.
-    private final NetworkPlayer.Rematcher rematcher = matchId -> {
-            getTurnBasedMultiplayerClient().rematch(matchId)
-                    .addOnSuccessListener(this::startGame)
-                    .addOnFailureListener(e -> {
-                        Log.e(TAG, "Failed to request rematch", e);
-                        checkInvites();
-                    });
-    };
+    private IgGameCenterClient serverClient;
+    private ServerCredentialStore credentialStore;
+    private ScheduledFuture<?> roomPoll;
+    private Dialog waitingDialog;
+    private BoardRef waitingBoard;
+    private UserSession waitingUser;
+    private long waitingEventId;
+    private boolean destroyed;
 
     public abstract void switchToGame(Game game);
 
     @Override
-    public void onSignInSucceeded(GoogleSignInAccount googleSignInAccount) {
-        super.onSignInSucceeded(googleSignInAccount);
-        getPlayersClient().getCurrentPlayer().addOnSuccessListener(player -> mPlayerId = player.getPlayerId());
-        getGamesClient().getActivationHint().addOnSuccessListener(bundle -> {
-           if (bundle == null) {
-               return;
-           }
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        credentialStore = new ServerCredentialStore(this);
+        serverClient = IgGameCenterClient.production(getStableNetworkUid());
+    }
 
-            if (bundle.containsKey(Multiplayer.EXTRA_INVITATION)) {
-                Invitation invitation = bundle.getParcelable(Multiplayer.EXTRA_INVITATION);
-                if (invitation.getInvitationType() == Invitation.INVITATION_TYPE_TURN_BASED) {
-                    getTurnBasedMultiplayerClient().acceptInvitation(invitation.getInvitationId()).addOnSuccessListener(this::startGame);
-                    return;
-                }
-            }
-
-           if (bundle.containsKey(Multiplayer.EXTRA_TURN_BASED_MATCH)) {
-               TurnBasedMatch match = bundle.getParcelable(Multiplayer.EXTRA_TURN_BASED_MATCH);
-               startGame(match);
-               return;
-           }
-        });
+    @Override
+    protected void onDestroy() {
+        destroyed = true;
+        cancelWaiting(false);
+        serverExecutor.shutdownNow();
+        super.onDestroy();
     }
 
     @Override
     public void startQuickGame() {
-        Bundle autoMatchCriteria = RoomConfig.createAutoMatchCriteria(MIN_OPPONENTS, MAX_OPPONENTS, 0);
-
-        TurnBasedMatchConfig config = TurnBasedMatchConfig.builder()
-                .setAutoMatchCriteria(autoMatchCriteria)
-                .build();
-
-        // Start the match
-        getTurnBasedMultiplayerClient().createMatch(config).addOnSuccessListener(this::startGame);
+        authenticate(user -> runBusy("Finding a game…", () -> {
+            BoardRef board = serverClient.joinRandomBoard(user, null);
+            HandlerResponse response = serverClient.handle(board, user, 0, null, null);
+            prepareRoom(board, user, response, false);
+        }));
     }
 
+    /** The former invite action now creates a discoverable server room. */
     @Override
     public void inviteFriends() {
-        getTurnBasedMultiplayerClient().getSelectOpponentsIntent(MIN_OPPONENTS, MAX_OPPONENTS, true).addOnSuccessListener(intent -> {
-            startActivityForResult(intent, REQUEST_CODE_SELECT_OPPONENT);
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-        });
+        authenticate(user -> runBusy("Creating game…", () -> {
+            BoardRef board = serverClient.createBoard(user, "1");
+            HandlerResponse response = serverClient.handle(board, user, 0, null, null);
+
+            LinkedHashMap<String, String> setup = new LinkedHashMap<>();
+            setup.put("boardSize", Integer.toString(Settings.getGridSize(this)));
+            setup.put("timerTotal", Integer.toString(Settings.getTimeAmount(this) * 60));
+            setup.put("timerInc", "0");
+            setup.put("scored", "0");
+            response = serverClient.handle(
+                    board,
+                    user,
+                    response.latestEventId(0),
+                    "SETUP",
+                    setup);
+            prepareRoom(board, user, response, true);
+        }));
     }
 
+    /** The former inbox action now browses open igGameCenter Hex rooms. */
     @Override
     public void checkInvites() {
-        getTurnBasedMultiplayerClient().getInboxIntent().addOnSuccessListener(intent -> {
-            startActivityForResult(intent, REQUEST_CODE_INBOX);
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-        });
+        authenticate(user -> runBusy("Loading games…", () -> {
+            List<LobbyBoard> available = new ArrayList<>();
+            for (LobbyBoard board : serverClient.fetchLobby(user)) {
+                if (!board.hidden
+                        && board.firstAvailablePlace() != null
+                        && !"FINISHED".equalsIgnoreCase(board.status)) {
+                    available.add(board);
+                }
+            }
+            mainHandler.post(() -> showLobby(user, available));
+        }));
     }
 
     @Override
     public void openAchievements() {
-        getAchievementsClient().getAchievementsIntent().addOnSuccessListener(intent -> {
-            // Note: Must call startActivityForResult or the activity won't launch.
-            startActivityForResult(intent, REQUEST_CODE_ACHIEVEMENTS);
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        if (!isSignedIn()) {
+            signIn();
+            return;
+        }
+        if (getAchievementsClient() != null) {
+            getAchievementsClient().getAchievementsIntent().addOnSuccessListener(intent -> {
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            });
+        }
+    }
+
+    public void signOutServerAccount() {
+        credentialStore.clear();
+        toast("Signed out of igGameCenter");
+    }
+
+    private void showLobby(UserSession user, List<LobbyBoard> boards) {
+        if (destroyed) return;
+        if (boards.isEmpty()) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Open Games")
+                    .setMessage("No open Hex games were found.")
+                    .setPositiveButton("Create Game", (dialog, which) -> inviteFriends())
+                    .setNeutralButton("Sign Out", (dialog, which) -> signOutServerAccount())
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show();
+            return;
+        }
+
+        String[] labels = new String[boards.size()];
+        for (int i = 0; i < boards.size(); i++) {
+            LobbyBoard board = boards.get(i);
+            String owner = board.members.isEmpty() ? "Open game" : board.members.get(0).name;
+            labels[i] = owner + " · game " + board.sid;
+        }
+        new AlertDialog.Builder(this)
+                .setTitle("Open Games")
+                .setItems(labels, (dialog, index) -> joinLobbyBoard(user, boards.get(index)))
+                .setNeutralButton("Sign Out", (dialog, which) -> signOutServerAccount())
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void joinLobbyBoard(UserSession user, LobbyBoard lobbyBoard) {
+        runBusy("Joining game…", () -> {
+            BoardRef board = new BoardRef(lobbyBoard.sid, lobbyBoard.server);
+            HandlerResponse response = serverClient.handle(board, user, 0, null, null);
+            prepareRoom(board, user, response, false);
         });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        switch (requestCode) {
-            case REQUEST_CODE_SELECT_OPPONENT:
-                onOpponentSelected(resultCode, intent);
-                break;
-            case REQUEST_CODE_INBOX:
-                onInboxSelected(resultCode, intent);
-                break;
-            default:
-                super.onActivityResult(requestCode, resultCode, intent);
-                break;
+    private void prepareRoom(
+            BoardRef board,
+            UserSession user,
+            HandlerResponse initial,
+            boolean created) throws Exception {
+        HandlerResponse response = initial;
+        long eventId = response.latestEventId(0);
+        if ("0".equals(response.localPlace) || response.localPlace.isEmpty()) {
+            String place = firstAvailablePlace(response.players);
+            if (place == null) throw new IllegalStateException("This game is already full.");
+            response = serverClient.command(board, user, eventId, "PLACE", "place", place);
+            eventId = response.latestEventId(eventId);
         }
+        response = serverClient.command(board, user, eventId, "START");
+        eventId = response.latestEventId(eventId);
+
+        waitingBoard = board;
+        waitingUser = user;
+        waitingEventId = eventId;
+        HandlerResponse current = response;
+        mainHandler.post(() -> {
+            showWaiting(created ? "Game " + board.sid + " is ready to join." : "Waiting for opponent…");
+            if ("ACTIVE".equalsIgnoreCase(current.status)) launchGame(board, user, current);
+            else scheduleRoomPoll();
+        });
     }
 
-    private void onOpponentSelected(int resultCode, Intent intent) {
-        if (resultCode != Activity.RESULT_OK) {
-            Log.e(TAG, "Failed to select an opponent");
+    private void showWaiting(String message) {
+        if (destroyed) return;
+        if (waitingDialog != null) waitingDialog.dismiss();
+        waitingDialog = new AlertDialog.Builder(this)
+                .setTitle("Online Hex")
+                .setMessage(message + "\n\nChecks occur at most once every 15 seconds.")
+                .setNegativeButton("Cancel", (dialog, which) -> cancelWaiting(true))
+                .setCancelable(false)
+                .create();
+        waitingDialog.show();
+    }
+
+    private void scheduleRoomPoll() {
+        if (destroyed || waitingBoard == null || waitingUser == null) return;
+        if (roomPoll != null) roomPoll.cancel(false);
+        roomPoll = serverExecutor.schedule(() -> {
+            try {
+                HandlerResponse response =
+                        serverClient.refresh(waitingBoard, waitingUser, waitingEventId);
+                waitingEventId = response.latestEventId(waitingEventId);
+                if ("ACTIVE".equalsIgnoreCase(response.status)) {
+                    mainHandler.post(() -> launchGame(waitingBoard, waitingUser, response));
+                } else {
+                    scheduleRoomPoll();
+                }
+            } catch (Exception e) {
+                mainHandler.post(() -> toast(safeMessage(e)));
+                scheduleRoomPoll();
+            }
+        }, IgGameCenterProtocol.POLL_INTERVAL_MS, TimeUnit.MILLISECONDS);
+    }
+
+    private void launchGame(BoardRef board, UserSession user, HandlerResponse response) {
+        if (destroyed) return;
+        cancelWaiting(false);
+        Member local = member(response.players, user.uid);
+        Member remote = opponent(response.players, user.uid);
+        if (local == null || remote == null) {
+            toast("The server did not return both players.");
             return;
         }
 
-        ArrayList<String> participants = intent.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS);
-        TurnBasedMatchConfig config = TurnBasedMatchConfig.builder()
-                .addInvitedPlayers(participants)
-                .setAutoMatchCriteria(RoomConfig.createAutoMatchCriteria(MIN_OPPONENTS, MAX_OPPONENTS, 0))
-                .build();
+        int localTeam = parseTeam(local.place);
+        int remoteTeam = parseTeam(remote.place);
+        int boardSize = response.options == null
+                ? Settings.getGridSize(this)
+                : response.options.boardSize;
+        PlayingEntity localPlayer = new PlayerObject(localTeam);
+        ServerNetworkPlayer remotePlayer = new ServerNetworkPlayer(
+                remoteTeam,
+                serverClient,
+                user,
+                board,
+                remote.uid,
+                boardSize,
+                response.latestEventId(waitingEventId),
+                serverPlayerListener(user),
+                serverExecutor);
 
-        // Start the game
-        getTurnBasedMultiplayerClient().createMatch(config)
-                .addOnSuccessListener(this::startGame)
-                .addOnFailureListener(e -> Log.e(TAG, "Failed to create a match", e));
-    }
+        localPlayer.setName(local.name);
+        remotePlayer.setName(remote.name);
+        localPlayer.setColor(localTeam == 1
+                ? Settings.getPlayer1Color(this)
+                : Settings.getPlayer2Color(this));
+        remotePlayer.setColor(remoteTeam == 1
+                ? Settings.getPlayer1Color(this)
+                : Settings.getPlayer2Color(this));
 
-    private void onInboxSelected(int resultCode, Intent intent) {
-        if (resultCode != Activity.RESULT_OK) {
-            Log.e(TAG, "Failed to select a match from the inbox");
-            return;
-        }
-
-        TurnBasedMatch match = intent.getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH);
-        if (match == null) {
-            Log.e(TAG, "A match was selected from the inbox, but the match was null");
-            return;
-        }
-
-        startGame(match);
-    }
-
-    private void startGame(@NonNull TurnBasedMatch match) {
-        PlayingEntity[] players = getPlayers(match);
-
-        Game game;
-        if (match.getData() != null) {
-            game = Game.load(new String(match.getData()), players[0], players[1]);
-            Log.d(TAG, String.format("Resuming match %s.", match.getMatchId()));
+        GameOptions.Builder options = new GameOptions.Builder()
+                .setGridSize(boardSize)
+                .setSwapEnabled(Settings.getSwap(this));
+        if (response.options != null && response.options.timerTotalSeconds > 0) {
+            long minutes = Math.max(1, (response.options.timerTotalSeconds + 59) / 60);
+            options.setTimer(new Timer(
+                    minutes,
+                    response.options.timerIncrementSeconds,
+                    response.options.timerIncrementSeconds > 0
+                            ? Timer.PER_MOVE
+                            : Timer.ENTIRE_MATCH));
         } else {
-            GameOptions gameOptions = new GameOptions.Builder()
-                    .setGridSize(Settings.getGridSize(this))
-                    .setSwapEnabled(Settings.getSwap(this))
-                    .setNoTimer()
-                    .build();
-
-            game = new Game(gameOptions, players[0], players[1]);
-            Log.d(TAG, String.format("New match %s.", match.getMatchId()));
+            options.setNoTimer();
         }
 
-        // Set names / colors here. Note that loading a game from a remote side will flip the names,
-        // so this must occur after Game.load.
-        String localPlayerName = getLocalPlayerName(match, mPlayerId);
-        String remotePlayerName = getRemotePlayerName(this, match, mPlayerId);
-        if (isLocalPlayer1(match)) {
-            players[0].setName(localPlayerName);
-            players[1].setName(remotePlayerName);
-        } else {
-            players[0].setName(remotePlayerName);
-            players[1].setName(localPlayerName);
-        }
-        players[0].setColor(getResources().getInteger(R.integer.DEFAULT_P1_COLOR));
-        players[1].setColor(getResources().getInteger(R.integer.DEFAULT_P2_COLOR));
-
-        Log.d(TAG, String.format("%s vs %s in match %s.", players[0].getName(), players[1].getName(), match.getMatchId()));
-
-        switch (match.getTurnStatus()) {
-            case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
-                Log.d(TAG, "It's my turn");
-                break;
-            case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN:
-                Log.d(TAG, "It's their turn");
-                break;
-        }
-
+        Game game = localTeam == 1
+                ? new Game(options.build(), localPlayer, remotePlayer)
+                : new Game(options.build(), remotePlayer, localPlayer);
         switchToGame(game);
     }
 
-    private PlayingEntity[] getPlayers(TurnBasedMatch match) {
-        String localParticipantId = getLocalParticipantId(match, mPlayerId);
-        String remoteParticipantId = getRemoteParticipantId(match, mPlayerId);
-        Log.d(TAG, String.format("Local id %s, remote id %s in match %s.", localParticipantId, remoteParticipantId, match.getMatchId()));
-
-        PlayingEntity[] players = new PlayingEntity[2];
-        if (isLocalPlayer1(match)) {
-            players[0] = new PlayerObject(1);
-            players[1] = new NetworkPlayer(
-                    2,
-                    localParticipantId,
-                    remoteParticipantId,
-                    match,
-                    rematcher,
-                    getTurnBasedMultiplayerClient());
-        } else {
-            players[0] = new NetworkPlayer(
-                    1,
-                    localParticipantId,
-                    remoteParticipantId,
-                    match,
-                    rematcher,
-                    getTurnBasedMultiplayerClient());
-            players[1] = new PlayerObject(2);
-        }
-
-        return players;
-    }
-
-    private static List<PlayerCompat> getPlayerList(TurnBasedMatch match) {
-        List<PlayerCompat> players = new ArrayList<>(match.getParticipantIds().size());
-        for (String participantId : match.getParticipantIds()) {
-            @Nullable PlayerCompat player = match.getParticipant(participantId).getPlayer();
-            if (player == null) {
-                continue;
+    private ServerNetworkPlayer.Listener serverPlayerListener(UserSession user) {
+        return new ServerNetworkPlayer.Listener() {
+            @Override
+            public void onNetworkError(String message) {
+                mainHandler.post(() -> toast(message));
             }
 
-            players.add(player);
-        }
-        return players;
-    }
-
-    private static String getLocalPlayerName(TurnBasedMatch match, String playerId) {
-        return getShortName(getLocalPlayer(playerId, getPlayerList(match)));
-    }
-
-    private static String getRemotePlayerName(Context context, TurnBasedMatch match, String playerId) {
-        @Nullable PlayerCompat remotePlayer = getRemotePlayer(playerId, getPlayerList(match));
-        if (remotePlayer == null) {
-            Log.d(TAG, "Unable to get remote player name. No player found.");
-            return context.getString(R.string.player_automatch);
-        }
-        return getShortName(remotePlayer);
-    }
-
-    private static String getLocalParticipantId(TurnBasedMatch match, String playerId) {
-        return match.getParticipantId(getLocalPlayer(playerId, getPlayerList(match)).getPlayerId());
-    }
-
-    // May return null in automatched games.
-    @Nullable
-    private static String getRemoteParticipantId(TurnBasedMatch match, String playerId) {
-        // For automatch games, the remote player is null. Therefore, we need to look up our
-        // participant id, and then find out who the remote participant is.
-        String localParticipantId = getLocalParticipantId(match, playerId);
-        for (String participantId : match.getParticipantIds()) {
-            if (localParticipantId.equals(participantId)) {
-                continue;
+            @Override
+            public void onRestartCreated(BoardRef board) {
+                joinRematch(user, board);
             }
 
-            return participantId;
-        }
+            @Override
+            public void onRestartOffered(BoardRef board) {
+                mainHandler.post(() -> new AlertDialog.Builder(NetActivity.this)
+                        .setTitle("Rematch")
+                        .setMessage("Your opponent requested another game.")
+                        .setPositiveButton("Join", (dialog, which) -> joinRematch(user, board))
+                        .setNegativeButton("Decline", null)
+                        .show());
+            }
 
+            @Override
+            public void onUndoUnavailable() {
+                mainHandler.post(() -> toast(
+                        "This Android game engine cannot safely apply asynchronous undo."));
+            }
+        };
+    }
+
+    private void joinRematch(UserSession user, BoardRef board) {
+        runBusy("Joining rematch…", () -> {
+            HandlerResponse response = serverClient.handle(board, user, 0, null, null);
+            prepareRoom(board, user, response, false);
+        });
+    }
+
+    private void cancelWaiting(boolean leaveBoard) {
+        ScheduledFuture<?> poll = roomPoll;
+        roomPoll = null;
+        if (poll != null) poll.cancel(true);
+        if (waitingDialog != null) {
+            waitingDialog.dismiss();
+            waitingDialog = null;
+        }
+        BoardRef board = waitingBoard;
+        UserSession user = waitingUser;
+        long eventId = waitingEventId;
+        waitingBoard = null;
+        waitingUser = null;
+        if (leaveBoard && board != null && user != null && !serverExecutor.isShutdown()) {
+            serverExecutor.execute(() -> {
+                try {
+                    serverClient.command(board, user, eventId, "LEAVE");
+                } catch (Exception ignored) {
+                    // The local room is already closed; there is nothing useful to retry.
+                }
+            });
+        }
+    }
+
+    private void authenticate(SessionAction action) {
+        ServerCredentials saved = credentialStore.load();
+        if (saved == null) {
+            showAuth(action);
+            return;
+        }
+        toast("Signing in…");
+        serverExecutor.execute(() -> {
+            try {
+                UserSession session =
+                        serverClient.loginWithDigest(saved.username, saved.passwordDigest);
+                remember(new ServerCredentials(saved.username, saved.passwordDigest, session));
+                action.run(session);
+            } catch (Exception e) {
+                mainHandler.post(() -> {
+                    toast(safeMessage(e));
+                    showAuth(action);
+                });
+            }
+        });
+    }
+
+    private void showAuth(SessionAction action) {
+        ServerAuthDialog.showSignIn(this, new ServerAuthDialog.Listener() {
+            @Override
+            public void onSignIn(String username, String plaintextPassword) {
+                String digest = IgGameCenterProtocol.md5(plaintextPassword);
+                runAuthAction("Signing in…", action, () -> {
+                    UserSession session = serverClient.loginWithDigest(username, digest);
+                    remember(new ServerCredentials(username, digest, session));
+                    action.run(session);
+                });
+            }
+
+            @Override
+            public void onSignUp(String username, String plaintextPassword, String email) {
+                String digest = IgGameCenterProtocol.md5(plaintextPassword);
+                runAuthAction("Creating account…", action, () -> {
+                    serverClient.register(username, plaintextPassword, email);
+                    UserSession session = serverClient.loginWithDigest(username, digest);
+                    remember(new ServerCredentials(username, digest, session));
+                    action.run(session);
+                });
+            }
+        });
+    }
+
+    private void runAuthAction(
+            String message,
+            SessionAction retryAction,
+            NetworkAction action) {
+        if (destroyed || serverExecutor.isShutdown()) return;
+        toast(message);
+        serverExecutor.execute(() -> {
+            try {
+                action.run();
+            } catch (Exception e) {
+                mainHandler.post(() -> {
+                    toast(safeMessage(e));
+                    showAuth(retryAction);
+                });
+            }
+        });
+    }
+
+    private void remember(ServerCredentials credentials) {
+        try {
+            credentialStore.save(credentials);
+        } catch (GeneralSecurityException e) {
+            mainHandler.post(() -> toast(
+                    "Signed in, but this device could not securely remember the account."));
+        }
+    }
+
+    private void runBusy(String message, NetworkAction action) {
+        if (destroyed || serverExecutor.isShutdown()) return;
+        mainHandler.post(() -> toast(message));
+        serverExecutor.execute(() -> {
+            try {
+                action.run();
+            } catch (Exception e) {
+                mainHandler.post(() -> toast(safeMessage(e)));
+            }
+        });
+    }
+
+    private String getStableNetworkUid() {
+        String androidId = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
+        if (androidId != null && !androidId.trim().isEmpty()) return androidId;
+        android.content.SharedPreferences prefs =
+                getSharedPreferences("iggamecenter_device", MODE_PRIVATE);
+        String generated = prefs.getString("network_uid", null);
+        if (generated == null) {
+            generated = UUID.randomUUID().toString();
+            prefs.edit().putString("network_uid", generated).apply();
+        }
+        return generated;
+    }
+
+    private static String firstAvailablePlace(List<Member> players) {
+        boolean first = false;
+        boolean second = false;
+        for (Member player : players) {
+            first |= "1".equals(player.place);
+            second |= "2".equals(player.place);
+        }
+        if (!first) return "1";
+        if (!second) return "2";
         return null;
     }
 
-    @NonNull
-    private static PlayerCompat getLocalPlayer(String localPlayerId, List<PlayerCompat> playerList) {
-        for (PlayerCompat player : playerList) {
-            if (player.getPlayerId().equals(localPlayerId)) {
-                return player;
-            }
-        }
-        throw new IllegalStateException(String.format("Local player %s was not found within the list of players: %s", localPlayerId, playerList));
+    private static Member member(List<Member> players, String uid) {
+        for (Member player : players) if (uid.equals(player.uid)) return player;
+        return null;
     }
 
-    @Nullable
-    private static PlayerCompat getRemotePlayer(String localPlayerId, List<PlayerCompat> playerList) {
-        for (PlayerCompat player : playerList) {
-            if (player.getPlayerId().equals(localPlayerId)) {
-                continue;
-            }
-
-            return player;
+    private static Member opponent(List<Member> players, String uid) {
+        for (Member player : players) {
+            if (!uid.equals(player.uid)
+                    && ("1".equals(player.place) || "2".equals(player.place))) return player;
         }
         return null;
     }
 
-    private static String getShortName(PlayerCompat player) {
-        String name = player.getDisplayName().split(" ")[0];
-        if (name.length() > 10) {
-            return name.substring(0, 10);
-        }
-        return name;
+    private static int parseTeam(String place) {
+        if ("1".equals(place)) return 1;
+        if ("2".equals(place)) return 2;
+        throw new IllegalStateException("The server returned an invalid player seat.");
     }
 
-    // Returns true if the local device is player 1.
-    private static boolean isLocalPlayer1(TurnBasedMatch match) {
-        // If there's no game state yet, then whoever's turn it is is player 1.
-        if (match.getData() == null) {
-            return isMyMove(match);
-        }
-
-        // Otherwise, if there is already game state, open up a local copy of the game to decide
-        // if its player1's move or player2's move. If it's player1's turn and it's our turn,
-        // we're player1. If it's player2's turn and it's our turn, we're player2.
-        Game game = Game.load(new String(match.getData()));
-        switch (game.getCurrentPlayer().getTeam()) {
-            case 1:
-                return isMyMove(match);
-            case 2:
-                return !isMyMove(match);
-            default:
-                throw new IllegalStateException("Cannot parse game. Current player has team " + game.getCurrentPlayer().getTeam());
-        }
+    private static String safeMessage(Exception error) {
+        String message = error.getMessage();
+        return message == null || message.trim().isEmpty()
+                ? "Could not connect to igGameCenter."
+                : message;
     }
 
-    private static boolean isMyMove(TurnBasedMatch match) {
-        return match.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN;
+    private void toast(String message) {
+        if (!destroyed) Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
+    private interface SessionAction {
+        void run(UserSession user) throws Exception;
+    }
+
+    private interface NetworkAction {
+        void run() throws Exception;
     }
 }

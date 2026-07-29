@@ -25,6 +25,7 @@ import com.xlythe.hex.server.ServerAuthDialog;
 import com.xlythe.hex.server.ServerCredentialStore;
 import com.xlythe.hex.server.ServerCredentials;
 import com.xlythe.hex.server.ServerNetworkPlayer;
+import com.xlythe.hex.server.GameChatStore;
 
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
@@ -54,6 +55,9 @@ public abstract class NetActivity extends BaseGameActivity {
     private UserSession waitingUser;
     private long waitingEventId;
     private ServerNetworkPlayer activeServerPlayer;
+    private final GameChatStore gameChatStore = new GameChatStore();
+    private final List<Runnable> chatObservers = new ArrayList<>();
+    private String localChatName = "";
     private boolean destroyed;
 
     public abstract void switchToGame(Game game);
@@ -260,6 +264,9 @@ public abstract class NetActivity extends BaseGameActivity {
                 serverPlayerListener(user),
                 serverExecutor);
         activeServerPlayer = remotePlayer;
+        gameChatStore.clear();
+        localChatName = local.name;
+        notifyChatObservers();
 
         localPlayer.setName(local.name);
         remotePlayer.setName(remote.name);
@@ -340,7 +347,71 @@ public abstract class NetActivity extends BaseGameActivity {
                     }
                 });
             }
+
+            @Override
+            public void onChatMessage(
+                    long eventId,
+                    String sender,
+                    String message,
+                    long timestampSeconds,
+                    boolean ownMessage) {
+                mainHandler.post(() -> {
+                    gameChatStore.receive(
+                            "event:" + eventId,
+                            sender,
+                            message,
+                            timestampSeconds > 0
+                                    ? timestampSeconds * 1000L
+                                    : System.currentTimeMillis(),
+                            ownMessage);
+                    notifyChatObservers();
+                });
+            }
+
+            @Override
+            public void onChatDelivery(String localId, boolean delivered) {
+                mainHandler.post(() -> {
+                    if (delivered) gameChatStore.markDelivered(localId);
+                    else gameChatStore.markFailed(localId);
+                    notifyChatObservers();
+                });
+            }
         };
+    }
+
+    public GameChatStore getGameChatStore() {
+        return gameChatStore;
+    }
+
+    public void sendGameChatMessage(String message) {
+        String normalized = message == null ? "" : message.trim();
+        if (normalized.isEmpty()
+                || normalized.length() > GameChatStore.MAX_MESSAGE_LENGTH
+                || activeServerPlayer == null) {
+            return;
+        }
+        String localId = "local:" + UUID.randomUUID();
+        gameChatStore.addOutgoing(
+                localId, localChatName, normalized, System.currentTimeMillis());
+        notifyChatObservers();
+        activeServerPlayer.sendChatMessage(localId, normalized);
+    }
+
+    public void addChatObserver(Runnable observer) {
+        if (!chatObservers.contains(observer)) chatObservers.add(observer);
+    }
+
+    public void removeChatObserver(Runnable observer) {
+        chatObservers.remove(observer);
+    }
+
+    public void markChatRead() {
+        gameChatStore.markRead();
+        notifyChatObservers();
+    }
+
+    private void notifyChatObservers() {
+        for (Runnable observer : new ArrayList<>(chatObservers)) observer.run();
     }
 
     private void joinRematch(UserSession user, BoardRef board) {

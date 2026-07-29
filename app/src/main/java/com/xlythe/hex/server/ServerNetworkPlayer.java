@@ -213,6 +213,15 @@ public final class ServerNetworkPlayer implements PlayingEntity {
                     }
                     pendingMoves.offer(move);
                 }
+            } else if ("MSG".equals(event.type) && event.data != null) {
+                Member sender = member(response, event.uid);
+                String senderName = sender == null ? "" : sender.name;
+                listener.onChatMessage(
+                        event.eid,
+                        senderName,
+                        event.data,
+                        event.stamp,
+                        user.uid.equals(event.uid));
             } else if ("NOTICE".equals(event.type)
                     && remoteUid.equals(event.uid)
                     && event.data != null
@@ -287,6 +296,26 @@ public final class ServerNetworkPlayer implements PlayingEntity {
                         "type",
                         accept ? "ACCEPT" : "DENY"),
                 activeGame));
+    }
+
+    public void sendChatMessage(String localId, String message) {
+        String normalized = message == null ? "" : message.trim();
+        if (normalized.isEmpty() || normalized.length() > GameChatStore.MAX_MESSAGE_LENGTH) {
+            listener.onChatDelivery(localId, false);
+            return;
+        }
+        executeGameplayRequest(() -> {
+            try {
+                process(
+                        client.command(
+                                board, user, lastEventId, "MSG", "message", normalized),
+                        activeGame);
+                listener.onChatDelivery(localId, true);
+            } catch (Exception error) {
+                listener.onChatDelivery(localId, false);
+                throw error;
+            }
+        });
     }
 
     @Override
@@ -441,6 +470,13 @@ public final class ServerNetworkPlayer implements PlayingEntity {
         }
     }
 
+    private static Member member(HandlerResponse response, String uid) {
+        for (Member player : response.players) {
+            if (uid.equals(player.uid)) return player;
+        }
+        return null;
+    }
+
     /**
      * MoveList.getPastMove() is broken in the bundled 2012 core. Reflection is
      * isolated here as a resume-game fallback; normal live games track their
@@ -472,5 +508,12 @@ public final class ServerNetworkPlayer implements PlayingEntity {
         void onRestartOffered(BoardRef board);
         void onUndoRequested(int moveIndex);
         void onUndoCompleted(int moveIndex);
+        void onChatMessage(
+                long eventId,
+                String sender,
+                String message,
+                long timestampSeconds,
+                boolean ownMessage);
+        void onChatDelivery(String localId, boolean delivered);
     }
 }

@@ -64,6 +64,15 @@
     <string name="game_save_replay">Save</string>
     <string name="game_settings">Settings</string>
     <string name="game_quit">Exit</string>
+    <string name="game_chat_button">Chat</string>
+    <string name="game_chat_unread">Chat (%1$d)</string>
+    <string name="game_chat_title">Game chat</string>
+    <string name="game_chat_empty">No messages yet. Say hello or wish your opponent good luck.</string>
+    <string name="game_chat_hint">Message your opponent</string>
+    <string name="game_chat_send">Send</string>
+    <string name="game_chat_you">You</string>
+    <string name="game_chat_sending">%1$s · Sending…</string>
+    <string name="game_chat_failed">%1$s · Not sent</string>
 
     <!-- In game notifications -->
     <string name="game_turn_title">%s\'s</string>

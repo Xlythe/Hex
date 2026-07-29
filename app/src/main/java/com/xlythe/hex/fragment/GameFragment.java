@@ -19,6 +19,7 @@ import com.hex.core.PlayerObject;
 import com.hex.core.PlayingEntity;
 import com.hex.core.Timer;
 import com.xlythe.hex.FileUtil;
+import com.xlythe.hex.MainActivity;
 import com.xlythe.hex.MainActivity.Stat;
 import com.xlythe.hex.R;
 import com.xlythe.hex.Settings;
@@ -71,6 +72,8 @@ public class GameFragment extends HexFragment {
     private Button exit;
     private Button newGame;
     private Button undo;
+    private Button chat;
+    private final Runnable chatObserver = this::updateChatButton;
 
     /**
      * Called when the activity is first created.
@@ -94,6 +97,22 @@ public class GameFragment extends HexFragment {
     public void onDetach() {
         super.onDetach();
         stopGame();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (isNetGame()) {
+            getMainActivity().addChatObserver(chatObserver);
+            updateChatButton();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        MainActivity activity = getMainActivity();
+        if (activity != null) activity.removeChatObserver(chatObserver);
+        super.onStop();
     }
 
     @Override
@@ -198,6 +217,13 @@ public class GameFragment extends HexFragment {
         newGame.setOnClickListener(v -> newGame());
         undo = view.findViewById(R.id.undo);
         undo.setOnClickListener(v -> undo());
+        chat = view.findViewById(R.id.chat);
+        chat.setVisibility(isNetGame() ? View.VISIBLE : View.GONE);
+        chat.setOnClickListener(v -> {
+            getMainActivity().markChatRead();
+            new GameChatDialogFragment().show(
+                    getParentFragmentManager(), GameChatDialogFragment.TAG);
+        });
 
         undo.setNextFocusRightId(R.id.board);
         board.setNextFocusLeftId(R.id.undo);
@@ -206,6 +232,14 @@ public class GameFragment extends HexFragment {
         undo.setVisibility(supportsUndo() ? View.VISIBLE : View.GONE);
 
         return view;
+    }
+
+    private void updateChatButton() {
+        if (chat == null || !isAdded()) return;
+        int unread = getMainActivity().getGameChatStore().unreadCount();
+        chat.setText(unread == 0
+                ? getString(R.string.game_chat_button)
+                : getString(R.string.game_chat_unread, unread));
     }
 
     protected void initializeNewGame() {

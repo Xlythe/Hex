@@ -112,6 +112,36 @@ public class ServerNetworkPlayerTest {
         remote.quit();
     }
 
+    @Test
+    public void sendsChatThroughSerializedGameCommandAndReceivesEcho() throws Exception {
+        QueueTransport transport = new QueueTransport();
+        transport.responses.add(handler(
+                "<member uid=\"7\" name=\"Alice\" place=\"1\"/>"
+                        + "<event eid=\"2\" stamp=\"123\" uid=\"7\" type=\"MSG\""
+                        + " data=\"good luck\"/>"));
+        RecordingListener listener = new RecordingListener();
+        IgGameCenterClient client = new IgGameCenterClient(transport, "device");
+        ServerNetworkPlayer remote = new ServerNetworkPlayer(
+                2,
+                client,
+                new UserSession("7", "Alice", "token"),
+                new BoardRef("42", "gc1"),
+                "9",
+                11,
+                1,
+                listener,
+                Runnable::run);
+
+        remote.sendChatMessage("local:1", "good luck");
+
+        assertTrue(listener.chatDelivered.await(1, TimeUnit.SECONDS));
+        assertEquals("MSG", transport.requests.get(0).get("cmd"));
+        assertEquals("good luck", transport.requests.get(0).get("message"));
+        assertEquals("good luck", listener.chatMessage);
+        assertTrue(listener.ownChatMessage);
+        remote.quit();
+    }
+
     private static ServerNetworkPlayer player(
             IgGameCenterClient client, int team, Executor externalExecutor) {
         return new ServerNetworkPlayer(
@@ -149,16 +179,36 @@ public class ServerNetworkPlayerTest {
         @Override public void onRestartOffered(BoardRef board) {}
         @Override public void onUndoRequested(int moveIndex) {}
         @Override public void onUndoCompleted(int moveIndex) {}
+        @Override public void onChatMessage(
+                long eventId, String sender, String message, long timestampSeconds,
+                boolean ownMessage) {}
+        @Override public void onChatDelivery(String localId, boolean delivered) {}
     }
 
     private static final class RecordingListener extends NoOpListener {
         final CountDownLatch undoCompleted = new CountDownLatch(1);
         int completedMoveIndex = -1;
+        final CountDownLatch chatDelivered = new CountDownLatch(1);
+        String chatMessage;
+        boolean ownChatMessage;
 
         @Override
         public void onUndoCompleted(int moveIndex) {
             completedMoveIndex = moveIndex;
             undoCompleted.countDown();
+        }
+
+        @Override
+        public void onChatMessage(
+                long eventId, String sender, String message, long timestampSeconds,
+                boolean ownMessage) {
+            chatMessage = message;
+            ownChatMessage = ownMessage;
+        }
+
+        @Override
+        public void onChatDelivery(String localId, boolean delivered) {
+            if (delivered) chatDelivered.countDown();
         }
     }
 }

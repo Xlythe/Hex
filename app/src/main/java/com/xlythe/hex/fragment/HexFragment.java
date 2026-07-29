@@ -6,10 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.games.AchievementsClient;
-import com.google.android.gms.games.GamesClient;
-import com.google.android.gms.games.PlayersClient;
 import com.xlythe.hex.compat.Game;
 import com.xlythe.hex.MainActivity;
 
@@ -79,26 +76,18 @@ public class HexFragment extends Fragment {
         activity.swapFragment(fragment);
     }
 
-    protected GamesClient getGamesClient() {
-        return getMainActivity().getGamesClient();
-    }
-
-    protected PlayersClient getPlayersClient() {
-        return getMainActivity().getPlayersClient();
-    }
-
     protected AchievementsClient getAchievementsClient() {
         return getMainActivity().getAchievementsClient();
     }
 
     @Nullable
-    protected GoogleSignInAccount getGoogleSignInAccount() {
+    protected String getPlayGamesPlayerName() {
         MainActivity activity = getMainActivity();
         if (activity == null || isDetached()) {
             return null;
         }
 
-        return activity.getGoogleSignInAccount();
+        return activity.getPlayGamesPlayerName();
     }
 
     protected boolean isSignedIn() {
@@ -118,16 +107,6 @@ public class HexFragment extends Fragment {
         }
 
         activity.signIn();
-    }
-
-    protected void signOut() {
-        MainActivity activity = getMainActivity();
-        if (activity == null || isDetached()) {
-            Log.w(TAG, "Unable to sign out because current fragment is detached.");
-            return;
-        }
-
-        activity.signOut();
     }
 
     protected void returnHome() {

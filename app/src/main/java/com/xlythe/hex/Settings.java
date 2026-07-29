@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.hex.core.Timer;
 
 import androidx.annotation.ColorInt;
@@ -76,9 +75,9 @@ public class Settings {
         return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString(TIMER, "0"));
     }
 
-    public static String getPlayer1Name(@NonNull Context context, @Nullable GoogleSignInAccount googleSignInAccount) {
-        if (googleSignInAccount != null && googleSignInAccount.getDisplayName() != null) {
-            return googleSignInAccount.getDisplayName().split(" ")[0];
+    public static String getPlayer1Name(@NonNull Context context, @Nullable String playGamesName) {
+        if (playGamesName != null && !playGamesName.trim().isEmpty()) {
+            return playGamesName.trim().split("\\s+")[0];
         }
         return context.getString(R.string.DEFAULT_P1_NAME);
     }

@@ -5,7 +5,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.xlythe.hex.compat.Game;
 import com.xlythe.hex.fragment.GameFragment;
 import com.xlythe.hex.fragment.GameSelectionFragment;
@@ -84,8 +83,8 @@ public class MainActivity extends NetActivity {
     }
 
     @Override
-    public void onSignInSucceeded(GoogleSignInAccount googleSignInAccount) {
-        super.onSignInSucceeded(googleSignInAccount);
+    public void onSignInSucceeded(String playerName) {
+        super.onSignInSucceeded(playerName);
 
         if (mMainFragment != null) mMainFragment.setSignedIn(true);
 

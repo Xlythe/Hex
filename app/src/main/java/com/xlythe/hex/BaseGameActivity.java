@@ -1,17 +1,12 @@
 package com.xlythe.hex;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.games.AchievementsClient;
-import com.google.android.gms.games.Games;
-import com.google.android.gms.games.GamesClient;
-import com.google.android.gms.games.PlayersClient;
+import com.google.android.gms.games.GamesSignInClient;
+import com.google.android.gms.games.PlayGames;
+import com.google.android.gms.games.PlayGamesSdk;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,49 +16,28 @@ import static com.xlythe.hex.Settings.TAG;
 
 public abstract class BaseGameActivity extends AppCompatActivity {
 
-    private static final int REQUEST_CODE_SIGN_IN = 1001;
-
-    private GoogleSignInClient mGoogleSignInClient;
-
-    private GoogleSignInAccount mGoogleSignInAccount;
-
-    private GamesClient mGamesClient;
-    private PlayersClient mPlayersClient;
+    private GamesSignInClient gamesSignInClient;
     private AchievementsClient mAchievementsClient;
+    private String playGamesPlayerName;
+    private boolean signedIn;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mGoogleSignInClient = GoogleSignIn.getClient(this, new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
-                .requestProfile()
-                .build());
+        PlayGamesSdk.initialize(getApplicationContext());
+        gamesSignInClient = PlayGames.getGamesSignInClient(this);
+        mAchievementsClient = PlayGames.getAchievementsClient(this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        mGoogleSignInClient.silentSignIn()
-                .addOnSuccessListener(this::onSignInSucceeded)
+        gamesSignInClient.isAuthenticated()
+                .addOnSuccessListener(result -> {
+                    if (result.isAuthenticated()) loadPlayGamesPlayer();
+                    else onSignInFailed(null);
+                })
                 .addOnFailureListener(this::onSignInFailed);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE_SIGN_IN) {
-            GoogleSignIn.getSignedInAccountFromIntent(data)
-                    .addOnSuccessListener(this::onSignInSucceeded)
-                    .addOnFailureListener(this::onSignInFailed);
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-    public GamesClient getGamesClient() {
-        return mGamesClient;
-    }
-
-    public PlayersClient getPlayersClient() {
-        return mPlayersClient;
     }
 
     public AchievementsClient getAchievementsClient() {
@@ -71,30 +45,35 @@ public abstract class BaseGameActivity extends AppCompatActivity {
     }
 
     public boolean isSignedIn() {
-        return GoogleSignIn.getLastSignedInAccount(this) != null;
+        return signedIn;
     }
 
     public void signIn() {
         Log.v(TAG, "User initiated sign in");
-        startActivityForResult(mGoogleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);
-    }
-
-    public void signOut() {
-        mGoogleSignInClient.signOut();
-        onSignInFailed();
+        gamesSignInClient.signIn()
+                .addOnSuccessListener(result -> {
+                    if (result.isAuthenticated()) loadPlayGamesPlayer();
+                    else onSignInFailed(null);
+                })
+                .addOnFailureListener(this::onSignInFailed);
     }
 
     @Nullable
-    public GoogleSignInAccount getGoogleSignInAccount() {
-        return mGoogleSignInAccount;
+    public String getPlayGamesPlayerName() {
+        return playGamesPlayerName;
     }
 
-    public void onSignInSucceeded(GoogleSignInAccount googleSignInAccount) {
-        Log.d(TAG, "User successfully signed in: " + googleSignInAccount.getDisplayName());
-        mGoogleSignInAccount = googleSignInAccount;
-        mGamesClient = Games.getGamesClient(this, googleSignInAccount);
-        mPlayersClient = Games.getPlayersClient(this, googleSignInAccount);
-        mAchievementsClient = Games.getAchievementsClient(this, googleSignInAccount);
+    private void loadPlayGamesPlayer() {
+        PlayGames.getPlayersClient(this).getCurrentPlayer()
+                .addOnSuccessListener(player ->
+                        onSignInSucceeded(player.getDisplayName()))
+                .addOnFailureListener(this::onSignInFailed);
+    }
+
+    public void onSignInSucceeded(String playerName) {
+        Log.d(TAG, "User successfully signed in to Play Games");
+        signedIn = true;
+        playGamesPlayerName = playerName;
     }
 
     public void onSignInFailed() {
@@ -103,7 +82,8 @@ public abstract class BaseGameActivity extends AppCompatActivity {
 
     public void onSignInFailed(@Nullable Throwable reason) {
         Log.e(TAG, "Failed to sign in", reason);
-        mGoogleSignInAccount = null;
+        signedIn = false;
+        playGamesPlayerName = null;
     }
 
     public void keepScreenOn(boolean screenOn) {

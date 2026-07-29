@@ -461,12 +461,12 @@ public class GameFragment extends HexFragment {
     protected void setName(@NonNull PlayingEntity player) {
         if (isPassToPlay()) {
             if (player.getTeam() == 1) {
-                player.setName(Settings.getPlayer1Name(getMainActivity(), getGoogleSignInAccount()));
+                player.setName(Settings.getPlayer1Name(getMainActivity(), getPlayGamesPlayerName()));
             } else {
                 player.setName(Settings.getPlayer2Name(getMainActivity()));
             }
         } else if (player.getType() == Player.Human) {
-            player.setName(Settings.getPlayer1Name(getMainActivity(), getGoogleSignInAccount()));
+            player.setName(Settings.getPlayer1Name(getMainActivity(), getPlayGamesPlayerName()));
         }
     }
 

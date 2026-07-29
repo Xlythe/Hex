@@ -114,10 +114,9 @@ public class MainFragment extends HexFragment {
 
         mSignInButton.setOnClickListener(v -> signIn());
 
-        mSignOutButton.setOnClickListener(v -> {
-            signOut();
-            refreshPlayerInformation();
-        });
+        // Play Games Services v2 owns account selection and no longer exposes
+        // app-controlled sign-out. Account changes happen in the Play Games app.
+        mSignOutButton.setVisibility(View.GONE);
         refreshPlayerInformation();
 
         return view;
@@ -146,12 +145,12 @@ public class MainFragment extends HexFragment {
             // Network is async, no promise that we won't lose connectivity
             if (getMainActivity() == null) return;
             if (mSignOutButton != null)
-                mSignOutButton.setVisibility(isSignedIn() ? View.VISIBLE : View.GONE);
+                mSignOutButton.setVisibility(View.GONE);
             if (mSignInButton != null)
                 mSignInButton.setVisibility(isSignedIn() ? View.GONE : View.VISIBLE);
             if (mTitleTextView != null)
                 mTitleTextView.setText(getString(R.string.main_title,
-                        Settings.getPlayer1Name(getMainActivity(), getGoogleSignInAccount())));
+                        Settings.getPlayer1Name(getMainActivity(), getPlayGamesPlayerName())));
             if (mHexagonLayout != null) mHexagonLayout.invalidate();
             if (mTimePlayedTextView != null && mGamesPlayedTextView != null && mGamesWonTextView != null)
                 showStats();

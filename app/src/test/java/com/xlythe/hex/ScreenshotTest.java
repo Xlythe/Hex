@@ -211,7 +211,10 @@ public class ScreenshotTest {
         dialog.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
-        snapshot(dialog);
+        // HexDialogView starts lifecycle-bound animators when Paparazzi attaches
+        // it. Capture a fixed, fully-open frame instead of whichever animation
+        // phase the host happens to render first.
+        paparazzi.snapshot(dialog, null, 300_000_000L);
     }
 
     @Test

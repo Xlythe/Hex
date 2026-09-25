@@ -32,6 +32,7 @@ import com.xlythe.hex.view.HexagonLayout;
 import com.xlythe.hex.view.SelectorLayout;
 
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Golden-image coverage for every XML-backed screen in the application.
@@ -97,6 +98,29 @@ public class ScreenshotTest {
                 originalRotation,
                 rotationOf(menu),
                 0.01f);
+    }
+
+    @Test
+    public void mainMenuCenterTouchDoesNotSpinOrActivateASection() throws ReflectiveOperationException {
+        View view = inflate(R.layout.fragment_main);
+        HexagonLayout menu = view.findViewById(R.id.hexagonButtons);
+        menu.setText(R.string.app_name);
+        for (int index = 0; index < menu.getButtons().length; index++) {
+            configure(menu.getButtons()[index], R.string.main_button_play,
+                    R.color.main_play, R.drawable.play);
+        }
+        snapshot(view, "carousel_center_touch");
+        float rotation = rotationOf(menu);
+        long downTime = 1_000L;
+        Field centerField = HexagonLayout.class.getDeclaredField("center");
+        centerField.setAccessible(true);
+        com.hex.core.Point center = (com.hex.core.Point) centerField.get(menu);
+        float centerX = center.x;
+        float centerY = center.y;
+        dispatch(menu, downTime, downTime, MotionEvent.ACTION_DOWN, centerX, centerY);
+        dispatch(menu, downTime, downTime + 16L, MotionEvent.ACTION_MOVE, centerX + 1, centerY);
+        dispatch(menu, downTime, downTime + 32L, MotionEvent.ACTION_UP, centerX + 1, centerY);
+        assertEquals(rotation, rotationOf(menu), 0.01f);
     }
 
     @Test

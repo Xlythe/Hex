@@ -40,9 +40,11 @@ public class HexagonLayout extends View implements OnTouchListener {
     // Rotation variables
     private boolean mAllowRotation;
     private float mRotation;
-    private float mRotationOffset;
-    private float mOldRotation;
-    private float[] mRotationHistory;
+    private float mLastTouchAngle;
+    private long mLastTouchTime;
+    private float mAngularVelocity;
+    private boolean mDragging;
+    private boolean mTouchInCenter;
     private ValueAnimator mAnimator;
 
     // Size and shape variables
@@ -141,6 +143,9 @@ public class HexagonLayout extends View implements OnTouchListener {
 
     @Override
     public View focusSearch(int direction) {
+        if (mFocusedButton < 0 || mFocusedButton >= mButtons.length) {
+            return super.focusSearch(direction);
+        }
         mButtons[mFocusedButton].setSelected(false);
         switch (direction) {
             case View.FOCUS_RIGHT:
@@ -457,12 +462,18 @@ public class HexagonLayout extends View implements OnTouchListener {
 
     @Override
     public boolean onTouch(View v, @NonNull MotionEvent event) {
-        int sign = (event.getX() > center.x) ? -1 : 1;
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            mRotationOffset = sign * cosineInverse(center, new Point(center.x, 0), new Point((int) event.getX(), (int) event.getY()));
-            mOldRotation = mRotation;
+        if (center == null) return false;
+        int action = event.getActionMasked();
+        float radius = (float) Math.hypot(event.getX() - center.x, event.getY() - center.y);
+        float centerDeadZone = Math.min(getWidth(), getHeight()) * 0.12f;
+        if (action == MotionEvent.ACTION_DOWN) {
+            mTouchInCenter = radius < centerDeadZone;
+            mLastTouchAngle = touchAngle(event);
+            mLastTouchTime = event.getEventTime();
+            mAngularVelocity = 0;
+            mDragging = false;
             for (Button b : mButtons) {
-                if (b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
+                if (!mTouchInCenter && b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
                     b.setPressed(b.isEnabled());
                 } else {
                     b.setPressed(false);
@@ -471,56 +482,67 @@ public class HexagonLayout extends View implements OnTouchListener {
             if (mAnimator != null) {
                 mAnimator.cancel();
             }
-            mRotationHistory = new float[4];
-        } else if (event.getAction() == MotionEvent.ACTION_UP) {
-            boolean performClick = false;
+        } else if (action == MotionEvent.ACTION_UP) {
+            boolean click = false;
             for (Button b : mButtons) {
                 if (b.isPressed()) {
-                    performClick();
-                    performClick = true;
+                    click = true;
                 }
-                b.setPressed(false);
             }
-            if (!performClick) {
-                mRotationHistory[3] = mRotationHistory[2];
-                mRotationHistory[2] = mRotationHistory[1];
-                mRotationHistory[1] = mRotationHistory[0];
-                mRotationHistory[0] = mRotation % 360;
-                spin(mRotation - getAverage(mRotationHistory));
+            if (click && !mDragging) {
+                performClick();
+            } else if (mDragging && !mTouchInCenter) {
+                spin(event.getEventTime() - mLastTouchTime > 80 ? 0 : mAngularVelocity);
             }
-        } else {
-            mRotation = mOldRotation + mRotationOffset - sign
-                    * cosineInverse(center, new Point(center.x, 0), new Point((int) event.getX(), (int) event.getY()));
-            mRotation = mRotation % 360;
+            for (Button b : mButtons) b.setPressed(false);
+        } else if (action == MotionEvent.ACTION_CANCEL) {
+            for (Button b : mButtons) b.setPressed(false);
+        } else if (action == MotionEvent.ACTION_MOVE && !mTouchInCenter) {
+            if (radius < centerDeadZone) {
+                mLastTouchAngle = touchAngle(event);
+                mLastTouchTime = event.getEventTime();
+                mAngularVelocity = 0;
+                return true;
+            }
+            float angle = touchAngle(event);
+            float delta = wrapAngle(mLastTouchAngle - angle);
+            long elapsed = event.getEventTime() - mLastTouchTime;
+            mRotation += delta;
+            if (Math.abs(delta) > 0.5f) mDragging = true;
+            if (elapsed > 0) {
+                float sample = Math.max(-720f, Math.min(720f, delta * 1000f / elapsed));
+                mAngularVelocity = 0.65f * mAngularVelocity + 0.35f * sample;
+            }
+            mLastTouchAngle = angle;
+            mLastTouchTime = event.getEventTime();
             for (Button b : mButtons) {
                 if (b.isPressed()) {
                     if (!b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
                         b.setPressed(false);
-                    } else if (Math.abs(Math.abs(mRotation) - Math.abs(mOldRotation)) > 10f) {
+                    } else if (mDragging) {
                         b.setPressed(false);
                     }
                 }
             }
-            mRotationHistory[3] = mRotationHistory[2];
-            mRotationHistory[2] = mRotationHistory[1];
-            mRotationHistory[1] = mRotationHistory[0];
-            mRotationHistory[0] = mRotation % 360;
         }
 
         invalidate();
         return true;
     }
 
-    private float getAverage(@NonNull float[] data) {
-        float sum = 0;
-        for (float f : data) {
-            sum += f;
-        }
-        return sum / data.length;
+    private float touchAngle(MotionEvent event) {
+        return (float) Math.toDegrees(Math.atan2(event.getX() - center.x, center.y - event.getY()));
     }
 
-    private void spin(float velocity) {
-        spinExactly(2.3f * velocity, false);
+    private static float wrapAngle(float angle) {
+        return ((angle + 540f) % 360f) - 180f;
+    }
+
+    private void spin(float degreesPerSecond) {
+        float speed = Math.min(Math.abs(degreesPerSecond), 720f);
+        float friction = 900f; // Degrees per second squared.
+        float distance = Math.signum(degreesPerSecond) * speed * speed / (2f * friction);
+        spinExactly(distance, false);
     }
 
     private void spinExactly(final float rotation, final boolean constantDuration) {
@@ -543,7 +565,7 @@ public class HexagonLayout extends View implements OnTouchListener {
 
         mAnimator = ValueAnimator.ofFloat(0, rotation);
         mAnimator.setInterpolator(new DecelerateInterpolator());
-        mAnimator.setDuration(constantDuration ? 300 : (long) (Math.abs(rotation) / 50 * 300));
+        mAnimator.setDuration(constantDuration ? 220 : Math.max(180, Math.min(800, (long) (Math.sqrt(2 * Math.abs(rotation) / 900f) * 1000))));
         mAnimator.addUpdateListener(animator -> {
                 float value = (Float) animator.getAnimatedValue();
                 mRotation = initialRotation + value;
@@ -596,16 +618,6 @@ public class HexagonLayout extends View implements OnTouchListener {
         super.onDetachedFromWindow();
     }
 
-    private float cosineInverse(@NonNull Point a, @NonNull Point b, @NonNull Point c) {
-        double top = distanceSqr(a, b) + distanceSqr(a, c) - distanceSqr(b, c);
-        double bottom = 2 * Math.sqrt(distanceSqr(a, b)) * Math.sqrt(distanceSqr(a, c));
-        return (float) (Math.acos(top / bottom) * 180 / Math.PI);
-    }
-
-    private double distanceSqr(@NonNull Point a, @NonNull Point b) {
-        return ((a.x - b.x) * (a.x - b.x)) + ((a.y - b.y) * (a.y - b.y));
-    }
-
     private int getDarkerColor(int color) {
         float[] hsv = new float[3];
         Color.colorToHSV(color, hsv);
@@ -634,7 +646,7 @@ public class HexagonLayout extends View implements OnTouchListener {
     }
 
     public void setInitialSpin(float spin) {
-        spin(spin);
+        spinExactly(spin, false);
     }
 
     public void setInitialRotation(float initialRotation) {

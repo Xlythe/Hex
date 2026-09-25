@@ -2,6 +2,7 @@ package com.xlythe.hex.compat;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -27,12 +28,24 @@ public final class GameReplayTest {
         assertTrue(json.has("moveList"));
         assertTrue(json.has("player1"));
         assertTrue(json.has("player2"));
+        assertEquals(1, json.get("formatVersion").getAsInt());
 
         Game restored = Game.load(replay);
         assertEquals(11, restored.getGridSize());
         assertTrue(restored.isFirstMoveSwapEnabled());
         assertEquals("Alice", restored.getPlayer1().getName());
         assertEquals("Bob", restored.getPlayer2().getName());
+
+        json.remove("formatVersion");
+        assertEquals("Alice", Game.load(json.toString()).getPlayer1().getName());
+
+        json.addProperty("formatVersion", 2);
+        try {
+            Game.load(json.toString());
+            fail("A future replay version must not be silently misread");
+        } catch (IllegalArgumentException expected) {
+            assertTrue(expected.getMessage().contains("version"));
+        }
     }
 
     private PlayerObject player(int number, String name, int color) {

@@ -11,6 +11,7 @@ import com.hex.core.Timer;
 import java.lang.reflect.Field;
 
 public class Game extends com.hex.core.Game {
+    private static final int REPLAY_FORMAT_VERSION = 1;
     private boolean hasStarted = false;
 
     public Game(GameOptions gameOptions, PlayingEntity player1, PlayingEntity player2) {
@@ -65,7 +66,9 @@ public class Game extends com.hex.core.Game {
      */
     @Override
     public String toString() {
-        return save();
+        JsonObject replay = new JsonParser().parse(save()).getAsJsonObject();
+        replay.addProperty("formatVersion", REPLAY_FORMAT_VERSION);
+        return replay.toString();
     }
 
     public static Game load(String state) {
@@ -74,6 +77,12 @@ public class Game extends com.hex.core.Game {
 
     public static Game load(String state, PlayingEntity player1, PlayingEntity player2) {
         JsonObject object = new JsonParser().parse(state).getAsJsonObject();
+        if (object.has("formatVersion")) {
+            int version = object.get("formatVersion").getAsInt();
+            if (version < 1 || version > REPLAY_FORMAT_VERSION) {
+                throw new IllegalArgumentException("Unsupported replay format version: " + version);
+            }
+        }
 
         Gson gson = new Gson();
         Game.GameOptions options = gson.fromJson(object.get("gameOptions"), Game.GameOptions.class);

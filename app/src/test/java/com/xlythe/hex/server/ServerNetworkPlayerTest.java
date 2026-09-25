@@ -70,6 +70,30 @@ public class ServerNetworkPlayerTest {
     }
 
     @Test
+    public void appliesRemoteSwapReceivedByBackgroundRefresh() throws Exception {
+        QueueTransport transport = new QueueTransport();
+        transport.responses.add(handler(""));
+        IgGameCenterClient client = new IgGameCenterClient(transport, "device");
+        PlayerObject local = new PlayerObject(1);
+        ServerNetworkPlayer remote = player(client, 2, Runnable::run);
+        Game game = new Game(
+                new GameOptions.Builder().setGridSize(11).setSwapEnabled(true).build(),
+                local,
+                remote);
+        assertTrue(GameAction.makeMove(local, new Point(3, 4), game));
+
+        remote.supportsUndo(game); // The game is active while the poll runs.
+        remote.process(IgGameCenterXml.parseHandler(handler(
+                "<event eid=\"2\" uid=\"9\" type=\"MOVE\" data=\"SWAP\"/>")), null);
+        remote.getPlayerTurn(game);
+        remote.quit();
+
+        assertEquals(2, game.getMoveList().size());
+        assertEquals(3, game.getMoveList().getMove().getX());
+        assertEquals(4, game.getMoveList().getMove().getY());
+    }
+
+    @Test
     public void advertisesUndoWithoutSendingDuringCapabilityChecks() {
         QueueTransport transport = new QueueTransport();
         IgGameCenterClient client = new IgGameCenterClient(transport, "device");

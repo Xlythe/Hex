@@ -193,7 +193,7 @@ public final class ServerNetworkPlayer implements PlayingEntity {
         });
     }
 
-    private void process(HandlerResponse response, Game game) {
+    void process(HandlerResponse response, Game game) {
         long priorEventId = lastEventId;
         for (Event event : response.events) {
             if (event.eid <= priorEventId) continue;
@@ -202,10 +202,11 @@ public final class ServerNetworkPlayer implements PlayingEntity {
             if ("MOVE".equals(event.type) && !user.uid.equals(event.uid)) {
                 Point move = IgGameCenterProtocol.decodeMove(event.data, boardSize);
                 if (IgGameCenterProtocol.isSwap(move)) {
-                    Move first = game == null || game.getMoveList().size() == 0
-                            ? null
-                            : game.getMoveList().getMove();
-                    if (first != null) move = new Point(first.getX(), first.getY());
+                    Game current = game != null ? game : activeGame;
+                    Point first = openingMove != null
+                            ? openingMove
+                            : current == null ? null : firstMove(current.getMoveList());
+                    if (first != null) move = first;
                 }
                 if (move != null && !IgGameCenterProtocol.isSwap(move)) {
                     if (game != null && game.getMoveList().size() == 0) {

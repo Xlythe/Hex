@@ -251,6 +251,7 @@ public final class ServerNetworkPlayer implements PlayingEntity {
         }
 
         lastEventId = response.latestEventId(lastEventId);
+        listener.onLastEventId(lastEventId);
         if (opponentMoved && response.localActive && lastEventId > lastNotifiedTurnEventId) {
             lastNotifiedTurnEventId = lastEventId;
             listener.onLocalTurn();
@@ -511,6 +512,7 @@ public final class ServerNetworkPlayer implements PlayingEntity {
     }
 
     public interface Listener {
+        default void onLastEventId(long eventId) {}
         default void onLocalTurn() {}
         void onNetworkError(String message);
         void onRestartCreated(BoardRef board);

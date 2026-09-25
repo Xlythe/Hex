@@ -14,7 +14,7 @@ public final class IgGameCenterProtocol {
     public static final String HEX_GAME_ID = "12";
     public static final long POLL_INTERVAL_MS = 15_000L;
     public static final String DEFAULT_API_BASE_URL =
-            "https://ig-game-center-proxy-12702774477.us-west1.run.app";
+            "https://hex-api.xlythe.com";
 
     private static final String COLUMNS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 

@@ -1,10 +1,6 @@
 package com.xlythe.hex;
 
 import android.app.Dialog;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,7 +10,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.NotificationCompat;
 import androidx.core.app.ActivityCompat;
 
 import com.hex.core.PlayerObject;
@@ -29,6 +24,8 @@ import com.xlythe.hex.server.IgGameCenterModels.LobbyBoard;
 import com.xlythe.hex.server.IgGameCenterModels.Member;
 import com.xlythe.hex.server.IgGameCenterModels.UserSession;
 import com.xlythe.hex.server.IgGameCenterProtocol;
+import com.xlythe.hex.server.OnlineNotifications;
+import com.xlythe.hex.server.OnlineNotificationState;
 import com.xlythe.hex.server.ServerAuthDialog;
 import com.xlythe.hex.server.ServerCredentialStore;
 import com.xlythe.hex.server.ServerCredentials;
@@ -68,7 +65,6 @@ public abstract class NetActivity extends BaseGameActivity {
     private String localChatName = "";
     private boolean destroyed;
     private boolean foreground;
-    private static final String NOTIFICATION_CHANNEL = "hex_online";
 
     public abstract void switchToGame(Game game);
 
@@ -77,42 +73,27 @@ public abstract class NetActivity extends BaseGameActivity {
         super.onCreate(savedInstanceState);
         credentialStore = new ServerCredentialStore(this);
         serverClient = IgGameCenterClient.production(getStableNetworkUid());
-        if (Build.VERSION.SDK_INT >= 26) {
-            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL,
-                    "Online Hex", NotificationManager.IMPORTANCE_DEFAULT);
-            getSystemService(NotificationManager.class).createNotificationChannel(channel);
-        }
+        OnlineNotifications.ensureChannel(this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         foreground = true;
+        OnlineNotificationState.foreground(this);
         requestOnlineNotificationPermission();
     }
 
     @Override
     protected void onStop() {
         foreground = false;
+        OnlineNotificationState.background(this);
         super.onStop();
     }
 
     private void notifyWhileBackgrounded(int id, String title, String message) {
         if (foreground || destroyed) return;
-        if (Build.VERSION.SDK_INT >= 33
-                && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
-                != PackageManager.PERMISSION_GRANTED) return;
-        Intent open = new Intent(this, MainActivity.class);
-        open.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent pending = PendingIntent.getActivity(this, id, open,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        NotificationCompat.Builder notification = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL)
-                .setSmallIcon(R.drawable.icon)
-                .setContentTitle(title)
-                .setContentText(message)
-                .setAutoCancel(true)
-                .setContentIntent(pending);
-        ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).notify(id, notification.build());
+        OnlineNotifications.post(this, id, title, message);
     }
 
     private void requestOnlineNotificationPermission() {
@@ -198,6 +179,7 @@ public abstract class NetActivity extends BaseGameActivity {
 
     public void signOutServerAccount() {
         credentialStore.clear();
+        OnlineNotificationState.clear(this);
         toast("Signed out of igGameCenter");
     }
 
@@ -319,9 +301,12 @@ public abstract class NetActivity extends BaseGameActivity {
                 remote.uid,
                 boardSize,
                 response.latestEventId(waitingEventId),
-                serverPlayerListener(user),
+                serverPlayerListener(user, board),
                 serverExecutor);
         activeServerPlayer = remotePlayer;
+        OnlineNotificationState.remember(this, board, user,
+                response.latestEventId(waitingEventId));
+        if (foreground) OnlineNotificationState.foreground(this);
         gameChatStore.clear();
         localChatName = local.name;
         notifyChatObservers();
@@ -358,8 +343,12 @@ public abstract class NetActivity extends BaseGameActivity {
         else if (response.localActive) notifyWhileBackgrounded(1001, "Your turn in Hex", "Your game has started.");
     }
 
-    private ServerNetworkPlayer.Listener serverPlayerListener(UserSession user) {
+    private ServerNetworkPlayer.Listener serverPlayerListener(UserSession user, BoardRef board) {
         return new ServerNetworkPlayer.Listener() {
+            @Override
+            public void onLastEventId(long eventId) {
+                OnlineNotificationState.advance(NetActivity.this, board.sid, eventId);
+            }
             @Override
             public void onLocalTurn() {
                 mainHandler.post(() -> notifyWhileBackgrounded(1001, "Your turn in Hex", "Your opponent has moved."));

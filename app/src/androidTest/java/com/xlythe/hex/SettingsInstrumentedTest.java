@@ -24,6 +24,7 @@ import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.hex.core.Timer;
+import com.xlythe.hex.compat.AndroidBotFactory;
 
 import org.junit.After;
 import org.junit.Before;
@@ -84,7 +85,7 @@ public final class SettingsInstrumentedTest {
         putString(Settings.TIMER, "45");
         assertEquals(45, Settings.getTimeAmount(context));
 
-        for (int difficulty = 0; difficulty <= 2; difficulty++) {
+        for (int difficulty = 0; difficulty <= AndroidBotFactory.TREE; difficulty++) {
             putString(Settings.DIFFICULTY, String.valueOf(difficulty));
             assertEquals(difficulty, Settings.getComputerDifficulty(context));
         }
@@ -151,8 +152,8 @@ public final class SettingsInstrumentedTest {
 
             scrollToPreference(R.string.preferences_title_com_difficulty);
             onView(withText(R.string.preferences_title_com_difficulty)).perform(click());
-            onView(withText("Hard")).perform(click());
-            assertEquals(2, Settings.getComputerDifficulty(context));
+            onView(withText("Tree (experimental)")).perform(click());
+            assertEquals(AndroidBotFactory.TREE, Settings.getComputerDifficulty(context));
 
             scrollToPreference(R.string.preferences_title_autosave);
             onView(withText(R.string.preferences_title_autosave))
@@ -165,7 +166,7 @@ public final class SettingsInstrumentedTest {
             assertFalse(Settings.getSwap(context));
             assertEquals(Timer.PER_MOVE, Settings.getTimerType(context));
             assertEquals(45, Settings.getTimeAmount(context));
-            assertEquals(2, Settings.getComputerDifficulty(context));
+            assertEquals(AndroidBotFactory.TREE, Settings.getComputerDifficulty(context));
             assertFalse(Settings.getAutosave(context));
         }
     }

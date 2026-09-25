@@ -104,7 +104,7 @@ public class Settings {
         int difficulty = parseInt(PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(DIFFICULTY, String.valueOf(defaultDifficulty)),
                 defaultDifficulty);
-        return clamp(difficulty, 0, 2);
+        return clamp(difficulty, 0, 3);
     }
 
     private static int parseInt(@Nullable String value, int fallback) {

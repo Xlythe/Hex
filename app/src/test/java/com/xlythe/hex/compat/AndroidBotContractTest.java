@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 import com.hex.ai.BeeGameAI;
 import com.hex.ai.GameAI;
+import com.hex.ai.TreeGameAI;
 import com.hex.core.AI;
 import com.hex.core.Game;
 import com.hex.core.GameAction;
@@ -27,14 +28,16 @@ public final class AndroidBotContractTest {
     private static final int BOARD_SIZE = 5;
 
     @Test
-    public void rosterMatchesTheThreeAdvertisedDifficulties() {
-        assertEquals(3, AndroidBotFactory.BOT_COUNT);
+    public void rosterIncludesTheExperimentalTreeBot() {
+        assertEquals(4, AndroidBotFactory.BOT_COUNT);
         assertTrue(AndroidBotFactory.create(
                 AndroidBotFactory.EASY, 1, BOARD_SIZE) instanceof GameAI);
         assertTrue(AndroidBotFactory.create(
                 AndroidBotFactory.MEDIUM, 1, BOARD_SIZE) instanceof BeeGameAI);
         assertTrue(AndroidBotFactory.create(
                 AndroidBotFactory.HARD, 1, BOARD_SIZE) instanceof BeeGameAI);
+        assertTrue(AndroidBotFactory.create(
+                AndroidBotFactory.TREE, 1, BOARD_SIZE) instanceof TreeGameAI);
         assertThrows(IllegalArgumentException.class,
                 () -> AndroidBotFactory.create(99, 1, BOARD_SIZE));
     }
@@ -48,7 +51,7 @@ public final class AndroidBotContractTest {
     @Test
     public void everyBotOpensInTheCenter() {
         for (int difficulty = AndroidBotFactory.EASY;
-             difficulty <= AndroidBotFactory.HARD;
+             difficulty <= AndroidBotFactory.TREE;
              difficulty++) {
             Move move = openingMove(difficulty);
             assertEquals("difficulty " + difficulty, 2, move.getX());
@@ -69,6 +72,16 @@ public final class AndroidBotContractTest {
             assertEquals(2, move.getX());
             assertEquals(2, move.getY());
         }
+    }
+
+    @Test
+    public void treeBotReturnsALegalReplyToACornerOpening() {
+        Move reply = replyTo(AndroidBotFactory.TREE, new Point(0, 0));
+        assertFalse(reply.isSwap());
+        assertTrue(reply.getX() >= 0 && reply.getX() < BOARD_SIZE);
+        assertTrue(reply.getY() >= 0 && reply.getY() < BOARD_SIZE);
+        assertFalse(reply.getX() == 0 && reply.getY() == 0);
+        assertEquals(2, reply.getTeam());
     }
 
     @Test

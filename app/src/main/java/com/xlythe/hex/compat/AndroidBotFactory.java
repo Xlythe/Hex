@@ -11,15 +11,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * The production Android bot roster and its legacy search parameters.
+ * The production Android bot roster. Tree is an experimental alternative to Bee.
  */
 public final class AndroidBotFactory {
     public static final int EASY = 0;
     public static final int MEDIUM = 1;
     public static final int HARD = 2;
-    public static final int BOT_COUNT = 3;
+    public static final int TREE = 3;
+    public static final int BOT_COUNT = 4;
 
-    @IntDef({EASY, MEDIUM, HARD})
+    @IntDef({EASY, MEDIUM, HARD, TREE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Difficulty {}
 
@@ -37,6 +38,9 @@ public final class AndroidBotFactory {
             case HARD:
                 // The legacy factory maps level N to depth N and beam 7 - N.
                 return AiTypes.newAI(AiTypes.BeeAI, team, gridSize, difficulty + 1);
+            case TREE:
+                return AiTypes.newAI(AiTypes.TreeAI, team, gridSize,
+                        gridSize <= 11 ? 12000 : 4000);
             default:
                 throw new IllegalArgumentException("Unknown bot difficulty: " + difficulty);
         }

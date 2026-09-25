@@ -10,6 +10,7 @@
         <item>Makkelijk</item>
         <item>Gemiddeld</item>
         <item>Moeilijk</item>
+        <item>Tree (experimenteel)</item>
     </string-array>
     <string-array name="timerTypeArray">
         <item>Geen timer</item>

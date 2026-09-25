@@ -33,15 +33,12 @@ public class BoardView extends View {
     private ShapeDrawable[][] mDrawable;
     private ShapeDrawable[][] mDrawableOutline;
     private ShapeDrawable[][] mCell;
-    private ShapeDrawable[][] mCellShadow;
     private Button[][] mButtons;
     @NonNull
     private Point mFocusedButton = new Point(-1, -1);
 
     private ShapeDrawable mPlayer1Background;
     private ShapeDrawable mPlayer2Background;
-    private ShapeDrawable mBorderBackground;
-    private int mBackgroundColor;
 
     private Game mGame;
 
@@ -50,7 +47,6 @@ public class BoardView extends View {
     private float mPieceMargin;
     private float mPieceWhiteBorder;
     private float mPieceLightBorder;
-    private float mPieceShadowOffset;
 
     private float mTextMargin;
     private String mTitleText;
@@ -80,8 +76,6 @@ public class BoardView extends View {
         mPieceMargin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, dm);
         mPieceWhiteBorder = mPieceMargin + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, dm);
         mPieceLightBorder = mPieceWhiteBorder + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, dm);
-        mPieceShadowOffset = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3, dm);
-        mBackgroundColor = 0xFFD2D2D2;
         mTextPaint = new Paint();
         mTextPaint.setColor(Color.WHITE);
         mTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 22, dm));
@@ -191,7 +185,6 @@ public class BoardView extends View {
             ShapeDrawable background = (player.getTeam() == 1) ? mPlayer1Background : mPlayer2Background;
             background.getPaint().setColor(player.getColor());
             background.draw(canvas);
-            mBorderBackground.draw(canvas);
 
             if (mTitleText != null && mActionText != null) {
                 String titleText = String.format(mTitleText, player.getName());
@@ -206,7 +199,6 @@ public class BoardView extends View {
             mPlayer1Background.draw(canvas);
             mPlayer2Background.getPaint().setColor(mGame.getPlayer2().getColor());
             mPlayer2Background.draw(canvas);
-            mBorderBackground.draw(canvas);
 
             if (mTitleText != null) {
                 String p1TitleText = mGame.getPlayer1().getName();
@@ -242,8 +234,6 @@ public class BoardView extends View {
                 else if (mGame.gamePieces[x][y].getTeam() == mGame.getPlayer2().getTeam())
                     c = mGame.getPlayer2().getColor();
                 if (mGame.gamePieces[x][y].isWinningPath()) c = getDarkerColor(c);
-                mCellShadow[x][y].draw(canvas);
-
                 if (mButtons[x][y].isSelected()) {
                     mCell[x][y].getPaint().setColor(Color.YELLOW);
                 } else {
@@ -268,7 +258,6 @@ public class BoardView extends View {
         mDrawable = new ShapeDrawable[n][n];
         mDrawableOutline = new ShapeDrawable[n][n];
         mCell = new ShapeDrawable[n][n];
-        mCellShadow = new ShapeDrawable[n][n];
         int windowHeight = (int) (h - 2 * mMargin);
         int windowWidth = w;
 
@@ -302,11 +291,6 @@ public class BoardView extends View {
                 mCell[xc][yc].setBounds((int) (x - hrad), (int) (y + mMargin), (int) (x + hrad - mPieceMargin),
                         (int) (y + mMargin + radius * 2 - (mPieceMargin * 1.1547)));
                 mCell[xc][yc].getPaint().setColor(Color.WHITE);
-                mCellShadow[xc][yc] = new ShapeDrawable(new PathShape(path, (int) hrad * 2, (int) radius * 2));
-                mCellShadow[xc][yc].setBounds((int) (x - hrad), (int) (y + mMargin + mPieceShadowOffset), (int) (x + hrad - mPieceMargin), (int) (y + mMargin
-                        + radius * 2 - (mPieceMargin * 1.1547)));
-                mCellShadow[xc][yc].getPaint().setColor(Color.BLACK);
-                mCellShadow[xc][yc].getPaint().setAlpha(15);
                 mButtons[xc][yc].hexagon = new Hexagon(x - hrad, y + mMargin, radius);
             }
         }
@@ -333,16 +317,6 @@ public class BoardView extends View {
         mPlayer2Background = new ShapeDrawable(new PathShape(p2Path, w, h));
         mPlayer2Background.setBounds(0, 0, w, h);
 
-        // Shape of a rectangle
-        Path borderPath = new Path();
-        borderPath.moveTo((float) (xOffset + hrad), (float) (mMargin + radius));
-        borderPath.lineTo((float) (xOffset + hrad * 2 * n - hrad), (float) (mMargin + radius));
-        borderPath.lineTo(w - (float) (xOffset + hrad), h - (float) (mMargin + radius));
-        borderPath.lineTo(w - (float) (xOffset + hrad * 2 * n - hrad), h - (float) (mMargin + radius));
-        borderPath.close();
-        mBorderBackground = new ShapeDrawable(new PathShape(borderPath, w, h));
-        mBorderBackground.setBounds(0, 0, w, h);
-        mBorderBackground.getPaint().setColor(mBackgroundColor);
     }
 
     private int getLighterColor(int color) {

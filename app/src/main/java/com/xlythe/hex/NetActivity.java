@@ -1,6 +1,12 @@
 package com.xlythe.hex;
 
 import android.app.Dialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -8,6 +14,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.ActivityCompat;
 
 import com.hex.core.PlayerObject;
 import com.hex.core.PlayingEntity;
@@ -59,6 +67,8 @@ public abstract class NetActivity extends BaseGameActivity {
     private final List<Runnable> chatObservers = new ArrayList<>();
     private String localChatName = "";
     private boolean destroyed;
+    private boolean foreground;
+    private static final String NOTIFICATION_CHANNEL = "hex_online";
 
     public abstract void switchToGame(Game game);
 
@@ -67,6 +77,53 @@ public abstract class NetActivity extends BaseGameActivity {
         super.onCreate(savedInstanceState);
         credentialStore = new ServerCredentialStore(this);
         serverClient = IgGameCenterClient.production(getStableNetworkUid());
+        if (Build.VERSION.SDK_INT >= 26) {
+            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL,
+                    "Online Hex", NotificationManager.IMPORTANCE_DEFAULT);
+            getSystemService(NotificationManager.class).createNotificationChannel(channel);
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        foreground = true;
+        requestOnlineNotificationPermission();
+    }
+
+    @Override
+    protected void onStop() {
+        foreground = false;
+        super.onStop();
+    }
+
+    private void notifyWhileBackgrounded(int id, String title, String message) {
+        if (foreground || destroyed) return;
+        if (Build.VERSION.SDK_INT >= 33
+                && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) return;
+        Intent open = new Intent(this, MainActivity.class);
+        open.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent pending = PendingIntent.getActivity(this, id, open,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        NotificationCompat.Builder notification = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL)
+                .setSmallIcon(R.drawable.icon)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setAutoCancel(true)
+                .setContentIntent(pending);
+        ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).notify(id, notification.build());
+    }
+
+    private void requestOnlineNotificationPermission() {
+        if (activeServerPlayer != null && Build.VERSION.SDK_INT >= 33
+                && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED
+                && !getPreferences(MODE_PRIVATE).getBoolean("notifications_requested", false)) {
+            getPreferences(MODE_PRIVATE).edit().putBoolean("notifications_requested", true).apply();
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1001);
+        }
     }
 
     @Override
@@ -297,10 +354,16 @@ public abstract class NetActivity extends BaseGameActivity {
                 ? new Game(options.build(), localPlayer, remotePlayer)
                 : new Game(options.build(), remotePlayer, localPlayer);
         switchToGame(game);
+        if (foreground) requestOnlineNotificationPermission();
+        else if (response.localActive) notifyWhileBackgrounded(1001, "Your turn in Hex", "Your game has started.");
     }
 
     private ServerNetworkPlayer.Listener serverPlayerListener(UserSession user) {
         return new ServerNetworkPlayer.Listener() {
+            @Override
+            public void onLocalTurn() {
+                mainHandler.post(() -> notifyWhileBackgrounded(1001, "Your turn in Hex", "Your opponent has moved."));
+            }
             @Override
             public void onNetworkError(String message) {
                 mainHandler.post(() -> toast(message));
@@ -366,6 +429,7 @@ public abstract class NetActivity extends BaseGameActivity {
                                     : System.currentTimeMillis(),
                             ownMessage);
                     notifyChatObservers();
+                    if (!ownMessage) notifyWhileBackgrounded(1002, sender.isEmpty() ? "Hex message" : sender, message);
                 });
             }
 

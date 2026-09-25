@@ -41,7 +41,8 @@
         android:drawableTop="@drawable/undo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/exit"
+        android:layout_toEndOf="@id/reload"
+        android:layout_alignParentBottom="true"
         style="?android:attr/borderlessButtonStyle" />
 
     <Button
@@ -49,8 +50,8 @@
         style="?android:attr/borderlessButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/reload"
-        android:layout_alignStart="@id/reload"
+        android:layout_toEndOf="@id/undo"
+        android:layout_alignParentBottom="true"
         android:drawableTop="@drawable/ic_chat"
         android:paddingBottom="7dp"
         android:text="@string/game_chat_button"

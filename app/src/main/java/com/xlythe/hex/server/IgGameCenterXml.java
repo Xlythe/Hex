@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 /** Secure DOM parsing for the small XML documents returned by igGameCenter. */
 public final class IgGameCenterXml {
@@ -30,12 +31,22 @@ public final class IgGameCenterXml {
 
     public static Document parse(String xml) throws ApiException {
         try {
+            // Android's platform DOM parser does not implement every JAXP feature.
+            // Reject declarations before parsing even when a feature is unavailable.
+            String upper = xml.toUpperCase(java.util.Locale.ROOT);
+            if (upper.contains("<!DOCTYPE") || upper.contains("<!ENTITY")) {
+                throw new ApiException("XML declarations are not allowed");
+            }
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            factory.setXIncludeAware(false);
+            setFeatureIfSupported(factory, XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            setFeatureIfSupported(factory, "http://apache.org/xml/features/disallow-doctype-decl", true);
+            setFeatureIfSupported(factory, "http://xml.org/sax/features/external-general-entities", false);
+            setFeatureIfSupported(factory, "http://xml.org/sax/features/external-parameter-entities", false);
+            try {
+                factory.setXIncludeAware(false);
+            } catch (UnsupportedOperationException ignored) {
+                // XInclude is disabled by default on Android's DOM parser.
+            }
             factory.setExpandEntityReferences(false);
             Document document = factory.newDocumentBuilder().parse(
                     new InputSource(new StringReader(xml)));
@@ -46,6 +57,15 @@ public final class IgGameCenterXml {
             throw e;
         } catch (Exception e) {
             throw new ApiException("Malformed XML response from igGameCenter", e);
+        }
+    }
+
+    private static void setFeatureIfSupported(DocumentBuilderFactory factory, String feature,
+                                              boolean value) throws ParserConfigurationException {
+        try {
+            factory.setFeature(feature, value);
+        } catch (ParserConfigurationException ignored) {
+            // The declaration guard above covers Android parsers without these features.
         }
     }
 

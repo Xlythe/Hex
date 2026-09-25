@@ -31,8 +31,8 @@ import com.xlythe.hex.view.HexDialogView;
 import com.xlythe.hex.view.HexagonLayout;
 import com.xlythe.hex.view.SelectorLayout;
 
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Golden-image coverage for every XML-backed screen in the application.
@@ -93,11 +93,8 @@ public class ScreenshotTest {
         dispatch(menu, downTime, downTime + 16L, MotionEvent.ACTION_MOVE,
                 menu.getWidth() * 0.55f, menu.getHeight() * 0.08f);
 
-        assertNotEquals(
-                "The deliberately oversized menu must remain swipe-rotatable",
-                originalRotation,
-                rotationOf(menu),
-                0.01f);
+        assertTrue("The menu should follow the finger around its center",
+                rotationOf(menu) < originalRotation);
     }
 
     @Test

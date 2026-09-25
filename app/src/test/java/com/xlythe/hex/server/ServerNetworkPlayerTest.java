@@ -89,8 +89,26 @@ public class ServerNetworkPlayerTest {
         remote.quit();
 
         assertEquals(2, game.getMoveList().size());
-        assertEquals(3, game.getMoveList().getMove().getX());
-        assertEquals(4, game.getMoveList().getMove().getY());
+        assertEquals(4, game.getMoveList().getMove().getX());
+        assertEquals(3, game.getMoveList().getMove().getY());
+        assertEquals(0, game.gamePieces[3][4].getTeam());
+        assertEquals(2, game.gamePieces[4][3].getTeam());
+    }
+
+    @Test
+    public void notifiesOnceWhenOpponentMoveMakesItOurTurn() throws Exception {
+        QueueTransport transport = new QueueTransport();
+        RecordingListener listener = new RecordingListener();
+        ServerNetworkPlayer remote = new ServerNetworkPlayer(
+                2, new IgGameCenterClient(transport, "device"),
+                new UserSession("7", "Alice", "token"), new BoardRef("42", "gc1"),
+                "9", 11, 0, listener, Runnable::run);
+        String response = handler("<event eid=\"2\" uid=\"9\" type=\"MOVE\" data=\"B2\"/>")
+                .replace("active=\"0\"", "active=\"1\"");
+        remote.process(IgGameCenterXml.parseHandler(response), null);
+        remote.process(IgGameCenterXml.parseHandler(response), null);
+        assertEquals(1, listener.localTurns);
+        remote.quit();
     }
 
     @Test
@@ -210,6 +228,8 @@ public class ServerNetworkPlayerTest {
     }
 
     private static final class RecordingListener extends NoOpListener {
+        int localTurns;
+        @Override public void onLocalTurn() { localTurns++; }
         final CountDownLatch undoCompleted = new CountDownLatch(1);
         int completedMoveIndex = -1;
         final CountDownLatch chatDelivered = new CountDownLatch(1);

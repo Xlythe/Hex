@@ -221,8 +221,9 @@ public class SelectorLayout extends View implements OnTouchListener {
 
     @Override
     public void onSizeChanged(int w, int h, int oldw, int oldh) {
-        int diagonal = (int) Math.sqrt(w * w + h * h);
-        int margin = (w - mWidth * 3) / 4;
+        int diagonal = (int) Math.hypot((double) w, (double) h);
+        int ribbonWidth = Math.min(mWidth, Math.max(1, w / 3));
+        int margin = Math.max(0, (w - ribbonWidth * 3) / 4);
         int offset = margin;
         // Create the buttons
         mOldRect = new Rect[mButtons.length];
@@ -230,8 +231,8 @@ public class SelectorLayout extends View implements OnTouchListener {
         mOldTextPos = new Point[mButtons.length];
 
         for (int i = 0; i < mButtons.length; i++) {
-            Hexagon hex = new Hexagon(new Point(offset, mIndentHeight - 3 * offset), new Point(mWidth / 2 + offset, -3 * offset), new Point(mWidth + offset,
-                    mIndentHeight - 3 * offset), new Point(mWidth + offset, h - offset), new Point(mWidth / 2 + offset, h - mIndentHeight - offset), new Point(
+            Hexagon hex = new Hexagon(new Point(offset, mIndentHeight - 3 * offset), new Point(ribbonWidth / 2 + offset, -3 * offset), new Point(ribbonWidth + offset,
+                    mIndentHeight - 3 * offset), new Point(ribbonWidth + offset, h - offset), new Point(ribbonWidth / 2 + offset, h - mIndentHeight - offset), new Point(
                     offset, h - offset));
 
             // Shape of a pressed state
@@ -244,8 +245,8 @@ public class SelectorLayout extends View implements OnTouchListener {
             buttonPath.lineTo(hex.f.x, hex.f.y);
             buttonPath.close();
 
-            Hexagon mirrorHex = new Hexagon(new Point(offset, mIndentHeight - offset), new Point(mWidth / 2 + offset, -offset), new Point(mWidth + offset,
-                    mIndentHeight - offset), new Point(mWidth + offset, h - offset), new Point(mWidth / 2 + offset, h - mIndentHeight - offset), new Point(
+            Hexagon mirrorHex = new Hexagon(new Point(offset, mIndentHeight - offset), new Point(ribbonWidth / 2 + offset, -offset), new Point(ribbonWidth + offset,
+                    mIndentHeight - offset), new Point(ribbonWidth + offset, h - offset), new Point(ribbonWidth / 2 + offset, h - mIndentHeight - offset), new Point(
                     offset, h - offset));
 
             // Shape of a pressed state
@@ -266,6 +267,8 @@ public class SelectorLayout extends View implements OnTouchListener {
                     / 2);
 
             mButtons[i].setHexagon(hex);
+            hex.setHitRegions(mirrorHex, mButtons[i].buttonDrawable.getBounds().top,
+                    mButtons[i].mirrorButtonDrawable.getBounds().top);
 
             mButtons[i].textX = mButtons[i].getHexagon().b.x * 2 - mButtonTextPaint.measureText(mButtons[i].getText()) / 2 - (int) (1.7 * i * margin);
             mButtons[i].textY = mButtons[i].getHexagon().d.y / 2f + mButtonTextPaint.getTextSize() / 4;
@@ -274,7 +277,7 @@ public class SelectorLayout extends View implements OnTouchListener {
             mOldMirrorRect[i] = mButtons[i].mirrorButtonDrawable.copyBounds();
             mOldTextPos[i] = new Point((int) mButtons[i].textX, (int) mButtons[i].textY);
 
-            offset += margin + mWidth;
+            offset += margin + ribbonWidth;
         }
 
     }
@@ -348,6 +351,9 @@ public class SelectorLayout extends View implements OnTouchListener {
 
     private class Hexagon {
         private final Point a, b, c, d, e, f;
+        private Hexagon mirror;
+        private int drawableOffsetY;
+        private int mirrorOffsetY;
         @NonNull
         private final Matrix m;
         @NonNull
@@ -369,10 +375,26 @@ public class SelectorLayout extends View implements OnTouchListener {
             points[0] = p.x;
             points[1] = p.y;
             m.mapPoints(points);
-            p.x = (int) points[0];
-            p.y = (int) points[1];
+            float x = points[0], y = points[1];
+            return inside(x, y - drawableOffsetY, this)
+                    || mirror != null && inside(x, y - mirrorOffsetY, mirror);
+        }
 
-            return p.x > a.x && p.x < c.x;
+        private void setHitRegions(Hexagon mirror, int drawableOffsetY, int mirrorOffsetY) {
+            this.mirror = mirror;
+            this.drawableOffsetY = drawableOffsetY;
+            this.mirrorOffsetY = mirrorOffsetY;
+        }
+
+        private static boolean inside(float x, float y, Hexagon hex) {
+            Point[] vertices = {hex.a, hex.b, hex.c, hex.d, hex.e, hex.f};
+            boolean hit = false;
+            for (int i = 0, j = vertices.length - 1; i < vertices.length; j = i++) {
+                Point a = vertices[i], b = vertices[j];
+                if ((a.y > y) != (b.y > y)
+                        && x < (float) (b.x - a.x) * (y - a.y) / (b.y - a.y) + a.x) hit = !hit;
+            }
+            return hit;
         }
     }
 

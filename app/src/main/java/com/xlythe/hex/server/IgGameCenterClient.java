@@ -7,6 +7,7 @@ import com.xlythe.hex.server.IgGameCenterModels.HandlerResponse;
 import com.xlythe.hex.server.IgGameCenterModels.LobbyBoard;
 import com.xlythe.hex.server.IgGameCenterModels.RegisteredUser;
 import com.xlythe.hex.server.IgGameCenterModels.UserSession;
+import com.xlythe.hex.BuildConfig;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,7 +31,7 @@ public final class IgGameCenterClient {
     public static IgGameCenterClient production(String networkUid) {
         return new IgGameCenterClient(
                 new IgGameCenterTransport.Http(
-                        IgGameCenterProtocol.DEFAULT_API_BASE_URL,
+                        BuildConfig.HEX_API_BASE_URL,
                         (int) IgGameCenterProtocol.POLL_INTERVAL_MS),
                 networkUid);
     }

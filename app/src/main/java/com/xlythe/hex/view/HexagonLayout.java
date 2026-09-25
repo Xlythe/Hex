@@ -505,7 +505,7 @@ public class HexagonLayout extends View implements OnTouchListener {
                 return true;
             }
             float angle = touchAngle(event);
-            float delta = wrapAngle(mLastTouchAngle - angle);
+            float delta = wrapAngle(angle - mLastTouchAngle);
             long elapsed = event.getEventTime() - mLastTouchTime;
             mRotation += delta;
             if (Math.abs(delta) > 0.5f) mDragging = true;

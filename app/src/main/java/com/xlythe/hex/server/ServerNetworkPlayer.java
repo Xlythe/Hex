@@ -61,6 +61,7 @@ public final class ServerNetworkPlayer implements PlayingEntity {
     private volatile Game activeGame;
     private volatile ScheduledFuture<?> refreshFuture;
     private boolean errorReported;
+    private long lastNotifiedTurnEventId;
 
     public ServerNetworkPlayer(
             int team,
@@ -149,7 +150,7 @@ public final class ServerNetworkPlayer implements PlayingEntity {
         if (moveCount == 1) openingMove = current;
         if (moveCount == 2) {
             Point first = openingMove != null ? openingMove : firstMove(moves);
-            encodedMove = first != null
+            encodedMove = move.isSwap() || first != null
                     && first.x == move.getX()
                     && first.y == move.getY()
                     ? "SWAP"
@@ -195,11 +196,13 @@ public final class ServerNetworkPlayer implements PlayingEntity {
 
     void process(HandlerResponse response, Game game) {
         long priorEventId = lastEventId;
+        boolean opponentMoved = false;
         for (Event event : response.events) {
             if (event.eid <= priorEventId) continue;
             lastEventId = Math.max(lastEventId, event.eid);
 
             if ("MOVE".equals(event.type) && !user.uid.equals(event.uid)) {
+                opponentMoved = true;
                 Point move = IgGameCenterProtocol.decodeMove(event.data, boardSize);
                 if (IgGameCenterProtocol.isSwap(move)) {
                     Game current = game != null ? game : activeGame;
@@ -248,6 +251,10 @@ public final class ServerNetworkPlayer implements PlayingEntity {
         }
 
         lastEventId = response.latestEventId(lastEventId);
+        if (opponentMoved && response.localActive && lastEventId > lastNotifiedTurnEventId) {
+            lastNotifiedTurnEventId = lastEventId;
+            listener.onLocalTurn();
+        }
         for (Member player : response.players) {
             if (!remoteUid.equals(player.uid)) continue;
             if (player.timerLeft >= 0) setTime(player.timerLeft * 1000L);
@@ -504,6 +511,7 @@ public final class ServerNetworkPlayer implements PlayingEntity {
     }
 
     public interface Listener {
+        default void onLocalTurn() {}
         void onNetworkError(String message);
         void onRestartCreated(BoardRef board);
         void onRestartOffered(BoardRef board);

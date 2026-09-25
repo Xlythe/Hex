@@ -15,7 +15,9 @@ android {
         versionCode = 31
         versionName = '5.1.2'
         testInstrumentationRunner = 'androidx.test.runner.AndroidJUnitRunner'
+        buildConfigField 'String', 'HEX_API_BASE_URL', '"' + (project.findProperty('hexApiBaseUrl') ?: 'https://hex-api.xlythe.com') + '"'
     }
+    buildFeatures { buildConfig = true }
     signingConfigs {
         release {
             storeFile = file(local.getProperty('keystoreDir'))

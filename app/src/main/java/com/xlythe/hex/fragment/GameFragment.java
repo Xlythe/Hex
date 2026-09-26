@@ -580,6 +580,8 @@ public class GameFragment extends HexFragment {
                     // Yes button clicked
                     if (isNetGame() && getNetPlayer() instanceof ServerNetworkPlayer) {
                         ((ServerNetworkPlayer) getNetPlayer()).forfeit();
+                        com.xlythe.hex.server.OnlineGameService.stop(getMainActivity());
+                        com.xlythe.hex.server.OnlineNotificationState.clear(getMainActivity());
                     }
                     stopGame();
                     returnHome();

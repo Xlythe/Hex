@@ -35,7 +35,7 @@ public final class OnlineNotificationWorker extends Worker {
             if (alerts.turn) OnlineNotifications.post(context, 1001,
                     "Your turn in Hex", "Your opponent has moved.");
             if (alerts.message != null) OnlineNotifications.post(context, 1002,
-                    alerts.sender, alerts.message);
+                    alerts.sender, alerts.message, state.board.sid);
             if ("FINISHED".equalsIgnoreCase(response.status)) {
                 OnlineNotificationState.clear(context);
             }

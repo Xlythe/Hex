@@ -182,6 +182,11 @@ public final class ServerNetworkPlayer implements PlayingEntity {
         }, IgGameCenterProtocol.POLL_INTERVAL_MS, TimeUnit.MILLISECONDS);
     }
 
+    /** Called by the live stream; the executor serializes it with moves and fallback polls. */
+    public void requestRefresh() {
+        executeGameplayRequest(() -> process(client.refresh(board, user, lastEventId), null));
+    }
+
     private void executeGameplayRequest(ThrowingRunnable request) {
         if (closed.get()) return;
         ioExecutor.execute(() -> {
@@ -264,6 +269,7 @@ public final class ServerNetworkPlayer implements PlayingEntity {
                     : player.status.toUpperCase(Locale.US);
             if ("QUIT".equals(status) || "LOST".equals(status)) markRemoteForfeit();
         }
+        if ("FINISHED".equalsIgnoreCase(response.status)) listener.onGameFinished();
     }
 
     private void markRemoteForfeit() {
@@ -514,6 +520,7 @@ public final class ServerNetworkPlayer implements PlayingEntity {
     public interface Listener {
         default void onLastEventId(long eventId) {}
         default void onLocalTurn() {}
+        default void onGameFinished() {}
         void onNetworkError(String message);
         void onRestartCreated(BoardRef board);
         void onRestartOffered(BoardRef board);

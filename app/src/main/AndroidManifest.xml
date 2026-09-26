@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
 
     <!-- For donations -->
     <uses-permission android:name="com.android.vending.BILLING" />
@@ -23,6 +25,10 @@
         android:supportsRtl="true"
         tools:ignore="UnusedAttribute"
         android:theme="@style/LightTheme">
+        <service android:name="com.xlythe.hex.server.OnlineGameService"
+            android:exported="false" android:foregroundServiceType="dataSync" />
+        <receiver android:name="com.xlythe.hex.server.OnlineReplyReceiver"
+            android:exported="false" />
         <meta-data android:name="com.google.android.gms.games.APP_ID" android:value="@string/app_id" />
         <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/>
         <activity

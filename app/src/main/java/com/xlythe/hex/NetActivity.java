@@ -25,6 +25,7 @@ import com.xlythe.hex.server.IgGameCenterModels.Member;
 import com.xlythe.hex.server.IgGameCenterModels.UserSession;
 import com.xlythe.hex.server.IgGameCenterProtocol;
 import com.xlythe.hex.server.OnlineNotifications;
+import com.xlythe.hex.server.OnlineGameService;
 import com.xlythe.hex.server.OnlineNotificationState;
 import com.xlythe.hex.server.ServerAuthDialog;
 import com.xlythe.hex.server.ServerCredentialStore;
@@ -81,12 +82,14 @@ public abstract class NetActivity extends BaseGameActivity {
         super.onStart();
         foreground = true;
         OnlineNotificationState.foreground(this);
+        OnlineGameService.setVisiblePlayer(activeServerPlayer);
         requestOnlineNotificationPermission();
     }
 
     @Override
     protected void onStop() {
         foreground = false;
+        OnlineGameService.setVisiblePlayer(null);
         OnlineNotificationState.background(this);
         super.onStop();
     }
@@ -112,6 +115,7 @@ public abstract class NetActivity extends BaseGameActivity {
         destroyed = true;
         cancelWaiting(false);
         if (activeServerPlayer != null) activeServerPlayer.quit();
+        OnlineGameService.setVisiblePlayer(null);
         serverExecutor.shutdownNow();
         super.onDestroy();
     }
@@ -180,6 +184,7 @@ public abstract class NetActivity extends BaseGameActivity {
     public void signOutServerAccount() {
         credentialStore.clear();
         OnlineNotificationState.clear(this);
+        OnlineGameService.stop(this);
         toast("Signed out of igGameCenter");
     }
 
@@ -307,6 +312,13 @@ public abstract class NetActivity extends BaseGameActivity {
         OnlineNotificationState.remember(this, board, user,
                 response.latestEventId(waitingEventId));
         if (foreground) OnlineNotificationState.foreground(this);
+        if (foreground) OnlineGameService.setVisiblePlayer(remotePlayer);
+        try {
+            OnlineGameService.start(this);
+        } catch (RuntimeException error) {
+            // The 15-second player poll and periodic background check remain available.
+            android.util.Log.w("HexOnlineStream", "Live service unavailable", error);
+        }
         gameChatStore.clear();
         localChatName = local.name;
         notifyChatObservers();
@@ -347,11 +359,21 @@ public abstract class NetActivity extends BaseGameActivity {
         return new ServerNetworkPlayer.Listener() {
             @Override
             public void onLastEventId(long eventId) {
-                OnlineNotificationState.advance(NetActivity.this, board.sid, eventId);
+                if (foreground) OnlineNotificationState.advance(NetActivity.this, board.sid, eventId);
             }
             @Override
             public void onLocalTurn() {
-                mainHandler.post(() -> notifyWhileBackgrounded(1001, "Your turn in Hex", "Your opponent has moved."));
+                mainHandler.post(() -> {
+                    if (!OnlineGameService.isRunning()) notifyWhileBackgrounded(
+                            1001, "Your turn in Hex", "Your opponent has moved.");
+                });
+            }
+            @Override
+            public void onGameFinished() {
+                mainHandler.post(() -> {
+                    OnlineGameService.stop(NetActivity.this);
+                    OnlineNotificationState.clear(NetActivity.this);
+                });
             }
             @Override
             public void onNetworkError(String message) {
@@ -418,7 +440,10 @@ public abstract class NetActivity extends BaseGameActivity {
                                     : System.currentTimeMillis(),
                             ownMessage);
                     notifyChatObservers();
-                    if (!ownMessage) notifyWhileBackgrounded(1002, sender.isEmpty() ? "Hex message" : sender, message);
+                    if (!ownMessage && !OnlineGameService.isRunning() && !foreground) {
+                        OnlineNotifications.post(NetActivity.this, 1002,
+                                sender.isEmpty() ? "Hex message" : sender, message, board.sid);
+                    }
                 });
             }
 

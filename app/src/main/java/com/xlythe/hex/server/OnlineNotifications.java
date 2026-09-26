@@ -10,6 +10,7 @@ import android.os.Build;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.RemoteInput;
 
 import com.xlythe.hex.MainActivity;
 import com.xlythe.hex.R;
@@ -28,6 +29,10 @@ public final class OnlineNotifications {
     }
 
     public static void post(Context context, int id, String title, String message) {
+        post(context, id, title, message, null);
+    }
+
+    public static void post(Context context, int id, String title, String message, String boardSid) {
         if (Build.VERSION.SDK_INT >= 33
                 && ActivityCompat.checkSelfPermission(context,
                 android.Manifest.permission.POST_NOTIFICATIONS)
@@ -43,6 +48,21 @@ public final class OnlineNotifications {
                 .setContentText(message)
                 .setAutoCancel(true)
                 .setContentIntent(pending);
+        if (boardSid != null && id == 1002) {
+            Intent reply = new Intent(context, OnlineReplyReceiver.class)
+                    .setAction(OnlineReplyReceiver.ACTION_REPLY)
+                    .putExtra(OnlineReplyReceiver.EXTRA_SID, boardSid);
+            PendingIntent replyIntent = PendingIntent.getBroadcast(context,
+                    boardSid.hashCode(), reply,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+            RemoteInput input = new RemoteInput.Builder(OnlineReplyReceiver.KEY_TEXT)
+                    .setLabel("Reply to opponent").build();
+            notification.addAction(new NotificationCompat.Action.Builder(
+                    R.drawable.icon, "Reply", replyIntent)
+                    .addRemoteInput(input)
+                    .setAllowGeneratedReplies(false)
+                    .build());
+        }
         ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE))
                 .notify(id, notification.build());
     }

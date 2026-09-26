@@ -184,6 +184,26 @@ public class ServerNetworkPlayerTest {
         remote.quit();
     }
 
+    @Test
+    public void streamSignalRefreshesPlayerImmediately() throws Exception {
+        QueueTransport transport = new QueueTransport();
+        transport.responses.add(handler(
+                "<member uid=\"9\" name=\"Bob\" place=\"2\"/>"
+                        + "<event eid=\"2\" uid=\"9\" type=\"MSG\" data=\"now\"/>"));
+        RecordingListener listener = new RecordingListener();
+        ServerNetworkPlayer remote = new ServerNetworkPlayer(
+                2, new IgGameCenterClient(transport, "device"),
+                new UserSession("7", "Alice", "token"), new BoardRef("42", "gc1"),
+                "9", 11, 1, listener, Runnable::run);
+
+        remote.requestRefresh();
+
+        assertTrue(listener.chatArrived.await(1, TimeUnit.SECONDS));
+        assertEquals("REFRESH", transport.requests.get(0).get("cmd"));
+        assertEquals("now", listener.chatMessage);
+        remote.quit();
+    }
+
     private static ServerNetworkPlayer player(
             IgGameCenterClient client, int team, Executor externalExecutor) {
         return new ServerNetworkPlayer(
@@ -234,6 +254,7 @@ public class ServerNetworkPlayerTest {
         int completedMoveIndex = -1;
         final CountDownLatch chatDelivered = new CountDownLatch(1);
         String chatMessage;
+        final CountDownLatch chatArrived = new CountDownLatch(1);
         boolean ownChatMessage;
 
         @Override
@@ -248,6 +269,7 @@ public class ServerNetworkPlayerTest {
                 boolean ownMessage) {
             chatMessage = message;
             ownChatMessage = ownMessage;
+            chatArrived.countDown();
         }
 
         @Override

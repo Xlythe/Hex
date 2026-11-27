@@ -103,4 +103,5 @@
     <string name="export_replay">Export replay</string>
     <string name="external_lobby">Open igGameCenter lobby in browser</string>
     <string name="no_browser">No browser is available.</string>
+    <string name="online_unavailable">Could not join the online game</string>
 </resources>

@@ -605,7 +605,15 @@ public abstract class NetActivity extends BaseGameActivity {
             try {
                 action.run();
             } catch (Exception e) {
-                mainHandler.post(() -> toast(safeMessage(e)));
+                mainHandler.post(() -> {
+                    if (destroyed || isFinishing()) return;
+                    new AlertDialog.Builder(this).setTitle(R.string.online_unavailable)
+                            .setMessage(safeMessage(e))
+                            .setPositiveButton(android.R.string.ok, null)
+                            .setNeutralButton(R.string.external_lobby,
+                                    (dialog, which) -> ServerAuthDialog.openExternalLobby(this))
+                            .show();
+                });
             }
         });
     }

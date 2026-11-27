@@ -20,6 +20,16 @@ import androidx.appcompat.app.AlertDialog;
 public final class ServerAuthDialog {
     private ServerAuthDialog() {}
 
+    public static void openExternalLobby(Context context) {
+        Intent intent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("https://www.iggamecenter.com/en/"));
+        try {
+            context.startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(context, R.string.no_browser, Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public static void showSignIn(Context context, Listener listener) {
         EditText username = field(context, "Username", InputType.TYPE_CLASS_TEXT);
         EditText password = field(
@@ -28,15 +38,7 @@ public final class ServerAuthDialog {
                 InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         Button backup = new Button(context);
         backup.setText(R.string.external_lobby);
-        backup.setOnClickListener(view -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW,
-                    Uri.parse("https://www.iggamecenter.com/en/"));
-            try {
-                context.startActivity(intent);
-            } catch (ActivityNotFoundException e) {
-                Toast.makeText(context, R.string.no_browser, Toast.LENGTH_SHORT).show();
-            }
-        });
+        backup.setOnClickListener(view -> openExternalLobby(context));
         LinearLayout content = content(context, username, password, backup);
         AlertDialog dialog = new AlertDialog.Builder(context)
                 .setTitle("Sign in to Xlythe Hex")

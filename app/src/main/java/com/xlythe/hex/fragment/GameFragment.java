@@ -280,11 +280,11 @@ public class GameFragment extends HexFragment {
         boolean autosave = Settings.getAutosave(applicationContext);
         long playedMillis = Math.max(0, game.getGameLength() - timeGamePaused);
         boolean humanWin = winner.getType() == Player.Human;
-        String replayState = autosave ? game.save() : null;
+        String replayState = autosave ? game.saveCompleted(winner) : null;
         String replayName = autosave
                 ? getString(
                         R.string.auto_saved_file_name,
-                        new SimpleDateFormat("yyyy-MM-dd HH-mm", Locale.getDefault())
+                        new SimpleDateFormat("yyyy-MM-dd HH-mm-ss-SSS", Locale.getDefault())
                                 .format(new Date()),
                         safeFileComponent(game.getPlayer1().getName()),
                         safeFileComponent(game.getPlayer2().getName()))

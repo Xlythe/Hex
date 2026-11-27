@@ -13,7 +13,16 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.hex.core.Game;
+import com.xlythe.hex.compat.Game;
+import com.xlythe.hex.ReplayDocument;
+import android.net.Uri;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 import com.xlythe.hex.FileUtil;
 import com.xlythe.hex.R;
 import com.xlythe.hex.AppExecutors;
@@ -39,11 +48,69 @@ public class HistoryFragment extends HexFragment {
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private HistoryAdapter historyAdapter;
 
+    private String exportFile;
+    private final ActivityResultLauncher<String[]> openDocument = registerForActivityResult(
+            new ActivityResultContracts.OpenDocument(), this::importReplay);
+    private final ActivityResultLauncher<String> createDocument = registerForActivityResult(
+            new ActivityResultContracts.CreateDocument("application/octet-stream"), this::exportReplay);
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle state) {
+        super.onSaveInstanceState(state);
+        state.putString("exportFile", exportFile);
+    }
+
+    private void importReplay(Uri uri) {
+        if (uri == null) return;
+        Context context = requireContext().getApplicationContext();
+        AppExecutors.io().execute(() -> {
+            try (InputStream input = context.getContentResolver().openInputStream(uri)) {
+                String replay = ReplayDocument.read(input);
+                FileUtil.autoSaveGame(context, UUID.randomUUID().toString(), replay);
+                mainHandler.post(() -> { if (getView() != null) bindFiles(getView()); });
+            } catch (IOException | RuntimeException error) {
+                reportFileError(error);
+            }
+        });
+    }
+
+    private void exportReplay(Uri uri) {
+        String file = exportFile;
+        exportFile = null;
+        if (uri == null || file == null) return;
+        Context context = requireContext().getApplicationContext();
+        AppExecutors.io().execute(() -> {
+            try {
+                byte[] replay = FileUtil.loadGameAsString(context, file).getBytes(StandardCharsets.UTF_8);
+                try (OutputStream output = context.getContentResolver().openOutputStream(uri, "wt")) {
+                    if (output == null) throw new IOException("No output stream");
+                    output.write(replay);
+                }
+            } catch (IOException | RuntimeException error) {
+                reportFileError(error);
+            }
+        });
+    }
+
+    private void reportFileError(Exception error) {
+        Log.w(TAG, "Could not transfer replay", error);
+        mainHandler.post(() -> {
+            if (isAdded()) Toast.makeText(requireContext(), R.string.game_toast_failed, Toast.LENGTH_LONG).show();
+        });
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_history, container, false);
 
+        if (savedInstanceState != null) exportFile = savedInstanceState.getString("exportFile");
+        view.findViewById(R.id.import_replay).setOnClickListener(v -> openDocument.launch(new String[]{"*/*"}));
+        bindFiles(view);
+        return view;
+    }
+
+    private void bindFiles(View view) {
         GridView games = view.findViewById(R.id.games);
         Item[] fileList = loadFileList();
         historyAdapter = new HistoryAdapter(
@@ -53,7 +120,19 @@ public class HistoryFragment extends HexFragment {
         games.setAdapter(historyAdapter);
         games.setOnItemClickListener((parent, v, position, id) -> openFile(fileList[position].file));
 
-        return view;
+        View export = view.findViewById(R.id.export_replay);
+        export.setEnabled(fileList.length > 0);
+        export.setOnClickListener(v -> {
+            String[] names = new String[fileList.length];
+            for (int i = 0; i < fileList.length; i++) {
+                names[i] = fileList[i].title == null ? fileList[i].file : fileList[i].title + " · " + fileList[i].date;
+            }
+            new AlertDialog.Builder(requireContext()).setTitle(R.string.export_replay)
+                    .setItems(names, (dialog, index) -> {
+                        exportFile = fileList[index].file;
+                        createDocument.launch(exportFile);
+                    }).show();
+        });
     }
 
     @Override
@@ -136,10 +215,7 @@ public class HistoryFragment extends HexFragment {
                     return;
                 }
 
-                // The last player to make the move is considered the winner.
-                int team = game.getMoveList().size() == 0
-                        ? 0
-                        : game.getMoveList().getMove().getTeam();
+                int team = game.replayWinner();
                 String title = context.getString(R.string.auto_saved_title, game.getPlayer1().getName(), game.getPlayer2().getName());
                 String date = new SimpleDateFormat(
                         "MMM dd, yyyy", Locale.getDefault())

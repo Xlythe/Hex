@@ -12,6 +12,7 @@ import java.lang.reflect.Field;
 
 public class Game extends com.hex.core.Game {
     private static final int REPLAY_FORMAT_VERSION = 1;
+    private JsonObject recordedResult;
     private boolean hasStarted = false;
 
     public Game(GameOptions gameOptions, PlayingEntity player1, PlayingEntity player2) {
@@ -66,9 +67,34 @@ public class Game extends com.hex.core.Game {
      */
     @Override
     public String toString() {
-        JsonObject replay = new JsonParser().parse(save()).getAsJsonObject();
+        return save();
+    }
+
+    @Override
+    public String save() {
+        JsonObject replay = new JsonParser().parse(super.save()).getAsJsonObject();
         replay.addProperty("formatVersion", REPLAY_FORMAT_VERSION);
+        if (recordedResult != null) replay.add("result", recordedResult);
         return replay.toString();
+    }
+
+    public String saveCompleted(PlayingEntity winner) {
+        PlayingEntity opponent = getOtherPlayer(winner);
+        recordedResult = new JsonObject();
+        recordedResult.addProperty("winner", winner.getTeam());
+        recordedResult.addProperty("reason", opponent.giveUp() ? "forfeit"
+                : hasTimer() && opponent.getTime() < 0 ? "timeout" : "connection");
+        return save();
+    }
+
+    public int replayWinner() {
+        if (recordedResult != null && recordedResult.has("winner") && !recordedResult.get("winner").isJsonNull()) {
+            return recordedResult.get("winner").getAsInt();
+        }
+        getMoveList().replay(0, this);
+        if (com.hex.core.GameAction.checkWinPlayer(1, this)) return 1;
+        if (com.hex.core.GameAction.checkWinPlayer(2, this)) return 2;
+        return 0;
     }
 
     public static Game load(String state) {
@@ -94,6 +120,7 @@ public class Game extends com.hex.core.Game {
         player2.setName(object.get("player2").getAsJsonObject().get("name").getAsString());
 
         Game game = new Game(options, player1, player2);
+        if (object.has("result") && object.get("result").isJsonObject()) game.recordedResult = object.getAsJsonObject("result");
         game.setCurrentPlayer(object.get("currentPlayer").getAsInt());
         game.setStartTime(object.get("gameStart").getAsLong());
         game.setEndTime(object.get("gameEnd").getAsLong());

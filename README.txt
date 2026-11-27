@@ -31,3 +31,17 @@ A modified version of https://github.com/mburman/Android-File-Explore (Released 
 
 src/com/sam/hex/ai/bee/Bee.java
 A modified AI originally written by Konstantin Lopyrev. (No official license. Special permission granted for use)
+Building and testing
+
+Use Gradle 9.6.1 and JDK 21 with the Android API 37 SDK. Set ANDROID_HOME
+or sdk.dir. A debug build works from a fresh checkout with:
+
+    gradle :app:assembleDebug :app:testDebugUnitTest :app:verifyPaparazziDebug
+
+Use :app:connectedDebugAndroidTest for device tests, including live games
+against the Xlythe matchmaking service. The browser companion test in
+Xlythe/Hex-Web- can join a deployed browser room with this test APK.
+
+In History, use Import replay and Export replay to exchange .rhex files
+with https://hex.xlythe.com. Android's document picker lets you choose
+the destination without granting the game access to your storage.

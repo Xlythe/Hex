@@ -2,7 +2,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'app.cash.paparazzi'
 
 Properties local = new Properties()
-local.load(project.rootProject.file('local.properties').newDataInputStream())
+def localFile = rootProject.file('local.properties')
+if (localFile.isFile()) localFile.withInputStream { local.load(it) }
 
 android {
     namespace = 'com.xlythe.hex'
@@ -19,7 +20,7 @@ android {
     }
     buildFeatures { buildConfig = true }
     signingConfigs {
-        release {
+        if (local.getProperty('keystoreDir')) release {
             storeFile = file(local.getProperty('keystoreDir'))
             storePassword = local.getProperty('keystorePassword')
             keyAlias = local.getProperty('keystoreAlias')
@@ -30,7 +31,7 @@ android {
         release {
             minifyEnabled = false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig = signingConfigs.release
+            signingConfig = signingConfigs.findByName('release')
         }
     }
     compileOptions {

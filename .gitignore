@@ -42,3 +42,7 @@ local.properties
 .idea/
 app/release/output-metadata.json
 *.dm
+
+/gradlew
+/gradlew.bat
+/gradle/wrapper/

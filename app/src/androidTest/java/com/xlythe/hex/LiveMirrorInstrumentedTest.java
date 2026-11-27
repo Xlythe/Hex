@@ -25,6 +25,7 @@ import com.xlythe.hex.server.OnlineNotificationState;
 import com.xlythe.hex.server.ServerCredentialStore;
 import com.xlythe.hex.server.ServerCredentials;
 import com.xlythe.hex.server.IgGameCenterModels.BoardRef;
+import com.xlythe.hex.server.IgGameCenterModels.LobbyBoard;
 import com.xlythe.hex.server.IgGameCenterModels.HandlerResponse;
 import com.xlythe.hex.server.IgGameCenterModels.UserSession;
 
@@ -45,7 +46,7 @@ public final class LiveMirrorInstrumentedTest {
         String suffix = Long.toString(System.currentTimeMillis(), 36);
         IgGameCenterClient first = IgGameCenterClient.production("device-first-" + suffix);
         IgGameCenterClient second = IgGameCenterClient.production("device-second-" + suffix);
-        String password = "test password 2026";
+        String password = java.util.UUID.randomUUID().toString();
         String firstName = "AndroidA" + suffix;
         String secondName = "AndroidB" + suffix;
         first.register(firstName, password, null);
@@ -73,13 +74,43 @@ public final class LiveMirrorInstrumentedTest {
         second.command(board, bob, seen.latestEventId(0), "MSG", "message", "Android chat");
         assertTrue(first.refresh(board, alice, 0).events.stream()
                 .anyMatch(event -> "MSG".equals(event.type) && "Android chat".equals(event.data)));
+        first.command(board, alice, 0, "END", "type", "GIVEUP");
+    }
+
+    /** Browser companion for the opt-in mixed-client Playwright test. */
+    @Test
+    public void playWithBrowserHost() throws Exception {
+        String host = androidx.test.platform.app.InstrumentationRegistry.getArguments().getString("hexHost");
+        org.junit.Assume.assumeNotNull(host);
+        String suffix = Long.toString(System.currentTimeMillis(), 36);
+        String name = "Mobile" + suffix;
+        String password = java.util.UUID.randomUUID().toString();
+        IgGameCenterClient client = IgGameCenterClient.production("crossplay-" + suffix);
+        client.register(name, password, null);
+        UserSession user = client.login(name, password);
+        LobbyBoard room = client.fetchLobby(user).stream()
+                .filter(r -> r.members.stream().anyMatch(m -> host.equals(m.name) && r.ownerUid.equals(m.uid)))
+                .findFirst().orElseThrow(() -> new AssertionError("Missing browser host"));
+        BoardRef board = new BoardRef(room.sid, room.server);
+        client.handle(board, user, 0, null, null);
+        client.command(board, user, 0, "PLACE", "place", "2");
+        try {
+            client.command(board, user, 0, "START");
+            assertTrue(await(() -> client.refresh(board, user, 0).board.charAt(0) == '1', 45000));
+            client.command(board, user, 0, "MOVE", "move", "B1");
+            client.command(board, user, 0, "MSG", "message", "Hello from Android");
+            assertTrue(await(() -> client.refresh(board, user, 0).events.stream()
+                    .anyMatch(e -> "MSG".equals(e.type) && "Hello from browser".equals(e.data)), 45000));
+        } finally {
+            client.command(board, user, 0, "LEAVE");
+        }
     }
 
     @Test
     public void backgroundStreamDeliversChatAndInlineReply() throws Exception {
         Context context = ApplicationProvider.getApplicationContext();
         String suffix = Long.toString(System.currentTimeMillis(), 36);
-        String password = "test password 2026";
+        String password = java.util.UUID.randomUUID().toString();
         IgGameCenterClient first = IgGameCenterClient.production("live-first-" + suffix);
         IgGameCenterClient second = IgGameCenterClient.production("live-second-" + suffix);
         String firstName = "StreamA" + suffix;

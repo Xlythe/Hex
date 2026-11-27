@@ -1,10 +1,17 @@
 package com.xlythe.hex.server;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.content.DialogInterface;
 import android.text.InputType;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import com.xlythe.hex.R;
 import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AlertDialog;
@@ -19,9 +26,20 @@ public final class ServerAuthDialog {
                 context,
                 "Password",
                 InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        LinearLayout content = content(context, username, password);
+        Button backup = new Button(context);
+        backup.setText(R.string.external_lobby);
+        backup.setOnClickListener(view -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("https://www.iggamecenter.com/en/"));
+            try {
+                context.startActivity(intent);
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(context, R.string.no_browser, Toast.LENGTH_SHORT).show();
+            }
+        });
+        LinearLayout content = content(context, username, password, backup);
         AlertDialog dialog = new AlertDialog.Builder(context)
-                .setTitle("Sign in to igGameCenter")
+                .setTitle("Sign in to Xlythe Hex")
                 .setView(content)
                 .setPositiveButton("Sign In", null)
                 .setNeutralButton("Create Account", null)
@@ -56,7 +74,7 @@ public final class ServerAuthDialog {
                 InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
         LinearLayout content = content(context, username, password, email);
         AlertDialog dialog = new AlertDialog.Builder(context)
-                .setTitle("Create igGameCenter account")
+                .setTitle("Create Xlythe Hex account")
                 .setMessage(
                         "This early-2010s service requires the password in the "
                                 + "encrypted registration request. Hex never stores it as plaintext.")

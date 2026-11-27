@@ -31,7 +31,7 @@ public class ReplayDocumentTest {
         String json = browserReplay();
         for (String invalid : new String[]{json.replace("\"gridSize\":3", "\"gridSize\":30000"),
                 json.replace("\"formatVersion\":1", "\"formatVersion\":2"),
-                json.replace("\"team\":2", "\"team\":1"), "{", "null"}) {
+                json.replace("\"team\":2", "\"team\":1"), json.replace("\"winner\":1", "\"winner\":2"), "{", "null"}) {
             try {
                 ReplayDocument.read(new ByteArrayInputStream(invalid.getBytes(StandardCharsets.UTF_8)));
                 fail("Accepted invalid replay");

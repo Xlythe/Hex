@@ -82,6 +82,24 @@ public final class GameReplayTest {
         assertTrue(game.gamePieces[2][1].isWinningPath());
     }
 
+    @Test
+    public void normalWinCheckChoosesShortestRouteAcrossAllFinishingCells() {
+        Game.GameOptions options = new Game.GameOptions();
+        options.gridSize = 3;
+        options.timer = new Timer(0, 0, Timer.NO_TIMER);
+        Game game = new Game(options, player(1, "Alice", 0xffff0000), player(2, "Bob", 0xff0000ff));
+        int[][] moves = {{0,2}, {0,0}, {2,0}, {1,0}, {2,1}, {0,1}, {1,2}};
+        for (int i = 0; i < moves.length; i++) {
+            assertTrue(GameAction.makeMove(i % 2 == 0 ? game.getPlayer1() : game.getPlayer2(),
+                    new Point(moves[i][0], moves[i][1]), game));
+        }
+        assertTrue(GameAction.checkWinPlayer(1, game));
+        assertTrue(game.gamePieces[0][2].isWinningPath());
+        assertTrue(game.gamePieces[1][2].isWinningPath());
+        assertTrue(game.gamePieces[2][1].isWinningPath());
+        org.junit.Assert.assertFalse(game.gamePieces[2][0].isWinningPath());
+    }
+
     private PlayerObject player(int number, String name, int color) {
         PlayerObject player = new PlayerObject(number);
         player.setName(name);

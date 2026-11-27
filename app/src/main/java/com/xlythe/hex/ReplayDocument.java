@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.xlythe.hex.compat.Game;
+import com.hex.core.GameAction;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -29,11 +30,14 @@ public final class ReplayDocument {
             JsonObject options = root.getAsJsonObject("gameOptions");
             int size = options.get("gridSize").getAsBigDecimal().intValueExact();
             if (size < 3 || size > Settings.MAX_BOARD_SIZE) throw new IOException("Unsupported board size");
-            boolean[][] occupied = new boolean[size][size];
             JsonArray moves = root.getAsJsonObject("moveList").getAsJsonArray("moveList");
             if (moves.size() > size * size + 1) throw new IOException("Too many moves");
+            Game game = Game.load(text);
+            if (game.gameOptions.timer == null) throw new IOException("Missing timer");
+            int winner = 0;
             int firstX = -1, firstY = -1;
             for (int i = 0; i < moves.size(); i++) {
+                if (winner != 0) throw new IOException("Move after a winning connection");
                 JsonObject move = moves.get(i).getAsJsonObject();
                 int x = move.get("x").getAsBigDecimal().intValueExact();
                 int y = move.get("y").getAsBigDecimal().intValueExact();
@@ -45,20 +49,24 @@ public final class ReplayDocument {
                     if (i != 1 || !options.get("swap").getAsBoolean() || x != firstY || y != firstX) {
                         throw new IOException("Invalid swap");
                     }
-                    occupied[firstX][firstY] = false;
+                    game.gamePieces[firstX][firstY].setTeam((byte) 0, game);
                 }
-                if (occupied[x][y]) throw new IOException("Cell already occupied");
-                occupied[x][y] = true;
+                if (game.gamePieces[x][y].getTeam() != 0) throw new IOException("Cell already occupied");
+                game.gamePieces[x][y].setTeam((byte) team, game);
+                if (GameAction.checkWinPlayer(team, game)) winner = team;
                 if (i == 0) { firstX = x; firstY = y; }
             }
             if (root.has("result")) {
                 JsonObject result = root.getAsJsonObject("result");
+                if (winner == 0 && result.has("reason") && !result.get("reason").isJsonNull()
+                        && "connection".equals(result.get("reason").getAsString())) {
+                    throw new IOException("Missing winning connection");
+                }
                 if (result.has("winner") && !result.get("winner").isJsonNull()) {
-                    int winner = result.get("winner").getAsBigDecimal().intValueExact();
-                    if (winner != 1 && winner != 2) throw new IOException("Invalid replay winner");
+                    int recorded = result.get("winner").getAsBigDecimal().intValueExact();
+                    if ((recorded != 1 && recorded != 2) || (winner != 0 && recorded != winner)) throw new IOException("Invalid replay winner");
                 }
             }
-            if (Game.load(text).gameOptions.timer == null) throw new IOException("Missing timer");
         } catch (RuntimeException invalid) {
             throw new IOException("Invalid Hex replay", invalid);
         }

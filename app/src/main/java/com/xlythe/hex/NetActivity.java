@@ -334,7 +334,7 @@ public abstract class NetActivity extends BaseGameActivity {
 
         GameOptions.Builder options = new GameOptions.Builder()
                 .setGridSize(boardSize)
-                .setSwapEnabled(Settings.getSwap(this));
+                .setSwapEnabled(true); // The online service enables the pie rule for both seats.
         if (response.options != null && response.options.timerTotalSeconds > 0) {
             long minutes = Math.max(1, (response.options.timerTotalSeconds + 59) / 60);
             options.setTimer(new Timer(

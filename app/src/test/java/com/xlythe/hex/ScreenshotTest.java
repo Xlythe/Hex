@@ -3,15 +3,22 @@ package com.xlythe.hex;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.ColorUtils;
 import androidx.preference.PreferenceGroupAdapter;
 import androidx.preference.PreferenceManager;
 import androidx.preference.PreferenceScreen;
@@ -145,7 +152,52 @@ public class ScreenshotTest {
 
     @Test
     public void history() {
-        snapshot(R.layout.fragment_history);
+        ViewGroup history = (ViewGroup) inflate(R.layout.fragment_history);
+        snapshot(history);
+        assertReplayButtonContrast(history, R.id.import_first_replay);
+    }
+
+    @Test
+    public void historyWithSavedReplay() {
+        ViewGroup history = (ViewGroup) inflate(R.layout.fragment_history);
+        GridView games = history.findViewById(R.id.games);
+        games.setEmptyView(history.findViewById(R.id.empty_history));
+        games.setAdapter(new ArrayAdapter<String>(games.getContext(), R.layout.view_history_item,
+                R.id.title, new String[] {"Alice vs Bob"}) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View card = super.getView(position, convertView, parent);
+                ((TextView) card.findViewById(R.id.date)).setText("Nov 28, 2026");
+                card.setBackgroundResource(R.drawable.history_background_red);
+                return card;
+            }
+        });
+        history.findViewById(R.id.replay_actions).setVisibility(View.VISIBLE);
+        snapshot(history);
+        assertReplayButtonContrast(history, R.id.import_replay);
+        assertReplayButtonContrast(history, R.id.export_replay);
+    }
+
+    private void assertReplayButtonContrast(ViewGroup history, int id) {
+        Button button = history.findViewById(id);
+        Rect bounds = new Rect(0, 0, button.getWidth(), button.getHeight());
+        history.offsetDescendantRectToMyCoords(button, bounds);
+        Bitmap rendered = Bitmap.createBitmap(history.getWidth(), history.getHeight(),
+                Bitmap.Config.ARGB_8888);
+        history.draw(new Canvas(rendered));
+        // Sample the fill inside the leading padding, then the ink inside the text area.
+        int surface = rendered.getPixel(bounds.left + button.getPaddingLeft() / 2, bounds.centerY());
+        double contrast = 1;
+        int top = bounds.top + button.getTotalPaddingTop();
+        for (int y = top; y < top + button.getLayout().getHeight(); y++) {
+            for (int x = bounds.left + button.getCompoundPaddingLeft();
+                    x < bounds.right - button.getCompoundPaddingRight(); x++) {
+                contrast = Math.max(contrast, ColorUtils.calculateContrast(rendered.getPixel(x, y), surface));
+            }
+        }
+        rendered.recycle();
+        assertTrue(button.getText() + " rendered contrast " + contrast + " must reach 4.5:1",
+                contrast >= 4.5);
     }
 
     @Test

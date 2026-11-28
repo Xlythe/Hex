@@ -1,10 +1,14 @@
+<!-- History has a dark reading surface inside the shared light activity window. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:background="@color/bar_background"
     android:paddingStart="16dp"
-    android:paddingEnd="16dp">
+    android:paddingEnd="16dp"
+    tools:ignore="Overdraw">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,22 +25,24 @@
             android:textSize="20sp" />
 
         <LinearLayout
-            style="?android:attr/buttonBarStyle"
             android:id="@+id/replay_actions"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
             android:visibility="gone">
 
             <Button
-                style="?android:attr/buttonBarButtonStyle"
+                style="@style/ReplayButton"
                 android:id="@+id/import_replay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/import_replay" />
 
             <Button
-                style="?android:attr/buttonBarButtonStyle"
+                style="@style/ReplayButton"
                 android:id="@+id/export_replay"
+                android:layout_marginStart="8dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/export_replay" />
@@ -97,13 +103,12 @@
                     android:textSize="15sp" />
 
                 <Button
+                    style="@style/ReplayButton"
                     android:id="@+id/import_first_replay"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:backgroundTint="@color/main_history"
-                    android:text="@string/import_replay"
-                    android:textColor="#262626" />
+                    android:text="@string/import_replay" />
             </LinearLayout>
         </ScrollView>
     </FrameLayout>

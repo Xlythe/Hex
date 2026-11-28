@@ -86,4 +86,9 @@
     <string name="game_over_home">Startseite</string>
     <string name="privacy_policy"><a href="https://xlythe.com/privacy.html">Datenschutzerklärung</a></string>
     <string name="preferences_summary_custom_timer">Zeit in Minuten</string>
+    <string name="import_replay">Wiederholung importieren</string>
+    <string name="export_replay">Wiederholung exportieren</string>
+    <string name="external_lobby">igGameCenter-Lobby im Browser öffnen</string>
+    <string name="no_browser">Kein Browser verfügbar.</string>
+    <string name="online_unavailable">Beitritt zum Online-Spiel fehlgeschlagen</string>
 </resources>

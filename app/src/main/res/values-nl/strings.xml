@@ -100,4 +100,9 @@
     <string name="game_over_home">Start</string>
     <string name="privacy_policy"><a href="https://xlythe.com/privacy.html">Privacybeleid</a></string>
     <string name="preferences_summary_custom_timer">Tijd in minuten</string>
+    <string name="import_replay">Herhaling importeren</string>
+    <string name="export_replay">Herhaling exporteren</string>
+    <string name="external_lobby">igGameCenter-lobby openen in de browser</string>
+    <string name="no_browser">Er is geen browser beschikbaar.</string>
+    <string name="online_unavailable">Deelnemen aan het online spel is mislukt</string>
 </resources>

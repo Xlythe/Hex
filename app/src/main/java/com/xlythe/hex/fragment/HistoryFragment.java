@@ -1,6 +1,9 @@
 package com.xlythe.hex.fragment;
 
+import static com.xlythe.hex.Settings.TAG;
+
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -13,33 +16,30 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.xlythe.hex.compat.Game;
-import com.xlythe.hex.ReplayDocument;
-import android.net.Uri;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.UiThread;
 import androidx.appcompat.app.AlertDialog;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.UUID;
+
+import com.xlythe.hex.AppExecutors;
 import com.xlythe.hex.FileUtil;
 import com.xlythe.hex.R;
-import com.xlythe.hex.AppExecutors;
+import com.xlythe.hex.ReplayDocument;
+import com.xlythe.hex.compat.Game;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.UiThread;
-
-import static com.xlythe.hex.Settings.TAG;
+import java.util.UUID;
 
 /**
  * @author Will Harmon
@@ -105,7 +105,9 @@ public class HistoryFragment extends HexFragment {
         View view = inflater.inflate(R.layout.fragment_history, container, false);
 
         if (savedInstanceState != null) exportFile = savedInstanceState.getString("exportFile");
-        view.findViewById(R.id.import_replay).setOnClickListener(v -> openDocument.launch(new String[]{"*/*"}));
+        View.OnClickListener importClick = v -> openDocument.launch(new String[]{"*/*"});
+        view.findViewById(R.id.import_replay).setOnClickListener(importClick);
+        view.findViewById(R.id.import_first_replay).setOnClickListener(importClick);
         bindFiles(view);
         return view;
     }
@@ -117,7 +119,9 @@ public class HistoryFragment extends HexFragment {
                 requireContext().getApplicationContext(),
                 fileList,
                 mainHandler);
+        games.setEmptyView(view.findViewById(R.id.empty_history));
         games.setAdapter(historyAdapter);
+        view.findViewById(R.id.replay_actions).setVisibility(fileList.length == 0 ? View.GONE : View.VISIBLE);
         games.setOnItemClickListener((parent, v, position, id) -> openFile(fileList[position].file));
 
         View export = view.findViewById(R.id.export_replay);

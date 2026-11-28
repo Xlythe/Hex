@@ -101,7 +101,7 @@
 
     <string name="import_replay">Import replay</string>
     <string name="export_replay">Export replay</string>
-    <string name="external_lobby">Open igGameCenter lobby in browser</string>
-    <string name="no_browser">No browser is available.</string>
     <string name="online_unavailable">Could not join the online game</string>
+    <string name="no_saved_replays">No saved replays</string>
+    <string name="empty_replay_hint">Save a finished game or import a .rhex file to watch it here.</string>
 </resources>

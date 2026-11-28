@@ -4,8 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.RemoteInput;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,39 +16,42 @@ import android.service.notification.StatusBarNotification;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.GrantPermissionRule;
 
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-
 import com.xlythe.hex.server.IgGameCenterClient;
+import com.xlythe.hex.server.IgGameCenterModels.BoardRef;
+import com.xlythe.hex.server.IgGameCenterModels.HandlerResponse;
+import com.xlythe.hex.server.IgGameCenterModels.LobbyBoard;
+import com.xlythe.hex.server.IgGameCenterModels.UserSession;
 import com.xlythe.hex.server.IgGameCenterProtocol;
 import com.xlythe.hex.server.OnlineGameService;
 import com.xlythe.hex.server.OnlineNotificationState;
 import com.xlythe.hex.server.ServerCredentialStore;
 import com.xlythe.hex.server.ServerCredentials;
-import com.xlythe.hex.server.IgGameCenterModels.BoardRef;
-import com.xlythe.hex.server.IgGameCenterModels.LobbyBoard;
-import com.xlythe.hex.server.IgGameCenterModels.HandlerResponse;
-import com.xlythe.hex.server.IgGameCenterModels.UserSession;
 
-import org.junit.Test;
+import org.junit.Assume;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.LinkedHashMap;
+import java.util.UUID;
+import java.util.concurrent.Callable;
 
 /** Device-level POST/XML smoke test against the live mirror. */
 @RunWith(AndroidJUnit4.class)
 public final class LiveMirrorInstrumentedTest {
     @Rule public GrantPermissionRule notifications = GrantPermissionRule.grant(
-            android.Manifest.permission.POST_NOTIFICATIONS);
+            Manifest.permission.POST_NOTIFICATIONS);
 
     @Test
     public void twoAndroidClientsCanPlayAndChat() throws Exception {
         String suffix = Long.toString(System.currentTimeMillis(), 36);
         IgGameCenterClient first = IgGameCenterClient.production("device-first-" + suffix);
         IgGameCenterClient second = IgGameCenterClient.production("device-second-" + suffix);
-        String password = java.util.UUID.randomUUID().toString();
+        String password = UUID.randomUUID().toString();
         String firstName = "AndroidA" + suffix;
         String secondName = "AndroidB" + suffix;
         first.register(firstName, password, null);
@@ -80,11 +85,11 @@ public final class LiveMirrorInstrumentedTest {
     /** Browser companion for the opt-in mixed-client Playwright test. */
     @Test
     public void playWithBrowserHost() throws Exception {
-        String host = androidx.test.platform.app.InstrumentationRegistry.getArguments().getString("hexHost");
-        org.junit.Assume.assumeNotNull(host);
+        String host = InstrumentationRegistry.getArguments().getString("hexHost");
+        Assume.assumeNotNull(host);
         String suffix = Long.toString(System.currentTimeMillis(), 36);
         String name = "Mobile" + suffix;
-        String password = java.util.UUID.randomUUID().toString();
+        String password = UUID.randomUUID().toString();
         IgGameCenterClient client = IgGameCenterClient.production("crossplay-" + suffix);
         client.register(name, password, null);
         UserSession user = client.login(name, password);
@@ -110,7 +115,7 @@ public final class LiveMirrorInstrumentedTest {
     public void backgroundStreamDeliversChatAndInlineReply() throws Exception {
         Context context = ApplicationProvider.getApplicationContext();
         String suffix = Long.toString(System.currentTimeMillis(), 36);
-        String password = java.util.UUID.randomUUID().toString();
+        String password = UUID.randomUUID().toString();
         IgGameCenterClient first = IgGameCenterClient.production("live-first-" + suffix);
         IgGameCenterClient second = IgGameCenterClient.production("live-second-" + suffix);
         String firstName = "StreamA" + suffix;
@@ -150,7 +155,7 @@ public final class LiveMirrorInstrumentedTest {
             Intent reply = new Intent();
             Bundle text = new Bundle();
             text.putCharSequence("reply", "Inline Android reply");
-            android.app.RemoteInput.addResultsToIntent(
+            RemoteInput.addResultsToIntent(
                     message.actions[0].getRemoteInputs(), reply, text);
             message.actions[0].actionIntent.send(context, 0, reply);
             assertTrue("The inline reply did not reach the opponent",
@@ -177,7 +182,7 @@ public final class LiveMirrorInstrumentedTest {
         return null;
     }
 
-    private static boolean await(java.util.concurrent.Callable<Boolean> check, long timeoutMs)
+    private static boolean await(Callable<Boolean> check, long timeoutMs)
             throws Exception {
         long deadline = SystemClock.elapsedRealtime() + timeoutMs;
         while (SystemClock.elapsedRealtime() < deadline) {

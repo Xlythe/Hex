@@ -6,6 +6,7 @@ import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Base64;
 
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 
@@ -28,7 +29,7 @@ public final class ServerCredentialStore {
     private static final String KEY_IV = "iv";
     private static final String KEY_PAYLOAD = "payload";
     private static final byte[] ASSOCIATED_DATA =
-            "com.sam.hex:iggamecenter:v1".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+            "com.sam.hex:iggamecenter:v1".getBytes(StandardCharsets.UTF_8);
 
     private final SharedPreferences preferences;
 

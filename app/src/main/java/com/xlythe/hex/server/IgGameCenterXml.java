@@ -56,7 +56,7 @@ public final class IgGameCenterXml {
         } catch (ApiException e) {
             throw e;
         } catch (Exception e) {
-            throw new ApiException("Malformed XML response from igGameCenter", e);
+            throw new ApiException("Malformed XML response from the game server", e);
         }
     }
 
@@ -89,7 +89,7 @@ public final class IgGameCenterXml {
         String sid = requiredText(document, "sid");
         String server = requiredText(document, "server");
         if (!IgGameCenterProtocol.isValidServerName(server)) {
-            throw new ApiException("Invalid game server in igGameCenter response");
+            throw new ApiException("Invalid game server in game server response");
         }
         return new BoardRef(sid, server);
     }
@@ -195,7 +195,7 @@ public final class IgGameCenterXml {
 
     private static Element requiredElement(Node parent, String name) throws ApiException {
         Element element = firstElement(parent, name);
-        if (element == null) throw new ApiException("Missing " + name + " in igGameCenter response");
+        if (element == null) throw new ApiException("Missing " + name + " in game server response");
         return element;
     }
 
@@ -211,7 +211,7 @@ public final class IgGameCenterXml {
 
     private static String requiredText(Document document, String name) throws ApiException {
         String value = firstText(document, name);
-        if (value == null) throw new ApiException("Missing " + name + " in igGameCenter response");
+        if (value == null) throw new ApiException("Missing " + name + " in game server response");
         return value;
     }
 

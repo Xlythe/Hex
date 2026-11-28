@@ -1,17 +1,10 @@
 package com.xlythe.hex.server;
 
-import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.content.DialogInterface;
 import android.text.InputType;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
-
-import com.xlythe.hex.R;
 import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AlertDialog;
@@ -20,26 +13,13 @@ import androidx.appcompat.app.AlertDialog;
 public final class ServerAuthDialog {
     private ServerAuthDialog() {}
 
-    public static void openExternalLobby(Context context) {
-        Intent intent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse("https://www.iggamecenter.com/en/"));
-        try {
-            context.startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(context, R.string.no_browser, Toast.LENGTH_SHORT).show();
-        }
-    }
-
     public static void showSignIn(Context context, Listener listener) {
         EditText username = field(context, "Username", InputType.TYPE_CLASS_TEXT);
         EditText password = field(
                 context,
                 "Password",
                 InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        Button backup = new Button(context);
-        backup.setText(R.string.external_lobby);
-        backup.setOnClickListener(view -> openExternalLobby(context));
-        LinearLayout content = content(context, username, password, backup);
+        LinearLayout content = content(context, username, password);
         AlertDialog dialog = new AlertDialog.Builder(context)
                 .setTitle("Sign in to Xlythe Hex")
                 .setView(content)
@@ -77,9 +57,6 @@ public final class ServerAuthDialog {
         LinearLayout content = content(context, username, password, email);
         AlertDialog dialog = new AlertDialog.Builder(context)
                 .setTitle("Create Xlythe Hex account")
-                .setMessage(
-                        "This early-2010s service requires the password in the "
-                                + "encrypted registration request. Hex never stores it as plaintext.")
                 .setView(content)
                 .setPositiveButton("Create Account", null)
                 .setNeutralButton("Sign In", null)

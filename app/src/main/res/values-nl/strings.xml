@@ -102,7 +102,7 @@
     <string name="preferences_summary_custom_timer">Tijd in minuten</string>
     <string name="import_replay">Herhaling importeren</string>
     <string name="export_replay">Herhaling exporteren</string>
-    <string name="external_lobby">igGameCenter-lobby openen in de browser</string>
-    <string name="no_browser">Er is geen browser beschikbaar.</string>
     <string name="online_unavailable">Deelnemen aan het online spel is mislukt</string>
+    <string name="no_saved_replays">Geen opgeslagen herhalingen</string>
+    <string name="empty_replay_hint">Sla een afgerond spel op of importeer een .rhex-bestand om het hier terug te kijken.</string>
 </resources>

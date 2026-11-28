@@ -3,6 +3,7 @@ package com.xlythe.hex.compat;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.hex.core.GameAction;
 import com.hex.core.MoveList;
 import com.hex.core.PlayerObject;
 import com.hex.core.PlayingEntity;
@@ -92,8 +93,8 @@ public class Game extends com.hex.core.Game {
             return recordedResult.get("winner").getAsInt();
         }
         getMoveList().replay(0, this);
-        if (com.hex.core.GameAction.checkWinPlayer(1, this)) return 1;
-        if (com.hex.core.GameAction.checkWinPlayer(2, this)) return 2;
+        if (GameAction.checkWinPlayer(1, this)) return 1;
+        if (GameAction.checkWinPlayer(2, this)) return 2;
         return 0;
     }
 

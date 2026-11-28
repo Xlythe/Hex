@@ -88,7 +88,7 @@
     <string name="preferences_summary_custom_timer">Zeit in Minuten</string>
     <string name="import_replay">Wiederholung importieren</string>
     <string name="export_replay">Wiederholung exportieren</string>
-    <string name="external_lobby">igGameCenter-Lobby im Browser öffnen</string>
-    <string name="no_browser">Kein Browser verfügbar.</string>
     <string name="online_unavailable">Beitritt zum Online-Spiel fehlgeschlagen</string>
+    <string name="no_saved_replays">Keine gespeicherten Wiederholungen</string>
+    <string name="empty_replay_hint">Speichere eine beendete Partie oder importiere eine .rhex-Datei, um sie hier anzusehen.</string>
 </resources>

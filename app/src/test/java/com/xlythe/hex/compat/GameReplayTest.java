@@ -1,14 +1,15 @@
 package com.xlythe.hex.compat;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.hex.core.PlayerObject;
 import com.hex.core.GameAction;
 import com.hex.core.GamePiece;
+import com.hex.core.PlayerObject;
 import com.hex.core.Point;
 import com.hex.core.Timer;
 
@@ -97,7 +98,7 @@ public final class GameReplayTest {
         assertTrue(game.gamePieces[0][2].isWinningPath());
         assertTrue(game.gamePieces[1][2].isWinningPath());
         assertTrue(game.gamePieces[2][1].isWinningPath());
-        org.junit.Assert.assertFalse(game.gamePieces[2][0].isWinningPath());
+        assertFalse(game.gamePieces[2][0].isWinningPath());
     }
 
     private PlayerObject player(int number, String name, int color) {

@@ -29,13 +29,13 @@ public interface IgGameCenterTransport {
             try {
                 uri = URI.create(normalized);
             } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Invalid igGameCenter API base URL", e);
+                throw new IllegalArgumentException("Invalid game server API base URL", e);
             }
             if (!"https".equalsIgnoreCase(uri.getScheme())
                     || uri.getHost() == null
                     || uri.getRawQuery() != null
                     || uri.getRawFragment() != null) {
-                throw new IllegalArgumentException("igGameCenter API base URL must be HTTPS");
+                throw new IllegalArgumentException("game server API base URL must be HTTPS");
             }
             if (timeoutMs <= 0) throw new IllegalArgumentException("Timeout must be positive");
             this.baseUrl = normalized;
@@ -67,7 +67,7 @@ public interface IgGameCenterTransport {
 
                 int status = connection.getResponseCode();
                 if (status < 200 || status >= 300) {
-                    throw new ApiException("igGameCenter returned HTTP " + status);
+                    throw new ApiException("game server returned HTTP " + status);
                 }
                 try (InputStream input = connection.getInputStream()) {
                     return readBounded(input);
@@ -75,7 +75,7 @@ public interface IgGameCenterTransport {
             } catch (ApiException e) {
                 throw e;
             } catch (IOException | IllegalArgumentException e) {
-                throw new ApiException("Could not connect to igGameCenter", e);
+                throw new ApiException("Could not connect to the game server", e);
             } finally {
                 if (connection != null) connection.disconnect();
             }
@@ -107,7 +107,7 @@ public interface IgGameCenterTransport {
             int count;
             while ((count = input.read(buffer)) != -1) {
                 if (output.size() + count > MAX_RESPONSE_BYTES) {
-                    throw new ApiException("igGameCenter response was unexpectedly large");
+                    throw new ApiException("game server response was unexpectedly large");
                 }
                 output.write(buffer, 0, count);
             }

@@ -22,6 +22,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.UiThread;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.xlythe.hex.AppExecutors;
 import com.xlythe.hex.FileUtil;
@@ -103,6 +106,14 @@ public class HistoryFragment extends HexFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_history, container, false);
+        int leftPadding = view.getPaddingLeft();
+        int rightPadding = view.getPaddingRight();
+        ViewCompat.setOnApplyWindowInsetsListener(view, (history, insets) -> {
+            Insets safe = insets.getInsets(WindowInsetsCompat.Type.systemBars()
+                    | WindowInsetsCompat.Type.displayCutout());
+            history.setPadding(leftPadding + safe.left, safe.top, rightPadding + safe.right, safe.bottom);
+            return insets;
+        });
 
         if (savedInstanceState != null) exportFile = savedInstanceState.getString("exportFile");
         View.OnClickListener importClick = v -> openDocument.launch(new String[]{"*/*"});

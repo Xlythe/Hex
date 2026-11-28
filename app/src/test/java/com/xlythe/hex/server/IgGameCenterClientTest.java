@@ -3,7 +3,9 @@ package com.xlythe.hex.server;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 
+import com.xlythe.hex.server.IgGameCenterModels.ApiException;
 import com.xlythe.hex.server.IgGameCenterModels.BoardRef;
 import com.xlythe.hex.server.IgGameCenterModels.HandlerResponse;
 import com.xlythe.hex.server.IgGameCenterModels.UserSession;
@@ -49,6 +51,26 @@ public class IgGameCenterClientTest {
         assertEquals("2ab96390c7dbe3439de74d0c9b0b1767",
                 transport.parameters.get("password"));
         assertEquals("1", transport.parameters.get("md5"));
+    }
+
+    @Test
+    public void syncReadsConfiguredClientAndSendsCodeOnlyWithUserSession() throws Exception {
+        String id = "12345-client.apps.googleusercontent.com";
+        RecordingTransport config = new RecordingTransport("<response><client_id>" + id + "</client_id></response>");
+        assertEquals(id, new IgGameCenterClient(config, "device").playGamesClientId());
+        assertFalse(config.parameters.containsKey("session_id"));
+        RecordingTransport sync = new RecordingTransport("<synced/>");
+        new IgGameCenterClient(sync, "device").syncPlayGames(new UserSession("7", "Alice", "session"), "one-time");
+        assertEquals("/api_play_sync.php", sync.path);
+        assertEquals("session", sync.parameters.get("session_id"));
+        assertEquals("one-time", sync.parameters.get("code"));
+    }
+
+    @Test
+    public void unconfiguredServerAndUnconfirmedSyncAreReportedAsFailures() {
+        IgGameCenterClient client = new IgGameCenterClient(new RecordingTransport("<response/>"), "device");
+        assertThrows(ApiException.class, client::playGamesClientId);
+        assertThrows(ApiException.class, () -> client.syncPlayGames(new UserSession("7", "Alice", "session"), "one-time"));
     }
 
     @Test

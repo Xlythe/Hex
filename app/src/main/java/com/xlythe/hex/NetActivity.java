@@ -1,22 +1,27 @@
 package com.xlythe.hex;
 
+import android.Manifest;
 import android.app.Dialog;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 
+import com.google.android.gms.games.PlayGames;
 import com.hex.core.PlayerObject;
 import com.hex.core.PlayingEntity;
 import com.hex.core.Timer;
 import com.xlythe.hex.compat.Game;
 import com.xlythe.hex.compat.GameOptions;
+import com.xlythe.hex.server.GameChatStore;
 import com.xlythe.hex.server.IgGameCenterClient;
 import com.xlythe.hex.server.IgGameCenterModels.BoardRef;
 import com.xlythe.hex.server.IgGameCenterModels.HandlerResponse;
@@ -24,23 +29,23 @@ import com.xlythe.hex.server.IgGameCenterModels.LobbyBoard;
 import com.xlythe.hex.server.IgGameCenterModels.Member;
 import com.xlythe.hex.server.IgGameCenterModels.UserSession;
 import com.xlythe.hex.server.IgGameCenterProtocol;
-import com.xlythe.hex.server.OnlineNotifications;
 import com.xlythe.hex.server.OnlineGameService;
 import com.xlythe.hex.server.OnlineNotificationState;
+import com.xlythe.hex.server.OnlineNotifications;
 import com.xlythe.hex.server.ServerAuthDialog;
 import com.xlythe.hex.server.ServerCredentialStore;
 import com.xlythe.hex.server.ServerCredentials;
 import com.xlythe.hex.server.ServerNetworkPlayer;
-import com.xlythe.hex.server.GameChatStore;
 
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /** Activity-level account, lobby, matchmaking, and rematch orchestration. */
@@ -101,12 +106,12 @@ public abstract class NetActivity extends BaseGameActivity {
 
     private void requestOnlineNotificationPermission() {
         if (activeServerPlayer != null && Build.VERSION.SDK_INT >= 33
-                && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED
                 && !getPreferences(MODE_PRIVATE).getBoolean("notifications_requested", false)) {
             getPreferences(MODE_PRIVATE).edit().putBoolean("notifications_requested", true).apply();
             ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1001);
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1001);
         }
     }
 
@@ -173,6 +178,32 @@ public abstract class NetActivity extends BaseGameActivity {
             signIn();
             return;
         }
+        new AlertDialog.Builder(this).setTitle(R.string.play_achievements)
+                .setItems(new String[]{getString(R.string.play_view), getString(R.string.play_sync)},
+                        (dialog, which) -> {
+                            if (which == 0) showGoogleAchievements();
+                            else authenticate(user -> runBusy(getString(R.string.play_sync), () -> {
+                                String clientId = serverClient.playGamesClientId();
+                                mainHandler.post(() -> confirmPlaySync(user, clientId));
+                            }));
+                        }).show();
+    }
+
+    private void confirmPlaySync(UserSession user, String clientId) {
+        if (destroyed || isFinishing()) return;
+        new AlertDialog.Builder(this).setTitle(R.string.play_sync)
+                .setMessage(getString(R.string.play_link_accounts, getPlayGamesPlayerName(), user.name))
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(R.string.play_sync, (dialog, which) ->
+                        PlayGames.getGamesSignInClient(this).requestServerSideAccess(clientId, false, Collections.emptyList())
+                                .addOnSuccessListener(this, result -> runBusy(getString(R.string.play_sync), () -> {
+                                    serverClient.syncPlayGames(user, result.getAuthCode());
+                                    mainHandler.post(() -> toast(getString(R.string.play_synced)));
+                                }))
+                                .addOnFailureListener(this, error -> toast(safeMessage(error)))).show();
+    }
+
+    private void showGoogleAchievements() {
         if (getAchievementsClient() != null) {
             getAchievementsClient().getAchievementsIntent().addOnSuccessListener(intent -> {
                 startActivity(intent);
@@ -185,7 +216,7 @@ public abstract class NetActivity extends BaseGameActivity {
         credentialStore.clear();
         OnlineNotificationState.clear(this);
         OnlineGameService.stop(this);
-        toast("Signed out of igGameCenter");
+        toast("Signed out of Xlythe Hex");
     }
 
     private void showLobby(UserSession user, List<LobbyBoard> boards) {
@@ -317,7 +348,7 @@ public abstract class NetActivity extends BaseGameActivity {
             OnlineGameService.start(this);
         } catch (RuntimeException error) {
             // The 15-second player poll and periodic background check remain available.
-            android.util.Log.w("HexOnlineStream", "Live service unavailable", error);
+            Log.w("HexOnlineStream", "Live service unavailable", error);
         }
         gameChatStore.clear();
         localChatName = local.name;
@@ -334,7 +365,7 @@ public abstract class NetActivity extends BaseGameActivity {
 
         GameOptions.Builder options = new GameOptions.Builder()
                 .setGridSize(boardSize)
-                .setSwapEnabled(Settings.getSwap(this));
+                .setSwapEnabled(true); // The online service enables the pie rule for both seats.
         if (response.options != null && response.options.timerTotalSeconds > 0) {
             long minutes = Math.max(1, (response.options.timerTotalSeconds + 59) / 60);
             options.setTimer(new Timer(
@@ -605,13 +636,19 @@ public abstract class NetActivity extends BaseGameActivity {
             try {
                 action.run();
             } catch (Exception e) {
-                mainHandler.post(() -> toast(safeMessage(e)));
+                mainHandler.post(() -> {
+                    if (destroyed || isFinishing()) return;
+                    new AlertDialog.Builder(this).setTitle(R.string.online_unavailable)
+                            .setMessage(safeMessage(e))
+                            .setPositiveButton(android.R.string.ok, null)
+                            .show();
+                });
             }
         });
     }
 
     private String getStableNetworkUid() {
-        android.content.SharedPreferences prefs =
+        SharedPreferences prefs =
                 getSharedPreferences("iggamecenter_device", MODE_PRIVATE);
         String generated = prefs.getString("network_uid", null);
         if (generated == null) {
@@ -655,7 +692,7 @@ public abstract class NetActivity extends BaseGameActivity {
     private static String safeMessage(Exception error) {
         String message = error.getMessage();
         return message == null || message.trim().isEmpty()
-                ? "Could not connect to igGameCenter."
+                ? "Could not connect to the game server."
                 : message;
     }
 

@@ -9,8 +9,10 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 
 /** Injectable POST transport so the legacy service can be tested without network access. */
 public interface IgGameCenterTransport {
@@ -23,19 +25,26 @@ public interface IgGameCenterTransport {
         private final String baseUrl;
         private final int timeoutMs;
 
+        private final SSLSocketFactory sockets;
+
         public Http(String baseUrl, int timeoutMs) {
+            this(baseUrl, timeoutMs, null);
+        }
+
+        public Http(String baseUrl, int timeoutMs, SSLSocketFactory sockets) {
+            this.sockets = sockets;
             String normalized = baseUrl == null ? "" : baseUrl.replaceAll("/+$", "");
             URI uri;
             try {
                 uri = URI.create(normalized);
             } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Invalid igGameCenter API base URL", e);
+                throw new IllegalArgumentException("Invalid game server API base URL", e);
             }
             if (!"https".equalsIgnoreCase(uri.getScheme())
                     || uri.getHost() == null
                     || uri.getRawQuery() != null
                     || uri.getRawFragment() != null) {
-                throw new IllegalArgumentException("igGameCenter API base URL must be HTTPS");
+                throw new IllegalArgumentException("game server API base URL must be HTTPS");
             }
             if (timeoutMs <= 0) throw new IllegalArgumentException("Timeout must be positive");
             this.baseUrl = normalized;
@@ -50,8 +59,9 @@ public interface IgGameCenterTransport {
 
             HttpURLConnection connection = null;
             try {
-                byte[] body = encodeForm(parameters).getBytes(StandardCharsets.UTF_8);
+                byte[] body = encodeForm(parameters).getBytes("UTF-8");
                 connection = (HttpURLConnection) URI.create(baseUrl + path).toURL().openConnection();
+                if (sockets != null) ((HttpsURLConnection) connection).setSSLSocketFactory(sockets);
                 connection.setConnectTimeout(timeoutMs);
                 connection.setReadTimeout(timeoutMs);
                 connection.setInstanceFollowRedirects(false);
@@ -67,7 +77,7 @@ public interface IgGameCenterTransport {
 
                 int status = connection.getResponseCode();
                 if (status < 200 || status >= 300) {
-                    throw new ApiException("igGameCenter returned HTTP " + status);
+                    throw new ApiException("game server returned HTTP " + status);
                 }
                 try (InputStream input = connection.getInputStream()) {
                     return readBounded(input);
@@ -75,7 +85,7 @@ public interface IgGameCenterTransport {
             } catch (ApiException e) {
                 throw e;
             } catch (IOException | IllegalArgumentException e) {
-                throw new ApiException("Could not connect to igGameCenter", e);
+                throw new ApiException("Could not connect to the game server", e);
             } finally {
                 if (connection != null) connection.disconnect();
             }
@@ -95,9 +105,9 @@ public interface IgGameCenterTransport {
 
         private static String urlEncode(String value) {
             try {
-                return URLEncoder.encode(value, StandardCharsets.UTF_8.name());
+                return URLEncoder.encode(value, "UTF-8");
             } catch (IOException impossible) {
-                throw new AssertionError("Android must support UTF-8", impossible);
+                throw new AssertionError(impossible);
             }
         }
 
@@ -107,11 +117,11 @@ public interface IgGameCenterTransport {
             int count;
             while ((count = input.read(buffer)) != -1) {
                 if (output.size() + count > MAX_RESPONSE_BYTES) {
-                    throw new ApiException("igGameCenter response was unexpectedly large");
+                    throw new ApiException("game server response was unexpectedly large");
                 }
                 output.write(buffer, 0, count);
             }
-            return output.toString(StandardCharsets.UTF_8.name());
+            return output.toString("UTF-8");
         }
     }
 }

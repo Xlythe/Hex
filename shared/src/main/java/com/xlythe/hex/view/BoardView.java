@@ -21,7 +21,6 @@ import com.hex.core.Point;
 import com.xlythe.hex.compat.Game;
 
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.UiThread;
@@ -70,6 +69,17 @@ public class BoardView extends View {
         setUp();
     }
 
+    public interface OnCellClickListener {
+        void onCellClick(int row, int column);
+    }
+
+    private OnCellClickListener onCellClick;
+
+    /** Online spectators and players share the server-authoritative board. */
+    public void setOnCellClickListener(OnCellClickListener listener) {
+        onCellClick = listener;
+    }
+
     private void setUp() {
         DisplayMetrics dm = getResources().getDisplayMetrics();
         mMargin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, dm);
@@ -88,7 +98,9 @@ public class BoardView extends View {
                 for (int y = 0; y < mGame.getGridSize(); y++) {
                     Button b = mButtons[x][y];
                     if (b.isSelected() || b.isPressed()) {
-                        GameAction.setPiece(new Point(x, y), mGame);
+                        if (onCellClick == null) GameAction.setPiece(new Point(x, y), mGame);
+                        else onCellClick.onCellClick(x, y);
+                        return;
                     }
                 }
             }
@@ -216,8 +228,8 @@ public class BoardView extends View {
         if (mGame.hasTimer() && !mGame.replayRunning && !mGame.isGameOver()) {
             float posX = getWidth() - mTextMargin;
             float posY = getHeight() / 2f;
-            long minutesLeft = TimeUnit.MILLISECONDS.toMinutes(mGame.getCurrentPlayer().getTime());
-            long secondsLeft = TimeUnit.MILLISECONDS.toSeconds(mGame.getCurrentPlayer().getTime()) - TimeUnit.MINUTES.toSeconds(minutesLeft);
+            long minutesLeft = mGame.getCurrentPlayer().getTime() / 60000L;
+            long secondsLeft = mGame.getCurrentPlayer().getTime() / 1000L % 60;
             String time = String.format(Locale.getDefault(), "%d:%02d", minutesLeft, secondsLeft);
             canvas.drawText(mTimerText, posX - mTextPaint.measureText(mTimerText), posY, mTextPaint);
             canvas.drawText(time, posX - mLargeTextPaint.measureText(time), posY + mLargeTextPaint.getTextSize(), mLargeTextPaint);
@@ -399,7 +411,7 @@ public class BoardView extends View {
                 for (int x = 0; x < game.gamePieces.length; x++) {
                     for (int y = 0; y < game.gamePieces[0].length; y++) {
                         if (mButtons[x][y].isPressed()) {
-                            if (game.gamePieces[x][y].getTeam() == 0 || (game.isFirstMoveSwapEnabled() && game.getMoveNumber() == 2)) {
+                            if (onCellClick != null || game.gamePieces[x][y].getTeam() == 0 || (game.isFirstMoveSwapEnabled() && game.getMoveNumber() == 2)) {
                                 performClick();
                             }
                         }

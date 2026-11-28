@@ -1,7 +1,6 @@
 package com.xlythe.hex.view;
 
-import android.animation.Animator;
-import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -20,8 +19,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.ViewConfiguration;
 import android.view.ViewTreeObserver;
-import android.view.animation.DecelerateInterpolator;
 
 import com.hex.core.Point;
 
@@ -29,9 +28,8 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
-import androidx.core.content.res.ResourcesCompat;
 
-import static com.xlythe.hex.Settings.TAG;
+
 
 /**
  * @author Will Harmon
@@ -40,12 +38,16 @@ public class HexagonLayout extends View implements OnTouchListener {
     // Rotation variables
     private boolean mAllowRotation;
     private float mRotation;
-    private float mLastTouchAngle;
+    private float mDownX, mDownY, mLastX, mLastY;
+    private int mTouchSlop;
+    private boolean mTracking;
+    private int mPressIndex = -1;
+    private float mPressAmount;
+    private WheelAnimation mPressAnimator;
     private long mLastTouchTime;
     private float mAngularVelocity;
     private boolean mDragging;
-    private boolean mTouchInCenter;
-    private ValueAnimator mAnimator;
+    private WheelAnimation mAnimator;
 
     // Size and shape variables
     private Point[] corners;
@@ -98,6 +100,7 @@ public class HexagonLayout extends View implements OnTouchListener {
     public void setUp() {
         DisplayMetrics dm = getResources().getDisplayMetrics();
         setOnTouchListener(this);
+        mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
         mRotation = 0;
         mBackgroundColor = 0xfff1f1f1;
         mButtons = new Button[6];
@@ -121,9 +124,13 @@ public class HexagonLayout extends View implements OnTouchListener {
         mAllowRotation = true;
         setOnClickListener(v -> {
             for (Button b : mButtons) {
-                if (b.isSelected() || b.isPressed()) {
+                if (b.isPressed()) {
                     b.performClick();
+                    return;
                 }
+            }
+            if (!mTracking && mFocusedButton >= 0 && mButtons[mFocusedButton].isEnabled()) {
+                mButtons[mFocusedButton].performClick();
             }
         });
         setFocusable(true);
@@ -263,13 +270,8 @@ public class HexagonLayout extends View implements OnTouchListener {
     }
 
     @Override
-    public boolean isLaidOut() {
-        return super.isLaidOut();
-    }
-
-    @Override
     protected void onDraw(@NonNull Canvas canvas) {
-        if (!isLaidOut()) {
+        if (mHexagon == null) {
             return;
         }
 
@@ -297,8 +299,8 @@ public class HexagonLayout extends View implements OnTouchListener {
         mTextBackground.draw(canvas);
 
         for (int i = 0; i < 6; i++) {
-            if (mButtons[i].isPressed()) {
-                mPressedState[i].getPaint().setColor(mPressedColor);
+            if (i == mPressIndex && mPressAmount > 0) {
+                mPressedState[i].getPaint().setColor(Color.argb((int) (30 * mPressAmount), 24, 36, 40));
                 mPressedState[i].draw(canvas);
             }
             if (!mButtons[i].isEnabled()) {
@@ -316,7 +318,13 @@ public class HexagonLayout extends View implements OnTouchListener {
             canvas.rotate(60, center.x, center.y);
             mBorderShadow[i].draw(canvas);
             mBorder[i].draw(canvas);
+            canvas.save();
+            if (i == mPressIndex) {
+                float scale = 1f - .08f * mPressAmount;
+                canvas.scale(scale, scale, center.x, center.y / 2f);
+            }
             mButtons[i].getDrawable().draw(canvas);
+            canvas.restore();
             canvas.drawText(mButtons[i].getText(), center.x - mButtonTextPaint.measureText(mButtons[i].getText()) / 2,
                     (mBorderWidth + mButtonTextPaint.getTextSize()) / 2 + (int) mTopMargin, mButtonTextPaint);
         }
@@ -463,95 +471,96 @@ public class HexagonLayout extends View implements OnTouchListener {
     @Override
     public boolean onTouch(View v, @NonNull MotionEvent event) {
         if (center == null) return false;
-        int action = event.getActionMasked();
-        float radius = (float) Math.hypot(event.getX() - center.x, event.getY() - center.y);
-        float centerDeadZone = Math.min(getWidth(), getHeight()) * 0.12f;
+        int action = event.getAction() & MotionEvent.ACTION_MASK;
+        float x = event.getX() - center.x;
+        float y = event.getY() - center.y;
+        float hub = Math.min(getWidth(), getHeight()) * .15f;
         if (action == MotionEvent.ACTION_DOWN) {
-            mTouchInCenter = radius < centerDeadZone;
-            mLastTouchAngle = touchAngle(event);
-            mLastTouchTime = event.getEventTime();
-            mAngularVelocity = 0;
+            if (mAnimator != null) mAnimator.cancel();
+            mTracking = true;
             mDragging = false;
-            for (Button b : mButtons) {
-                if (!mTouchInCenter && b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
-                    b.setPressed(b.isEnabled());
-                } else {
-                    b.setPressed(false);
-                }
-            }
-            if (mAnimator != null) {
-                mAnimator.cancel();
-            }
-        } else if (action == MotionEvent.ACTION_UP) {
-            boolean click = false;
-            for (Button b : mButtons) {
-                if (b.isPressed()) {
-                    click = true;
-                }
-            }
-            if (click && !mDragging) {
-                performClick();
-            } else if (mDragging && !mTouchInCenter) {
-                spin(event.getEventTime() - mLastTouchTime > 80 ? 0 : mAngularVelocity);
-            }
-            for (Button b : mButtons) b.setPressed(false);
-        } else if (action == MotionEvent.ACTION_CANCEL) {
-            for (Button b : mButtons) b.setPressed(false);
-        } else if (action == MotionEvent.ACTION_MOVE && !mTouchInCenter) {
-            if (radius < centerDeadZone) {
-                mLastTouchAngle = touchAngle(event);
-                mLastTouchTime = event.getEventTime();
-                mAngularVelocity = 0;
-                return true;
-            }
-            float angle = touchAngle(event);
-            float delta = wrapAngle(angle - mLastTouchAngle);
-            long elapsed = event.getEventTime() - mLastTouchTime;
-            mRotation += delta;
-            if (Math.abs(delta) > 0.5f) mDragging = true;
-            if (elapsed > 0) {
-                float sample = Math.max(-720f, Math.min(720f, delta * 1000f / elapsed));
-                mAngularVelocity = 0.65f * mAngularVelocity + 0.35f * sample;
-            }
-            mLastTouchAngle = angle;
+            mAngularVelocity = 0;
+            mDownX = mLastX = x;
+            mDownY = mLastY = y;
             mLastTouchTime = event.getEventTime();
-            for (Button b : mButtons) {
-                if (b.isPressed()) {
-                    if (!b.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
-                        b.setPressed(false);
-                    } else if (mDragging) {
-                        b.setPressed(false);
+            if (Math.hypot(x, y) > hub) {
+                for (int i = 0; i < mButtons.length; i++) {
+                    Button button = mButtons[i];
+                    if (button.isEnabled() && button.getTriangle().contains(new Point((int) event.getX(), (int) event.getY()))) {
+                        button.setPressed(true);
+                        animatePress(i, true);
+                        break;
                     }
                 }
             }
+        } else if (mTracking && (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_POINTER_DOWN)) {
+            releasePress();
+            mTracking = false;
+            spin(0);
+        } else if (mTracking && (action == MotionEvent.ACTION_MOVE || action == MotionEvent.ACTION_UP)) {
+            if (!mDragging && Math.hypot(x - mDownX, y - mDownY) > mTouchSlop) {
+                mDragging = true;
+                releasePress();
+            }
+            float dx = x - mLastX, dy = y - mLastY;
+            float lengthSquared = dx * dx + dy * dy;
+            if (mDragging && lengthSquared > 0) {
+                // A sparse event stream can cross the hub without ever sampling inside it.
+                float t = Math.max(0, Math.min(1, -(mLastX * dx + mLastY * dy) / lengthSquared));
+                long elapsed = event.getEventTime() - mLastTouchTime;
+                if (Math.hypot(mLastX + t * dx, mLastY + t * dy) > hub) {
+                    float delta = (float) Math.toDegrees(Math.atan2(mLastX * y - mLastY * x, mLastX * x + mLastY * y));
+                    mRotation += delta;
+                    if (elapsed > 0) {
+                        float speed = Math.max(-720f, Math.min(720f, delta * 1000f / elapsed));
+                        mAngularVelocity += (speed - mAngularVelocity) * (1f - (float) Math.exp(-elapsed / 45f));
+                    }
+                } else {
+                    mAngularVelocity = 0;
+                }
+                mLastX = x;
+                mLastY = y;
+                mLastTouchTime = event.getEventTime();
+            }
+            if (action == MotionEvent.ACTION_UP) {
+                if (!mDragging && mPressIndex >= 0 && mButtons[mPressIndex].isPressed()) performClick();
+                releasePress();
+                mTracking = false;
+                spin(mDragging && event.getEventTime() - mLastTouchTime <= 80 ? mAngularVelocity : 0);
+            }
         }
-
         invalidate();
         return true;
     }
 
-    private float touchAngle(MotionEvent event) {
-        return (float) Math.toDegrees(Math.atan2(event.getX() - center.x, center.y - event.getY()));
+    private void releasePress() {
+        if (mPressIndex >= 0 && mButtons[mPressIndex].isPressed()) {
+            mButtons[mPressIndex].setPressed(false);
+            animatePress(mPressIndex, false);
+        }
     }
 
-    private static float wrapAngle(float angle) {
-        return ((angle + 540f) % 360f) - 180f;
+    private void animatePress(int index, boolean pressed) {
+        if (mPressAnimator != null) mPressAnimator.cancel();
+        if (index != mPressIndex) mPressAmount = 0;
+        mPressIndex = index;
+        mPressAnimator = WheelAnimation.start(this, mPressAmount, pressed ? 1f : 0f, pressed ? 90 : 140, amount -> {
+            mPressAmount = amount;
+            invalidate();
+        });
     }
 
-    private void spin(float degreesPerSecond) {
-        float speed = Math.min(Math.abs(degreesPerSecond), 720f);
-        float friction = 900f; // Degrees per second squared.
-        float distance = Math.signum(degreesPerSecond) * speed * speed / (2f * friction);
-        spinExactly(distance, false);
+    private void spin(float speed) {
+        spinExactly(speed * Math.abs(speed) / 1800f);
     }
 
-    private void spinExactly(final float rotation, final boolean constantDuration) {
+    private void spinExactly(final float rotation) {
         if (getWidth() == 0) {
             getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
-                    getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    spinExactly(rotation, constantDuration);
+                    getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                    spinExactly(rotation);
                 }
             });
             return;
@@ -563,50 +572,12 @@ public class HexagonLayout extends View implements OnTouchListener {
 
         final float initialRotation = mRotation;
 
-        mAnimator = ValueAnimator.ofFloat(0, rotation);
-        mAnimator.setInterpolator(new DecelerateInterpolator());
-        mAnimator.setDuration(constantDuration ? 220 : Math.max(180, Math.min(800, (long) (Math.sqrt(2 * Math.abs(rotation) / 900f) * 1000))));
-        mAnimator.addUpdateListener(animator -> {
-                float value = (Float) animator.getAnimatedValue();
-                mRotation = initialRotation + value;
-                postInvalidateOnAnimation();
+        float targetRotation = Math.round((initialRotation + rotation) / 60f) * 60f;
+        long duration = Math.max(180, Math.min(800, (long) (Math.sqrt(2 * Math.abs(targetRotation - initialRotation) / 900f) * 1000)));
+        mAnimator = WheelAnimation.start(this, initialRotation, targetRotation, duration, value -> {
+            mRotation = value;
+            invalidate();
         });
-        mAnimator.addListener(new Animator.AnimatorListener() {
-            private boolean canceled;
-
-            @Override
-            public void onAnimationStart(Animator animator) {}
-
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                if (canceled) {
-                    return;
-                }
-                // We're done rotating. Snap to whatever side we landed on.
-                float offset = Math.abs(mRotation % 60);
-                if (offset > 30) {
-                    offset = 60f - offset;
-                }
-
-                if (offset < 1f) {
-                    mRotation -= mRotation % 60;
-                    invalidate();
-                } else if ((mRotation + offset) % 60 == 0) {
-                    spinExactly(offset, true);
-                } else {
-                    spinExactly(-offset, true);
-                }
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animator) {
-                canceled = true;
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animator) {}
-        });
-        mAnimator.start();
     }
 
     @Override
@@ -615,6 +586,10 @@ public class HexagonLayout extends View implements OnTouchListener {
             mAnimator.cancel();
             mAnimator = null;
         }
+        if (mPressAnimator != null) mPressAnimator.cancel();
+        if (mPressIndex >= 0) mButtons[mPressIndex].setPressed(false);
+        mPressAmount = 0;
+        mTracking = false;
         super.onDetachedFromWindow();
     }
 
@@ -646,11 +621,11 @@ public class HexagonLayout extends View implements OnTouchListener {
     }
 
     public void setInitialSpin(float spin) {
-        spinExactly(spin, false);
+        spinExactly(spin);
     }
 
     public void setInitialRotation(float initialRotation) {
-        Log.v(TAG, "Initial rotation set to " + initialRotation);
+        Log.v("Hex", "Initial rotation set to " + initialRotation);
         mRotation = initialRotation;
     }
 
@@ -726,8 +701,10 @@ public class HexagonLayout extends View implements OnTouchListener {
             this.drawable = drawable;
         }
 
+        // These wheel icons are bitmap drawables in both APKs.
+        @SuppressLint("UseCompatLoadingForDrawables")
         public void setDrawableResource(@DrawableRes int id) {
-            setDrawable(ResourcesCompat.getDrawable(context.getResources(), id, null));
+            setDrawable(context.getResources().getDrawable(id));
         }
 
         public Drawable getDrawable() {

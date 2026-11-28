@@ -20,6 +20,7 @@ import org.xml.sax.InputSource;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -33,7 +34,7 @@ public final class IgGameCenterXml {
         try {
             // Android's platform DOM parser does not implement every JAXP feature.
             // Reject declarations before parsing even when a feature is unavailable.
-            String upper = xml.toUpperCase(java.util.Locale.ROOT);
+            String upper = xml.toUpperCase(Locale.US);
             if (upper.contains("<!DOCTYPE") || upper.contains("<!ENTITY")) {
                 throw new ApiException("XML declarations are not allowed");
             }
@@ -56,7 +57,7 @@ public final class IgGameCenterXml {
         } catch (ApiException e) {
             throw e;
         } catch (Exception e) {
-            throw new ApiException("Malformed XML response from igGameCenter", e);
+            throw new ApiException("Malformed XML response from the game server", e);
         }
     }
 
@@ -89,7 +90,7 @@ public final class IgGameCenterXml {
         String sid = requiredText(document, "sid");
         String server = requiredText(document, "server");
         if (!IgGameCenterProtocol.isValidServerName(server)) {
-            throw new ApiException("Invalid game server in igGameCenter response");
+            throw new ApiException("Invalid game server in game server response");
         }
         return new BoardRef(sid, server);
     }
@@ -195,7 +196,7 @@ public final class IgGameCenterXml {
 
     private static Element requiredElement(Node parent, String name) throws ApiException {
         Element element = firstElement(parent, name);
-        if (element == null) throw new ApiException("Missing " + name + " in igGameCenter response");
+        if (element == null) throw new ApiException("Missing " + name + " in game server response");
         return element;
     }
 
@@ -211,27 +212,37 @@ public final class IgGameCenterXml {
 
     private static String requiredText(Document document, String name) throws ApiException {
         String value = firstText(document, name);
-        if (value == null) throw new ApiException("Missing " + name + " in igGameCenter response");
+        if (value == null) throw new ApiException("Missing " + name + " in game server response");
         return value;
     }
 
-    private static String firstText(Document document, String name) {
+    static String firstText(Document document, String name) {
         NodeList nodes = document.getElementsByTagName(name);
         if (nodes.getLength() == 0) return null;
-        String value = nodes.item(0).getTextContent();
-        return value == null || value.trim().isEmpty() ? null : value.trim();
+        String value = elementText(nodes.item(0));
+        return value == null || value.trim().length() == 0 ? null : value.trim();
     }
 
     private static String childText(Element parent, String name) {
         NodeList nodes = parent.getElementsByTagName(name);
         if (nodes.getLength() == 0) return null;
-        String value = nodes.item(0).getTextContent();
+        String value = elementText(nodes.item(0));
         return value == null ? null : value.trim();
+    }
+
+    private static String elementText(Node element) {
+        StringBuilder text = new StringBuilder();
+        for (Node child = element.getFirstChild(); child != null; child = child.getNextSibling()) {
+            if (child.getNodeType() == Node.TEXT_NODE || child.getNodeType() == Node.CDATA_SECTION_NODE)
+                text.append(child.getNodeValue());
+            else if (child.getNodeType() == Node.ELEMENT_NODE) text.append(elementText(child));
+        }
+        return text.toString();
     }
 
     private static String attr(Element element, String name, String fallback) {
         String value = element.getAttribute(name);
-        return value == null || value.isEmpty() ? fallback : value;
+        return value == null || value.length() == 0 ? fallback : value;
     }
 
     private static long longAttr(Element element, String name, long fallback) {
@@ -248,7 +259,7 @@ public final class IgGameCenterXml {
 
     private static long longValue(String value, long fallback) {
         try {
-            return value == null || value.isEmpty() ? fallback : Long.parseLong(value);
+            return value == null || value.length() == 0 ? fallback : Long.parseLong(value);
         } catch (NumberFormatException e) {
             return fallback;
         }

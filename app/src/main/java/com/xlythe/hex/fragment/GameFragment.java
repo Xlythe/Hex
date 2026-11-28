@@ -1,15 +1,20 @@
 package com.xlythe.hex.fragment;
 
+import static com.xlythe.hex.Settings.TAG;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.os.Bundle;
 import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.gson.JsonSyntaxException;
 import com.hex.core.Game.GameListener;
@@ -18,16 +23,18 @@ import com.hex.core.Player;
 import com.hex.core.PlayerObject;
 import com.hex.core.PlayingEntity;
 import com.hex.core.Timer;
+import com.xlythe.hex.AppExecutors;
 import com.xlythe.hex.FileUtil;
 import com.xlythe.hex.MainActivity;
-import com.xlythe.hex.AppExecutors;
 import com.xlythe.hex.R;
 import com.xlythe.hex.Settings;
 import com.xlythe.hex.Stats;
-import com.xlythe.hex.compat.Game;
 import com.xlythe.hex.compat.AndroidBotFactory;
-import com.xlythe.hex.server.ServerNetworkPlayer;
+import com.xlythe.hex.compat.Game;
 import com.xlythe.hex.compat.GameOptions;
+import com.xlythe.hex.server.OnlineGameService;
+import com.xlythe.hex.server.OnlineNotificationState;
+import com.xlythe.hex.server.ServerNetworkPlayer;
 import com.xlythe.hex.view.BoardView;
 
 import java.io.IOException;
@@ -35,11 +42,6 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import static com.xlythe.hex.Settings.TAG;
 
 /**
  * @author Will Harmon
@@ -280,11 +282,11 @@ public class GameFragment extends HexFragment {
         boolean autosave = Settings.getAutosave(applicationContext);
         long playedMillis = Math.max(0, game.getGameLength() - timeGamePaused);
         boolean humanWin = winner.getType() == Player.Human;
-        String replayState = autosave ? game.save() : null;
+        String replayState = autosave ? game.saveCompleted(winner) : null;
         String replayName = autosave
                 ? getString(
                         R.string.auto_saved_file_name,
-                        new SimpleDateFormat("yyyy-MM-dd HH-mm", Locale.getDefault())
+                        new SimpleDateFormat("yyyy-MM-dd HH-mm-ss-SSS", Locale.getDefault())
                                 .format(new Date()),
                         safeFileComponent(game.getPlayer1().getName()),
                         safeFileComponent(game.getPlayer2().getName()))
@@ -580,8 +582,8 @@ public class GameFragment extends HexFragment {
                     // Yes button clicked
                     if (isNetGame() && getNetPlayer() instanceof ServerNetworkPlayer) {
                         ((ServerNetworkPlayer) getNetPlayer()).forfeit();
-                        com.xlythe.hex.server.OnlineGameService.stop(getMainActivity());
-                        com.xlythe.hex.server.OnlineNotificationState.clear(getMainActivity());
+                        OnlineGameService.stop(getMainActivity());
+                        OnlineNotificationState.clear(getMainActivity());
                     }
                     stopGame();
                     returnHome();

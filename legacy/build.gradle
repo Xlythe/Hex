@@ -1,0 +1,48 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.xlythe.hex'
+    compileSdk 37
+    enableKotlin = false
+    defaultConfig {
+        applicationId 'com.sam.hex'
+        minSdk 7
+        testInstrumentationRunner 'com.xlythe.hex.legacy.LegacyDeviceTests'
+        targetSdk 37
+        // The modern APK has the higher version code when both are compatible.
+        versionCode 33
+        versionName '5.2.0'
+        buildConfigField 'String', 'HEX_API_BASE_URL', '"' + (project.findProperty('hexApiBaseUrl') ?: 'https://hex-api.xlythe.com') + '"'
+    }
+    buildFeatures { buildConfig = true }
+    sourceSets.main.java.srcDir '../shared/src/main/java'
+    sourceSets.androidTest.assets.srcDir '../app/src/test/resources'
+    // Eclair cannot read AAPT2's UTF-8 resource table. Its wheel reads the original PNG assets.
+    // Eclair reads the same default strings.xml directly from assets.
+    sourceSets.main.assets.srcDir 'src/main/res/values'
+    sourceSets.main.assets.srcDir '../shared/src/main/res/drawable-hdpi'
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+androidComponents.finalizeDsl { extension ->
+    def modernSigning = project(':app').android.signingConfigs.findByName('release')
+    if (modernSigning != null) {
+        def releaseSigning = extension.signingConfigs.create('release') {
+            storeFile = modernSigning.storeFile
+            storePassword = modernSigning.storePassword
+            keyAlias = modernSigning.keyAlias
+            keyPassword = modernSigning.keyPassword
+        }
+        extension.buildTypes.release.signingConfig = releaseSigning
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: '../app/libs', include: ['*.jar'])
+    compileOnly 'androidx.annotation:annotation:1.1.0'
+}

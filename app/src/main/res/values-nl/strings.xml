@@ -100,4 +100,14 @@
     <string name="game_over_home">Start</string>
     <string name="privacy_policy"><a href="https://xlythe.com/privacy.html">Privacybeleid</a></string>
     <string name="preferences_summary_custom_timer">Tijd in minuten</string>
+    <string name="import_replay">Herhaling importeren</string>
+    <string name="export_replay">Herhaling exporteren</string>
+    <string name="online_unavailable">Deelnemen aan het online spel is mislukt</string>
+    <string name="no_saved_replays">Geen opgeslagen herhalingen</string>
+    <string name="empty_replay_hint">Sla een afgerond spel op of importeer een .rhex-bestand om het hier terug te kijken.</string>
+    <string name="play_achievements">Prestaties</string>
+    <string name="play_view">Bekijken in Google Play Games</string>
+    <string name="play_sync">Synchroniseren met Xlythe</string>
+    <string name="play_link_accounts">Play Games-speler %1$s aan Xlythe-account %2$s koppelen en prestaties synchroniseren?</string>
+    <string name="play_synced">Prestaties gesynchroniseerd</string>
 </resources>

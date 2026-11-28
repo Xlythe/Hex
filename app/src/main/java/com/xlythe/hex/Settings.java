@@ -16,7 +16,7 @@ import androidx.annotation.Nullable;
 public class Settings {
     public static final String TAG = "Hex";
 
-    public static final int MAX_BOARD_SIZE = 30;
+    public static final int MAX_BOARD_SIZE = ReplayDocument.MAX_BOARD_SIZE;
     public static final int MIN_BOARD_SIZE = 4;
 
     private static final String NUM_TIMES_OPENED = "num_times_app_opened_review";

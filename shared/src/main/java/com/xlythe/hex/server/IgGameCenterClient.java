@@ -21,7 +21,7 @@ public final class IgGameCenterClient {
 
     public IgGameCenterClient(IgGameCenterTransport transport, String networkUid) {
         if (transport == null) throw new NullPointerException("transport");
-        if (networkUid == null || networkUid.trim().isEmpty()) {
+        if (networkUid == null || networkUid.trim().length() == 0) {
             throw new IllegalArgumentException("A stable network UID is required");
         }
         this.transport = transport;
@@ -46,7 +46,7 @@ public final class IgGameCenterClient {
         parameters.put("name", username);
         parameters.put("password", plaintextPassword);
         parameters.put("networkuid", networkUid);
-        if (email != null && !email.trim().isEmpty()) parameters.put("email", email.trim());
+        if (email != null && email.trim().length() != 0) parameters.put("email", email.trim());
         return IgGameCenterXml.parseRegistration(
                 transport.post("/api_user_add.php", parameters));
     }
@@ -101,8 +101,8 @@ public final class IgGameCenterClient {
         LinkedHashMap<String, String> parameters = authenticated(user);
         parameters.put("sid", board.sid);
         parameters.put("lasteid", Long.toString(Math.max(0, lastEventId)));
-        if (command != null && !command.trim().isEmpty()) {
-            parameters.put("cmd", command.toUpperCase(Locale.ROOT));
+        if (command != null && command.trim().length() != 0) {
+            parameters.put("cmd", command.toUpperCase(Locale.US));
         }
         if (commandParameters != null) parameters.putAll(commandParameters);
         return IgGameCenterXml.parseHandler(transport.post(
@@ -146,8 +146,8 @@ public final class IgGameCenterClient {
         if (user == null
                 || user.uid == null
                 || user.sessionId == null
-                || user.uid.isEmpty()
-                || user.sessionId.isEmpty()) {
+                || user.uid.length() == 0
+                || user.sessionId.length() == 0) {
             throw new IllegalArgumentException("An authenticated user is required");
         }
         LinkedHashMap<String, String> parameters = common();

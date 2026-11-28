@@ -1,6 +1,7 @@
 package com.xlythe.hex;
 
 import android.content.Context;
+import java.util.Locale;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -9,7 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 
 import androidx.annotation.NonNull;
 
@@ -29,7 +30,7 @@ public class FileUtil {
         File file = resolveReplay(directory, fileName);
         StringBuilder text = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                new FileInputStream(file), StandardCharsets.UTF_8))) {
+                new FileInputStream(file), Charset.forName("UTF-8")))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 text.append(line).append('\n');
@@ -55,7 +56,7 @@ public class FileUtil {
 
         try (FileOutputStream stream = new FileOutputStream(temporary, false);
              BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-                     stream, StandardCharsets.UTF_8))) {
+                     stream, Charset.forName("UTF-8")))) {
             writer.write(gameState);
             writer.flush();
             stream.getFD().sync();
@@ -84,7 +85,7 @@ public class FileUtil {
         String leafName = new File(fileName).getName();
         if (!leafName.equals(fileName)
                 || leafName.contains("..")
-                || leafName.trim().isEmpty()
+                || leafName.trim().length() == 0
                 || leafName.length() > MAX_FILE_NAME_LENGTH) {
             throw new IOException("Invalid replay file name");
         }
@@ -104,7 +105,7 @@ public class FileUtil {
     }
 
     private static String ensureExtension(String fileName) {
-        return fileName.toLowerCase(java.util.Locale.ROOT).endsWith(EXTENSION)
+        return fileName.toLowerCase(Locale.US).endsWith(EXTENSION)
                 ? fileName
                 : fileName + EXTENSION;
     }

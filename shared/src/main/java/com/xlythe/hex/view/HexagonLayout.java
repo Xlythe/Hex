@@ -1,6 +1,6 @@
 package com.xlythe.hex.view;
 
-import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -21,7 +21,6 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewConfiguration;
 import android.view.ViewTreeObserver;
-import android.view.animation.DecelerateInterpolator;
 
 import com.hex.core.Point;
 
@@ -29,9 +28,8 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
-import androidx.core.content.res.ResourcesCompat;
 
-import static com.xlythe.hex.Settings.TAG;
+
 
 /**
  * @author Will Harmon
@@ -45,11 +43,11 @@ public class HexagonLayout extends View implements OnTouchListener {
     private boolean mTracking;
     private int mPressIndex = -1;
     private float mPressAmount;
-    private ValueAnimator mPressAnimator;
+    private WheelAnimation mPressAnimator;
     private long mLastTouchTime;
     private float mAngularVelocity;
     private boolean mDragging;
-    private ValueAnimator mAnimator;
+    private WheelAnimation mAnimator;
 
     // Size and shape variables
     private Point[] corners;
@@ -272,13 +270,8 @@ public class HexagonLayout extends View implements OnTouchListener {
     }
 
     @Override
-    public boolean isLaidOut() {
-        return super.isLaidOut();
-    }
-
-    @Override
     protected void onDraw(@NonNull Canvas canvas) {
-        if (!isLaidOut()) {
+        if (mHexagon == null) {
             return;
         }
 
@@ -478,7 +471,7 @@ public class HexagonLayout extends View implements OnTouchListener {
     @Override
     public boolean onTouch(View v, @NonNull MotionEvent event) {
         if (center == null) return false;
-        int action = event.getActionMasked();
+        int action = event.getAction() & MotionEvent.ACTION_MASK;
         float x = event.getX() - center.x;
         float y = event.getY() - center.y;
         float hub = Math.min(getWidth(), getHeight()) * .15f;
@@ -551,14 +544,10 @@ public class HexagonLayout extends View implements OnTouchListener {
         if (mPressAnimator != null) mPressAnimator.cancel();
         if (index != mPressIndex) mPressAmount = 0;
         mPressIndex = index;
-        mPressAnimator = ValueAnimator.ofFloat(mPressAmount, pressed ? 1f : 0f);
-        mPressAnimator.setDuration(pressed ? 90 : 140);
-        mPressAnimator.setInterpolator(new DecelerateInterpolator());
-        mPressAnimator.addUpdateListener(animator -> {
-            mPressAmount = (float) animator.getAnimatedValue();
-            postInvalidateOnAnimation();
+        mPressAnimator = WheelAnimation.start(this, mPressAmount, pressed ? 1f : 0f, pressed ? 90 : 140, amount -> {
+            mPressAmount = amount;
+            invalidate();
         });
-        mPressAnimator.start();
     }
 
     private void spin(float speed) {
@@ -570,7 +559,7 @@ public class HexagonLayout extends View implements OnTouchListener {
             getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
-                    getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    getViewTreeObserver().removeGlobalOnLayoutListener(this);
                     spinExactly(rotation);
                 }
             });
@@ -584,15 +573,11 @@ public class HexagonLayout extends View implements OnTouchListener {
         final float initialRotation = mRotation;
 
         float targetRotation = Math.round((initialRotation + rotation) / 60f) * 60f;
-        mAnimator = ValueAnimator.ofFloat(initialRotation, targetRotation);
-        mAnimator.setInterpolator(new DecelerateInterpolator());
-        mAnimator.setDuration(Math.max(180, Math.min(800, (long) (Math.sqrt(2 * Math.abs(targetRotation - initialRotation) / 900f) * 1000))));
-        mAnimator.addUpdateListener(animator -> {
-                float value = (Float) animator.getAnimatedValue();
-                mRotation = value;
-                postInvalidateOnAnimation();
+        long duration = Math.max(180, Math.min(800, (long) (Math.sqrt(2 * Math.abs(targetRotation - initialRotation) / 900f) * 1000)));
+        mAnimator = WheelAnimation.start(this, initialRotation, targetRotation, duration, value -> {
+            mRotation = value;
+            invalidate();
         });
-        mAnimator.start();
     }
 
     @Override
@@ -640,7 +625,7 @@ public class HexagonLayout extends View implements OnTouchListener {
     }
 
     public void setInitialRotation(float initialRotation) {
-        Log.v(TAG, "Initial rotation set to " + initialRotation);
+        Log.v("Hex", "Initial rotation set to " + initialRotation);
         mRotation = initialRotation;
     }
 
@@ -716,8 +701,10 @@ public class HexagonLayout extends View implements OnTouchListener {
             this.drawable = drawable;
         }
 
+        // These wheel icons are bitmap drawables in both APKs.
+        @SuppressLint("UseCompatLoadingForDrawables")
         public void setDrawableResource(@DrawableRes int id) {
-            setDrawable(ResourcesCompat.getDrawable(context.getResources(), id, null));
+            setDrawable(context.getResources().getDrawable(id));
         }
 
         public Drawable getDrawable() {

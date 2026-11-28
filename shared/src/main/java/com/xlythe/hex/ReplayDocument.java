@@ -9,10 +9,12 @@ import com.hex.core.GameAction;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+
 
 /** Validates an external .rhex before allocating a board or placing it in game history. */
 public final class ReplayDocument {
+    public static final int MAX_BOARD_SIZE = 30;
+
     private ReplayDocument() {}
 
     public static String read(InputStream input) throws IOException {
@@ -24,12 +26,12 @@ public final class ReplayDocument {
             if (count + bytes.size() > 1024 * 1024) throw new IOException("Replay is too large");
             bytes.write(buffer, 0, count);
         }
-        String text = bytes.toString(StandardCharsets.UTF_8.name());
+        String text = bytes.toString("UTF-8");
         try {
             JsonObject root = new JsonParser().parse(text).getAsJsonObject();
             JsonObject options = root.getAsJsonObject("gameOptions");
             int size = options.get("gridSize").getAsBigDecimal().intValueExact();
-            if (size < 3 || size > Settings.MAX_BOARD_SIZE) throw new IOException("Unsupported board size");
+            if (size < 3 || size > MAX_BOARD_SIZE) throw new IOException("Unsupported board size");
             JsonArray moves = root.getAsJsonObject("moveList").getAsJsonArray("moveList");
             if (moves.size() > size * size + 1) throw new IOException("Too many moves");
             Game game = Game.load(text);
@@ -68,7 +70,7 @@ public final class ReplayDocument {
                 }
             }
         } catch (RuntimeException invalid) {
-            throw new IOException("Invalid Hex replay", invalid);
+            throw (IOException) new IOException("Invalid Hex replay").initCause(invalid);
         }
         return text;
     }

@@ -40,8 +40,24 @@ or sdk.dir. A debug build works from a fresh checkout with:
 
 Use :app:connectedDebugAndroidTest for device tests, including live games
 against the Xlythe matchmaking service. The browser companion test in
-Xlythe/Hex-Web- can join a deployed browser room with this test APK.
+Xlythe/Hex-Web can join a deployed browser room with this test APK.
 
 In History, use Import replay and Export replay to exchange .rhex files
 with https://hex.xlythe.com. Android's document picker lets you choose
 the destination without granting the game access to your storage.
+
+Android editions
+
+The modern :app APK supports API 24 and later, including Google Play Games
+achievements and background online-game notifications. Build :legacy:assembleDebug
+for Android 2.1 (API 7) through Android 6. Both editions target API 37 and use
+the same application ID, signing configuration, rules, AI and .rhex history.
+The modern APK has the higher version code for upgrades.
+
+The legacy wheel opens pass-and-play, computer opponents, board size, history,
+instructions and online play. Completed local games appear in History. Use
+a file picker to import .rhex files and Share to send them to another app.
+Online matchmaking, moves, swap and chat require a trusted HTTPS connection.
+Android 2.1's stock TLS cannot connect to today's public server. Android
+4.1–4.4 clients request TLS 1.2 explicitly. Legacy online games update while
+the game is open.

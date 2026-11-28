@@ -3,7 +3,7 @@ package com.xlythe.hex;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import android.animation.ValueAnimator;
+import com.xlythe.hex.view.WheelAnimation;
 import android.content.Context;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
@@ -66,13 +66,13 @@ public class WheelGestureInstrumentedTest {
     public void tapWithinSlopPressesAndReleasesExactlyOneButton() throws Exception {
         float jitter = ViewConfiguration.get(wheel.getContext()).getScaledTouchSlop() / 2f;
         send(MotionEvent.ACTION_DOWN, 1000, 0, -130);
-        ((ValueAnimator) field("mPressAnimator").get(wheel)).end();
+        ((WheelAnimation) field("mPressAnimator").get(wheel)).end();
         assertEquals(1f, field("mPressAmount").getFloat(wheel), .01f);
         send(MotionEvent.ACTION_MOVE, 1016, jitter, -130);
         assertEquals(0f, rotation(), .01f);
         send(MotionEvent.ACTION_UP, 1032, jitter, -130);
         assertEquals(1, clicks);
-        ((ValueAnimator) field("mPressAnimator").get(wheel)).end();
+        ((WheelAnimation) field("mPressAnimator").get(wheel)).end();
         assertEquals(0f, field("mPressAmount").getFloat(wheel), .01f);
     }
 
@@ -104,7 +104,7 @@ public class WheelGestureInstrumentedTest {
         send(MotionEvent.ACTION_MOVE, 1032, 92, -92);
         send(MotionEvent.ACTION_MOVE, 1064, 130, 0);
         send(MotionEvent.ACTION_UP, 1064 + pause, 130, 0);
-        ((ValueAnimator) field("mAnimator").get(wheel)).end();
+        ((WheelAnimation) field("mAnimator").get(wheel)).end();
         return rotation();
     }
 }

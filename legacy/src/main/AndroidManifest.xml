@@ -1,0 +1,17 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <application android:label="Hex" android:enableOnBackInvokedCallback="false" android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
+        android:usesCleartextTraffic="false" android:allowBackup="false">
+        <provider android:name=".legacy.ReplayProvider" android:authorities="com.sam.hex.legacy.replays"
+            android:exported="false" android:grantUriPermissions="true" />
+        <activity android:name=".legacy.LegacyOnlineActivity" android:exported="false"
+            android:screenOrientation="landscape" android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity android:name=".legacy.LegacyActivity" android:exported="true"
+            android:screenOrientation="landscape" android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

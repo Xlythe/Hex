@@ -13,11 +13,13 @@ android {
         applicationId = 'com.sam.hex'
         minSdk = 24
         targetSdk = 37
-        versionCode = 31
+        versionCode = 33
         versionName = '5.1.2'
         testInstrumentationRunner = 'androidx.test.runner.AndroidJUnitRunner'
         buildConfigField 'String', 'HEX_API_BASE_URL', '"' + (project.findProperty('hexApiBaseUrl') ?: 'https://hex-api.xlythe.com') + '"'
     }
+    sourceSets.main.java.srcDir '../shared/src/main/java'
+    sourceSets.main.res.srcDir '../shared/src/main/res'
     buildFeatures { buildConfig = true }
     signingConfigs {
         if (local.getProperty('keystoreDir')) release {

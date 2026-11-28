@@ -2,7 +2,7 @@ package com.xlythe.hex.server;
 
 import com.hex.core.Point;
 
-import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
@@ -58,13 +58,13 @@ public final class IgGameCenterProtocol {
     public static String md5(String value) {
         try {
             MessageDigest digest = MessageDigest.getInstance("MD5");
-            byte[] bytes = digest.digest(value.getBytes(StandardCharsets.UTF_8));
+            byte[] bytes = digest.digest(value.getBytes("UTF-8"));
             StringBuilder result = new StringBuilder(32);
             for (byte current : bytes) {
                 result.append(String.format(Locale.US, "%02x", current & 0xff));
             }
             return result.toString();
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
             throw new IllegalStateException("Android must provide MD5 for the legacy login API", e);
         }
     }

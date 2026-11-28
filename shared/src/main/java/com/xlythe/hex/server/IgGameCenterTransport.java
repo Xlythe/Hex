@@ -9,8 +9,10 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 
 /** Injectable POST transport so the legacy service can be tested without network access. */
 public interface IgGameCenterTransport {
@@ -23,7 +25,14 @@ public interface IgGameCenterTransport {
         private final String baseUrl;
         private final int timeoutMs;
 
+        private final SSLSocketFactory sockets;
+
         public Http(String baseUrl, int timeoutMs) {
+            this(baseUrl, timeoutMs, null);
+        }
+
+        public Http(String baseUrl, int timeoutMs, SSLSocketFactory sockets) {
+            this.sockets = sockets;
             String normalized = baseUrl == null ? "" : baseUrl.replaceAll("/+$", "");
             URI uri;
             try {
@@ -50,8 +59,9 @@ public interface IgGameCenterTransport {
 
             HttpURLConnection connection = null;
             try {
-                byte[] body = encodeForm(parameters).getBytes(StandardCharsets.UTF_8);
+                byte[] body = encodeForm(parameters).getBytes("UTF-8");
                 connection = (HttpURLConnection) URI.create(baseUrl + path).toURL().openConnection();
+                if (sockets != null) ((HttpsURLConnection) connection).setSSLSocketFactory(sockets);
                 connection.setConnectTimeout(timeoutMs);
                 connection.setReadTimeout(timeoutMs);
                 connection.setInstanceFollowRedirects(false);
@@ -95,9 +105,9 @@ public interface IgGameCenterTransport {
 
         private static String urlEncode(String value) {
             try {
-                return URLEncoder.encode(value, StandardCharsets.UTF_8.name());
+                return URLEncoder.encode(value, "UTF-8");
             } catch (IOException impossible) {
-                throw new AssertionError("Android must support UTF-8", impossible);
+                throw new AssertionError(impossible);
             }
         }
 
@@ -111,7 +121,7 @@ public interface IgGameCenterTransport {
                 }
                 output.write(buffer, 0, count);
             }
-            return output.toString(StandardCharsets.UTF_8.name());
+            return output.toString("UTF-8");
         }
     }
 }

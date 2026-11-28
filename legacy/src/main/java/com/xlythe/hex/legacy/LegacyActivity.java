@@ -1,6 +1,5 @@
 package com.xlythe.hex.legacy;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -21,6 +20,7 @@ import com.hex.core.GameAction;
 import com.hex.core.PlayerObject;
 import com.hex.core.PlayingEntity;
 import com.hex.core.Timer;
+import com.xlythe.hex.R;
 import com.xlythe.hex.FileUtil;
 import android.graphics.drawable.Drawable;
 import com.xlythe.hex.ReplayDocument;
@@ -37,7 +37,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /** Native Hex for devices older than the modern Android dependencies. */
-public final class LegacyActivity extends Activity {
+public final class LegacyActivity extends LegacyTextActivity {
     private final Handler ui = new Handler();
     private final ExecutorService files = Executors.newSingleThreadExecutor();
     private Game game;
@@ -97,8 +97,8 @@ public final class LegacyActivity extends Activity {
         FrameLayout frame = new FrameLayout(this);
         frame.setBackgroundColor(0xffd2d2d2);
         HexagonLayout wheel = new HexagonLayout(this);
-        wheel.setText("Hex");
-        String[] labels = {"Board size", "Online", "History", "How to play", "Computer", "Play"};
+        wheel.setText(text(R.string.app_name));
+        String[] labels = {text(R.string.board_size), text(R.string.online), text(R.string.history), text(R.string.how_to_play), text(R.string.computer), text(R.string.play)};
         String[] icons = {"settings", "store", "history", "howtoplay", "achievements", "play"};
         int[] colors = {0xffcc5c57, 0xff5f6ec2, 0xfff9db00, 0xffb7cf47, 0xfff48935, 0xff4ba5e2};
         Runnable[] actions = {this::chooseSize, () -> startActivity(new Intent(this, LegacyOnlineActivity.class)),
@@ -119,15 +119,17 @@ public final class LegacyActivity extends Activity {
     }
 
     private void instructions() {
-        new AlertDialog.Builder(this).setTitle("How to play")
-                .setMessage("Connect your two colored sides with a chain of stones. Stones in adjacent hexagons touch. On the second turn you can tap the opening stone to swap.")
+        new AlertDialog.Builder(this).setTitle(text(R.string.how_to_play))
+                .setMessage(text(R.string.instructions))
                 .setPositiveButton(android.R.string.ok, null).show();
     }
 
     private void chooseSize() {
         int[] sizes = {7, 9, 11, 13, 15, 19};
-        new AlertDialog.Builder(this).setTitle("Board size").setSingleChoiceItems(
-                new String[]{"7 × 7", "9 × 9", "11 × 11", "13 × 13", "15 × 15", "19 × 19"},
+        String[] labels = new String[sizes.length];
+        for (int i = 0; i < sizes.length; i++) labels[i] = text(R.string.board_dimensions, sizes[i]);
+        new AlertDialog.Builder(this).setTitle(text(R.string.board_size)).setSingleChoiceItems(
+                labels,
                 Arrays.binarySearch(sizes, size), (dialog, which) -> {
                     size = sizes[which];
                     getPreferences(0).edit().putInt("size", size).commit();
@@ -136,8 +138,8 @@ public final class LegacyActivity extends Activity {
     }
 
     private void chooseBot() {
-        new AlertDialog.Builder(this).setTitle("Play the computer")
-                .setItems(new String[]{"Easy", "Medium", "Hard"}, (dialog, which) -> {
+        new AlertDialog.Builder(this).setTitle(text(R.string.play_computer))
+                .setItems(new String[]{text(R.string.difficulty_easy), text(R.string.difficulty_medium), text(R.string.difficulty_hard)}, (dialog, which) -> {
                     difficulty = which;
                     startMatch();
                 }).show();
@@ -146,8 +148,8 @@ public final class LegacyActivity extends Activity {
     private void startMatch() {
         stopGame();
         Game next = newGame(size, new PlayerObject(1), opponent());
-        next.getPlayer1().setName("Red");
-        next.getPlayer2().setName(difficulty < 0 ? "Blue" : "Computer");
+        next.getPlayer1().setName(text(R.string.player_red));
+        next.getPlayer2().setName(difficulty < 0 ? text(R.string.player_blue) : text(R.string.computer));
         play(next);
     }
 
@@ -176,7 +178,7 @@ public final class LegacyActivity extends Activity {
     private void refresh(Game source) {
         ui.post(() -> {
             if (source != game) return;
-            board.setActionText(source.isGameOver() ? "wins" : "to move");
+            board.setActionText(source.isGameOver() ? text(R.string.player_wins) : text(R.string.player_to_move));
             board.invalidate();
         });
     }
@@ -191,14 +193,14 @@ public final class LegacyActivity extends Activity {
         layout.addView(board, new LinearLayout.LayoutParams(-1, 0, 1));
         LinearLayout controls = new LinearLayout(this);
         controls.setGravity(Gravity.CENTER);
-        addButton(controls, "Exit", this::menu);
+        addButton(controls, text(R.string.exit), this::menu);
         if (replayFile == null) {
-            addButton(controls, "Restart", this::startMatch);
-            addButton(controls, "Undo", () -> GameAction.undo(GameAction.LOCAL_GAME, game));
+            addButton(controls, text(R.string.restart), this::startMatch);
+            addButton(controls, text(R.string.undo), () -> GameAction.undo(GameAction.LOCAL_GAME, game));
         } else {
             board.setEnabled(false);
-            addButton(controls, "Replay", () -> openReplay(replayFile));
-            addButton(controls, "Share", this::share);
+            addButton(controls, text(R.string.replay), () -> openReplay(replayFile));
+            addButton(controls, text(R.string.share), this::share);
         }
         layout.addView(controls);
         setContentView(layout);
@@ -218,10 +220,10 @@ public final class LegacyActivity extends Activity {
             Arrays.sort(history, Collections.reverseOrder());
             ui.post(() -> {
                 if (destroyed) return;
-                AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle("History");
-                if (history.length == 0) dialog.setMessage("Completed games appear here. You can also import a .rhex replay.");
+                AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle(text(R.string.history));
+                if (history.length == 0) dialog.setMessage(text(R.string.empty_history));
                 else dialog.setItems(history, (d, index) -> openReplay(history[index]));
-                dialog.setPositiveButton("Import replay", (d, index) -> pickReplay())
+                dialog.setPositiveButton(text(R.string.import_replay), (d, index) -> pickReplay())
                         .setNegativeButton(android.R.string.cancel, null).show();
             });
         });
@@ -232,7 +234,7 @@ public final class LegacyActivity extends Activity {
         try {
             startActivityForResult(intent, 1);
         } catch (ActivityNotFoundException e) {
-            toast("Install a file picker to open .rhex files.");
+            toast(text(R.string.install_picker));
         }
     }
 
@@ -247,7 +249,7 @@ public final class LegacyActivity extends Activity {
                 FileUtil.autoSaveGame(this, name, text);
                 ui.post(() -> { if (!destroyed) openReplay(name); });
             } catch (IOException | SecurityException invalid) {
-                toast("Could not open replay: " + invalid.getMessage());
+                toast(text(R.string.replay_open_failure, invalid.getMessage()));
             }
         });
     }
@@ -257,7 +259,7 @@ public final class LegacyActivity extends Activity {
             try {
                 FileUtil.autoSaveGame(this, name, replay);
             } catch (IOException error) {
-                toast("Could not save replay: " + error.getMessage());
+                toast(text(R.string.replay_save_failure, error.getMessage()));
             }
         });
     }
@@ -269,7 +271,7 @@ public final class LegacyActivity extends Activity {
                 Game loaded = Game.load(FileUtil.loadGameAsString(this, name));
                 ui.post(() -> { if (!destroyed) showReplay(name, loaded); });
             } catch (IOException | RuntimeException invalid) {
-                toast("Could not open replay: " + invalid.getMessage());
+                toast(text(R.string.replay_open_failure, invalid.getMessage()));
             }
         });
     }
@@ -308,7 +310,7 @@ public final class LegacyActivity extends Activity {
         Intent intent = new Intent(Intent.ACTION_SEND).setType("application/octet-stream")
                 .putExtra(Intent.EXTRA_STREAM, ReplayProvider.uri(replayFile))
                 .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        startActivity(Intent.createChooser(intent, "Share replay"));
+        startActivity(Intent.createChooser(intent, text(R.string.share_replay)));
     }
 
     private void toast(String message) {

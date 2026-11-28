@@ -9,22 +9,24 @@ import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.xlythe.hex.R;
+
 /** In-app sign-in and sign-up forms for the legacy account service. */
 public final class ServerAuthDialog {
     private ServerAuthDialog() {}
 
     public static void showSignIn(Context context, Listener listener) {
-        EditText username = field(context, "Username", InputType.TYPE_CLASS_TEXT);
+        EditText username = field(context, R.string.account_username, InputType.TYPE_CLASS_TEXT);
         EditText password = field(
                 context,
-                "Password",
+                R.string.account_password,
                 InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         LinearLayout content = content(context, username, password);
         AlertDialog dialog = new AlertDialog.Builder(context)
-                .setTitle("Sign in to Xlythe Hex")
+                .setTitle(R.string.account_sign_in_title)
                 .setView(content)
-                .setPositiveButton("Sign In", null)
-                .setNeutralButton("Create Account", null)
+                .setPositiveButton(R.string.account_sign_in, null)
+                .setNeutralButton(R.string.account_create, null)
                 .setNegativeButton(android.R.string.cancel, null)
                 .create();
         dialog.setOnShowListener(ignored -> {
@@ -45,21 +47,21 @@ public final class ServerAuthDialog {
     }
 
     public static void showSignUp(Context context, Listener listener) {
-        EditText username = field(context, "Username", InputType.TYPE_CLASS_TEXT);
+        EditText username = field(context, R.string.account_username, InputType.TYPE_CLASS_TEXT);
         EditText password = field(
                 context,
-                "Password",
+                R.string.account_password,
                 InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         EditText email = field(
                 context,
-                "Email (optional)",
+                R.string.account_email_optional,
                 InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
         LinearLayout content = content(context, username, password, email);
         AlertDialog dialog = new AlertDialog.Builder(context)
-                .setTitle("Create Xlythe Hex account")
+                .setTitle(R.string.account_create_title)
                 .setView(content)
-                .setPositiveButton("Create Account", null)
-                .setNeutralButton("Sign In", null)
+                .setPositiveButton(R.string.account_create, null)
+                .setNeutralButton(R.string.account_sign_in, null)
                 .setNegativeButton(android.R.string.cancel, null)
                 .create();
         dialog.setOnShowListener(ignored -> {
@@ -86,17 +88,17 @@ public final class ServerAuthDialog {
             EditText usernameField,
             EditText passwordField) {
         if (username.isEmpty()) {
-            usernameField.setError("Username is required");
+            usernameField.setError(usernameField.getContext().getString(R.string.account_username_required));
             return false;
         }
         if (password.isEmpty()) {
-            passwordField.setError("Password is required");
+            passwordField.setError(passwordField.getContext().getString(R.string.account_password_required));
             return false;
         }
         return true;
     }
 
-    private static EditText field(Context context, String hint, int inputType) {
+    private static EditText field(Context context, int hint, int inputType) {
         EditText field = new EditText(context);
         field.setHint(hint);
         field.setInputType(inputType);

@@ -12,14 +12,16 @@ android {
         testInstrumentationRunner 'com.xlythe.hex.legacy.LegacyDeviceTests'
         targetSdk 37
         // The modern APK has the higher version code when both are compatible.
-        versionCode 32
-        versionName '5.1.2'
+        versionCode 33
+        versionName '5.2.0'
         buildConfigField 'String', 'HEX_API_BASE_URL', '"' + (project.findProperty('hexApiBaseUrl') ?: 'https://hex-api.xlythe.com') + '"'
     }
     buildFeatures { buildConfig = true }
     sourceSets.main.java.srcDir '../shared/src/main/java'
     sourceSets.androidTest.assets.srcDir '../app/src/test/resources'
     // Eclair cannot read AAPT2's UTF-8 resource table. Its wheel reads the original PNG assets.
+    // Eclair reads the same default strings.xml directly from assets.
+    sourceSets.main.assets.srcDir 'src/main/res/values'
     sourceSets.main.assets.srcDir '../shared/src/main/res/drawable-hdpi'
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

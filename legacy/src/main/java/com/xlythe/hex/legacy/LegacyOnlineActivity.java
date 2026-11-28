@@ -1,6 +1,5 @@
 package com.xlythe.hex.legacy;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,6 +12,7 @@ import android.widget.Toast;
 import com.hex.core.GameAction;
 import com.hex.core.PlayerObject;
 import com.hex.core.Point;
+import com.xlythe.hex.R;
 import com.xlythe.hex.compat.Game;
 import com.xlythe.hex.server.IgGameCenterClient;
 import com.xlythe.hex.server.IgGameCenterModels.BoardRef;
@@ -30,7 +30,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /** Foreground matchmaking and chat using the same authenticated server as the modern clients. */
-public final class LegacyOnlineActivity extends Activity {
+public final class LegacyOnlineActivity extends LegacyTextActivity {
     private final Handler ui = new Handler();
     private final ExecutorService network = Executors.newSingleThreadExecutor();
     private final StringBuilder messages = new StringBuilder();
@@ -55,27 +55,27 @@ public final class LegacyOnlineActivity extends Activity {
         }
         client = LegacyServer.connect(id);
         screen();
-        status.setText("Xlythe account");
+        status.setText(text(R.string.account));
         EditText name = new EditText(this);
         name.setSingleLine(true);
-        name.setHint("Username");
+        name.setHint(text(R.string.username));
         layout.addView(name);
         EditText password = new EditText(this);
         password.setSingleLine(true);
         password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        password.setHint("Password");
+        password.setHint(text(R.string.password));
         layout.addView(password);
         LinearLayout actions = new LinearLayout(this);
         layout.addView(actions);
-        LegacyActivity.addButton(actions, "Sign in", () -> login(name, password, false));
-        LegacyActivity.addButton(actions, "Create account", () -> login(name, password, true));
+        LegacyActivity.addButton(actions, text(R.string.sign_in), () -> login(name, password, false));
+        LegacyActivity.addButton(actions, text(R.string.create_account), () -> login(name, password, true));
     }
 
     private void login(EditText name, EditText password, boolean register) {
         String username = name.getText().toString().trim();
         String secret = password.getText().toString();
         if (username.length() == 0 || secret.length() == 0) {
-            status.setText("Enter a username and password.");
+            status.setText(text(R.string.credentials_required));
             return;
         }
         request(() -> {
@@ -85,9 +85,9 @@ public final class LegacyOnlineActivity extends Activity {
                 user = account;
                 password.setText("");
                 screen();
-                status.setText("Signed in as " + user.name);
-                LegacyActivity.addButton(layout, "Find a game", () -> enter(false));
-                LegacyActivity.addButton(layout, "Create a game", () -> enter(true));
+                status.setText(text(R.string.signed_in_as, user.name));
+                LegacyActivity.addButton(layout, text(R.string.find_game), () -> enter(false));
+                LegacyActivity.addButton(layout, text(R.string.create_game), () -> enter(true));
             };
         });
     }
@@ -105,9 +105,9 @@ public final class LegacyOnlineActivity extends Activity {
                 layout.addView(board, new LinearLayout.LayoutParams(-1, 0, 1));
                 LinearLayout controls = new LinearLayout(this);
                 layout.addView(controls);
-                LegacyActivity.addButton(controls, "Exit", this::onBackPressed);
-                LegacyActivity.addButton(controls, "Swap", () -> sendMove("SWAP"));
-                LegacyActivity.addButton(controls, "Chat", this::chat);
+                LegacyActivity.addButton(controls, text(R.string.exit), this::onBackPressed);
+                LegacyActivity.addButton(controls, text(R.string.swap_action), () -> sendMove("SWAP"));
+                LegacyActivity.addButton(controls, text(R.string.chat), this::chat);
                 render(start);
             };
         });
@@ -128,7 +128,7 @@ public final class LegacyOnlineActivity extends Activity {
         String cells = response.board;
         int size = response.options == null ? 11 : response.options.boardSize;
         if (size < 3 || size > 19 || cells == null || cells.length() != size * size || !cells.matches("[012]+")) {
-            status.setText("The server returned an invalid board.");
+            status.setText(text(R.string.invalid_board));
             return;
         }
         position = response;
@@ -154,11 +154,11 @@ public final class LegacyOnlineActivity extends Activity {
         eventId = response.latestEventId(eventId);
         if ("FINISHED".equals(response.status)) {
             if (!GameAction.checkWinPlayer(1, game)) GameAction.checkWinPlayer(2, game);
-            status.setText("Game finished");
+            status.setText(text(R.string.game_finished));
         } else if ("ACTIVE".equals(response.status)) {
-            status.setText(response.localActive ? "Your turn" : "Opponent’s turn");
+            status.setText(response.localActive ? text(R.string.your_turn) : text(R.string.opponents_turn));
         } else {
-            status.setText("Waiting for an opponent");
+            status.setText(text(R.string.waiting));
         }
         board.invalidate();
     }
@@ -171,11 +171,11 @@ public final class LegacyOnlineActivity extends Activity {
 
     private void chat() {
         EditText field = new EditText(this);
-        field.setHint("Message");
-        new AlertDialog.Builder(this).setTitle("Game chat")
-                .setMessage(messages.length() == 0 ? "No messages yet." : messages.toString())
+        field.setHint(text(R.string.message));
+        new AlertDialog.Builder(this).setTitle(text(R.string.game_chat))
+                .setMessage(messages.length() == 0 ? text(R.string.no_messages) : messages.toString())
                 .setView(field).setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton("Send", (dialog, which) -> {
+                .setPositiveButton(text(R.string.send), (dialog, which) -> {
                     String text = field.getText().toString().trim();
                     if (text.length() > 0) request(() -> update(client.command(room, user, eventId, "MSG", "message", text)));
                 }).show();
@@ -186,7 +186,7 @@ public final class LegacyOnlineActivity extends Activity {
     private void request(Request action) {
         if (destroyed) return;
         if (busy) {
-            Toast.makeText(this, "Finishing the previous request. Please try again.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, text(R.string.request_busy), Toast.LENGTH_SHORT).show();
             return;
         }
         busy = true;
@@ -198,7 +198,7 @@ public final class LegacyOnlineActivity extends Activity {
             } catch (Exception error) {
                 String message = (error.getCause() instanceof SSLException || (error.getCause() != null
                         && String.valueOf(error.getCause().getMessage()).contains("SSL handshake")))
-                        ? "This device could not establish a trusted HTTPS connection to the game server."
+                        ? text(R.string.tls_error)
                         : error.getMessage();
                 result = () -> status.setText(message);
             }
@@ -226,9 +226,9 @@ public final class LegacyOnlineActivity extends Activity {
             super.onBackPressed();
             return;
         }
-        new AlertDialog.Builder(this).setMessage("Leave this game?")
+        new AlertDialog.Builder(this).setMessage(text(R.string.leave_game))
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton("Leave", (dialog, which) -> {
+                .setPositiveButton(text(R.string.leave), (dialog, which) -> {
                     network.execute(() -> {
                         try { client.command(room, user, eventId, "LEAVE"); }
                         catch (Exception ignored) { /* The room also expires when disconnected. */ }

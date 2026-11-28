@@ -104,4 +104,9 @@
     <string name="online_unavailable">Could not join the online game</string>
     <string name="no_saved_replays">No saved replays</string>
     <string name="empty_replay_hint">Save a finished game or import a .rhex file to watch it here.</string>
+    <string name="play_achievements">Achievements</string>
+    <string name="play_view">View on Google Play Games</string>
+    <string name="play_sync">Sync with Xlythe</string>
+    <string name="play_link_accounts">Link Play Games player %1$s with Xlythe account %2$s and sync achievement progress?</string>
+    <string name="play_synced">Achievements synced</string>
 </resources>

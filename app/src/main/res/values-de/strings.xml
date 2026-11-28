@@ -91,4 +91,9 @@
     <string name="online_unavailable">Beitritt zum Online-Spiel fehlgeschlagen</string>
     <string name="no_saved_replays">Keine gespeicherten Wiederholungen</string>
     <string name="empty_replay_hint">Speichere eine beendete Partie oder importiere eine .rhex-Datei, um sie hier anzusehen.</string>
+    <string name="play_achievements">Erfolge</string>
+    <string name="play_view">In Google Play Spiele ansehen</string>
+    <string name="play_sync">Mit Xlythe synchronisieren</string>
+    <string name="play_link_accounts">Play-Spiele-Profil %1$s mit Xlythe-Konto %2$s verknüpfen und Erfolge synchronisieren?</string>
+    <string name="play_synced">Erfolge synchronisiert</string>
 </resources>

@@ -8,6 +8,7 @@ import android.text.InputType;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hex.core.GameAction;
 import com.hex.core.PlayerObject;
@@ -183,7 +184,11 @@ public final class LegacyOnlineActivity extends Activity {
     private interface Request { Runnable run() throws Exception; }
 
     private void request(Request action) {
-        if (busy || destroyed) return;
+        if (destroyed) return;
+        if (busy) {
+            Toast.makeText(this, "Finishing the previous request. Please try again.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         busy = true;
         ui.removeCallbacks(poll);
         network.execute(() -> {

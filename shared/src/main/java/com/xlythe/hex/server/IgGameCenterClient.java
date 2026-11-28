@@ -65,6 +65,22 @@ public final class IgGameCenterClient {
         return IgGameCenterXml.parseLogin(transport.post("/api_login.php", parameters));
     }
 
+    public String playGamesClientId() throws ApiException {
+        String id = IgGameCenterXml.firstText(IgGameCenterXml.parse(
+                transport.post("/api_play_config.php", common())), "client_id");
+        if (id == null || !id.endsWith(".apps.googleusercontent.com")) {
+            throw new ApiException("Google Play Games sync is unavailable on this server.");
+        }
+        return id;
+    }
+
+    public void syncPlayGames(UserSession user, String code) throws ApiException {
+        LinkedHashMap<String, String> parameters = authenticated(user);
+        parameters.put("code", code);
+        if (!"synced".equals(IgGameCenterXml.parse(transport.post("/api_play_sync.php", parameters))
+                .getDocumentElement().getNodeName())) throw new ApiException("Sync was not confirmed.");
+    }
+
     public BoardRef createBoard(UserSession user, String place) throws ApiException {
         LinkedHashMap<String, String> parameters = authenticated(user);
         parameters.put("gid", IgGameCenterProtocol.HEX_GAME_ID);

@@ -216,7 +216,7 @@ public final class IgGameCenterXml {
         return value;
     }
 
-    private static String firstText(Document document, String name) {
+    static String firstText(Document document, String name) {
         NodeList nodes = document.getElementsByTagName(name);
         if (nodes.getLength() == 0) return null;
         String value = elementText(nodes.item(0));

@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 
+import com.google.android.gms.games.PlayGames;
 import com.hex.core.PlayerObject;
 import com.hex.core.PlayingEntity;
 import com.hex.core.Timer;
@@ -38,6 +39,7 @@ import com.xlythe.hex.server.ServerNetworkPlayer;
 
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
@@ -176,6 +178,32 @@ public abstract class NetActivity extends BaseGameActivity {
             signIn();
             return;
         }
+        new AlertDialog.Builder(this).setTitle(R.string.play_achievements)
+                .setItems(new String[]{getString(R.string.play_view), getString(R.string.play_sync)},
+                        (dialog, which) -> {
+                            if (which == 0) showGoogleAchievements();
+                            else authenticate(user -> runBusy(getString(R.string.play_sync), () -> {
+                                String clientId = serverClient.playGamesClientId();
+                                mainHandler.post(() -> confirmPlaySync(user, clientId));
+                            }));
+                        }).show();
+    }
+
+    private void confirmPlaySync(UserSession user, String clientId) {
+        if (destroyed || isFinishing()) return;
+        new AlertDialog.Builder(this).setTitle(R.string.play_sync)
+                .setMessage(getString(R.string.play_link_accounts, getPlayGamesPlayerName(), user.name))
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(R.string.play_sync, (dialog, which) ->
+                        PlayGames.getGamesSignInClient(this).requestServerSideAccess(clientId, false, Collections.emptyList())
+                                .addOnSuccessListener(this, result -> runBusy(getString(R.string.play_sync), () -> {
+                                    serverClient.syncPlayGames(user, result.getAuthCode());
+                                    mainHandler.post(() -> toast(getString(R.string.play_synced)));
+                                }))
+                                .addOnFailureListener(this, error -> toast(safeMessage(error)))).show();
+    }
+
+    private void showGoogleAchievements() {
         if (getAchievementsClient() != null) {
             getAchievementsClient().getAchievementsIntent().addOnSuccessListener(intent -> {
                 startActivity(intent);
